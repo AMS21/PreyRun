@@ -11,6 +11,7 @@
 //HUMANHEAD END
 
 // PreyRun BEGIN
+#include "../PreyRun/interprocess.hpp"
 pr::InitPreySplitPipe();
 // PreyRun END
 

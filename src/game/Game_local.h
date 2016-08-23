@@ -87,10 +87,6 @@ class idLocationEntity;
 
 //============================================================================
 
-// PreyRun BEGIN
-#include "../PreyRun/interprocess.hpp"
-// PreyRun END
-
 #include "gamesys/Event.h"
 #include "gamesys/Class.h"
 #include "gamesys/SysCvar.h"
