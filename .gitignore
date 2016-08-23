@@ -1,0 +1,32 @@
+*.db
+*.def
+*.dll
+*.filters
+*.filters
+*.ipch
+*.lib
+*.log
+*.map
+*.obj
+*.opendb
+*.tlog
+*.user
+*.vcproj
+*.vcxproj
+Added.txt
+code pieces.txt
+EULA.Development Kit.rtf
+examples/
+Info.txt
+ReadMe.rtf
+src/.vs/
+src/Backup/
+src/DebugDLL/
+src/game/DebugDLL/
+src/game/ReleaseDLL/
+src/idLib/DebugDLL/
+src/idLib/ReleaseDLL/
+src/ipch/
+src/ReleaseDLL/
+src/UpgradeLog.htm
+ToDo.txt
