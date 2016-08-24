@@ -1,6 +1,5 @@
 #pragma once
-//#include "../game/game_local.h"
-#include <Windows.h>
+#include "../game/game_local.h"
 
 // Realy hacking way to use stdlib functions
 #undef strcmp
@@ -52,9 +51,11 @@ namespace pr
 	void ShutdownPreySplitPipe();
 
 	void WriteGameEnd(const Time& time);
-	void WriteMapChange(const Time& time, const std::string& map);
+	void WriteMapChange(const Time& time, idStr& map);
 	void WriteTimerReset(const Time& time);
 	void WriteTimerStart(const Time& time);
+
+	Time GetTime();
 }
 
 #define strcmp			idStr::Cmp		// use_idStr_Cmp

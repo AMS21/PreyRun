@@ -204,6 +204,8 @@ void hhSphereBoss::Killed( idEntity *inflictor, idEntity *attacker, int damage, 
 		pr_Timer.Stop();
 		pr_timer_running = false;
 		gameLocal.Printf("PreyRun: AutoSplitter: End game\n");
+
+		pr::WriteGameEnd(pr::GetTime());
 	}
 	//PreyRun END
 

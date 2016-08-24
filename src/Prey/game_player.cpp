@@ -1061,8 +1061,12 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 	// Might not be the optimal solution because when the game decides to not draw the hud the timer cant resume but it gives better times then hooking IniFromMap()
 	if (pr_timer_running && !pr_Timer.IsRunning() && pr_autosplit.GetBool())
 	{
-		gameLocal.Printf("PreyRun: AutoSplitter: Resuming");
+		gameLocal.Printf("PreyRun: AutoSplitter: Resuming\n");
 		pr_Timer.Start();
+
+		pr::WriteMapChange(pr::GetTime(), (idStr)gameLocal.GetMapName());
+
+		gameLocal.Printf("PreyRun: Changing map to: %s\n", gameLocal.GetMapName());
 	}
 	// PreyRun END
 
@@ -1194,7 +1198,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		idStr roll;
 
 		idAngles angles;
-		
+
 		// ViewAngles show 0,0,0 when in vehicle
 		/*if (InVehicle())
 		{
@@ -1202,11 +1206,11 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		}
 		else
 		{*/
-			angles = GetViewAngles();
+		angles = GetViewAngles();
 
-			sprintf(pitch, "Pitch : %f", angles.pitch);
-			sprintf(yaw, "Yaw   : %f", angles.yaw);
-			sprintf(roll, "Roll  : %f", angles.roll);
+		sprintf(pitch, "Pitch : %f", angles.pitch);
+		sprintf(yaw, "Yaw   : %f", angles.yaw);
+		sprintf(roll, "Roll  : %f", angles.roll);
 		//}
 
 		renderSystem->DrawSmallStringExt(0, 0, pitch.c_str(), idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
@@ -1311,175 +1315,175 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		else
 		{
 
-		switch (currentWeapon)
-		{
-		case 2: // Rifle
-		{
-			int clip = weapon->AmmoInClip();
-			int avail = weapon->AmmoAvailable();
-			idVec4 color;
-			idStr strAmmo;
-
-			sprintf(strAmmo, "%02d | %02d", clip, avail);
-
-			// PR_FIXME
-			// very ugly there might be a better solution to this than if then else trees
-			if (clip > 0)
+			switch (currentWeapon)
 			{
-				color.Set(1, 1, 1, 1);
+			case 2: // Rifle
+			{
+				int clip = weapon->AmmoInClip();
+				int avail = weapon->AmmoAvailable();
+				idVec4 color;
+				idStr strAmmo;
+
+				sprintf(strAmmo, "%02d | %02d", clip, avail);
+
+				// PR_FIXME
+				// very ugly there might be a better solution to this than if then else trees
+				if (clip > 0)
+				{
+					color.Set(1, 1, 1, 1);
+				}
+				else
+				{
+					if (avail > 0)
+					{
+						color.Set(1, 1, 0.25, 1);
+					}
+					else
+					{
+						color.Set(1, 0, 0, 1);
+					}
+				}
+
+				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
+
+				break;
 			}
-			else
+			case 3: // Grendade
 			{
+				int avail = weapon->AmmoAvailable();
+				idVec4 color;
+				idStr strAmmo;
+
+				sprintf(strAmmo, "     %02d", avail);
+
+				// PR_FIXME
+				// very ugly there might be a better solution to this than if then else trees
 				if (avail > 0)
 				{
-					color.Set(1, 1, 0.25, 1);
+					color.Set(1, 1, 1, 1);
 				}
 				else
 				{
 					color.Set(1, 0, 0, 1);
 				}
+
+				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
+				break;
 			}
-
-			renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
-
-			break;
-		}
-		case 3: // Grendade
-		{
-			int avail = weapon->AmmoAvailable();
-			idVec4 color;
-			idStr strAmmo;
-
-			sprintf(strAmmo, "     %02d", avail);
-
-			// PR_FIXME
-			// very ugly there might be a better solution to this than if then else trees
-			if (avail > 0)
+			case 4: // Leecher
 			{
-				color.Set(1, 1, 1, 1);
-			}
-			else
-			{
-				color.Set(1, 0, 0, 1);
-			}
+				int avail = weapon->AmmoAvailable();
+				idVec4 color;
+				idStr strAmmo;
 
-			renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
-			break;
-		}
-		case 4: // Leecher
-		{
-			int avail = weapon->AmmoAvailable();
-			idVec4 color;
-			idStr strAmmo;
+				sprintf(strAmmo, "     %02d", avail);
 
-			sprintf(strAmmo, "     %02d", avail);
-
-			// PR_FIXME
-			// very ugly there might be a better solution to this than if then else trees
-			if (avail > 0)
-			{
-				color.Set(1, 1, 1, 1);
-			}
-			else
-			{
-				color.Set(1, 0, 0, 1);
-			}
-
-			renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
-			break;
-		}
-		case 5: // Minigun
-		{
-			int avail = weapon->AmmoAvailable();
-			int altAvail = weapon->AltAmmoAvailable();
-			idVec4 color;
-			idVec4 color2;
-			idStr strAmmo;
-			idStr strAmmo2;
-
-			sprintf(strAmmo, "  %03d", avail);
-			sprintf(strAmmo2, "  %02d", altAvail);
-
-			// PR_FIXME
-			// very ugly there might be a better solution to this than if then else trees
-			if (avail > 0)
-			{
-				color.Set(1, 1, 1, 1);
-			}
-			else
-			{
-				color.Set(1, 0, 0, 1);
-			}
-
-			if (altAvail > 0)
-			{
-				color2.Set(1, 1, 1, 1);
-			}
-			else
-			{
-				color2.Set(1, 0, 0, 1);
-			}
-
-
-			renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS2_Y, strAmmo2, color2, false, declManager->FindMaterial("textures/bigchars"));
-			break;
-		}
-		case 6: // Shotgun
-		{
-			int clip = weapon->AmmoInClip();
-			int avail = weapon->AmmoAvailable();
-			idVec4 color;
-			idStr strAmmo;
-
-			sprintf(strAmmo, "%02d | %02d", clip, avail);
-
-			// PR_FIXME
-			// very ugly there might be a better solution to this than if then else trees
-			if (clip > 0)
-			{
-				color.Set(1, 1, 1, 1);
-			}
-			else
-			{
+				// PR_FIXME
+				// very ugly there might be a better solution to this than if then else trees
 				if (avail > 0)
 				{
-					color.Set(1, 1, 0.25, 1);
+					color.Set(1, 1, 1, 1);
 				}
 				else
 				{
 					color.Set(1, 0, 0, 1);
 				}
+
+				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
+				break;
 			}
-
-			renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
-			break;
-		}
-		case 7: // RocketLauncher
-		{
-			int avail = weapon->AmmoAvailable();
-			idVec4 color;
-			idStr strAmmo;
-
-			sprintf(strAmmo, "     %02d", avail);
-
-			// PR_FIXME
-			// very ugly there might be a better solution to this than if then else trees
-			if (avail > 0)
+			case 5: // Minigun
 			{
-				color.Set(1, 1, 1, 1);
-			}
-			else
-			{
-				color.Set(1, 0, 0, 1);
-			}
+				int avail = weapon->AmmoAvailable();
+				int altAvail = weapon->AltAmmoAvailable();
+				idVec4 color;
+				idVec4 color2;
+				idStr strAmmo;
+				idStr strAmmo2;
 
-			renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
-			break;
-		}
-		default: // Wrench or no weapon
-			break;
-		}
+				sprintf(strAmmo, "  %03d", avail);
+				sprintf(strAmmo2, "  %02d", altAvail);
+
+				// PR_FIXME
+				// very ugly there might be a better solution to this than if then else trees
+				if (avail > 0)
+				{
+					color.Set(1, 1, 1, 1);
+				}
+				else
+				{
+					color.Set(1, 0, 0, 1);
+				}
+
+				if (altAvail > 0)
+				{
+					color2.Set(1, 1, 1, 1);
+				}
+				else
+				{
+					color2.Set(1, 0, 0, 1);
+				}
+
+
+				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS2_Y, strAmmo2, color2, false, declManager->FindMaterial("textures/bigchars"));
+				break;
+			}
+			case 6: // Shotgun
+			{
+				int clip = weapon->AmmoInClip();
+				int avail = weapon->AmmoAvailable();
+				idVec4 color;
+				idStr strAmmo;
+
+				sprintf(strAmmo, "%02d | %02d", clip, avail);
+
+				// PR_FIXME
+				// very ugly there might be a better solution to this than if then else trees
+				if (clip > 0)
+				{
+					color.Set(1, 1, 1, 1);
+				}
+				else
+				{
+					if (avail > 0)
+					{
+						color.Set(1, 1, 0.25, 1);
+					}
+					else
+					{
+						color.Set(1, 0, 0, 1);
+					}
+				}
+
+				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
+				break;
+			}
+			case 7: // RocketLauncher
+			{
+				int avail = weapon->AmmoAvailable();
+				idVec4 color;
+				idStr strAmmo;
+
+				sprintf(strAmmo, "     %02d", avail);
+
+				// PR_FIXME
+				// very ugly there might be a better solution to this than if then else trees
+				if (avail > 0)
+				{
+					color.Set(1, 1, 1, 1);
+				}
+				else
+				{
+					color.Set(1, 0, 0, 1);
+				}
+
+				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
+				break;
+			}
+			default: // Wrench or no weapon
+				break;
+			}
 		}
 	}
 

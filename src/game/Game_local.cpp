@@ -10,11 +10,6 @@
 #include "../framework/BuildVersion.h" // HUMANHEAD mdl
 //HUMANHEAD END
 
-// PreyRun BEGIN
-#include "../PreyRun/interprocess.hpp"
-pr::InitPreySplitPipe();
-// PreyRun END
-
 #ifdef GAME_DLL
 
 idSys *						sys = NULL;
@@ -378,6 +373,10 @@ void idGameLocal::Init( void ) {
 	Printf( "...%d aas types\n", aasList.Num() );
 	Printf( "game initialized.\n" );
 	Printf( "--------------------------------------\n" );
+
+	// PreyRun BEGIN
+	pr::InitPreySplitPipe();
+	// PreyRun END
 }
 
 /*
@@ -392,6 +391,10 @@ void idGameLocal::Shutdown( void ) {
 	if ( !common ) {
 		return;
 	}
+
+	// PreyRun BEGIN
+	pr::ShutdownPreySplitPipe();
+	// PreyRun END
 
 	Printf( "------------ Game Shutdown -----------\n" );
 

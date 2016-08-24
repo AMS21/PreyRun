@@ -1743,6 +1743,8 @@ void idPhysics_Player::SetMovementType( const pmtype_t type ) {
 		gameLocal.Printf("PreyRun: AutoSplitter: Auto starting now!\n");
 		pr_timer_running = true;
 		pr_Timer.Start();
+
+		pr::WriteTimerStart(pr::GetTime());
 	}
 	// PreyRun END
 

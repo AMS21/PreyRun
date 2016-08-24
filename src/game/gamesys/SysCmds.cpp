@@ -73,6 +73,8 @@ void Cmd_PR_timer_Start_f(const idCmdArgs &args)
 	pr_Timer.Start();
 	pr_timer_running = true;
 
+	pr::WriteTimerStart(pr::Time{pr::GetTime()});
+
 	gameLocal.Printf("Starting timer\n");
 }
 
@@ -80,6 +82,7 @@ void Cmd_PR_timer_Stop_f(const idCmdArgs &args)
 {
 	pr_Timer.Stop();
 	pr_timer_running = false;
+
 	gameLocal.Printf("Stopping timer\n");
 }
 
@@ -88,6 +91,9 @@ void Cmd_PR_Timer_Reset_f(const idCmdArgs &args)
 	pr_Timer.Stop();
 	pr_Timer.Clear();
 	pr_timer_running = false;
+
+	pr::WriteTimerReset(pr::GetTime());
+
 	gameLocal.Printf("Resetting timer\n");
 }
 
