@@ -91,6 +91,9 @@ void hhGameLocal::MapShutdown( void ) {
 	{
 		gameLocal.Printf("PreyRun: Autosplitter: Paused Map Shutdown\n");
 		pr_Timer.Stop();
+
+		pr::WriteMapChange(pr::GetTime(), (idStr)gameLocal.GetMapName());
+		gameLocal.Printf("PreyRun: leaving map: %s\n", gameLocal.GetMapName());
 	}
 	// PreyRun END
 

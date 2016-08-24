@@ -1064,7 +1064,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		gameLocal.Printf("PreyRun: AutoSplitter: Resuming\n");
 		pr_Timer.Start();
 
-		pr::WriteMapChange(pr::GetTime(), (idStr)gameLocal.GetMapName());
+		//pr::WriteMapChange(pr::GetTime(), (idStr)gameLocal.GetMapName());
 
 		gameLocal.Printf("PreyRun: Changing map to: %s\n", gameLocal.GetMapName());
 	}
