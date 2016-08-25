@@ -21,8 +21,8 @@ All game cvars should be defined here.
 
 // PreyRun BEGIN
 idCVar pr_autojump("PR_AutoJump", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "automaticly jumps when holding spacebar");
-idCVar pr_autopause("PR_AutoPause", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly pauses after map load");
-idCVar pr_autosplit("PR_AutoSplit", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly splits at map reload and pauses the Timer when not ingame");
+idCVar pr_autopause("PR_AutoPause", "0", CVAR_GAME | CVAR_BOOL, "Automaticly pauses after map load");
+idCVar pr_preysplit("PR_PreySplit", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Enables support for interaction with PreySplit a LiveSplit component");
 
 // HUD BEGIN
 
@@ -36,35 +36,36 @@ idCVar pr_hud_speedometer_x("PR_hud_Speedometer_x", "310", CVAR_GAME | CVAR_INTE
 idCVar pr_hud_speedometer_y("PR_hud_Speedometer_y", "460", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "posiont of the speedometer y coordinate 0-479",0,479);
 
 // Viewangles
-idCVar pr_hud_viewangles("PR_hud_ViewAngles", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Shows viewangles");
+idCVar pr_hud_viewangles("PR_hud_ViewAngles", "0", CVAR_GAME | CVAR_BOOL , "Shows viewangles");
 
 // Velocity
-idCVar pr_hud_velocity("PR_hud_Velocity", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Shows information about the users Velocity");
+idCVar pr_hud_velocity("PR_hud_Velocity", "0", CVAR_GAME | CVAR_BOOL, "Shows information about the users Velocity");
 
 // Timer
-idTimer pr_Timer;
+idTimer pr_Timer; // The actual timer
 bool pr_timer_running = false;
+
+idCVar pr_autostart("PR_Timer_AutoStart", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly start the hud timer at run begin");
+idCVar pr_autostop("PR_Timer_AutoStop", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly stop the hud timer when the sphere boss dies");
+
 idCVar pr_hud_timer("PR_hud_Timer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Shows the timer");
 idCVar pr_hud_timer_x("PR_hud_Timer_x", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position 0-639",0,639);
 idCVar pr_hud_timer_y("PR_hud_Timer_y", "235", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position 0-479",0,479);
 idCVar pr_hud_timer_r("PR_hud_Timer_r", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer color 0-255",0,255);
 idCVar pr_hud_timer_g("PR_hud_Timer_g", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer color 0-255",0,255);
-idCVar pr_hud_timer_b("PR_hud_Timer_b", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer color 0-255",0,255);
+idCVar pr_hud_timer_b("PR_hud_Timer_b", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer color 0-255",0,255);
 
-// Position
-idCVar pr_hud_position("PR_hud_Position", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Shows the current position");
+// Location
+idCVar pr_hud_location("PR_hud_Location", "0", CVAR_GAME | CVAR_BOOL, "Shows the current position");
 
 // Entity Info
-idCVar pr_hud_entityinfo("PR_hud_EntityInfo", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Shows info about the entity aimed at");
+idCVar pr_hud_entityinfo("PR_hud_EntityInfo", "0", CVAR_GAME | CVAR_BOOL, "Shows info about the entity aimed at");
 
 // Ammo
 idCVar pr_hud_ammo("PR_hud_Ammo", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Shows ammo in numbers");
 
 // Health
 idCVar pr_hud_health("PR_hud_Health", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Shows health in numbers");
-
-// PreySplit - LiveSplit
-
 
 // HUD END
 // PreyRun END

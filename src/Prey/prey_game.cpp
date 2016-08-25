@@ -87,13 +87,17 @@ void hhGameLocal::UnregisterEntity( idEntity *ent ) {
 //---------------------------------------------------
 void hhGameLocal::MapShutdown( void ) {
 	// PreyRun BEGIN
-	if (pr_autosplit.GetBool() && pr_timer_running)
+	if (pr_timer_running)
 	{
-		gameLocal.Printf("PreyRun: Autosplitter: Paused Map Shutdown\n");
+		gameLocal.Printf("PreyRun: Timer: Paused, Map Shutdown\n");
 		pr_Timer.Stop();
+#ifdef PR_DEBUG
+		auto time = PR_ms2time(pr_Timer.Milliseconds());
+		gameLocal.Printf("PreyRunDGB: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+#endif // PR_DEBUG
 
-		pr::WriteMapChange(pr::GetTime(), (idStr)gameLocal.GetMapName());
-		gameLocal.Printf("PreyRun: leaving map: %s\n", gameLocal.GetMapName());
+		// now done in idGameLocal::InitFromNewMap
+		/*pr::WriteMapChange(pr::GetTime(),(idStr) GetMapName());*/
 	}
 	// PreyRun END
 
@@ -119,6 +123,16 @@ void hhGameLocal::MapShutdown( void ) {
 //---------------------------------------------------
 void hhGameLocal::InitFromNewMap( const char *mapName, idRenderWorld *renderWorld, idSoundWorld *soundWorld, bool isServer, bool isClient, int randseed ) {
 	
+	// PreyRun BEGIN
+	if (pr_timer_running)
+	{
+		/*pr::WriteMapChange(pr::GetTime(), (idStr)mapName);*/
+#ifdef PR_DEBUG
+		gameLocal.Printf("PreyRun Debug: Starting Map: %s\n", mapName);
+#endif // PR_DEBUG
+	}
+	// PreyRun END
+
 	//HUMANHEAD rww - throw up the prey logo if using the logitech lcd screen
 	if (logitechLCDEnabled) {
 		sys->LGLCD_UploadImage(NULL, -1, -1, false, true);
@@ -141,12 +155,6 @@ void hhGameLocal::InitFromNewMap( const char *mapName, idRenderWorld *renderWorl
 		bIsLOTA = true;
 	}
 
-	// PreyRun BEGIN
-	/*if (pr_autosplit.GetBool() && pr_timer_running)
-	{
-		gameLocal.Printf("PreyRun: Autosplitter: Resume map init\n");
-		pr_Timer.Start();
-	}*/
 	if (pr_autopause.GetBool())
 	{
 		gameLocal.Printf("PreyRun: Autopause: paused map load\n");

@@ -1,6 +1,8 @@
 #include "../idLib/precompiled.h"
 #pragma hdrstop
 
+// Credits to Ivan Molodetskikh (Yalter) and Chong Jiang Wei (Matherunner) for their interprocess.cpp from BunnymodXT (https://github.com/YaLTeR/BunnymodXT/blob/master/BunnymodXT/Windows/interprocess.cpp)
+
 #include "interprocess.hpp"
 
 namespace pr
@@ -12,37 +14,50 @@ namespace pr
 
 	void InitPreySplitPipe()
 	{
-		pipe_preysplit = CreateNamedPipe(
-			"\\\\.\\pipe\\" PREYSPLIT_PIPE_NAME,
-			PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
-			PIPE_TYPE_MESSAGE | PIPE_REJECT_REMOTE_CLIENTS,
-			1,
-			256 * 1000,
-			0,
-			0,
-			NULL);
-		if (pipe_preysplit == INVALID_HANDLE_VALUE) {
-			gameLocal.Printf("Error opening the PreySplit pipe: %d\n", GetLastError());
-			gameLocal.Printf("PreySplit integration is not available.\n");
-			return;
-		}
-		gameLocal.Printf("Opened the PreySplit pipe.\n");
+		if (pr_preysplit.GetBool())
+		{
+			pipe_preysplit = CreateNamedPipe(
+				"\\\\.\\pipe\\" PREYSPLIT_PIPE_NAME,
+				PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
+				PIPE_TYPE_MESSAGE | PIPE_REJECT_REMOTE_CLIENTS,
+				1,
+				256 * 1000,
+				0,
+				0,
+				NULL);
+			if (pipe_preysplit == INVALID_HANDLE_VALUE) {
+#ifdef PR_DEBUG
+				gameLocal.Printf("Error opening the PreySplit pipe: %d\n", GetLastError());
+#endif // PR_DEBUG
+				gameLocal.Printf("PreyRun: PreySplit integration is not available.\n");
+				return;
+			}
+			gameLocal.Printf("PreyRun: Opened the PreySplit pipe.\n");
 
-		std::memset(&overlapped, 0, sizeof(overlapped));
-		overlapped.hEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
-		if (overlapped.hEvent == NULL) {
-			gameLocal.Printf("Error creating an event for overlapped: %d. Closing the PreySplit pipe.\n", GetLastError());
-			gameLocal.Printf("PreySplit integration is not available.\n");
-			CloseHandle(pipe_preysplit);
-			pipe_preysplit = INVALID_HANDLE_VALUE;
+			std::memset(&overlapped, 0, sizeof(overlapped));
+			overlapped.hEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
+			if (overlapped.hEvent == NULL) {
+#ifdef PR_DEBUG
+				gameLocal.Printf("Error creating an event for overlapped: %d. Closing the PreySplit pipe.\n", GetLastError());
+#endif // PR_DEBUG
+				gameLocal.Printf("PreyRun: PreySplit integration is not available.\n");
+				CloseHandle(pipe_preysplit);
+				pipe_preysplit = INVALID_HANDLE_VALUE;
+			}
 		}
+#ifdef PR_DEBUG
+		else
+		{
+			gameLocal.Printf("Skipping PreySplit initialization\n");
+		}
+#endif // PR_DEBUG
 	}
 
 	void ShutdownPreySplitPipe()
 	{
 		if (pipe_preysplit != INVALID_HANDLE_VALUE) {
 			CloseHandle(pipe_preysplit);
-			//gameLocal.Printf("Closed the PreySplit pipe.\n");
+			gameLocal.Printf("PreyRun: Closed the PreySplit pipe.\n");
 		}
 		pipe_preysplit = INVALID_HANDLE_VALUE;
 
@@ -58,7 +73,9 @@ namespace pr
 		if (writing_to_pipe) {
 			if (WaitForSingleObject(overlapped.hEvent, INFINITE) != WAIT_OBJECT_0) {
 				// Some weird error?
+#ifdef PR_DEBUG
 				gameLocal.Printf("WaitForSingleObject failed with %d.\n", GetLastError());
+#endif // PR_DEBUG
 				DisconnectNamedPipe(pipe_preysplit);
 				return WritePreySplit(data);
 			}
@@ -79,7 +96,9 @@ namespace pr
 			else if (err != ERROR_PIPE_CONNECTED) {
 				// Some weird error with pipe?
 				// Try remaking it.
+#ifdef PR_DEBUG
 				gameLocal.Printf("ConnectNamedPipe failed with %d.\n", err);
+#endif // PR_DEBUG
 				ShutdownPreySplitPipe();
 				InitPreySplitPipe();
 				return WritePreySplit(data);
@@ -94,7 +113,9 @@ namespace pr
 				return;
 			}
 			else {
-				//gameLocal.Printf("WriteFile failed with %d.\n", err);
+#ifdef PR_DEBUG
+				gameLocal.Printf("WriteFile failed with %d.\n", err);
+#endif // PR_DEBUG
 				DisconnectNamedPipe(pipe_preysplit);
 				return;
 			}
@@ -118,14 +139,22 @@ namespace pr
 		buf[2] = static_cast<char>(EventType::GAMEEND);
 		AddTimeToBuffer(buf.data() + 3, time);
 
+#ifdef PR_DEBUG
+		gameLocal.Printf("PreyRunDBG: WriteGameEnd: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+#endif // PR_DEBUG
+
+
 		WritePreySplit(buf);
 	}
 
 	void WriteMapChange(const Time& time, idStr& map)
 	{
-		// normal map path: maps/game/roadhouse.map
-		// get turned into: roadhouse.map
+		// normal map path   : maps/game/roadhouse.map
+		// gets turneded into: roadhouse.map
 		map.Replace("maps/game/", "");
+#ifdef PR_DEBUG
+		gameLocal.Printf("PreyRunDBG: WriteMapChange: Map exited: %s\nPreyRunDGB: WriteMapChange: Time %02d:%02d:%02d.%03d\n", map.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
+#endif // PR_DEBUG
 
 		int32_t size = static_cast<int32_t>(map.Size());
 
@@ -148,6 +177,9 @@ namespace pr
 		buf[1] = static_cast<char>(MessageType::EVENT);
 		buf[2] = static_cast<char>(EventType::TIMER_RESET);
 		AddTimeToBuffer(buf.data() + 3, time);
+#ifdef PR_DEBUG
+		gameLocal.Printf("PreyRunDBG: WriteTimerReset: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+#endif // PR_DEBUG
 
 		WritePreySplit(buf);
 	}
@@ -160,31 +192,28 @@ namespace pr
 		buf[2] = static_cast<char>(EventType::TIMER_START);
 		AddTimeToBuffer(buf.data() + 3, time);
 
+#ifdef PR_DEBUG
+		gameLocal.Printf("PreyRunDBG: WriteTimerStart: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+#endif // PR_DEBUG
+
 		WritePreySplit(buf);
 	}
 
 	Time GetTime()
 	{
-		bool isrun = pr_Timer.IsRunning();
-		if (isrun)
+		PR_time_t times;
+
+		if (pr_Timer.IsRunning())
 		{
 			pr_Timer.Stop();
-		}
-
-		auto ms = pr_Timer.Milliseconds();
-
-		if (isrun)
-		{
+			times = PR_ms2time(pr_Timer.Milliseconds());
 			pr_Timer.Start();
 		}
-		auto hour = ms / (60 * 60 * 1000);
-		ms = ms - hour*(60 * 60 * 1000);
-		auto minute = ms / (60 * 1000);
-		ms = ms - minute*(60 * 1000);
-		auto seconds = ms / 1000;
-		ms = ms - seconds * 1000;
+		else
+		{
+			times = PR_ms2time(pr_Timer.Milliseconds());
+		}
 
-		// cast our doubles to the uints we need
-		return Time{ static_cast<uint32_t>(hour),static_cast<uint8_t>(minute),static_cast<uint8_t>(seconds),static_cast<uint16_t>(ms) };
+		return Time{ times.hours, times.minutes, times.seconds, times.milliseconds };
 	}
 }

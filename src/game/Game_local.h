@@ -21,7 +21,7 @@
 
 // if set to 1 the server sends the client PVS with snapshots and the client compares against what it sees
 #ifndef ASYNC_WRITE_PVS
-	#define ASYNC_WRITE_PVS 0
+#define ASYNC_WRITE_PVS 0
 #endif
 
 #ifdef ID_DEBUG_UNINITIALIZED_MEMORY
@@ -89,6 +89,17 @@ class idLocationEntity;
 
 // PreyRun BEGIN
 #include "../PreyRun/interprocess.hpp"
+#include <cstdint>
+
+struct PR_time_t
+{
+	uint32_t hours;
+	uint8_t minutes;
+	uint8_t seconds;
+	uint16_t milliseconds;
+};
+
+PR_time_t PR_ms2time(unsigned);
 // PreyRun END
 
 #include "gamesys/Event.h"
@@ -123,10 +134,10 @@ class idLocationEntity;
 
 //============================================================================
 
-const int MAX_GAME_MESSAGE_SIZE		= 8192;
-const int MAX_ENTITY_STATE_SIZE		= 512;
-const int ENTITY_PVS_SIZE			= ((MAX_GENTITIES+31)>>5);
-const int NUM_RENDER_PORTAL_BITS	= idMath::BitsForInteger( PS_BLOCK_ALL );
+const int MAX_GAME_MESSAGE_SIZE = 8192;
+const int MAX_ENTITY_STATE_SIZE = 512;
+const int ENTITY_PVS_SIZE = ((MAX_GENTITIES + 31) >> 5);
+const int NUM_RENDER_PORTAL_BITS = idMath::BitsForInteger(PS_BLOCK_ALL);
 
 typedef struct entityState_s {
 	int						entityNumber;
@@ -142,7 +153,7 @@ typedef struct snapshot_s {
 	struct snapshot_s *		next;
 } snapshot_t;
 
-const int MAX_EVENT_PARAM_SIZE		= 128;
+const int MAX_EVENT_PARAM_SIZE = 128;
 
 //HUMANHEAD rww - for assistance in cleaning up garbage events for ents that no longer exist on client
 //#define _HH_NET_EVENT_TYPE_VALIDATION
@@ -216,23 +227,23 @@ public:
 		OUTOFORDER_SORT
 	} outOfOrderBehaviour_t;
 
-							idEventQueue() : start( NULL ), end( NULL ) {}
+	idEventQueue() : start(NULL), end(NULL) {}
 
 	entityNetEvent_t *		Alloc();
-	void					Free( entityNetEvent_t *event );
+	void					Free(entityNetEvent_t *event);
 	void					Shutdown();
 
 	void					Init();
-	void					Enqueue( entityNetEvent_t* event, outOfOrderBehaviour_t oooBehaviour );
-	entityNetEvent_t *		Dequeue( void );
-	entityNetEvent_t *		RemoveLast( void );
+	void					Enqueue(entityNetEvent_t* event, outOfOrderBehaviour_t oooBehaviour);
+	entityNetEvent_t *		Dequeue(void);
+	entityNetEvent_t *		RemoveLast(void);
 
-	entityNetEvent_t *		Start( void ) { return start; }
+	entityNetEvent_t *		Start(void) { return start; }
 
 private:
 	entityNetEvent_t *					start;
 	entityNetEvent_t *					end;
-	idBlockAlloc<entityNetEvent_t,32>	eventAllocator;
+	idBlockAlloc<entityNetEvent_t, 32>	eventAllocator;
 };
 
 //============================================================================
@@ -240,40 +251,40 @@ private:
 template< class type >
 class idEntityPtr {
 public:
-							idEntityPtr();
+	idEntityPtr();
 
 	// save games
-	void					Save( idSaveGame *savefile ) const;					// archives object for save game file
-	void					Restore( idRestoreGame *savefile );					// unarchives object from save game file
+	void					Save(idSaveGame *savefile) const;					// archives object for save game file
+	void					Restore(idRestoreGame *savefile);					// unarchives object from save game file
 
 #ifndef HUMANHEAD //HUMANHEAD: aob - changed prototype.  new version in HH section
-	idEntityPtr<type> &		operator=( type *ent );
+	idEntityPtr<type> &		operator=(type *ent);
 #endif
 
 	// synchronize entity pointers over the network
-	int						GetSpawnId( void ) const { return spawnId; }
-	bool					SetSpawnId( int id );
-	bool					UpdateSpawnId( void );
+	int						GetSpawnId(void) const { return spawnId; }
+	bool					SetSpawnId(int id);
+	bool					UpdateSpawnId(void);
 
-	bool					IsValid( void ) const;
-	type *					GetEntity( void ) const;
-	int						GetEntityNum( void ) const;
+	bool					IsValid(void) const;
+	type *					GetEntity(void) const;
+	int						GetEntityNum(void) const;
 
 #ifdef HUMANHEAD //HUMANHEAD: aob
-							idEntityPtr( const type* ent ) { Assign( ent ); }
+	idEntityPtr(const type* ent) { Assign(ent); }
 
 	void					Clear();
-	idEntityPtr<type> &		Assign( const idEntity *ent );
-	idEntityPtr<type> &		Assign( const idEntityPtr<type> &ent );
-	idEntityPtr<type> &		operator=( const idEntity *ent );
-	idEntityPtr<type> &		operator=( const idEntityPtr<type> &ent );
+	idEntityPtr<type> &		Assign(const idEntity *ent);
+	idEntityPtr<type> &		Assign(const idEntityPtr<type> &ent);
+	idEntityPtr<type> &		operator=(const idEntity *ent);
+	idEntityPtr<type> &		operator=(const idEntityPtr<type> &ent);
 	type *					operator->() const { return GetEntity(); }
-	bool					IsEqualTo( const idEntity *ent ) const;
-	bool					IsEqualTo( const idEntityPtr<type> &ent ) const;
-	bool					operator==( const idEntity *ent ) const;
-	bool					operator==( const idEntityPtr<type> &ent ) const;
-	bool					operator!=( const idEntity *ent ) const;
-	bool					operator!=( const idEntityPtr<type> &ent ) const;
+	bool					IsEqualTo(const idEntity *ent) const;
+	bool					IsEqualTo(const idEntityPtr<type> &ent) const;
+	bool					operator==(const idEntity *ent) const;
+	bool					operator==(const idEntityPtr<type> &ent) const;
+	bool					operator!=(const idEntity *ent) const;
+	bool					operator!=(const idEntityPtr<type> &ent) const;
 #endif
 
 private:
@@ -286,13 +297,13 @@ ID_INLINE idEntityPtr<type>::idEntityPtr() {
 }
 
 template< class type >
-ID_INLINE void idEntityPtr<type>::Save( idSaveGame *savefile ) const {
-	savefile->WriteInt( spawnId );
+ID_INLINE void idEntityPtr<type>::Save(idSaveGame *savefile) const {
+	savefile->WriteInt(spawnId);
 }
 
 template< class type >
-ID_INLINE void idEntityPtr<type>::Restore( idRestoreGame *savefile ) {
-	savefile->ReadInt( spawnId );
+ID_INLINE void idEntityPtr<type>::Restore(idRestoreGame *savefile) {
+	savefile->ReadInt(spawnId);
 }
 
 //HUMANHEAD: aob - moved operator= code to this helper function
@@ -303,67 +314,69 @@ ID_INLINE void idEntityPtr<type>::Clear() {
 }
 
 template< class type >
-ID_INLINE bool idEntityPtr<type>::IsEqualTo( const idEntity *ent ) const {
+ID_INLINE bool idEntityPtr<type>::IsEqualTo(const idEntity *ent) const {
 	return GetEntity() == ent;
 }
 
 template< class type >
-ID_INLINE bool idEntityPtr<type>::IsEqualTo( const idEntityPtr<type> &ent ) const {
-	return IsEqualTo( ent.GetEntity() );
+ID_INLINE bool idEntityPtr<type>::IsEqualTo(const idEntityPtr<type> &ent) const {
+	return IsEqualTo(ent.GetEntity());
 }
 
 template< class type >
-ID_INLINE bool idEntityPtr<type>::operator==( const idEntity *ent ) const {
-	return IsEqualTo( ent );
+ID_INLINE bool idEntityPtr<type>::operator==(const idEntity *ent) const {
+	return IsEqualTo(ent);
 }
 
 template< class type >
-ID_INLINE bool idEntityPtr<type>::operator==( const idEntityPtr<type> &ent ) const {
-	return IsEqualTo( ent );
+ID_INLINE bool idEntityPtr<type>::operator==(const idEntityPtr<type> &ent) const {
+	return IsEqualTo(ent);
 }
 
 template< class type >
-ID_INLINE bool idEntityPtr<type>::operator!=( const idEntity *ent ) const {
-	return !IsEqualTo( ent );
+ID_INLINE bool idEntityPtr<type>::operator!=(const idEntity *ent) const {
+	return !IsEqualTo(ent);
 }
 
 template< class type >
-ID_INLINE bool idEntityPtr<type>::operator!=( const idEntityPtr<type> &ent ) const {
-	return !IsEqualTo( ent );
+ID_INLINE bool idEntityPtr<type>::operator!=(const idEntityPtr<type> &ent) const {
+	return !IsEqualTo(ent);
 }
 
 template< class type >
-ID_INLINE idEntityPtr<type> &idEntityPtr<type>::Assign( const idEntityPtr<type> &ent ) {
-	return Assign( ent.GetEntity() );
+ID_INLINE idEntityPtr<type> &idEntityPtr<type>::Assign(const idEntityPtr<type> &ent) {
+	return Assign(ent.GetEntity());
 }
 
 template< class type >
-ID_INLINE idEntityPtr<type> &idEntityPtr<type>::Assign( const idEntity *ent ) {
-	if ( ent == NULL ) {
+ID_INLINE idEntityPtr<type> &idEntityPtr<type>::Assign(const idEntity *ent) {
+	if (ent == NULL) {
 		spawnId = 0;
-	} else {
+	}
+	else {
 		//HUMANHEAD rww - take cent bits into account
-		spawnId = ( gameLocal.spawnIds[ent->entityNumber] << GENTITYNUM_BITS_PLUSCENT ) | ent->entityNumber;
+		spawnId = (gameLocal.spawnIds[ent->entityNumber] << GENTITYNUM_BITS_PLUSCENT) | ent->entityNumber;
 	}
 	return *this;
 }
 
 template< class type >
-ID_INLINE idEntityPtr<type> &idEntityPtr<type>::operator=( const idEntityPtr<type> &ent ) {
-	return Assign( ent );
+ID_INLINE idEntityPtr<type> &idEntityPtr<type>::operator=(const idEntityPtr<type> &ent) {
+	return Assign(ent);
 }
 
 template< class type >
-ID_INLINE idEntityPtr<type> &idEntityPtr<type>::operator=( const idEntity *ent ) {
-	return Assign( ent );
+ID_INLINE idEntityPtr<type> &idEntityPtr<type>::operator=(const idEntity *ent) {
+	return Assign(ent);
 }
 #else
 template< class type >
-ID_INLINE idEntityPtr<type> &idEntityPtr<type>::operator=( type *ent ) {
-	if ( ent == NULL ) {
+ID_INLINE idEntityPtr<type> &idEntityPtr<type>::operator=(type *ent) {
+	if (ent == NULL) {
 		spawnId = 0;
-	} else {
-		spawnId = ( gameLocal.spawnIds[ent->entityNumber] << GENTITYNUM_BITS ) | ent->entityNumber;
+	}
+	else {
+		spawnId = (gameLocal.spawnIds[ent->entityNumber] << GENTITYNUM_BITS) | ent->entityNumber;
 	}
 	return *this;
 }
@@ -371,12 +384,12 @@ ID_INLINE idEntityPtr<type> &idEntityPtr<type>::operator=( type *ent ) {
 // HUMANHEAD END
 
 template< class type >
-ID_INLINE bool idEntityPtr<type>::SetSpawnId( int id ) {
-	if ( id == spawnId ) {
+ID_INLINE bool idEntityPtr<type>::SetSpawnId(int id) {
+	if (id == spawnId) {
 		return false;
 	}
 	//HUMANHEAD rww - take cent bits into account
-	if ( ( id >> GENTITYNUM_BITS_PLUSCENT ) == gameLocal.spawnIds[ id & ( ( 1 << GENTITYNUM_BITS_PLUSCENT ) - 1 ) ] ) {
+	if ((id >> GENTITYNUM_BITS_PLUSCENT) == gameLocal.spawnIds[id & ((1 << GENTITYNUM_BITS_PLUSCENT) - 1)]) {
 		spawnId = id;
 		return true;
 	}
@@ -384,25 +397,25 @@ ID_INLINE bool idEntityPtr<type>::SetSpawnId( int id ) {
 }
 
 template< class type >
-ID_INLINE bool idEntityPtr<type>::IsValid( void ) const {
+ID_INLINE bool idEntityPtr<type>::IsValid(void) const {
 	//HUMANHEAD rww - take cent bits into account
-	return ( gameLocal.spawnIds[ spawnId & ( ( 1 << GENTITYNUM_BITS_PLUSCENT ) - 1 ) ] == ( spawnId >> GENTITYNUM_BITS_PLUSCENT ) );
+	return (gameLocal.spawnIds[spawnId & ((1 << GENTITYNUM_BITS_PLUSCENT) - 1)] == (spawnId >> GENTITYNUM_BITS_PLUSCENT));
 }
 
 template< class type >
-ID_INLINE type *idEntityPtr<type>::GetEntity( void ) const {
+ID_INLINE type *idEntityPtr<type>::GetEntity(void) const {
 	//HUMANHEAD rww - take cent bits into account
-	int entityNum = spawnId & ( ( 1 << GENTITYNUM_BITS_PLUSCENT ) - 1 );
-	if ( ( gameLocal.spawnIds[ entityNum ] == ( spawnId >> GENTITYNUM_BITS_PLUSCENT ) ) ) {
-		return static_cast<type *>( gameLocal.entities[ entityNum ] );
+	int entityNum = spawnId & ((1 << GENTITYNUM_BITS_PLUSCENT) - 1);
+	if ((gameLocal.spawnIds[entityNum] == (spawnId >> GENTITYNUM_BITS_PLUSCENT))) {
+		return static_cast<type *>(gameLocal.entities[entityNum]);
 	}
 	return NULL;
 }
 
 template< class type >
-ID_INLINE int idEntityPtr<type>::GetEntityNum( void ) const {
+ID_INLINE int idEntityPtr<type>::GetEntityNum(void) const {
 	//HUMANHEAD rww - take cent bits into account
-	return ( spawnId & ( ( 1 << GENTITYNUM_BITS_PLUSCENT ) - 1 ) );
+	return (spawnId & ((1 << GENTITYNUM_BITS_PLUSCENT) - 1));
 }
 
 //============================================================================
@@ -419,8 +432,8 @@ public:
 	idEntity *				entities[MAX_GENTITIES];// index to entities
 	int						spawnIds[MAX_GENTITIES];// for use in idEntityPtr
 	*/
-	idEntity *				entities[MAX_GENTITIES+MAX_CENTITIES];// index to entities
-	int						spawnIds[MAX_GENTITIES+MAX_CENTITIES];// for use in idEntityPtr
+	idEntity *				entities[MAX_GENTITIES + MAX_CENTITIES];// index to entities
+	int						spawnIds[MAX_GENTITIES + MAX_CENTITIES];// for use in idEntityPtr
 	//END HUMANHEAD
 	int						firstFreeIndex;			// first free index in the entities array
 	int						num_entities;			// current number <= MAX_GENTITIES
@@ -438,7 +451,7 @@ public:
 	idDict					persistentLevelInfo;	// contains args that are kept around between levels
 
 	// can be used to automatically effect every material in the world that references globalParms
-	float					globalShaderParms[ MAX_GLOBAL_SHADER_PARMS ];	
+	float					globalShaderParms[MAX_GLOBAL_SHADER_PARMS];
 
 	idRandom				random;					// random number generator used throughout the game
 
@@ -465,7 +478,7 @@ public:
 	bool					inCinematic;			// game is playing cinematic (player controls frozen)
 	bool					skipCinematic;
 
-													// are kept up to date with changes to serverInfo
+	// are kept up to date with changes to serverInfo
 	int						framenum;
 	int						previousTime;			// time in msec of last frame
 	int						time;					// in msec
@@ -486,7 +499,7 @@ public:
 	float					clientSmoothing;		// smoothing of other clients in the view
 	int						entityDefBits;			// bits required to store an entity def number
 
-	static const char *		sufaceTypeNames[ MAX_SURFACE_TYPES ];	// text names for surface types
+	static const char *		sufaceTypeNames[MAX_SURFACE_TYPES];	// text names for surface types
 
 	idEntityPtr<idEntity>	lastGUIEnt;				// last entity with a GUI, used by Cmd_NextGUI_f
 	int						lastGUI;				// last GUI on the lastGUIEnt
@@ -495,41 +508,41 @@ public:
 
 	// ---------------------- Public idGame Interface -------------------
 
-							idGameLocal();
+	idGameLocal();
 
-	virtual void			Init( void );
-	virtual void			Shutdown( void );
-	virtual void			SetLocalClient( int clientNum );
-	virtual void			ThrottleUserInfo( void );
-	virtual const idDict *	SetUserInfo( int clientNum, const idDict &userInfo, bool isClient, bool canModify );
-	virtual const idDict *	GetUserInfo( int clientNum );
-	virtual void			SetServerInfo( const idDict &serverInfo );
+	virtual void			Init(void);
+	virtual void			Shutdown(void);
+	virtual void			SetLocalClient(int clientNum);
+	virtual void			ThrottleUserInfo(void);
+	virtual const idDict *	SetUserInfo(int clientNum, const idDict &userInfo, bool isClient, bool canModify);
+	virtual const idDict *	GetUserInfo(int clientNum);
+	virtual void			SetServerInfo(const idDict &serverInfo);
 
-	virtual const idDict &	GetPersistentPlayerInfo( int clientNum );
-	virtual void			SetPersistentPlayerInfo( int clientNum, const idDict &playerInfo );
-	virtual void			InitFromNewMap( const char *mapName, idRenderWorld *renderWorld, idSoundWorld *soundWorld, bool isServer, bool isClient, int randSeed );
-	virtual bool			InitFromSaveGame( const char *mapName, idRenderWorld *renderWorld, idSoundWorld *soundWorld, idFile *saveGameFile );
-	virtual void			SaveGame( idFile *saveGameFile );
-	virtual void			MapShutdown( void );
-	virtual void			CacheDictionaryMedia( const idDict *dict );
-	virtual void			SpawnPlayer( int clientNum );
-	virtual gameReturn_t	RunFrame( const usercmd_t *clientCmds );
-	virtual bool			Draw( int clientNum );
-	virtual escReply_t		HandleESC( idUserInterface **gui );
-	virtual idUserInterface	*StartMenu( void );
-	virtual const char *	HandleGuiCommands( const char *menuCommand );
-	virtual allowReply_t	ServerAllowClient( int numClients, const char *IP, const char *guid, const char *password, char reason[MAX_STRING_CHARS] );
-	virtual void			ServerClientConnect( int clientNum );
-	virtual void			ServerClientBegin( int clientNum );
-	virtual void			ServerClientDisconnect( int clientNum );
-	virtual void			ServerWriteInitialReliableMessages( int clientNum );
-	virtual void			ServerWriteSnapshot( int clientNum, int sequence, idBitMsg &msg, byte *clientInPVS, int numPVSClients );
-	virtual bool			ServerApplySnapshot( int clientNum, int sequence );
-	virtual void			ServerProcessReliableMessage( int clientNum, const idBitMsg &msg );
-	virtual void			ClientReadSnapshot( int clientNum, int sequence, const int gameFrame, const int gameTime, const int dupeUsercmds, const int aheadOfServer, const idBitMsg &msg );
-	virtual bool			ClientApplySnapshot( int clientNum, int sequence );
-	virtual void			ClientProcessReliableMessage( int clientNum, const idBitMsg &msg );
-	virtual gameReturn_t	ClientPrediction( int clientNum, const usercmd_t *clientCmds );
+	virtual const idDict &	GetPersistentPlayerInfo(int clientNum);
+	virtual void			SetPersistentPlayerInfo(int clientNum, const idDict &playerInfo);
+	virtual void			InitFromNewMap(const char *mapName, idRenderWorld *renderWorld, idSoundWorld *soundWorld, bool isServer, bool isClient, int randSeed);
+	virtual bool			InitFromSaveGame(const char *mapName, idRenderWorld *renderWorld, idSoundWorld *soundWorld, idFile *saveGameFile);
+	virtual void			SaveGame(idFile *saveGameFile);
+	virtual void			MapShutdown(void);
+	virtual void			CacheDictionaryMedia(const idDict *dict);
+	virtual void			SpawnPlayer(int clientNum);
+	virtual gameReturn_t	RunFrame(const usercmd_t *clientCmds);
+	virtual bool			Draw(int clientNum);
+	virtual escReply_t		HandleESC(idUserInterface **gui);
+	virtual idUserInterface	*StartMenu(void);
+	virtual const char *	HandleGuiCommands(const char *menuCommand);
+	virtual allowReply_t	ServerAllowClient(int numClients, const char *IP, const char *guid, const char *password, char reason[MAX_STRING_CHARS]);
+	virtual void			ServerClientConnect(int clientNum);
+	virtual void			ServerClientBegin(int clientNum);
+	virtual void			ServerClientDisconnect(int clientNum);
+	virtual void			ServerWriteInitialReliableMessages(int clientNum);
+	virtual void			ServerWriteSnapshot(int clientNum, int sequence, idBitMsg &msg, byte *clientInPVS, int numPVSClients);
+	virtual bool			ServerApplySnapshot(int clientNum, int sequence);
+	virtual void			ServerProcessReliableMessage(int clientNum, const idBitMsg &msg);
+	virtual void			ClientReadSnapshot(int clientNum, int sequence, const int gameFrame, const int gameTime, const int dupeUsercmds, const int aheadOfServer, const idBitMsg &msg);
+	virtual bool			ClientApplySnapshot(int clientNum, int sequence);
+	virtual void			ClientProcessReliableMessage(int clientNum, const idBitMsg &msg);
+	virtual gameReturn_t	ClientPrediction(int clientNum, const usercmd_t *clientCmds);
 
 	//HUMANHEAD rww
 	virtual void			LogitechLCDUpdate(void) {}
@@ -538,167 +551,167 @@ public:
 	virtual void			ClientReadUnreliableSnapMessages(int clientNum, const idBitMsg &msg);
 	//HUMANHEAD END
 
-	virtual void			GetClientStats( int clientNum, char *data, const int len );
-	virtual void			SwitchTeam( int clientNum, int team );
+	virtual void			GetClientStats(int clientNum, char *data, const int len);
+	virtual void			SwitchTeam(int clientNum, int team);
 
-	virtual bool			DownloadRequest( const char *IP, const char *guid, const char *paks, char urls[ MAX_STRING_CHARS ] );
+	virtual bool			DownloadRequest(const char *IP, const char *guid, const char *paks, char urls[MAX_STRING_CHARS]);
 
 	// ---------------------- Public idGameLocal Interface -------------------
 
-	void					Printf( const char *fmt, ... ) const id_attribute((format(printf,2,3)));
-	void					DPrintf( const char *fmt, ... ) const id_attribute((format(printf,2,3)));
-	void					Warning( const char *fmt, ... ) const id_attribute((format(printf,2,3)));
-	void					DWarning( const char *fmt, ... ) const id_attribute((format(printf,2,3)));
-	void					Error( const char *fmt, ... ) const id_attribute((format(printf,2,3)));
+	void					Printf(const char *fmt, ...) const id_attribute((format(printf, 2, 3)));
+	void					DPrintf(const char *fmt, ...) const id_attribute((format(printf, 2, 3)));
+	void					Warning(const char *fmt, ...) const id_attribute((format(printf, 2, 3)));
+	void					DWarning(const char *fmt, ...) const id_attribute((format(printf, 2, 3)));
+	void					Error(const char *fmt, ...) const id_attribute((format(printf, 2, 3)));
 
-							// Initializes all map variables common to both save games and spawned games
-	void					LoadMap( const char *mapName, int randseed );
+	// Initializes all map variables common to both save games and spawned games
+	void					LoadMap(const char *mapName, int randseed);
 
-	void					LocalMapRestart( void );
-	void					MapRestart( void );
-	static void				MapRestart_f( const idCmdArgs &args );
-	bool					NextMap( void );	// returns wether serverinfo settings have been modified
-	static void				NextMap_f( const idCmdArgs &args );
+	void					LocalMapRestart(void);
+	void					MapRestart(void);
+	static void				MapRestart_f(const idCmdArgs &args);
+	bool					NextMap(void);	// returns wether serverinfo settings have been modified
+	static void				NextMap_f(const idCmdArgs &args);
 
-	idMapFile *				GetLevelMap( void );
-	const char *			GetMapName( void ) const;
+	idMapFile *				GetLevelMap(void);
+	const char *			GetMapName(void) const;
 
-	int						NumAAS( void ) const;
-	idAAS *					GetAAS( int num ) const;
-	idAAS *					GetAAS( const char *name ) const;
-	void					SetAASAreaState( const idBounds &bounds, const int areaContents, bool closed );
-	aasHandle_t				AddAASObstacle( const idBounds &bounds );
-	void					RemoveAASObstacle( const aasHandle_t handle );
-	void					RemoveAllAASObstacles( void );
+	int						NumAAS(void) const;
+	idAAS *					GetAAS(int num) const;
+	idAAS *					GetAAS(const char *name) const;
+	void					SetAASAreaState(const idBounds &bounds, const int areaContents, bool closed);
+	aasHandle_t				AddAASObstacle(const idBounds &bounds);
+	void					RemoveAASObstacle(const aasHandle_t handle);
+	void					RemoveAllAASObstacles(void);
 
-	bool					CheatsOk( bool requirePlayer = true );
-//	void					SetSkill( int value );	// HUMANHEAD pdm: not used
-	gameState_t				GameState( void ) const;
-	idEntity *				SpawnEntityType( const idTypeInfo &classdef, const idDict *args = NULL, bool bIsClientReadSnapshot = false );
+	bool					CheatsOk(bool requirePlayer = true);
+	//	void					SetSkill( int value );	// HUMANHEAD pdm: not used
+	gameState_t				GameState(void) const;
+	idEntity *				SpawnEntityType(const idTypeInfo &classdef, const idDict *args = NULL, bool bIsClientReadSnapshot = false);
 	//HUMANHEAD rww
-	idEntity *				SpawnEntityTypeClient( const idTypeInfo &classdef, const idDict *args );
+	idEntity *				SpawnEntityTypeClient(const idTypeInfo &classdef, const idDict *args);
 	//HUMANHEAD END
 
 	//HUMANHEAD rww - added clientEntity, bIsClientReadSnapshot
-	bool					SpawnEntityDef( const idDict &args, idEntity **ent = NULL, bool setDefaults = true, bool clientEntity = false, bool bIsClientReadSnapshot = false );
+	bool					SpawnEntityDef(const idDict &args, idEntity **ent = NULL, bool setDefaults = true, bool clientEntity = false, bool bIsClientReadSnapshot = false);
 	//HUMANHEAD END
 
-	int						GetSpawnId( const idEntity *ent ) const;
+	int						GetSpawnId(const idEntity *ent) const;
 
-	const idDeclEntityDef *	FindEntityDef( const char *name, bool makeDefault = false ) const;
-	const idDict *			FindEntityDefDict( const char *name, bool makeDefault = false ) const;
+	const idDeclEntityDef *	FindEntityDef(const char *name, bool makeDefault = false) const;
+	const idDict *			FindEntityDefDict(const char *name, bool makeDefault = false) const;
 
-	void					RegisterEntity( idEntity *ent );
-	void					UnregisterEntity( idEntity *ent );
+	void					RegisterEntity(idEntity *ent);
+	void					UnregisterEntity(idEntity *ent);
 
-	bool					RequirementMet( idEntity *activator, const idStr &requires, int removeItem );
+	bool					RequirementMet(idEntity *activator, const idStr &requires, int removeItem);
 
 	virtual					//HUMANHEAD jsh made virtual
-	void					AlertAI( idEntity *ent );
-	idActor *				GetAlertEntity( void );
+		void					AlertAI(idEntity *ent);
+	idActor *				GetAlertEntity(void);
 
-	bool					InPlayerPVS( idEntity *ent ) const;
-	bool					InPlayerConnectedArea( idEntity *ent ) const;
+	bool					InPlayerPVS(idEntity *ent) const;
+	bool					InPlayerConnectedArea(idEntity *ent) const;
 
-	void					SetCamera( idCamera *cam );
-	idCamera *				GetCamera( void ) const;
-	bool					SkipCinematic( void );
-	void					CalcFov( float base_fov, float &fov_x, float &fov_y ) const;
+	void					SetCamera(idCamera *cam);
+	idCamera *				GetCamera(void) const;
+	bool					SkipCinematic(void);
+	void					CalcFov(float base_fov, float &fov_x, float &fov_y) const;
 
-	void					AddEntityToHash( const char *name, idEntity *ent );
-	bool					RemoveEntityFromHash( const char *name, idEntity *ent );
-	int						GetTargets( const idDict &args, idList< idEntityPtr<idEntity> > &list, const char *ref ) const;
+	void					AddEntityToHash(const char *name, idEntity *ent);
+	bool					RemoveEntityFromHash(const char *name, idEntity *ent);
+	int						GetTargets(const idDict &args, idList< idEntityPtr<idEntity> > &list, const char *ref) const;
 
-							// returns the master entity of a trace.  for example, if the trace entity is the player's head, it will return the player.
-	idEntity *				GetTraceEntity( const trace_t &trace ) const;
+	// returns the master entity of a trace.  for example, if the trace entity is the player's head, it will return the player.
+	idEntity *				GetTraceEntity(const trace_t &trace) const;
 
-	static void				ArgCompletion_EntityName( const idCmdArgs &args, void(*callback)( const char *s ) );
-	idEntity *				FindTraceEntity( idVec3 start, idVec3 end, const idTypeInfo &c, const idEntity *skip ) const;
-	idEntity *				FindEntity( const char *name ) const;
-	idEntity *				FindEntityUsingDef( idEntity *from, const char *match ) const;
-	int						EntitiesWithinRadius( const idVec3 org, float radius, idEntity **entityList, int maxCount ) const;
+	static void				ArgCompletion_EntityName(const idCmdArgs &args, void(*callback)(const char *s));
+	idEntity *				FindTraceEntity(idVec3 start, idVec3 end, const idTypeInfo &c, const idEntity *skip) const;
+	idEntity *				FindEntity(const char *name) const;
+	idEntity *				FindEntityUsingDef(idEntity *from, const char *match) const;
+	int						EntitiesWithinRadius(const idVec3 org, float radius, idEntity **entityList, int maxCount) const;
 
 	// HUMANHEAD pdm
-	static void				ArgCompletion_ClassName( const idCmdArgs &args, void(*callback)( const char *s ) );
-	static void				ArgCompletion_EntityOrClassName( const idCmdArgs &args, void(*callback)( const char *s ) );
-	virtual bool			PlayerIsDeathwalking( void );
-	virtual unsigned int	GetTimePlayed( void );
-	virtual void			ClearTimePlayed( void );
+	static void				ArgCompletion_ClassName(const idCmdArgs &args, void(*callback)(const char *s));
+	static void				ArgCompletion_EntityOrClassName(const idCmdArgs &args, void(*callback)(const char *s));
+	virtual bool			PlayerIsDeathwalking(void);
+	virtual unsigned int	GetTimePlayed(void);
+	virtual void			ClearTimePlayed(void);
 
-	void					KillBox( idEntity *ent, bool catch_teleport = false );
+	void					KillBox(idEntity *ent, bool catch_teleport = false);
 	//HUMANHEAD PCF rww 05/15/06 - use a custom clipmask killbox (seperated due to pcf paranoia)
-	void					KillBoxMasked( idEntity *ent, int clipMask, bool catch_teleport = false );
+	void					KillBoxMasked(idEntity *ent, int clipMask, bool catch_teleport = false);
 	//HUMANHEAD END
 	virtual					// HUMANHEAD JRM - made virtual
-	void					RadiusDamage( const idVec3 &origin, idEntity *inflictor, idEntity *attacker, idEntity *ignoreDamage, idEntity *ignorePush, const char *damageDefName, float dmgPower = 1.0f );
+		void					RadiusDamage(const idVec3 &origin, idEntity *inflictor, idEntity *attacker, idEntity *ignoreDamage, idEntity *ignorePush, const char *damageDefName, float dmgPower = 1.0f);
 	virtual					// HUMANHEAD JRM - made virtual
-	void					RadiusPush( const idVec3 &origin, const float radius, const float push, const idEntity *inflictor, const idEntity *ignore, float inflictorScale, const bool quake );
-	void					RadiusPushClipModel( const idVec3 &origin, const float push, const idClipModel *clipModel );
+		void					RadiusPush(const idVec3 &origin, const float radius, const float push, const idEntity *inflictor, const idEntity *ignore, float inflictorScale, const bool quake);
+	void					RadiusPushClipModel(const idVec3 &origin, const float push, const idClipModel *clipModel);
 
-	void					ProjectDecal( const idVec3 &origin, const idVec3 &dir, float depth, bool parallel, float size, const char *material, float angle = 0.0f );
-	void					BloodSplat( const idVec3 &origin, const idVec3 &dir, float size, const char *material );
+	void					ProjectDecal(const idVec3 &origin, const idVec3 &dir, float depth, bool parallel, float size, const char *material, float angle = 0.0f);
+	void					BloodSplat(const idVec3 &origin, const idVec3 &dir, float size, const char *material);
 
-	void					CallFrameCommand( idEntity *ent, const function_t *frameCommand );
-	void					CallObjectFrameCommand( idEntity *ent, const char *frameCommand );
+	void					CallFrameCommand(idEntity *ent, const function_t *frameCommand);
+	void					CallObjectFrameCommand(idEntity *ent, const char *frameCommand);
 
-	const idVec3 &			GetGravity( void ) const;
+	const idVec3 &			GetGravity(void) const;
 
 	// added the following to assist licensees with merge issues
 	int						GetFrameNum() const { return framenum; };
 	int						GetTime() const { return time; };
 	int						GetMSec() const { return msec; };
 
-	int						GetNextClientNum( int current ) const;
-	idPlayer *				GetClientByNum( int current ) const;
-	idPlayer *				GetClientByName( const char *name ) const;
-	idPlayer *				GetClientByCmdArgs( const idCmdArgs &args ) const;
+	int						GetNextClientNum(int current) const;
+	idPlayer *				GetClientByNum(int current) const;
+	idPlayer *				GetClientByName(const char *name) const;
+	idPlayer *				GetClientByCmdArgs(const idCmdArgs &args) const;
 
 	idPlayer *				GetLocalPlayer() const;
 	// HUMANHEAD nla
-	bool 					AmLocalClient( idPlayer *player );
+	bool 					AmLocalClient(idPlayer *player);
 	bool					isCoop;
-	bool					IsCooperative() const	{	return isCoop;	}
-	bool					IsCompetitive() const	{	return isMultiplayer && !IsCooperative();	}
+	bool					IsCooperative() const { return isCoop; }
+	bool					IsCompetitive() const { return isMultiplayer && !IsCooperative(); }
 
 	// For saving objects that we don't want to have to spawn -mdl
-	void					RegisterUniqueObject( idClass *object ); // Meant to be called once by constructor of object being registered
-	void					UnregisterUniqueObject( idClass *object ); // Meant to be called by once destructor of object being registered
+	void					RegisterUniqueObject(idClass *object); // Meant to be called once by constructor of object being registered
+	void					UnregisterUniqueObject(idClass *object); // Meant to be called by once destructor of object being registered
 
 	virtual void			FocusGUICleanup(idUserInterface *gui); //HUMANHEAD rww
 
 	// HUMANHEAD pdm: print game side memory statistics
-	virtual void			PrintMemInfo( MemInfo_t *mi );
+	virtual void			PrintMemInfo(MemInfo_t *mi);
 
-// HUMANHEAD pdm: Support for level appending
-	bool					DeathwalkMapLoaded() const	{	return bShouldAppend;	}
+	// HUMANHEAD pdm: Support for level appending
+	bool					DeathwalkMapLoaded() const { return bShouldAppend; }
 #if DEATHWALK_AUTOLOAD
 	bool					bShouldAppend;			// Taken from serverinfo
 protected:
 	idMapFile *				additionalMapFile;
 	virtual void			SpawnAppendedMapEntities() {}
 #endif
-// HUMANHEAD END
+	// HUMANHEAD END
 
-// HUMANHEAD mdl
+	// HUMANHEAD mdl
 protected:
 	// Special case, these must be virtual.  Allows hhGameLocal to save and restore it's data -mdl
-	virtual void			Save( idSaveGame *savefile ) const { }
-	virtual void			Restore( idRestoreGame *savefile ) { }
+	virtual void			Save(idSaveGame *savefile) const { }
+	virtual void			Restore(idRestoreGame *savefile) { }
 
 	// For saving objects that we don't want to have to spawn -mdl
 	idList<idClass *>		uniqueObjects; // The object list
 	idList<int>				uniqueObjRefs; // The reference count list
 
 public:
-// HUMANHEAD END
+	// HUMANHEAD END
 
 	void					SpreadLocations();
-	idLocationEntity *		LocationForPoint( const idVec3 &point );	// May return NULL
-	idEntity *				SelectInitialSpawnPoint( idPlayer *player );
+	idLocationEntity *		LocationForPoint(const idVec3 &point);	// May return NULL
+	idEntity *				SelectInitialSpawnPoint(idPlayer *player);
 
-	void					SetPortalState( qhandle_t portal, int blockingBits );
-	void					SaveEntityNetworkEvent( const idEntity *ent, int event, const idBitMsg *msg );
-	void					ServerSendChatMessage( int to, const char *name, const char *text );
+	void					SetPortalState(qhandle_t portal, int blockingBits);
+	void					SaveEntityNetworkEvent(const idEntity *ent, int event, const idBitMsg *msg);
+	void					ServerSendChatMessage(int to, const char *name, const char *text);
 	//HUMANHEAD PCF rww 05/10/06 - "fix" for server-localized join messages (this is dumb).
 	typedef enum {
 		SPECIALMSG_UNKNOWN = 0,
@@ -709,28 +722,28 @@ public:
 		//HUMANHEAD END
 		SPECIALMSG_NUM
 	} serverSpecialMsg_e;
-	void					ServerSendSpecialMessage( serverSpecialMsg_e msgType, int to, const char *fromNonLoc, int numTextPtrs, const char **text );
+	void					ServerSendSpecialMessage(serverSpecialMsg_e msgType, int to, const char *fromNonLoc, int numTextPtrs, const char **text);
 	//HUMANHEAD END
-	int						ServerRemapDecl( int clientNum, declType_t type, int index );
-	int						ClientRemapDecl( declType_t type, int index );
+	int						ServerRemapDecl(int clientNum, declType_t type, int index);
+	int						ClientRemapDecl(declType_t type, int index);
 
-	void					SetGlobalMaterial( const idMaterial *mat );
+	void					SetGlobalMaterial(const idMaterial *mat);
 	const idMaterial *		GetGlobalMaterial();
 
-	void					SetGibTime( int _time ) { nextGibTime = _time; };
+	void					SetGibTime(int _time) { nextGibTime = _time; };
 	int						GetGibTime() { return nextGibTime; };
 
 	bool					NeedRestart();
 
-// HUMANHEAD
-	void					SetSteamTime( int _time ) { nextSteamTime = _time; };
+	// HUMANHEAD
+	void					SetSteamTime(int _time) { nextSteamTime = _time; };
 	int						GetSteamTime() { return nextSteamTime; };
 	void					SpiritWalkSoundMode(bool active);
 	void					DialogSoundMode(bool active);
-// HUMANHEAD END
+	// HUMANHEAD END
 
-	//HUMANHEAD rww
-	bool					EntInClientSnapshot(int entNum) { return (!isClient || (clientPVS[localClientNum][entNum >> 5] & ( 1 << ( entNum & 31 ) ))); }
+		//HUMANHEAD rww
+	bool					EntInClientSnapshot(int entNum) { return (!isClient || (clientPVS[localClientNum][entNum >> 5] & (1 << (entNum & 31)))); }
 	int						GetMapSpawnCount(void) { return mapSpawnCount; }
 
 	void					GetAPUserInfo(idDict &dict, int clientNum);
@@ -801,8 +814,8 @@ protected:	// HUMANHEAD
 	entityState_t *			clientEntityStates[MAX_CLIENTS][MAX_GENTITIES];
 	int						clientPVS[MAX_CLIENTS][ENTITY_PVS_SIZE];
 	snapshot_t *			clientSnapshots[MAX_CLIENTS];
-	idBlockAlloc<entityState_t,256>entityStateAllocator;
-	idBlockAlloc<snapshot_t,64>snapshotAllocator;
+	idBlockAlloc<entityState_t, 256>entityStateAllocator;
+	idBlockAlloc<snapshot_t, 64>snapshotAllocator;
 
 	idMsgQueue				unreliableSnapMsg[MAX_CLIENTS]; //HUMANHEAD rww - unreliable messages get appended to the snapshot message (since snapshots are unreliable)
 
@@ -817,69 +830,69 @@ protected:	// HUMANHEAD
 
 	idStrList				shakeSounds;
 
-	byte					lagometer[ LAGO_IMG_HEIGHT ][ LAGO_IMG_WIDTH ][ 4 ];
+	byte					lagometer[LAGO_IMG_HEIGHT][LAGO_IMG_WIDTH][4];
 
 	// HUMANHEAD mdl:  Play time
 	unsigned int			playTime; // Total play time, not including current session
 	unsigned int			playTimeStart; // -1 if not playing, otherwise time when current sesion started
 	// HUMANHEAD END
 
-	void					Clear( void );
-							// returns true if the entity shouldn't be spawned at all in this game type or difficulty level
+	void					Clear(void);
+	// returns true if the entity shouldn't be spawned at all in this game type or difficulty level
 	virtual					// HUMANHEAD mdl: Made virtual
-	bool					InhibitEntitySpawn( idDict &spawnArgs );
-							// spawn entities from the map file
+		bool					InhibitEntitySpawn(idDict &spawnArgs);
+	// spawn entities from the map file
 	virtual	// HUMANHEAD JRM - made virtual
-	void					SpawnMapEntities( void );
-							// commons used by init, shutdown, and restart
-	void					MapPopulate( void );
-	void					MapClear( bool clearClients );
+		void					SpawnMapEntities(void);
+	// commons used by init, shutdown, and restart
+	void					MapPopulate(void);
+	void					MapClear(bool clearClients);
 
-	pvsHandle_t				GetClientPVS( idPlayer *player, pvsType_t type );
-	void					SetupPlayerPVS( void );
-	void					FreePlayerPVS( void );
-	void					UpdateGravity( void );
-	void					SortActiveEntityList( void );
+	pvsHandle_t				GetClientPVS(idPlayer *player, pvsType_t type);
+	void					SetupPlayerPVS(void);
+	void					FreePlayerPVS(void);
+	void					UpdateGravity(void);
+	void					SortActiveEntityList(void);
 	//HUMANHEAD
-	void					SortSnapshotEntityList( void );
+	void					SortSnapshotEntityList(void);
 	void					RegisterLocationsWithSoundWorld();
 	//HUMANHEAD END
-	void					ShowTargets( void );
-	void					RunDebugInfo( void );
+	void					ShowTargets(void);
+	void					RunDebugInfo(void);
 
-	void					InitScriptForMap( void );
+	void					InitScriptForMap(void);
 
-	void					InitConsoleCommands( void );
-	void					ShutdownConsoleCommands( void );
+	void					InitConsoleCommands(void);
+	void					ShutdownConsoleCommands(void);
 
-	void					InitAsyncNetwork( void );
-	void					ShutdownAsyncNetwork( void );
-	void					InitLocalClient( int clientNum );
-	void					InitClientDeclRemap( int clientNum );
-	void					ServerSendDeclRemapToClient( int clientNum, declType_t type, int index );
-	void					FreeSnapshotsOlderThanSequence( int clientNum, int sequence );
-	bool					ApplySnapshot( int clientNum, int sequence );
-	void					WriteGameStateToSnapshot( idBitMsgDelta &msg ) const;
-	void					ReadGameStateFromSnapshot( const idBitMsgDelta &msg );
-	void					NetworkEventWarning( const entityNetEvent_t *event, const char *fmt, ... ) id_attribute((format(printf,3,4)));
-	void					ServerProcessEntityNetworkEventQueue( void );
-	void					ClientProcessEntityNetworkEventQueue( void );
-	void					ClientShowSnapshot( int clientNum ) const;
-							// call after any change to serverInfo. Will update various quick-access flags
-	void					UpdateServerInfoFlags( void );
-	void					RandomizeInitialSpawns( void );
-	static int				sortSpawnPoints( const void *ptr1, const void *ptr2 );
+	void					InitAsyncNetwork(void);
+	void					ShutdownAsyncNetwork(void);
+	void					InitLocalClient(int clientNum);
+	void					InitClientDeclRemap(int clientNum);
+	void					ServerSendDeclRemapToClient(int clientNum, declType_t type, int index);
+	void					FreeSnapshotsOlderThanSequence(int clientNum, int sequence);
+	bool					ApplySnapshot(int clientNum, int sequence);
+	void					WriteGameStateToSnapshot(idBitMsgDelta &msg) const;
+	void					ReadGameStateFromSnapshot(const idBitMsgDelta &msg);
+	void					NetworkEventWarning(const entityNetEvent_t *event, const char *fmt, ...) id_attribute((format(printf, 3, 4)));
+	void					ServerProcessEntityNetworkEventQueue(void);
+	void					ClientProcessEntityNetworkEventQueue(void);
+	void					ClientShowSnapshot(int clientNum) const;
+	// call after any change to serverInfo. Will update various quick-access flags
+	void					UpdateServerInfoFlags(void);
+	void					RandomizeInitialSpawns(void);
+	static int				sortSpawnPoints(const void *ptr1, const void *ptr2);
 
-	void					DumpOggSounds( void );
-	void					GetShakeSounds( const idDict *dict );
+	void					DumpOggSounds(void);
+	void					GetShakeSounds(const idDict *dict);
 
-	void					SelectTimeGroup( int timeGroup );
-	int						GetTimeGroupTime( int timeGroup );
-	idStr					GetBestGameType( const char* map, const char* gametype );
+	void					SelectTimeGroup(int timeGroup);
+	int						GetTimeGroupTime(int timeGroup);
+	idStr					GetBestGameType(const char* map, const char* gametype);
 
-	void					Tokenize( idStrList &out, const char *in );
+	void					Tokenize(idStrList &out, const char *in);
 
-	void					UpdateLagometer( int aheadOfServer, int dupeUsercmds );
+	void					UpdateLagometer(int aheadOfServer, int dupeUsercmds);
 };
 
 //============================================================================
@@ -887,8 +900,8 @@ protected:	// HUMANHEAD
 // HUMANHEAD pdm
 // HUMANHEAD mdl:  Commented out the old gameLocal because it was messing up tagging
 //#ifdef HUMANHEAD
-	#include "../prey/prey_game.h"
-	extern hhGameLocal			gameLocal;
+#include "../prey/prey_game.h"
+extern hhGameLocal			gameLocal;
 //#else	// HUMANHEAD
 //extern idGameLocal			gameLocal;
 //#endif	// HUMANHEAD
@@ -899,7 +912,7 @@ extern idAnimManager		animationLib;
 
 class idGameError : public idException {
 public:
-	idGameError( const char *text ) : idException( text ) {}
+	idGameError(const char *text) : idException(text) {}
 };
 
 //============================================================================
@@ -923,7 +936,7 @@ typedef enum {
 	SND_CHANNEL_LANDING,	// HUMANHEAD pdm: needed seperate channel for landing
 	SND_CHANNEL_RADIO,
 
-//HUMANHEAD: aob
+	//HUMANHEAD: aob
 	SND_CHANNEL_WALLWALK,
 	SND_CHANNEL_WALLWALK2,
 	SND_CHANNEL_SPIRITWALK,
@@ -938,11 +951,11 @@ typedef enum {
 	SND_CHANNEL_DOCKED,
 	SND_CHANNEL_TRACTORBEAM,
 	SND_CHANNEL_RECHARGE,
-//HUMANHEAD END
+	//HUMANHEAD END
 
-	// internal use only.  not exposed to script or framecommands.
-	SND_CHANNEL_AMBIENT,
-	SND_CHANNEL_DAMAGE
+		// internal use only.  not exposed to script or framecommands.
+		SND_CHANNEL_AMBIENT,
+		SND_CHANNEL_DAMAGE
 } gameSoundChannel_t;
 
 // content masks
@@ -974,11 +987,11 @@ typedef enum {
 #define	MASK_SHOT_BOUNDINGBOX		(CONTENTS_SOLID|CONTENTS_BODY)
 #endif	// HUMANHEAD
 
-const float DEFAULT_GRAVITY			= 1066.0f;
+const float DEFAULT_GRAVITY = 1066.0f;
 #define DEFAULT_GRAVITY_STRING		"1066"
-const idVec3 DEFAULT_GRAVITY_VEC3( 0, 0, -DEFAULT_GRAVITY );
+const idVec3 DEFAULT_GRAVITY_VEC3(0, 0, -DEFAULT_GRAVITY);
 
-const int	CINEMATIC_SKIP_DELAY	= SEC2MS( 2.0f );
+const int	CINEMATIC_SKIP_DELAY = SEC2MS(2.0f);
 
 //============================================================================
 

@@ -7,7 +7,7 @@
 // PreyRun BEGIN
 extern idCVar pr_autojump;
 extern idCVar pr_autopause;
-extern idCVar pr_autosplit;
+extern idCVar pr_preysplit;
 // Speedometer
 extern idCVar pr_hud_speedometer;
 extern idCVar pr_hud_speedometer_r;
@@ -23,14 +23,18 @@ extern idCVar pr_hud_velocity;
 // Timer
 extern idTimer pr_Timer;
 extern bool pr_timer_running;
+
+extern idCVar pr_autostart;
+extern idCVar pr_autostop;
+
 extern idCVar pr_hud_timer;
 extern idCVar pr_hud_timer_x;
 extern idCVar pr_hud_timer_y;
 extern idCVar pr_hud_timer_r;
 extern idCVar pr_hud_timer_g;
 extern idCVar pr_hud_timer_b;
-// Position
-extern idCVar pr_hud_position;
+// Location
+extern idCVar pr_hud_location;
 // Entity Info
 extern idCVar pr_hud_entityinfo;
 // Ammo
