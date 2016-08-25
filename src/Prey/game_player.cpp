@@ -977,7 +977,7 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 	_hud->SetStateFloat("pr_hud_timer_g", pr_hud_timer_g.GetFloat());
 	_hud->SetStateFloat("pr_hud_timer_b", pr_hud_timer_b.GetFloat());
 	// Position
-	_hud->SetStateBool("pr_hud_position", pr_hud_position.GetBool());
+	_hud->SetStateBool("pr_hud_location", pr_hud_location.GetBool());
 	// Entity info
 	_hud->SetStateBool("pr_hud_entityinfo", pr_hud_entityinfo.GetBool());
 	// Ammo
@@ -1058,15 +1058,18 @@ hhPlayer::DrawHUD
 */
 void hhPlayer::DrawHUD(idUserInterface *_hud) {
 	// PreyRun BEGIN
-	// Might not be the optimal solution because when the game decides to not draw the hud the timer cant resume but it gives better times then hooking IniFromMap()
-	if (pr_timer_running && !pr_Timer.IsRunning() && pr_autosplit.GetBool())
+	// Might not be the optimal solution because when the game decides to not draw the hud the timer cant resume but it gives better times then hooking InitFromMap()
+	if (pr_timer_running && !pr_Timer.IsRunning())
 	{
-		gameLocal.Printf("PreyRun: AutoSplitter: Resuming\n");
+		gameLocal.Printf("PreyRun: Timer: Resuming\n");
 		pr_Timer.Start();
 
-		//pr::WriteMapChange(pr::GetTime(), (idStr)gameLocal.GetMapName());
+#ifdef PR_DEBUG
+		auto time = PR_ms2time(pr_Timer.Milliseconds());
+		gameLocal.Printf("PreyRunDGB: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
 
-		gameLocal.Printf("PreyRun: Changing map to: %s\n", gameLocal.GetMapName());
+		gameLocal.Printf("PreyRun Debug: Changed map to: %s\n", gameLocal.GetMapName());
+#endif // PR_DEBUG
 	}
 	// PreyRun END
 
@@ -1147,7 +1150,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 			idStr strText;
 
-			sprintf(strText, "%02d:%02d:%02d.%03d", times.hour, times.minute, times.seconds, times.ms);
+			sprintf(strText, "%02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
 
 			renderSystem->DrawSmallStringExt(pr_t_x, pr_t_y, strText.c_str(), idVec4(PR_calcStuff(pr_t_r), PR_calcStuff(pr_t_g), PR_calcStuff(pr_t_b), 1), false, declManager->FindMaterial("textures/bigchars"));
 		}
@@ -1157,7 +1160,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 			idStr strText;
 
-			sprintf(strText, "%02d:%02d:%02d.%03d", times.hour, times.minute, times.seconds, times.ms);
+			sprintf(strText, "%02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
 
 			renderSystem->DrawSmallStringExt(pr_t_x, pr_t_y, strText.c_str(), idVec4(PR_calcStuff(pr_t_r), PR_calcStuff(pr_t_g), PR_calcStuff(pr_t_b), 1), false, declManager->FindMaterial("textures/bigchars"));
 		}
@@ -1179,7 +1182,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		// Uses InVehicle now
 		if (physicsObj.HasGroundContacts() || InVehicle())
 		{
-			// are we standing on the ground or in a Vehicle? then add Z speed as well (when wallwalking, being on stairs or flying)
+			// are we standing on the ground or in a Vehicle? then add Z speed as well (when wallwalking, being on stairs/slopes or flying in Vehicle)
 			sprintf(strText, "%.2f", vel.Length());
 		}
 		else
@@ -1199,19 +1202,18 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 		idAngles angles;
 
-		// ViewAngles show 0,0,0 when in vehicle
-		/*if (InVehicle())
+		if (InVehicle())
 		{
-			angles=GetVehicleInterfaceLocal()->GetVehicle()
+			angles = GetVehicleInterfaceLocal()->GetVehicle()->GetAxis().ToAngles();
 		}
 		else
-		{*/
-		angles = GetViewAngles();
+		{
+			angles = GetViewAngles();
+		}
 
 		sprintf(pitch, "Pitch : %f", angles.pitch);
 		sprintf(yaw, "Yaw   : %f", angles.yaw);
 		sprintf(roll, "Roll  : %f", angles.roll);
-		//}
 
 		renderSystem->DrawSmallStringExt(0, 0, pitch.c_str(), idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
 		renderSystem->DrawSmallStringExt(0, 15, yaw.c_str(), idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
@@ -1242,7 +1244,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 	}
 
 	// Position
-	if (_hud->GetStateBool("pr_hud_position", "0"))
+	if (_hud->GetStateBool("pr_hud_location", "0"))
 	{
 		auto eyePos = GetEyePosition();
 
@@ -1296,7 +1298,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			{
 				idStr strHealth;
 				sprintf(strHealth, "Health: %d/%d", ent->health, ent->GetMaxHealth());
-				//sprintf(strName, "Name: %s", ent->name);
+				//sprintf(strName, "Name: %s", ent->name); // crashes
 
 				renderSystem->DrawSmallStringExt(360, 235, strHealth, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
 			}
@@ -1324,7 +1326,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				idVec4 color;
 				idStr strAmmo;
 
-				sprintf(strAmmo, "%02d | %02d", clip, avail);
+				sprintf(strAmmo, "%02d | %02d", clip, avail - clip);
 
 				// PR_FIXME
 				// very ugly there might be a better solution to this than if then else trees
@@ -1356,8 +1358,6 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 				sprintf(strAmmo, "     %02d", avail);
 
-				// PR_FIXME
-				// very ugly there might be a better solution to this than if then else trees
 				if (avail > 0)
 				{
 					color.Set(1, 1, 1, 1);
@@ -1378,8 +1378,6 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 				sprintf(strAmmo, "     %02d", avail);
 
-				// PR_FIXME
-				// very ugly there might be a better solution to this than if then else trees
 				if (avail > 0)
 				{
 					color.Set(1, 1, 1, 1);
@@ -1404,8 +1402,6 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				sprintf(strAmmo, "  %03d", avail);
 				sprintf(strAmmo2, "  %02d", altAvail);
 
-				// PR_FIXME
-				// very ugly there might be a better solution to this than if then else trees
 				if (avail > 0)
 				{
 					color.Set(1, 1, 1, 1);
@@ -1436,10 +1432,8 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				idVec4 color;
 				idStr strAmmo;
 
-				sprintf(strAmmo, "%02d | %02d", clip, avail);
+				sprintf(strAmmo, "%02d | %02d", clip, avail - clip);
 
-				// PR_FIXME
-				// very ugly there might be a better solution to this than if then else trees
 				if (clip > 0)
 				{
 					color.Set(1, 1, 1, 1);
@@ -1467,8 +1461,6 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 				sprintf(strAmmo, "     %02d", avail);
 
-				// PR_FIXME
-				// very ugly there might be a better solution to this than if then else trees
 				if (avail > 0)
 				{
 					color.Set(1, 1, 1, 1);
@@ -1487,22 +1479,14 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		}
 	}
 
-	// Health | crashes when dying
-	/*if (_hud->GetStateBool("pr_hud_health", "0"))
+	// Health
+	if (_hud->GetStateBool("pr_hud_health", "0"))
 	{
 		idStr strHealth;
 		idVec4 color;
 
 		// Player is dead
-		if (IsDeathWalking() || IsDead())
-		{
-			auto maxHealth = GetMaxHealth();
-
-			color.Set(1, 0.1, 0.1, 1);
-
-			sprintf(strHealth, "000 | %03d", maxHealth);
-		}
-		else
+		if (!IsDead())
 		{
 			auto health = GetHealth();
 			auto maxHealth = GetMaxHealth();
@@ -1518,32 +1502,32 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			}
 
 			sprintf(strHealth, "%03d | %03d", health, maxHealth);
-		}
 
-		renderSystem->DrawSmallStringExt(70, 448, strHealth, color, false, declManager->FindMaterial("textures/bigchars"));
-	}*/
+			renderSystem->DrawSmallStringExt(70, 448, strHealth, color, false, declManager->FindMaterial("textures/bigchars"));
+		}
+	}
 
 	// PreyRun END
 }
 
 // PreyRun BEGIN
-// converts the 0-255 format for the 0-1 format used by the DrawSmallStringExt function
+// converts the 0-255 format to the 0-1 format used by the DrawSmallStringExt function
+//PR_time_t PR_ms2time(unsigned x)
+//{
+//	PR_time_t ts;
+//	ts.hours = x / (60 * 60 * 1000);
+//	x = x - ts.hours*(60 * 60 * 1000);
+//	ts.minutes = x / (60 * 1000);
+//	x = x - ts.minutes*(60 * 1000);
+//	ts.seconds = x / 1000;
+//	ts.milliseconds = x - ts.seconds * 1000;
+//
+//	return ts;
+//}
+
 inline float PR_calcStuff(float f)
 {
 	return f / 255;
-}
-
-PR_time_t PR_ms2time(int x)
-{
-	PR_time_t ts;
-	ts.hour = x / (60 * 60 * 1000);
-	x = x - ts.hour*(60 * 60 * 1000);
-	ts.minute = x / (60 * 1000);
-	x = x - ts.minute*(60 * 1000);
-	ts.seconds = x / 1000;
-	ts.ms = x - ts.seconds * 1000;
-
-	return ts;
 }
 // PreyRun END
 

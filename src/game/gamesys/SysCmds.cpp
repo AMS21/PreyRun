@@ -73,17 +73,20 @@ void Cmd_PR_timer_Start_f(const idCmdArgs &args)
 	pr_Timer.Start();
 	pr_timer_running = true;
 
-	pr::WriteTimerStart(pr::Time{pr::GetTime()});
+	pr::WriteTimerStart(pr::GetTime());
 
 	gameLocal.Printf("Starting timer\n");
 }
 
 void Cmd_PR_timer_Stop_f(const idCmdArgs &args)
 {
-	pr_Timer.Stop();
-	pr_timer_running = false;
+	if (pr_Timer.IsRunning())
+	{
+		pr_Timer.Stop();
+		pr_timer_running = false;
 
-	gameLocal.Printf("Stopping timer\n");
+		gameLocal.Printf("Stopping timer\n");
+	}
 }
 
 void Cmd_PR_Timer_Reset_f(const idCmdArgs &args)
@@ -99,34 +102,35 @@ void Cmd_PR_Timer_Reset_f(const idCmdArgs &args)
 
 void Cmd_PR_Timer_Now_f(const idCmdArgs &args)
 {
-	int ms;
+	PR_time_t times;
 	if (pr_timer_running)
 	{
 		pr_Timer.Stop();
-		int ms = pr_Timer.Milliseconds();
+		times = PR_ms2time(pr_Timer.Milliseconds());
 		pr_Timer.Start();
 	}
 	else
 	{
-		int mx = pr_Timer.Milliseconds();
+		times = PR_ms2time(pr_Timer.Milliseconds());
 	}
 
-	int hour = ms / (60 * 60 * 1000);
-	ms = ms - hour*(60 * 60 * 1000);
-	int minute = ms / (60 * 1000);
-	ms = ms - minute*(60 * 1000);
-	int seconds = ms / 1000;
-	ms = ms - seconds * 1000;
-
-	gameLocal.Printf("%02d:%02d:%02d.%03d\n", hour, minute, minute, seconds, ms);
+	gameLocal.Printf("%02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
 }
 
+#ifdef PR_DEBUG
 void Cmd_PR_test_f(const idCmdArgs &args)
 {
 	auto player = gameLocal.GetLocalPlayer();
-	gameLocal.Printf("clip:%d\navail:%d\naltclip:%d\naltavail:%d\nzoomfov:%d\n",player->weapon->AmmoInClip(),player->weapon->AmmoAvailable(),player->weapon->AltAmmoInClip(),player->weapon->AltAmmoAvailable(),player->weapon->GetZoomFov());
-	
+	gameLocal.Printf("clip:%d\navail:%d\naltclip:%d\naltavail:%d\nzoomfov:%d\n", player->weapon->AmmoInClip(), player->weapon->AmmoAvailable(), player->weapon->AltAmmoInClip(), player->weapon->AltAmmoAvailable(), player->weapon->GetZoomFov());
+
 }
+
+void Cmd_PR_dgb_timer_f(const idCmdArgs &args)
+{
+	auto time = PR_ms2time(pr_Timer.Milliseconds());
+	gameLocal.Printf("Timer is running: %s\nTimer is on: %s\nTime: %02d:%02d:%02d.%03d\n",pr_Timer.IsRunning() ? "True" : "False",pr_timer_running ? "True" : "False",time.hours,time.minutes,time.seconds,time.milliseconds);
+}
+#endif // PR_DEBUG
 
 /////////////////
 // PreyRun END //
@@ -559,7 +563,7 @@ void Cmd_Give_f(const idCmdArgs &args) {
 	//HUMANHEAD PCF rww 05/16/06
 	declManager->SetInsideLevelLoad(wasInside);
 	//HUMANHEAD END
-}
+		}
 
 /*
 ==================
@@ -799,7 +803,7 @@ static void Cmd_Say(bool team, const idCmdArgs &args) {
 	else {
 		gameLocal.mpGame.ProcessChatMessage(gameLocal.localClientNum, team, name, text, NULL);
 	}
-}
+	}
 
 /*
 ==================
@@ -1083,7 +1087,7 @@ void Cmd_PlayerShadowToggle_f(const idCmdArgs &args) {
 		}
 		if (gameLocal.entities[i]->IsType(hhPlayer::Type)) {
 			gameLocal.entities[i]->GetRenderEntity()->noShadow = setShadows;
-		}
+}
 	}
 }
 #endif
@@ -2596,7 +2600,7 @@ static void Cmd_EraseViewNote_f(const idCmdArgs &args) {
 		remove(str);
 	}
 #endif
-}
+	}
 // HUMANHEAD END
 
 /*
@@ -2833,7 +2837,7 @@ void Cmd_PrintTypeName_f(const idCmdArgs &args) {
 	}
 	else {
 		common->Printf("Invalid typenum.\n");
-	}
+}
 }
 #endif
 /*
@@ -2873,8 +2877,11 @@ void idGameLocal::InitConsoleCommands(void) {
 	cmdSystem->AddCommand("PR_Timer_Reset", Cmd_PR_Timer_Reset_f, CMD_FL_GAME, "PreyRun cmd: Resets thes hud timer");
 	cmdSystem->AddCommand("PR_Timer_Now", Cmd_PR_Timer_Now_f, CMD_FL_GAME, "PreyRun cmd: Displays the time of the hud timer");
 
-	// DEBUG REMOVE IN ACTUAL RELEASE
-	cmdSystem->AddCommand("PR_Test", Cmd_PR_test_f, CMD_FL_GAME, "tests stuff u know");
+	// DEBUG COMMANDS
+#ifdef PR_DEBUG
+	cmdSystem->AddCommand("PR_Test", Cmd_PR_test_f, CMD_FL_GAME, "For testing purpose");
+	cmdSystem->AddCommand("PR_dgb_timer", Cmd_PR_dgb_timer_f, CMD_FL_GAME, "Prints timer stats");
+#endif // PR_DEBUG
 
 	// PreyRun END
 

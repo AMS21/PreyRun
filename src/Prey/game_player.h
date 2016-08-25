@@ -37,20 +37,22 @@ class hhTalon;
 class hhPossessedTommy;
 
 // PreyRun BEGIN
+#include <cstdint>
+
+//struct PR_time_t
+//{
+//	uint32_t hours;
+//	uint8_t minutes;
+//	uint8_t seconds;
+//	uint16_t milliseconds;
+//};
+
 int const PR_AMMOPOS_X = 550;
 int const PR_AMMOPOS_Y = 448;
 int const PR_AMMOPOS2_Y = PR_AMMOPOS_Y + 15;
 
-struct PR_time_t
-{
-	int hour;
-	int minute;
-	int seconds;
-	int ms;
-};
-
-inline float PR_calcStuff(float f);
-PR_time_t PR_ms2time(int x);
+//PR_time_t PR_ms2time(unsigned);
+inline float PR_calcStuff(float);
 // PreyRun END
 
 #define MAX_HEALTH_NORMAL_MP		100 //rww - a probably temporary hack for trying out the pipe-as-armor concept

@@ -1,6 +1,8 @@
 #pragma once
 #include "../game/game_local.h"
 
+// Credits to Ivan Molodetskikh (Yalter) and Chong Jiang Wei (Matherunner) for their interprocess.cpp from BunnymodXT (https://github.com/YaLTeR/BunnymodXT/blob/master/BunnymodXT/Windows/interprocess.cpp)
+
 // Realy hacking way to use stdlib functions
 #undef strcmp
 #undef strncmp

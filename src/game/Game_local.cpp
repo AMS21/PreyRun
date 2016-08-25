@@ -10,6 +10,21 @@
 #include "../framework/BuildVersion.h" // HUMANHEAD mdl
 //HUMANHEAD END
 
+// PreyRun BEGIN
+PR_time_t PR_ms2time(unsigned x)
+{
+	PR_time_t ts;
+	ts.hours = x / (60 * 60 * 1000);
+	x = x - ts.hours*(60 * 60 * 1000);
+	ts.minutes = x / (60 * 1000);
+	x = x - ts.minutes*(60 * 1000);
+	ts.seconds = x / 1000;
+	ts.milliseconds = x - ts.seconds * 1000;
+
+	return ts;
+}
+// PreyRun END
+
 #ifdef GAME_DLL
 
 idSys *						sys = NULL;
@@ -710,7 +725,7 @@ void idGameLocal::Printf( const char *fmt, ... ) const {
 	idStr::vsnPrintf( text, sizeof( text ), fmt, argptr );
 	va_end( argptr );
 
-	common->Printf( "%s", text );
+	common->Printf("%s", text);
 }
 
 /*
@@ -1309,6 +1324,9 @@ idGameLocal::InitFromNewMap
 ===================
 */
 void idGameLocal::InitFromNewMap( const char *mapName, idRenderWorld *renderWorld, idSoundWorld *soundWorld, bool isServer, bool isClient, int randseed ) {
+	// PreyRun BEGIN
+	pr::WriteMapChange(pr::GetTime(), (idStr)mapName);
+	// PreyRun END
 
 	uniqueObjects.Clear(); // HUMANHEAD mdl
 
@@ -1639,14 +1657,6 @@ bool idGameLocal::InitFromSaveGame( const char *mapName, idRenderWorld *renderWo
 
 	// free up any unused animations
 	animationLib.FlushUnusedAnims();
-
-	// PreyRun BEGIN
-	/*if (pr_autosplit.GetBool() && pr_timer_running)
-	{
-		gameLocal.Printf("PreyRun: Autosplitter: Resuming load\n");
-		pr_Timer.Start();
-	}*/
-	// PreyRun END
 
 	gamestate = GAMESTATE_ACTIVE;
 
