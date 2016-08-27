@@ -31,7 +31,7 @@ idCVar pr_hud_speedometer("PR_hud_Speedometer", "0", CVAR_GAME | CVAR_BOOL | CVA
 idCVar pr_hud_speedometer_r("PR_hud_Speedometer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the red value of the speedometer 0-255",0,255);
 idCVar pr_hud_speedometer_g("PR_hud_Speedometer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the green value of the speedometer 0-255",0,255);
 idCVar pr_hud_speedometer_b("PR_hud_Speedometer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the blue value of the speedometer 0-255",0,255);
-idCVar pr_hud_speedometer_precision("PR_hud_Speedometer_Precision", "6", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "the amount of number shown after the comma 0-6",0,6);
+idCVar pr_hud_speedometer_precision("PR_hud_Speedometer_Precision", "6", CVAR_GAME | CVAR_INTEGER /*| CVAR_ARCHIVE*/, "the amount of number shown after the comma 0-6",0,6);
 idCVar pr_hud_speedometer_x("PR_hud_Speedometer_x", "310", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer x coordinate 0-639",0,639);
 idCVar pr_hud_speedometer_y("PR_hud_Speedometer_y", "460", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "posiont of the speedometer y coordinate 0-479",0,479);
 
@@ -66,6 +66,10 @@ idCVar pr_hud_ammo("PR_hud_Ammo", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Sh
 
 // Health
 idCVar pr_hud_health("PR_hud_Health", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Shows health in numbers");
+
+#ifdef PR_DEBUG
+idCVar pr_dgb_hud_drawtime("pr_dgb_hud_drawtime", "0", CVAR_GAME | CVAR_BOOL, "*Debug*: Shows the time in ms it took to draw the hud");
+#endif // PR_DEBUG
 
 // HUD END
 // PreyRun END
