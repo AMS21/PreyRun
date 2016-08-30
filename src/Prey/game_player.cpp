@@ -1058,6 +1058,10 @@ hhPlayer::DrawHUD
 */
 void hhPlayer::DrawHUD(idUserInterface *_hud) {
 	// PreyRun BEGIN
+#ifdef PR_DEBUG
+	idTimer pr_dgb_timer;
+	pr_dgb_timer.Start();
+#endif // PR_DEBUG
 	// Might not be the optimal solution because when the game decides to not draw the hud the timer cant resume but it gives better times then hooking InitFromMap()
 	if (pr_timer_running && !pr_Timer.IsRunning())
 	{
@@ -1506,6 +1510,18 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			renderSystem->DrawSmallStringExt(70, 448, strHealth, color, false, declManager->FindMaterial("textures/bigchars"));
 		}
 	}
+
+#ifdef PR_DEBUG
+	if (pr_dgb_hud_drawtime.GetBool())
+	{
+		pr_dgb_timer.Stop();
+
+		idStr str;
+		sprintf(str, "%f ms", pr_dgb_timer.Milliseconds());
+
+		renderSystem->DrawSmallStringExt(460, 0, str, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
+	}
+#endif // PR_DEBUG
 
 	// PreyRun END
 }

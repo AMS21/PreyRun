@@ -39,19 +39,10 @@ class hhPossessedTommy;
 // PreyRun BEGIN
 #include <cstdint>
 
-//struct PR_time_t
-//{
-//	uint32_t hours;
-//	uint8_t minutes;
-//	uint8_t seconds;
-//	uint16_t milliseconds;
-//};
-
 int const PR_AMMOPOS_X = 550;
 int const PR_AMMOPOS_Y = 448;
 int const PR_AMMOPOS2_Y = PR_AMMOPOS_Y + 15;
 
-//PR_time_t PR_ms2time(unsigned);
 inline float PR_calcStuff(float);
 // PreyRun END
 

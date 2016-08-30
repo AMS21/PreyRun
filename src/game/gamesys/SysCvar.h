@@ -41,6 +41,10 @@ extern idCVar pr_hud_entityinfo;
 extern idCVar pr_hud_ammo;
 // Health
 extern idCVar pr_hud_health;
+
+#ifdef PR_DEBUG
+extern idCVar pr_dgb_hud_drawtime;
+#endif // PR_DEBUG
 // PreyRun END
 
 // HUMANHEAD
