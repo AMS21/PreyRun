@@ -23,6 +23,7 @@
 
 #include <vector>
 #include <cstring>
+#include <chrono>
 
 #define PREYSPLIT_PIPE_NAME "PreyRun-PreySplit"
 
@@ -38,7 +39,7 @@ namespace pr
 		GAMEEND = 0x00,
 		MAPCHANGE = 0x01,
 		TIMER_RESET = 0x02,
-		TIMER_START = 0x03,
+		TIMER_START = 0x03
 	};
 
 	struct Time
@@ -51,6 +52,8 @@ namespace pr
 
 	void InitPreySplitPipe();
 	void ShutdownPreySplitPipe();
+
+	void WriteTime(const Time& time);
 
 	void WriteGameEnd(const Time& time);
 	void WriteMapChange(const Time& time, idStr& map);

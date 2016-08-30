@@ -1070,9 +1070,22 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 #ifdef PR_DEBUG
 		auto time = PR_ms2time(pr_Timer.Milliseconds());
-		gameLocal.Printf("PreyRunDGB: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		gameLocal.Printf("PreyRunDBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
 
 		gameLocal.Printf("PreyRun Debug: Changed map to: %s\n", gameLocal.GetMapName());
+#endif // PR_DEBUG
+	}
+
+	if (pr_preysplit.GetBool())
+	{
+		pr::WriteTime(pr::GetTime());
+	}
+
+	if (pr_demo_timer_running && !pr_demo_timer.IsRunning())
+	{
+		pr_demo_timer.Start();
+#ifdef PR_DEBUG
+		gameLocal.Printf("PreyRunDBG: Starting demo timing\n");
 #endif // PR_DEBUG
 	}
 	// PreyRun END
@@ -1183,11 +1196,12 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		auto vel = physicsObj.GetLinearVelocity();
 
 		idStr strText;
+
 		// Uses InVehicle now
 		if (physicsObj.HasGroundContacts() || InVehicle())
 		{
 			// are we standing on the ground or in a Vehicle? then add Z speed as well (when wallwalking, being on stairs/slopes or flying in Vehicle)
-			sprintf(strText, "%.2f", vel.Length());
+			sprintf(strText, "%.2f", vel.Length()); // vel.Lenght() == idMath::Sqrt(vel.x * vel.x + vel.y * vel.y + vel.z * vel.z)
 		}
 		else
 		{
@@ -1247,7 +1261,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		renderSystem->DrawSmallStringExt(500, 80, velXYZ, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
 	}
 
-	// Position
+	// Location
 	if (_hud->GetStateBool("pr_hud_location", "0"))
 	{
 		auto eyePos = GetEyePosition();
@@ -1275,9 +1289,9 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 		start = GetEyePosition();
 
-		// end the traceline 768 units ahead in the direction we're viewing
+		// end the traceline 2048 units ahead in the direction we're viewing
 
-		end = start + viewAngles.ToForward() * 768.0f;
+		end = start + viewAngles.ToForward() * 2048.0f;
 
 		// perform the traceline and store the results in trace
 		// stop the trace for monsters and players
@@ -1296,15 +1310,20 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			// gameLocal.GetTraceEntity returns the entity's master entity if it exists
 			// search the SDK for more examples
 
-			int health = ent->health;
+			int health = ent->GetHealth();
 			int maxHealth = ent->GetMaxHealth();
+
 			if (health > 0 && maxHealth > 0)
 			{
 				idStr strHealth;
-				sprintf(strHealth, "Health: %d/%d", ent->health, ent->GetMaxHealth());
-				//sprintf(strName, "Name: %s", ent->name); // crashes
+				sprintf(strHealth, "Health: %03d/%03d", ent->health, ent->GetMaxHealth());
 
 				renderSystem->DrawSmallStringExt(360, 235, strHealth, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
+
+				idStr strName;
+				sprintf(strName, "Name: %s", ent->GetName());
+
+				renderSystem->DrawSmallStringExt(360, 220, strName, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));				
 			}
 		}
 	}
@@ -1484,12 +1503,13 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 	}
 
 	// Health
+	// PR_FIXME: Get health of shuttle
 	if (_hud->GetStateBool("pr_hud_health", "0"))
 	{
 		idStr strHealth;
 		idVec4 color;
 
-		// Player is dead
+		// Player is alive, Dead != Deathwalking
 		if (!IsDead())
 		{
 			auto health = GetHealth();
@@ -1527,20 +1547,6 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 }
 
 // PreyRun BEGIN
-// converts the 0-255 format to the 0-1 format used by the DrawSmallStringExt function
-//PR_time_t PR_ms2time(unsigned x)
-//{
-//	PR_time_t ts;
-//	ts.hours = x / (60 * 60 * 1000);
-//	x = x - ts.hours*(60 * 60 * 1000);
-//	ts.minutes = x / (60 * 1000);
-//	x = x - ts.minutes*(60 * 1000);
-//	ts.seconds = x / 1000;
-//	ts.milliseconds = x - ts.seconds * 1000;
-//
-//	return ts;
-//}
-
 inline float PR_calcStuff(float f)
 {
 	return f / 255;
