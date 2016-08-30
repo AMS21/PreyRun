@@ -91,14 +91,27 @@ void hhGameLocal::MapShutdown( void ) {
 	{
 		gameLocal.Printf("PreyRun: Timer: Paused, Map Shutdown\n");
 		pr_Timer.Stop();
+
 #ifdef PR_DEBUG
 		auto time = PR_ms2time(pr_Timer.Milliseconds());
-		gameLocal.Printf("PreyRunDGB: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		gameLocal.Printf("PreyRunDBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DEBUG
 
 		// now done in idGameLocal::InitFromNewMap
 		/*pr::WriteMapChange(pr::GetTime(),(idStr) GetMapName());*/
 	}
+
+	if (pr_demo_timer_running&&pr_demo_timer.IsRunning())
+	{
+		pr_demo_timer.Stop();
+#ifdef PR_DEBUG
+		gameLocal.Printf("PreyRunDBG: Stopping demo Timer\n");
+#endif // PR_DEBUG
+	}
+	
+#ifdef PR_DEBUG
+	gameLocal.Printf("PreyRunDBG: Leaving map:%s\n", gameLocal.GetMapName());
+#endif
 	// PreyRun END
 
 	//HUMANHEAD: mdc - added support for automatically dumping stats on map switch/game exit
@@ -909,7 +922,7 @@ gameReturn_t hhGameLocal::RunFrame( const usercmd_t *clientCmds ) {
 				timer_think.Milliseconds(), timer_events.Milliseconds(), num );
 		}
 
-		// build the return value		
+		// build the return value
 		ret.consistencyHash = 0;
 		ret.sessionCommand[0] = 0;
 

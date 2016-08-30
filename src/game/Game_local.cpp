@@ -1412,6 +1412,10 @@ bool idGameLocal::InitFromSaveGame( const char *mapName, idRenderWorld *renderWo
 	idEntity *ent;
 	idDict si;
 
+#ifdef PR_DEBUG
+	gameLocal.Printf("PreyRun DBG: Loading savegame %s from map %s\n",saveGameFile->GetName(),mapName);
+#endif // PR_DEBUG
+
 	if ( mapFileName.Length() ) {
 		MapShutdown();
 	}

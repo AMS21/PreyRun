@@ -147,13 +147,38 @@ namespace pr
 		WritePreySplit(buf);
 	}
 
+	void WriteTime(const Time& time)
+	{
+		std::vector<char> buf(10);
+		buf[0] = static_cast<char>(buf.size());
+		buf[1] = static_cast<char>(MessageType::TIME);
+		AddTimeToBuffer(buf.data() + 2, time);
+
+		if (pr_preysplit_update.GetFloat() > 0.0f)
+		{
+			static auto last_time = std::chrono::steady_clock::now() - std::chrono::milliseconds(static_cast<long long>(1000 / pr_preysplit_update.GetFloat()) + 1);
+
+			auto now = std::chrono::steady_clock::now();
+
+			if (now >= last_time + std::chrono::milliseconds(static_cast<long long>(1000 / pr_preysplit_update.GetFloat())))
+			{
+				WritePreySplit(buf);
+				last_time = now;
+			}
+		}
+		else
+		{
+			WritePreySplit(buf);
+		}
+	}
+
 	void WriteMapChange(const Time& time, idStr& map)
 	{
 		// normal map path   : maps/game/roadhouse.map
 		// gets turneded into: roadhouse.map
 		map.Replace("maps/game/", "");
 #ifdef PR_DEBUG
-		gameLocal.Printf("PreyRunDBG: WriteMapChange: Map exited: %s\nPreyRunDGB: WriteMapChange: Time %02d:%02d:%02d.%03d\n", map.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
+		gameLocal.Printf("PreyRunDBG: WriteMapChange: Map exited: %s\nPreyRunDBG: WriteMapChange: Time %02d:%02d:%02d.%03d\n", map.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DEBUG
 
 		int32_t size = static_cast<int32_t>(map.Size());

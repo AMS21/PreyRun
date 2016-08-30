@@ -24,15 +24,14 @@ void Cmd_PR_TimeDemo_f(const idCmdArgs &args)
 	const char *demoName;
 	demoName = args.Argv(1);
 
-	auto startTime = gameLocal.GetTime();
-	gameLocal.Printf("Start time: %u\n", startTime);
+	pr_demo_timer.Clear();
+	pr_demo_timer_running = true;
 
 	cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("playDemo %s", demoName));
 
-	auto endTime = gameLocal.GetTime();
-	gameLocal.Printf("End time: %u\n", endTime);
+	auto times = PR_ms2time(pr_demo_timer.Milliseconds());
 
-	gameLocal.Printf("Demo took: %u milliseconds\n", (endTime - startTime));
+	gameLocal.Printf("Demoplayback: %02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
 }
 
 /*
@@ -72,8 +71,6 @@ void Cmd_PR_timer_Start_f(const idCmdArgs &args)
 {
 	pr_Timer.Start();
 	pr_timer_running = true;
-
-	pr::WriteTimerStart(pr::GetTime());
 
 	gameLocal.Printf("Starting timer\n");
 }
@@ -122,7 +119,6 @@ void Cmd_PR_test_f(const idCmdArgs &args)
 {
 	auto player = gameLocal.GetLocalPlayer();
 	gameLocal.Printf("clip:%d\navail:%d\naltclip:%d\naltavail:%d\nzoomfov:%d\n", player->weapon->AmmoInClip(), player->weapon->AmmoAvailable(), player->weapon->AltAmmoInClip(), player->weapon->AltAmmoAvailable(), player->weapon->GetZoomFov());
-
 }
 
 void Cmd_PR_dgb_timer_f(const idCmdArgs &args)
@@ -2880,7 +2876,7 @@ void idGameLocal::InitConsoleCommands(void) {
 	// DEBUG COMMANDS
 #ifdef PR_DEBUG
 	cmdSystem->AddCommand("PR_Test", Cmd_PR_test_f, CMD_FL_GAME, "For testing purpose");
-	cmdSystem->AddCommand("PR_dgb_timer", Cmd_PR_dgb_timer_f, CMD_FL_GAME, "Prints timer stats");
+	cmdSystem->AddCommand("PR_dgb_timer", Cmd_PR_dgb_timer_f, CMD_FL_GAME, "PreyRun Debug cmd: Prints timer stats");
 #endif // PR_DEBUG
 
 	// PreyRun END

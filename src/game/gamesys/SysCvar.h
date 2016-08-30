@@ -8,6 +8,7 @@
 extern idCVar pr_autojump;
 extern idCVar pr_autopause;
 extern idCVar pr_preysplit;
+extern idCVar pr_preysplit_update;
 // Speedometer
 extern idCVar pr_hud_speedometer;
 extern idCVar pr_hud_speedometer_r;
@@ -22,7 +23,9 @@ extern idCVar pr_hud_viewangles;
 extern idCVar pr_hud_velocity;
 // Timer
 extern idTimer pr_Timer;
+extern idTimer pr_demo_timer;
 extern bool pr_timer_running;
+extern bool pr_demo_timer_running;
 
 extern idCVar pr_autostart;
 extern idCVar pr_autostop;

@@ -23,6 +23,7 @@ All game cvars should be defined here.
 idCVar pr_autojump("PR_AutoJump", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "automaticly jumps when holding spacebar");
 idCVar pr_autopause("PR_AutoPause", "0", CVAR_GAME | CVAR_BOOL, "Automaticly pauses after map load");
 idCVar pr_preysplit("PR_PreySplit", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Enables support for interaction with PreySplit a LiveSplit component");
+idCVar pr_preysplit_update("PR_PreySplit_update", "41", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The time in milliseconds PreyRun shoud update the game timer of PreySplit",0,1000);
 
 // HUD BEGIN
 
@@ -31,7 +32,7 @@ idCVar pr_hud_speedometer("PR_hud_Speedometer", "0", CVAR_GAME | CVAR_BOOL | CVA
 idCVar pr_hud_speedometer_r("PR_hud_Speedometer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the red value of the speedometer 0-255",0,255);
 idCVar pr_hud_speedometer_g("PR_hud_Speedometer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the green value of the speedometer 0-255",0,255);
 idCVar pr_hud_speedometer_b("PR_hud_Speedometer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the blue value of the speedometer 0-255",0,255);
-idCVar pr_hud_speedometer_precision("PR_hud_Speedometer_Precision", "6", CVAR_GAME | CVAR_INTEGER /*| CVAR_ARCHIVE*/, "the amount of number shown after the comma 0-6",0,6);
+idCVar pr_hud_speedometer_precision("PR_hud_Speedometer_Precision", "6", CVAR_GAME | CVAR_INTEGER /*| CVAR_ARCHIVE*/, "the amount of numbers shown after the comma 0-6",0,6);
 idCVar pr_hud_speedometer_x("PR_hud_Speedometer_x", "310", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer x coordinate 0-639",0,639);
 idCVar pr_hud_speedometer_y("PR_hud_Speedometer_y", "460", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "posiont of the speedometer y coordinate 0-479",0,479);
 
@@ -43,6 +44,8 @@ idCVar pr_hud_velocity("PR_hud_Velocity", "0", CVAR_GAME | CVAR_BOOL, "Shows inf
 
 // Timer
 idTimer pr_Timer; // The actual timer
+idTimer pr_demo_timer;
+bool pr_demo_timer_running;
 bool pr_timer_running = false;
 
 idCVar pr_autostart("PR_Timer_AutoStart", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly start the hud timer at run begin");
