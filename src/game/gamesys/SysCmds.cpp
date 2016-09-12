@@ -13,6 +13,7 @@
 
 // Includes
 #include "../../idlib/Timer.h"
+#include "../../PreyRun/Hooking.hpp"
 
 /*
 ==================
@@ -24,14 +25,11 @@ void Cmd_PR_TimeDemo_f(const idCmdArgs &args)
 	const char *demoName;
 	demoName = args.Argv(1);
 
-	pr_demo_timer.Clear();
-	pr_demo_timer_running = true;
+	pr::timeDemoInit();
 
 	cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("playDemo %s", demoName));
 
-	auto times = PR_ms2time(pr_demo_timer.Milliseconds());
-
-	gameLocal.Printf("Demoplayback: %02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
+	pr_timedemo = true;
 }
 
 /*
@@ -43,7 +41,8 @@ void Cmd_PR_GetHealth_f(const idCmdArgs &args)
 {
 	auto localPlayer = gameLocal.GetLocalPlayer();
 
-	if (localPlayer) {
+	if (localPlayer)
+	{
 		gameLocal.Printf("%d/%d\n", localPlayer->GetHealth(), localPlayer->GetMaxHealth());
 	}
 }
@@ -57,7 +56,8 @@ void Cmd_PR_ch_SetHealth_f(const idCmdArgs &args)
 {
 	auto localPlayer = gameLocal.GetLocalPlayer();
 
-	if (!localPlayer || !gameLocal.CheatsOk(false)) {
+	if (!localPlayer || !gameLocal.CheatsOk(false))
+	{
 		return;
 	}
 	localPlayer->SetHealth(atoi(args.Argv(1)));
@@ -69,7 +69,7 @@ void Cmd_PR_ch_SetHealth_f(const idCmdArgs &args)
 
 void Cmd_PR_timer_Start_f(const idCmdArgs &args)
 {
-	pr_Timer.Start();
+	pr_hudtimer.Start();
 	pr_timer_running = true;
 
 	gameLocal.Printf("Starting timer\n");
@@ -77,9 +77,9 @@ void Cmd_PR_timer_Start_f(const idCmdArgs &args)
 
 void Cmd_PR_timer_Stop_f(const idCmdArgs &args)
 {
-	if (pr_Timer.IsRunning())
+	if (pr_hudtimer.IsRunning())
 	{
-		pr_Timer.Stop();
+		pr_hudtimer.Stop();
 		pr_timer_running = false;
 
 		gameLocal.Printf("Stopping timer\n");
@@ -88,8 +88,8 @@ void Cmd_PR_timer_Stop_f(const idCmdArgs &args)
 
 void Cmd_PR_Timer_Reset_f(const idCmdArgs &args)
 {
-	pr_Timer.Stop();
-	pr_Timer.Clear();
+	pr_hudtimer.Stop();
+	pr_hudtimer.Clear();
 	pr_timer_running = false;
 
 	pr::WriteTimerReset(pr::GetTime());
@@ -102,13 +102,13 @@ void Cmd_PR_Timer_Now_f(const idCmdArgs &args)
 	PR_time_t times;
 	if (pr_timer_running)
 	{
-		pr_Timer.Stop();
-		times = PR_ms2time(pr_Timer.Milliseconds());
-		pr_Timer.Start();
+		pr_hudtimer.Stop();
+		times = PR_ms2time(pr_hudtimer.Milliseconds());
+		pr_hudtimer.Start();
 	}
 	else
 	{
-		times = PR_ms2time(pr_Timer.Milliseconds());
+		times = PR_ms2time(pr_hudtimer.Milliseconds());
 	}
 
 	gameLocal.Printf("%02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
@@ -123,8 +123,8 @@ void Cmd_PR_test_f(const idCmdArgs &args)
 
 void Cmd_PR_dgb_timer_f(const idCmdArgs &args)
 {
-	auto time = PR_ms2time(pr_Timer.Milliseconds());
-	gameLocal.Printf("Timer is running: %s\nTimer is on: %s\nTime: %02d:%02d:%02d.%03d\n",pr_Timer.IsRunning() ? "True" : "False",pr_timer_running ? "True" : "False",time.hours,time.minutes,time.seconds,time.milliseconds);
+	auto time = PR_ms2time(pr_hudtimer.Milliseconds());
+	gameLocal.Printf("Timer is running: %s\nTimer is on: %s\nTime: %02d:%02d:%02d.%03d\n", pr_hudtimer.IsRunning() ? "True" : "False", pr_timer_running ? "True" : "False", time.hours, time.minutes, time.seconds, time.milliseconds);
 }
 #endif // PR_DEBUG
 
@@ -559,7 +559,7 @@ void Cmd_Give_f(const idCmdArgs &args) {
 	//HUMANHEAD PCF rww 05/16/06
 	declManager->SetInsideLevelLoad(wasInside);
 	//HUMANHEAD END
-		}
+}
 
 /*
 ==================
@@ -799,7 +799,7 @@ static void Cmd_Say(bool team, const idCmdArgs &args) {
 	else {
 		gameLocal.mpGame.ProcessChatMessage(gameLocal.localClientNum, team, name, text, NULL);
 	}
-	}
+}
 
 /*
 ==================
@@ -1083,7 +1083,7 @@ void Cmd_PlayerShadowToggle_f(const idCmdArgs &args) {
 		}
 		if (gameLocal.entities[i]->IsType(hhPlayer::Type)) {
 			gameLocal.entities[i]->GetRenderEntity()->noShadow = setShadows;
-}
+		}
 	}
 }
 #endif
@@ -2596,7 +2596,7 @@ static void Cmd_EraseViewNote_f(const idCmdArgs &args) {
 		remove(str);
 	}
 #endif
-	}
+}
 // HUMANHEAD END
 
 /*
@@ -2833,7 +2833,7 @@ void Cmd_PrintTypeName_f(const idCmdArgs &args) {
 	}
 	else {
 		common->Printf("Invalid typenum.\n");
-}
+	}
 }
 #endif
 /*

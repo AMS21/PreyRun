@@ -956,6 +956,16 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 		int blah2 = 0;
 	}
 	// PreyRun BEGIN
+	// PreySplit pipe shoud be open but isnt
+	if (pr_preysplit.GetBool() && !pr_preysplit_pipeopen)
+	{
+		pr::InitPreySplitPipe();
+	}
+	// PreySplit pipe soudnt be open but is
+	else if (!pr_preysplit.GetBool() && pr_preysplit_pipeopen)
+	{
+		pr::ShutdownPreySplitPipe();
+	}
 
 	// Speedometer
 	_hud->SetStateBool("pr_hud_speedometer", pr_hud_speedometer.GetBool());
@@ -965,10 +975,6 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 	_hud->SetStateInt("pr_hud_speedometer_precision", pr_hud_speedometer_precision.GetInteger());
 	_hud->SetStateInt("pr_hud_speedometer_x", pr_hud_speedometer_x.GetInteger());
 	_hud->SetStateInt("pr_hud_speedometer_y", pr_hud_speedometer_y.GetInteger());
-	// ViewAngles
-	_hud->SetStateBool("pr_hud_viewangles", pr_hud_viewangles.GetBool());
-	// Velocity
-	_hud->SetStateBool("pr_hud_velocity", pr_hud_velocity.GetBool());
 	// Timer
 	_hud->SetStateBool("pr_hud_timer", pr_hud_timer.GetBool());
 	_hud->SetStateInt("pr_hud_timer_x", pr_hud_timer_x.GetInteger());
@@ -976,7 +982,13 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 	_hud->SetStateFloat("pr_hud_timer_r", pr_hud_timer_r.GetFloat());
 	_hud->SetStateFloat("pr_hud_timer_g", pr_hud_timer_g.GetFloat());
 	_hud->SetStateFloat("pr_hud_timer_b", pr_hud_timer_b.GetFloat());
-	// Position
+	// JumpSpeed
+	_hud->SetStateBool("pr_hud_jumpspeed", pr_hud_jumpspeed.GetBool());
+	// ViewAngles
+	_hud->SetStateBool("pr_hud_viewangles", pr_hud_viewangles.GetBool());
+	// Velocity
+	_hud->SetStateBool("pr_hud_velocity", pr_hud_velocity.GetBool());
+	// Location
 	_hud->SetStateBool("pr_hud_location", pr_hud_location.GetBool());
 	// Entity info
 	_hud->SetStateBool("pr_hud_entityinfo", pr_hud_entityinfo.GetBool());
@@ -984,6 +996,10 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 	_hud->SetStateBool("pr_hud_ammo", pr_hud_ammo.GetBool());
 	// Health
 	_hud->SetStateBool("pr_hud_health", pr_hud_health.GetBool());
+	// SpiritPower
+	_hud->SetStateBool("pr_hud_spiritpower", pr_hud_spiritpower.GetBool());
+	// Distance
+	_hud->SetStateBool("pr_hud_distance", pr_hud_distance.GetBool());
 	// PreyRun END
 
 	_hud->SetStateBool("invehicle", InVehicle());
@@ -1063,13 +1079,13 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 	pr_dgb_timer.Start();
 #endif // PR_DEBUG
 	// Might not be the optimal solution because when the game decides to not draw the hud the timer cant resume but it gives better times then hooking InitFromMap()
-	if (pr_timer_running && !pr_Timer.IsRunning())
+	if (pr_timer_running && !pr_hudtimer.IsRunning())
 	{
 		gameLocal.Printf("PreyRun: Timer: Resuming\n");
-		pr_Timer.Start();
+		pr_hudtimer.Start();
 
 #ifdef PR_DEBUG
-		auto time = PR_ms2time(pr_Timer.Milliseconds());
+		auto time = PR_ms2time(pr_hudtimer.Milliseconds());
 		gameLocal.Printf("PreyRunDBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
 
 		gameLocal.Printf("PreyRun Debug: Changed map to: %s\n", gameLocal.GetMapName());
@@ -1079,14 +1095,6 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 	if (pr_preysplit.GetBool())
 	{
 		pr::WriteTime(pr::GetTime());
-	}
-
-	if (pr_demo_timer_running && !pr_demo_timer.IsRunning())
-	{
-		pr_demo_timer.Start();
-#ifdef PR_DEBUG
-		gameLocal.Printf("PreyRunDBG: Starting demo timing\n");
-#endif // PR_DEBUG
 	}
 	// PreyRun END
 
@@ -1159,11 +1167,11 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		int pr_t_x = _hud->GetStateInt("pr_hud_timer_x", "0");
 		int pr_t_y = _hud->GetStateInt("pr_hud_timer_y", "235");
 
-		if (pr_Timer.IsRunning())
+		if (pr_hudtimer.IsRunning())
 		{
-			pr_Timer.Stop();
-			auto times = PR_ms2time(pr_Timer.Milliseconds());
-			pr_Timer.Start();
+			pr_hudtimer.Stop();
+			auto times = PR_ms2time(pr_hudtimer.Milliseconds());
+			pr_hudtimer.Start();
 
 			idStr strText;
 
@@ -1173,7 +1181,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		}
 		else
 		{
-			auto times = PR_ms2time(pr_Timer.Milliseconds());
+			auto times = PR_ms2time(pr_hudtimer.Milliseconds());
 
 			idStr strText;
 
@@ -1184,7 +1192,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 	}
 
 	// Speedometer
-	if (_hud->GetStateBool("pr_hud_speedometer", "0"))
+	if (_hud->GetStateBool("pr_hud_speedometer", "1"))
 	{
 		float pr_sm_r = _hud->GetStateFloat("pr_hud_speedometer_r", "255");
 		float pr_sm_g = _hud->GetStateFloat("pr_hud_speedometer_g", "255");
@@ -1209,6 +1217,28 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 		}
 		renderSystem->DrawSmallStringExt(pr_sm_x, pr_sm_y, strText.c_str(), idVec4(PR_calcStuff(pr_sm_r), PR_calcStuff(pr_sm_g), PR_calcStuff(pr_sm_b), 1), false, declManager->FindMaterial("textures/bigchars"));
+	}
+
+	// JumpSpeed
+	if (_hud->GetStateBool("pr_hud_jumpspeed", "0"))
+	{
+		idStr strText;
+
+		// If were are standing on the ground or are in a Vehicle get velocity and save it
+		if (physicsObj.HasGroundContacts() || InVehicle())
+		{
+			auto vel = physicsObj.GetLinearVelocity().Length();
+			_hud->SetStateFloat("pr_hud_jumpspeed_val", vel);
+			sprintf(strText, "%.2f", vel);
+		}
+		// Were arent standing on the ground so were in mid air, so we display the last speedvalue we had while on the ground
+		else
+		{
+			sprintf(strText, "%.2f", _hud->GetStateFloat("pr_hud_jumpspeed_val", 0));
+
+		}
+
+		renderSystem->DrawSmallStringExt(310, 445, strText.c_str(), idVec4(PR_calcStuff(255), PR_calcStuff(255), PR_calcStuff(63.75), 1), false, declManager->FindMaterial("textures/bigchars"));
 	}
 
 	// Viewangles
@@ -1323,7 +1353,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				idStr strName;
 				sprintf(strName, "Name: %s", ent->GetName());
 
-				renderSystem->DrawSmallStringExt(360, 220, strName, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));				
+				renderSystem->DrawSmallStringExt(360, 220, strName, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
 			}
 		}
 	}
@@ -1506,12 +1536,12 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 	// PR_FIXME: Get health of shuttle
 	if (_hud->GetStateBool("pr_hud_health", "0"))
 	{
-		idStr strHealth;
-		idVec4 color;
-
 		// Player is alive, Dead != Deathwalking
 		if (!IsDead())
 		{
+			idStr strHealth;
+			idVec4 color;
+
 			auto health = GetHealth();
 			auto maxHealth = GetMaxHealth();
 
@@ -1531,8 +1561,64 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		}
 	}
 
+	if (_hud->GetStateBool("pr_hud_spiritpower", "0"))
+	{
+		if (!IsDead() && inventory.requirements.bCanSpiritWalk)
+		{
+			idStr strSpirit;
 #ifdef PR_DEBUG
-	if (pr_dgb_hud_drawtime.GetBool())
+			gameLocal.Printf("SpiritPower: %d", GetSpiritPower());
+#endif // PR_DEBUG
+
+			sprintf(strSpirit, "%03d | 100", GetSpiritPower());
+
+			renderSystem->DrawSmallStringExt(70, 433, strSpirit, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
+		}
+	}
+
+	if (_hud->GetStateBool("pr_hud_distance", "0"))
+	{
+		trace_t trace;
+		idVec3 start;
+		idVec3 end;
+
+		// start the traceline at our eyes
+
+		start = GetEyePosition();
+
+		// end the traceline 2048 units ahead in the direction we're viewing
+
+		end = start + viewAngles.ToForward() * 2048.0f;
+
+		// perform the traceline and store the results in trace
+		// and ignore this (the player) since we started the trace inside the player
+		if (IsSpiritWalking())
+		{
+			gameLocal.clip.TracePoint(trace, start, end, CONTENTS_SOLID | CONTENTS_PLAYERCLIP | CONTENTS_BODY | CONTENTS_SPIRITBRIDGE, this);
+		}
+		else
+		{
+			gameLocal.clip.TracePoint(trace, start, end, CONTENTS_SOLID | CONTENTS_PLAYERCLIP | CONTENTS_BODY | CONTENTS_FORCEFIELD, this);
+		}
+
+		// trace.fraction is the fraction of the traceline that was travelled
+		// if trace.fraction is less than one then we hit something
+
+		if ((trace.fraction < 1.0f) && (trace.c.entityNum != ENTITYNUM_NONE))
+		{
+			auto distance = start - trace.endpos;
+
+
+
+			idStr strText;
+			sprintf(strText, "Distance %f", fabs(distance.x) + fabs(distance.y) + fabs(distance.z));
+
+			renderSystem->DrawSmallStringExt(360, 205, strText, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
+		}
+	}
+
+#ifdef PR_DEBUG
+	if (pr_dbg_hud_drawtime.GetBool())
 	{
 		pr_dgb_timer.Stop();
 
