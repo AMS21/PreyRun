@@ -9,9 +9,9 @@
 ===============================================================================
 */
 
-#define GAME_NAME						"Prey"			// appears on window titles and errors
+#define GAME_NAME						"PreyRun"			// appears on window titles and errors
 
-#define	ENGINE_VERSION					"Prey 1.2"		// printed in console
+#define	ENGINE_VERSION					"PreyRun 1.0.3"		// printed in console
 
 // paths
 #define	CD_BASEDIR						"Prey"
