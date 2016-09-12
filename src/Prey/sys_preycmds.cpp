@@ -1077,7 +1077,7 @@ void P_InitConsoleCommands( void ) {
 	cmdSystem->AddCommand("getmapname",				Cmd_GetMapName_f,			CMD_FL_SYSTEM,				"print current map name to console" );
  
 #if INGAME_PROFILER_ENABLED
-	cmdSystem->AddCommand("Prof_out", 				Profiler_ZoomOut_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"Profiler command" );
+ 	cmdSystem->AddCommand("Prof_out", 				Profiler_ZoomOut_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"Profiler command" );
 	cmdSystem->AddCommand("Prof_mode",				Profiler_Mode_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"Profiler command" );
 	cmdSystem->AddCommand("Prof_ms",				Profiler_MSMode_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"Profiler command" );
 	cmdSystem->AddCommand("Prof_smooth",			Profiler_Smooth_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"Profiler command" );

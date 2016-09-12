@@ -33,7 +33,6 @@ namespace pr
 				return;
 			}
 			gameLocal.Printf("PreyRun: Opened the PreySplit pipe.\n");
-			pr_preysplit_pipeopen = true;
 
 			std::memset(&overlapped, 0, sizeof(overlapped));
 			overlapped.hEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
@@ -44,7 +43,6 @@ namespace pr
 				gameLocal.Printf("PreyRun: PreySplit integration is not available.\n");
 				CloseHandle(pipe_preysplit);
 				pipe_preysplit = INVALID_HANDLE_VALUE;
-				pr_preysplit_pipeopen = false;
 			}
 		}
 #ifdef PR_DEBUG
@@ -62,7 +60,6 @@ namespace pr
 			gameLocal.Printf("PreyRun: Closed the PreySplit pipe.\n");
 		}
 		pipe_preysplit = INVALID_HANDLE_VALUE;
-		pr_preysplit_pipeopen = false;
 
 		CloseHandle(overlapped.hEvent);
 		std::memset(&overlapped, 0, sizeof(overlapped));
@@ -231,15 +228,15 @@ namespace pr
 	{
 		PR_time_t times;
 
-		if (pr_hudtimer.IsRunning())
+		if (pr_Timer.IsRunning())
 		{
-			pr_hudtimer.Stop();
-			times = PR_ms2time(pr_hudtimer.Milliseconds());
-			pr_hudtimer.Start();
+			pr_Timer.Stop();
+			times = PR_ms2time(pr_Timer.Milliseconds());
+			pr_Timer.Start();
 		}
 		else
 		{
-			times = PR_ms2time(pr_hudtimer.Milliseconds());
+			times = PR_ms2time(pr_Timer.Milliseconds());
 		}
 
 		return Time{ times.hours, times.minutes, times.seconds, times.milliseconds };

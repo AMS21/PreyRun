@@ -9,7 +9,6 @@ extern idCVar pr_autojump;
 extern idCVar pr_autopause;
 extern idCVar pr_preysplit;
 extern idCVar pr_preysplit_update;
-extern bool pr_preysplit_pipeopen;
 // Speedometer
 extern idCVar pr_hud_speedometer;
 extern idCVar pr_hud_speedometer_r;
@@ -18,13 +17,18 @@ extern idCVar pr_hud_speedometer_b;
 extern idCVar pr_hud_speedometer_precision;
 extern idCVar pr_hud_speedometer_x;
 extern idCVar pr_hud_speedometer_y;
+// Viewangles
+extern idCVar pr_hud_viewangles;
+// Velocity
+extern idCVar pr_hud_velocity;
 // Timer
-extern idTimer pr_hudtimer;
+extern idTimer pr_Timer;
+extern idTimer pr_demo_timer;
 extern bool pr_timer_running;
-extern bool pr_timedemo;
+extern bool pr_demo_timer_running;
 
-extern idCVar pr_timer_autostart;
-extern idCVar pr_timer_autostop;
+extern idCVar pr_autostart;
+extern idCVar pr_autostop;
 
 extern idCVar pr_hud_timer;
 extern idCVar pr_hud_timer_x;
@@ -32,12 +36,6 @@ extern idCVar pr_hud_timer_y;
 extern idCVar pr_hud_timer_r;
 extern idCVar pr_hud_timer_g;
 extern idCVar pr_hud_timer_b;
-// JumpSpeed
-extern idCVar pr_hud_jumpspeed;
-// Viewangles
-extern idCVar pr_hud_viewangles;
-// Velocity
-extern idCVar pr_hud_velocity;
 // Location
 extern idCVar pr_hud_location;
 // Entity Info
@@ -46,13 +44,9 @@ extern idCVar pr_hud_entityinfo;
 extern idCVar pr_hud_ammo;
 // Health
 extern idCVar pr_hud_health;
-// SpiritPower
-extern idCVar pr_hud_spiritpower;
-// Distance
-extern idCVar pr_hud_distance;
 
 #ifdef PR_DEBUG
-extern idCVar pr_dbg_hud_drawtime;
+extern idCVar pr_dgb_hud_drawtime;
 #endif // PR_DEBUG
 // PreyRun END
 

@@ -124,7 +124,7 @@ void idInventory::GetPersistantData( idDict &dict ) {
 	// armor
 	dict.SetInt( "armor", armor );
 
-	// don't bother with powerups, maxhealth, maxarmor, or the clip
+    // don't bother with powerups, maxhealth, maxarmor, or the clip
 
 	// ammo
 	for( i = 0; i < AMMO_NUMTYPES; i++ ) {
@@ -3680,7 +3680,7 @@ bool idPlayer::Collide( const trace_t &collision, const idVec3 &velocity ) {
 			// mdl:  Ugly hack to fix movables in harvesterb gravity puzzle
 			float negVel = (other->GetPhysics()->GetMass() > 50000.0f ? -24.0f : -48.0f);
 			if (other->IsType(idMoveable::Type)) {
-				if (localVel.z > 128.0f) {
+ 				if (localVel.z > 128.0f) {
 					localVel.z = 128.0f;
 				} else if (localVel.z < negVel) { // mdl:  For inverse gravity
 					localVel.z = negVel;
@@ -3961,7 +3961,7 @@ void idPlayer::UpdateFocus( void ) {
 			// clamp the mouse to the corner
 			ev = sys->GenerateMouseMoveEvent( -2000, -2000 );
 			command = focusUI->HandleEvent( &ev, gameLocal.time );
-			HandleGuiCommands( focusGUIent, command );
+ 			HandleGuiCommands( focusGUIent, command );
 
 			// move to an absolute position
 			ev = sys->GenerateMouseMoveEvent( pt.x * SCREEN_WIDTH, pt.y * SCREEN_HEIGHT );
@@ -4818,7 +4818,7 @@ void idPlayer::AdjustBodyAngles( void ) {
 		upBlend			= -frac;
 	}
 
-	animator.CurrentAnim( ANIMCHANNEL_TORSO )->SetSyncedAnimWeight( 0, downBlend );
+    animator.CurrentAnim( ANIMCHANNEL_TORSO )->SetSyncedAnimWeight( 0, downBlend );
 	animator.CurrentAnim( ANIMCHANNEL_TORSO )->SetSyncedAnimWeight( 1, forwardBlend );
 	animator.CurrentAnim( ANIMCHANNEL_TORSO )->SetSyncedAnimWeight( 2, upBlend );
 
@@ -5024,7 +5024,7 @@ void idPlayer::Move( void ) {
 
 	if ( AI_JUMP ) {
 		// bounce the view weapon
-		loggedAccel_t	*acc = &loggedAccel[currentLoggedAccel&(NUM_LOGGED_ACCELS-1)];
+ 		loggedAccel_t	*acc = &loggedAccel[currentLoggedAccel&(NUM_LOGGED_ACCELS-1)];
 		currentLoggedAccel++;
 		acc->time = gameLocal.time;
 		acc->dir[2] = 200;
@@ -5312,7 +5312,7 @@ void idPlayer::Think( void ) {
 
 		// service animations
 		if ( !spectating && !af.IsActive() && !gameLocal.inCinematic ) {
-			UpdateConditions();
+    		UpdateConditions();
 			UpdateAnimState();
 			CheckBlink();
 		}
@@ -5382,7 +5382,7 @@ void idPlayer::Think( void ) {
 	if ( !g_stopTime.GetBool() ) {
 		UpdateAnimation();
 
-		Present();
+        Present();
 
 		UpdateDamageEffects();
 
@@ -6713,7 +6713,7 @@ void idPlayer::ClientPredictionThink( void ) {
 
 	// service animations
 	if ( !spectating && !af.IsActive() ) {
-		UpdateConditions();
+    	UpdateConditions();
 		UpdateAnimState();
 		CheckBlink();
 	}

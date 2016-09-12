@@ -123,7 +123,7 @@ public:
 	//Make these idEntityPtr just to be safe
 	hhWeaponHandState			weaponHandState;
 	idEntityPtr<hhHand>			hand;
-	idEntityPtr<hhHand>			handNext;					// Next hand to pop up
+   	idEntityPtr<hhHand>			handNext;					// Next hand to pop up
 	hhPlayerVehicleInterface	vehicleInterfaceLocal;
 
 	// Death Variables

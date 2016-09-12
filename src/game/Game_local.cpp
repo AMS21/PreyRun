@@ -391,15 +391,6 @@ void idGameLocal::Init( void ) {
 
 	// PreyRun BEGIN
 	pr::InitPreySplitPipe();
-
-	// Load PreyRun.cfg
-	cmdSystem->BufferCommandText(CMD_EXEC_NOW, "exec preyrun.cfg");
-
-	printf("Running %s\n", ENGINE_VERSION);
-
-#ifdef PR_DEBUG
-	printf("Running extra PreyRun debug functionality!\n");
-#endif // PR_DEBUG
 	// PreyRun END
 }
 
@@ -416,11 +407,11 @@ void idGameLocal::Shutdown( void ) {
 		return;
 	}
 
-	Printf( "------------ Game Shutdown -----------\n" );
-
 	// PreyRun BEGIN
 	pr::ShutdownPreySplitPipe();
 	// PreyRun END
+
+	Printf( "------------ Game Shutdown -----------\n" );
 
 	mpGame.Shutdown();
 
@@ -2469,7 +2460,7 @@ bool idGameLocal::InPlayerPVS( idEntity *ent ) const {
 	if ( playerPVS.i == -1 ) {
 		return false;
 	}
-	return pvs.InCurrentPVS( playerPVS, ent->GetPVSAreas(), ent->GetNumPVSAreas() );
+    return pvs.InCurrentPVS( playerPVS, ent->GetPVSAreas(), ent->GetNumPVSAreas() );
 }
 
 /*
@@ -2483,7 +2474,7 @@ bool idGameLocal::InPlayerConnectedArea( idEntity *ent ) const {
 	if ( playerConnectedAreas.i == -1 ) {
 		return false;
 	}
-	return pvs.InCurrentPVS( playerConnectedAreas, ent->GetPVSAreas(), ent->GetNumPVSAreas() );
+    return pvs.InCurrentPVS( playerConnectedAreas, ent->GetPVSAreas(), ent->GetNumPVSAreas() );
 }
 
 /*
@@ -2498,7 +2489,7 @@ void idGameLocal::UpdateGravity( void ) {
 		if ( g_gravity.GetFloat() == 0.0f ) {
 			g_gravity.SetFloat( 1.0f );
 		}
-		gravity.Set( 0, 0, -g_gravity.GetFloat() );
+        gravity.Set( 0, 0, -g_gravity.GetFloat() );
 
 		// update all physics objects
 		for( ent = spawnedEntities.Next(); ent != NULL; ent = ent->spawnNode.Next() ) {
@@ -4093,7 +4084,7 @@ int idGameLocal::GetTargets( const idDict &args, idList< idEntityPtr<idEntity> >
 			ent = FindEntity( arg->GetValue() );
 			if ( ent ) {
 				idEntityPtr<idEntity> &entityPtr = list.Alloc();
-				entityPtr = ent;
+                entityPtr = ent;
 			}
 		}
 	}
