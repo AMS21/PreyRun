@@ -43,6 +43,11 @@ int const PR_AMMOPOS_X = 550;
 int const PR_AMMOPOS_Y = 448;
 int const PR_AMMOPOS2_Y = PR_AMMOPOS_Y + 15;
 
+#ifdef PR_DEBUG
+double const PR_DBG_HUDDRAWTIME_YELLOW = 0.3;
+double const PR_DBG_HUDDRAWTIME_RED = 0.4;
+#endif // PR_DEBUG
+
 inline float PR_calcStuff(float);
 // PreyRun END
 

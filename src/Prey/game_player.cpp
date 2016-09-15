@@ -1075,8 +1075,10 @@ hhPlayer::DrawHUD
 void hhPlayer::DrawHUD(idUserInterface *_hud) {
 	// PreyRun BEGIN
 #ifdef PR_DEBUG
-	idTimer pr_dgb_timer;
-	pr_dgb_timer.Start();
+	if (pr_dbg_hud_drawtime.GetBool())
+	{
+		pr_dbg_timer.Start();
+	}
 #endif // PR_DEBUG
 	// Might not be the optimal solution because when the game decides to not draw the hud the timer cant resume but it gives better times then hooking InitFromMap()
 	if (pr_timer_running && !pr_hudtimer.IsRunning())
@@ -1088,7 +1090,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		auto time = PR_ms2time(pr_hudtimer.Milliseconds());
 		gameLocal.Printf("PreyRunDBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
 
-		gameLocal.Printf("PreyRun Debug: Changed map to: %s\n", gameLocal.GetMapName());
+		gameLocal.Printf("PreyRunDBG: Changed map to: %s\n", gameLocal.GetMapName());
 #endif // PR_DEBUG
 	}
 
@@ -1620,12 +1622,29 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 #ifdef PR_DEBUG
 	if (pr_dbg_hud_drawtime.GetBool())
 	{
-		pr_dgb_timer.Stop();
+		pr_dbg_timer.Stop();
 
 		idStr str;
-		sprintf(str, "%f ms", pr_dgb_timer.Milliseconds());
+		idVec4 color{ 1,1,1,1 };
+		auto time{ pr_dbg_timer.Milliseconds() };
 
-		renderSystem->DrawSmallStringExt(460, 0, str, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
+		if (time > PR_DBG_HUDDRAWTIME_YELLOW)
+		{
+			if (time > PR_DBG_HUDDRAWTIME_RED)
+			{
+				color.Set(1, 0, 0, 1);
+			}
+			else
+			{
+				color.Set(1, 1, 0.25, 1);
+			}
+		}
+
+		sprintf(str, "%f ms", pr_dbg_timer.Milliseconds());
+
+		renderSystem->DrawSmallStringExt(460, 0, str, color, false, declManager->FindMaterial("textures/bigchars"));
+
+		pr_dbg_timer.Clear();
 	}
 #endif // PR_DEBUG
 
@@ -3141,8 +3160,8 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 			else {
 				localViewAngles.pitch -= fadd;
 			}
-		}
 	}
+		}
 	else {
 		lastAutoLevelTime = gameLocal.time;
 	}
@@ -3190,7 +3209,7 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 	loggedViewAngles[gameLocal.framenum & (NUM_LOGGED_VIEW_ANGLES - 1)] = localViewAngles;
 
 	return localViewAngles;
-}
+	}
 
 /*
 ================
@@ -3499,8 +3518,8 @@ void hhPlayer::PerformImpulse(int impulse) {
 			if (developer.GetBool() && (gameLocal.time - deathWalkTime > spawnArgs.GetInt("deathWalkMinTime", "4000"))) { // Force the player to stay in deathwalk for a short period of time
 				deathWalkFlash = 0.0f;
 				PostEventMS(&EV_PrepareToResurrect, 0);
-			}
 		}
+	}
 		else if (inventory.requirements.bCanSpiritWalk) {
 			ToggleSpiritWalk();
 		}
@@ -3515,8 +3534,8 @@ void hhPlayer::PerformImpulse(int impulse) {
 #endif // VENOM END
 		break;
 	}
-	}
 }
+	}
 
 void hhPlayer::Present() {
 	idPlayer::Present();
@@ -5871,9 +5890,9 @@ void hhPlayer::Move(void) {
 								physicsObj.SetOrigin(flippedOrigin);
 								physicsObj.SetAxis(flippedAxis);
 								physicsObj.CheckWallWalk(true);*/
-			}
 		}
 	}
+}
 #endif
 	// HUMANHEAD END
 
