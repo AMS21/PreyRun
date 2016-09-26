@@ -717,7 +717,7 @@ void hhVehicle::Save(idSaveGame *savefile) const {
 
 	if( fireController ) {
 		savefile->WriteBool(true);
-        savefile->WriteStaticObject(*fireController);
+		savefile->WriteStaticObject(*fireController);
 	} else {
 		savefile->WriteBool(false);
 	}
@@ -1585,7 +1585,7 @@ void hhVehicle::DrawHUD( idUserInterface* _hud ) {
 	if( _hud ) {
 		//rww - transfer necessary hud variables from the player hud to the vehicle hud
 		if (GetPilotInterface() && GetPilotInterface()->GetPilot() && GetPilotInterface()->GetPilot()->IsType(hhPlayer::Type)) {
-            hhPlayer *plPilot = static_cast<hhPlayer *>(GetPilotInterface()->GetPilot());
+			hhPlayer *plPilot = static_cast<hhPlayer *>(GetPilotInterface()->GetPilot());
 			if (plPilot->hud) {
 				//aiming
 				_hud->SetStateFloat("aim_R", plPilot->hud->GetStateFloat("aim_R", ""));

@@ -89,6 +89,9 @@ class idLocationEntity;
 
 // PreyRun BEGIN
 #include "../PreyRun/interprocess.hpp"
+//#include "../PreyRun/Random.hpp"
+#include "../PreyRun/AutoCmd.hpp"
+
 #include <cstdint>
 
 struct PR_time_t
@@ -453,7 +456,12 @@ public:
 	// can be used to automatically effect every material in the world that references globalParms
 	float					globalShaderParms[MAX_GLOBAL_SHADER_PARMS];
 
+	// PreyRun EDIT BEGIN
+	//prRandom				random;					// random number generator used throughout the game
+	// PreyRun EDIT END
+	// PreyRun ORIGINAL BEGIN
 	idRandom				random;					// random number generator used throughout the game
+	// PreyRun ORIGINAL END
 
 	idProgram				program;				// currently loaded script and data space
 	idThread *				frameCommandThread;

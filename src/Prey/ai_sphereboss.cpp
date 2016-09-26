@@ -199,20 +199,19 @@ idProjectile *hhSphereBoss::LaunchProjectile( const char *jointname, idEntity *t
 
 void hhSphereBoss::Killed( idEntity *inflictor, idEntity *attacker, int damage, const idVec3 &dir, int location ) {
 	// PreyRun BEGIN
-	if (pr_timer_running && pr_autostop.GetBool())
+	if (pr_gametimer_running && pr_timer_autostop.GetBool())
 	{
-		pr_Timer.Stop();
-		pr_timer_running = false;
+		pr_gametimer.Stop();
+		pr_gametimer_running = false;
 
 		if (pr_preysplit.GetBool())
 		{
 			pr::WriteGameEnd(pr::GetTime());
 		}
 
-		auto times = PR_ms2time(pr_Timer.Milliseconds());
+		auto times = PR_ms2time(pr_gametimer.Milliseconds());
 
 		gameLocal.Printf("PreyRun: Timer: End game, time: %02d:%02d:%02d.%03d\n",times.hours,times.minutes,times.seconds,times.milliseconds);
-
 	}
 	// PreyRun END
 

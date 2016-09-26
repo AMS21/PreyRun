@@ -2,7 +2,6 @@
 *.def
 *.dll
 *.filters
-*.filters
 *.ipch
 *.lib
 *.log
@@ -14,10 +13,7 @@
 *.vcproj
 *.vcxproj
 Added.txt
-code pieces.txt
-EULA.Development Kit.rtf
 examples/
-Info.txt
 ReadMe.rtf
 src/.vs/
 src/Backup/
@@ -29,5 +25,7 @@ src/idLib/ReleaseDLL/
 src/ipch/
 src/ReleaseDLL/
 src/UpgradeLog.htm
-ToDo.txt
 *.rtf#
+Prey.exe Hooking.txt
+DevNotes.txt
+Changelog.txt

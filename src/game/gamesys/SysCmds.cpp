@@ -13,6 +13,7 @@
 
 // Includes
 #include "../../idlib/Timer.h"
+#include "../../PreyRun/Hooking.hpp"
 
 /*
 ==================
@@ -24,14 +25,11 @@ void Cmd_PR_TimeDemo_f(const idCmdArgs &args)
 	const char *demoName;
 	demoName = args.Argv(1);
 
-	pr_demo_timer.Clear();
-	pr_demo_timer_running = true;
+	pr::timeDemoInit();
 
 	cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("playDemo %s", demoName));
 
-	auto times = PR_ms2time(pr_demo_timer.Milliseconds());
-
-	gameLocal.Printf("Demoplayback: %02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
+	pr_timedemo = true;
 }
 
 /*
@@ -43,7 +41,8 @@ void Cmd_PR_GetHealth_f(const idCmdArgs &args)
 {
 	auto localPlayer = gameLocal.GetLocalPlayer();
 
-	if (localPlayer) {
+	if (localPlayer)
+	{
 		gameLocal.Printf("%d/%d\n", localPlayer->GetHealth(), localPlayer->GetMaxHealth());
 	}
 }
@@ -57,7 +56,8 @@ void Cmd_PR_ch_SetHealth_f(const idCmdArgs &args)
 {
 	auto localPlayer = gameLocal.GetLocalPlayer();
 
-	if (!localPlayer || !gameLocal.CheatsOk(false)) {
+	if (!localPlayer || !gameLocal.CheatsOk(false))
+	{
 		return;
 	}
 	localPlayer->SetHealth(atoi(args.Argv(1)));
@@ -69,18 +69,18 @@ void Cmd_PR_ch_SetHealth_f(const idCmdArgs &args)
 
 void Cmd_PR_timer_Start_f(const idCmdArgs &args)
 {
-	pr_Timer.Start();
-	pr_timer_running = true;
+	pr_gametimer.Start();
+	pr_gametimer_running = true;
 
 	gameLocal.Printf("Starting timer\n");
 }
 
 void Cmd_PR_timer_Stop_f(const idCmdArgs &args)
 {
-	if (pr_Timer.IsRunning())
+	if (pr_gametimer.IsRunning())
 	{
-		pr_Timer.Stop();
-		pr_timer_running = false;
+		pr_gametimer.Stop();
+		pr_gametimer_running = false;
 
 		gameLocal.Printf("Stopping timer\n");
 	}
@@ -88,9 +88,9 @@ void Cmd_PR_timer_Stop_f(const idCmdArgs &args)
 
 void Cmd_PR_Timer_Reset_f(const idCmdArgs &args)
 {
-	pr_Timer.Stop();
-	pr_Timer.Clear();
-	pr_timer_running = false;
+	pr_gametimer.Stop();
+	pr_gametimer.Clear();
+	pr_gametimer_running = false;
 
 	pr::WriteTimerReset(pr::GetTime());
 
@@ -100,18 +100,99 @@ void Cmd_PR_Timer_Reset_f(const idCmdArgs &args)
 void Cmd_PR_Timer_Now_f(const idCmdArgs &args)
 {
 	PR_time_t times;
-	if (pr_timer_running)
+	if (pr_gametimer_running)
 	{
-		pr_Timer.Stop();
-		times = PR_ms2time(pr_Timer.Milliseconds());
-		pr_Timer.Start();
+		pr_gametimer.Stop();
+		times = PR_ms2time(pr_gametimer.Milliseconds());
+		pr_gametimer.Start();
 	}
 	else
 	{
-		times = PR_ms2time(pr_Timer.Milliseconds());
+		times = PR_ms2time(pr_gametimer.Milliseconds());
 	}
 
 	gameLocal.Printf("%02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
+}
+
+// Autocmdzone
+
+void Cmd_PR_autocmd_add_f(const idCmdArgs &args)
+{
+	if (args.Argc() != 8)
+	{
+		gameLocal.Printf("Usage: Pr_AutoCmd_Add <Point1 X (Float)> <Point1 Y (Float)> <Point 1 Z (Float)> <Point 2 X (Float)> <Point 2 Y (Float)> <Point 2 Z (Float)> <Command (String)>");
+		return;
+	}
+
+	pr::AutocmdzoneHandler::getInstance().Add(
+		idVec3(atof(args.Argv(1)), atof(args.Argv(2)), atof(args.Argv(3)))
+		, idVec3(atof(args.Argv(4)), atof(args.Argv(5)), atof(args.Argv(6)))
+		, (idStr)args.Argv(7)
+	);
+
+	gameLocal.Printf("Succesfully added Autocmdzone\n");
+}
+
+void Cmd_PR_autocmd_clear_f(const idCmdArgs &args)
+{
+	pr::AutocmdzoneHandler::getInstance().Clear();
+
+	gameLocal.Printf("Cleared autocmdzones\n");
+}
+
+void Cmd_PR_autocmd_edit_f(const idCmdArgs &args)
+{
+	if (args.Argc() != 9) // 8 ist ne geile Nummer :D *roflcoppter*
+	{
+		gameLocal.Printf("Usage: PR_AutoCmd_Edit <Index (0-%d)> <Point1 X (Float)> <Point1 Y (Float)> <Point 1 Z (Float)> <Point 2 X (Float)> <Point 2 Y (Float)> <Point 2 Z (Float)> <Command (String)>", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		return;
+	}
+
+	if (atoi(args.Argv(1)) > pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1)
+	{
+		gameLocal.Printf("Out of bounds: %d max:%d", atoi(args.Argv(1)), pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		return;
+	}
+
+	pr::AutocmdzoneHandler::getInstance().Edit(
+		atoi(args.Argv(1))
+		, idVec3(atof(args.Argv(2)), atof(args.Argv(3)), atof(args.Argv(4)))
+		, idVec3(atof(args.Argv(5)), atof(args.Argv(6)), atof(args.Argv(7)))
+		, (idStr)args.Argv(8)
+	);
+}
+
+void Cmd_PR_autocmd_list_f(const idCmdArgs &args)
+{
+	auto& aczHandler = pr::AutocmdzoneHandler::getInstance();
+	int num{ 0 };
+
+	for (auto && e : aczHandler)
+	{
+		idVec3 pos1 = e.GetPos1();
+		idVec3 pos2 = e.GetPos2();
+		auto cmds = e.GetCmds();
+
+		gameLocal.Printf("%d: %.2f %.2f %.2f %.2f %.2f %.2f %s\n", num, pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z, cmds.c_str());
+
+		num++;
+	}
+}
+
+void Cmd_PR_autocmd_remove_f(const idCmdArgs &args)
+{
+	if (args.Argc() != 2)
+	{
+		gameLocal.Printf("Usage: PR_AutoCmd_Remove <Index (0-%d)>", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+	}
+
+	if (atoi(args.Argv(1)) > pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1)
+	{
+		gameLocal.Printf("Out of bounds: %d max:%d\n", atoi(args.Argv(1)), pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		return;
+	}
+
+	pr::AutocmdzoneHandler::getInstance().Remove(atoi(args.Argv(1)));
 }
 
 #ifdef PR_DEBUG
@@ -121,10 +202,20 @@ void Cmd_PR_test_f(const idCmdArgs &args)
 	gameLocal.Printf("clip:%d\navail:%d\naltclip:%d\naltavail:%d\nzoomfov:%d\n", player->weapon->AmmoInClip(), player->weapon->AmmoAvailable(), player->weapon->AltAmmoInClip(), player->weapon->AltAmmoAvailable(), player->weapon->GetZoomFov());
 }
 
-void Cmd_PR_dgb_timer_f(const idCmdArgs &args)
+void Cmd_PR_dbg_timer_f(const idCmdArgs &args)
 {
-	auto time = PR_ms2time(pr_Timer.Milliseconds());
-	gameLocal.Printf("Timer is running: %s\nTimer is on: %s\nTime: %02d:%02d:%02d.%03d\n",pr_Timer.IsRunning() ? "True" : "False",pr_timer_running ? "True" : "False",time.hours,time.minutes,time.seconds,time.milliseconds);
+	auto time = PR_ms2time(pr_gametimer.Milliseconds());
+	gameLocal.Printf("Timer is running: %s\nTimer is on: %s\nTime: %02d:%02d:%02d.%03d\n", pr_gametimer.IsRunning() ? "True" : "False", pr_gametimer_running ? "True" : "False", time.hours, time.minutes, time.seconds, time.milliseconds);
+}
+
+void Cmd_PR_dbg_randseed_f(const idCmdArgs &args)
+{
+	gameLocal.Printf("Seed: %d\n", gameLocal.random.GetSeed());
+}
+
+void Cmd_PR_dbg_rngint_f(const idCmdArgs &args)
+{
+	gameLocal.Printf("Int: %d\n", gameLocal.random.RandomInt());
 }
 #endif // PR_DEBUG
 
@@ -799,7 +890,7 @@ static void Cmd_Say(bool team, const idCmdArgs &args) {
 	else {
 		gameLocal.mpGame.ProcessChatMessage(gameLocal.localClientNum, team, name, text, NULL);
 	}
-	}
+}
 
 /*
 ==================
@@ -1083,7 +1174,7 @@ void Cmd_PlayerShadowToggle_f(const idCmdArgs &args) {
 		}
 		if (gameLocal.entities[i]->IsType(hhPlayer::Type)) {
 			gameLocal.entities[i]->GetRenderEntity()->noShadow = setShadows;
-}
+		}
 	}
 }
 #endif
@@ -2596,7 +2687,7 @@ static void Cmd_EraseViewNote_f(const idCmdArgs &args) {
 		remove(str);
 	}
 #endif
-	}
+}
 // HUMANHEAD END
 
 /*
@@ -2833,7 +2924,7 @@ void Cmd_PrintTypeName_f(const idCmdArgs &args) {
 	}
 	else {
 		common->Printf("Invalid typenum.\n");
-}
+	}
 }
 #endif
 /*
@@ -2873,10 +2964,19 @@ void idGameLocal::InitConsoleCommands(void) {
 	cmdSystem->AddCommand("PR_Timer_Reset", Cmd_PR_Timer_Reset_f, CMD_FL_GAME, "PreyRun cmd: Resets thes hud timer");
 	cmdSystem->AddCommand("PR_Timer_Now", Cmd_PR_Timer_Now_f, CMD_FL_GAME, "PreyRun cmd: Displays the time of the hud timer");
 
+	// AutoCmd
+	cmdSystem->AddCommand("PR_AutoCmd_Add", Cmd_PR_autocmd_add_f, CMD_FL_GAME, "PreyRun cmd: Add a autocmdzone");
+	cmdSystem->AddCommand("PR_AutoCmd_Clear", Cmd_PR_autocmd_clear_f, CMD_FL_GAME, "PreyRun cmd: Remove all autocmdzones");
+	cmdSystem->AddCommand("PR_AutoCmd_Edit", Cmd_PR_autocmd_edit_f, CMD_FL_GAME, "PreyRun cmd: Edit a autocmdzone by index retrieved from PR_AutoCmd_List");
+	cmdSystem->AddCommand("PR_AutoCmd_List", Cmd_PR_autocmd_list_f, CMD_FL_GAME, "PreyRun cmd: List all autocmdzones with Index");
+	cmdSystem->AddCommand("PR_AutoCmd_Remove", Cmd_PR_autocmd_remove_f, CMD_FL_GAME, "PreyRun cmd: Removes a autocmdzone by index retrieved from PR_AutoCmd_List");
+
 	// DEBUG COMMANDS
 #ifdef PR_DEBUG
 	cmdSystem->AddCommand("PR_Test", Cmd_PR_test_f, CMD_FL_GAME, "For testing purpose");
-	cmdSystem->AddCommand("PR_dgb_timer", Cmd_PR_dgb_timer_f, CMD_FL_GAME, "PreyRun Debug cmd: Prints timer stats");
+	cmdSystem->AddCommand("PR_dbg_timer", Cmd_PR_dbg_timer_f, CMD_FL_GAME, "PreyRun Debug cmd: Prints timer stats");
+	cmdSystem->AddCommand("PR_dbg_randseed", Cmd_PR_dbg_randseed_f, CMD_FL_GAME, "PreyRun Debug cmd: Prints infos about the random seed");
+	cmdSystem->AddCommand("pr_dbg_rngint", Cmd_PR_dbg_rngint_f, CMD_FL_GAME, "PreyRUn Debug cmd: Prints an rng interger");
 #endif // PR_DEBUG
 
 	// PreyRun END

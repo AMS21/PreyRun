@@ -297,9 +297,9 @@ void idGameEdit::ParseSpawnArgsToRenderEntity( const idDict *args, renderEntity_
 			angles[ 0 ] = 90.0f;
 		} 
 		else {
-   			angles[ 0 ] = args->GetFloat( "pitch" );
+			angles[ 0 ] = args->GetFloat( "pitch" );
 			angles[ 1 ] = angle;
-   			angles[ 2 ] = args->GetFloat( "roll" );
+			angles[ 2 ] = args->GetFloat( "roll" );
 		}
 		//HUMANHEAD END
 		renderEntity->axis = angles.ToMat3();
@@ -2667,7 +2667,7 @@ void idEntity::JoinTeam( idEntity *teammember ) {
 			ent->teamChain->teamMaster = master;
 		}
 
-    	prev->teamChain = this;
+		prev->teamChain = this;
 		ent->teamChain = next;
 	}
 
@@ -4868,9 +4868,9 @@ void idEntity::Event_RestorePosition( void ) {
 	if ( spawnArgs.GetMatrix( "rotation", "1 0 0 0 1 0 0 0 1", axis ) ) {
 		angles = axis.ToAngles();
 	} else {
-   		angles[ 0 ] = 0;
-   		angles[ 1 ] = spawnArgs.GetFloat( "angle" );
-   		angles[ 2 ] = 0;
+		angles[ 0 ] = 0;
+		angles[ 1 ] = spawnArgs.GetFloat( "angle" );
+		angles[ 2 ] = 0;
 	}
 
 	Teleport( org, angles, NULL );
@@ -5042,7 +5042,7 @@ void idEntity::Event_SetNeverDormant( int enable ) {
 #if GAMEPAD_SUPPORT	// VENOM BEGIN
 void idEntity::Event_PlayRumbleEffect( int effect ) {
 	if( bindMaster->entityNumber == gameLocal.GetLocalPlayer()->entityNumber ) {
-        common->SetGamePadRumble(effect);
+		common->SetGamePadRumble(effect);
 	}
 }
 
@@ -6000,9 +6000,9 @@ void idAnimatedEntity::AddLocalDamageEffect( jointHandle_t jointNum, const idVec
 
 	// blood splats are thrown onto nearby surfaces
 	key = va( "mtr_splat_%s", materialType );
-	splat = spawnArgs.RandomPrefix( key, gameLocal.random );
+	splat = spawnArgs.RandomPrefix( key,gameLocal.random );
 	if ( *splat == '\0' ) {
-		splat = def->dict.RandomPrefix( key, gameLocal.random );
+		splat = def->dict.RandomPrefix( key,gameLocal.random );
 	}
 	if ( *splat != '\0' ) {
 		gameLocal.BloodSplat( origin, dir, 64.0f, splat );
@@ -6012,9 +6012,9 @@ void idAnimatedEntity::AddLocalDamageEffect( jointHandle_t jointNum, const idVec
 	if ( !( IsType( idPlayer::Type ) && !gameLocal.isMultiplayer ) ) {
 		// place a wound overlay on the model
 		key = va( "mtr_wound_%s", materialType );
-		decal = spawnArgs.RandomPrefix( key, gameLocal.random );
+		decal = spawnArgs.RandomPrefix( key,gameLocal.random );
 		if ( *decal == '\0' ) {
-			decal = def->dict.RandomPrefix( key, gameLocal.random );
+			decal = def->dict.RandomPrefix( key,gameLocal.random );
 		}
 		if ( *decal != '\0' ) {
 			ProjectOverlay( origin, dir, 20.0f, decal );

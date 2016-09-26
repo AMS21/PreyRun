@@ -157,23 +157,23 @@ double ticksPerNanosecond;
 #ifdef __MWERKS__ //time_in_millisec is missing
 /*
 
-    .text
+	.text
 	.align 2
 	.globl _GetTB
 _GetTB:
 
 loop:
-	        mftbu   r4	;  load from TBU
-	        mftb    r5	;  load from TBL
-	        mftbu   r6	;  load from TBU
-	        cmpw    r6, r4	;  see if old == new
-	        bne     loop	;  if not, carry occured, therefore loop
+			mftbu   r4	;  load from TBU
+			mftb    r5	;  load from TBL
+			mftbu   r6	;  load from TBU
+			cmpw    r6, r4	;  see if old == new
+			bne     loop	;  if not, carry occured, therefore loop
 
-	        stw     r4, 0(r3)
-	        stw     r5, 4(r3)
+			stw     r4, 0(r3)
+			stw     r5, 4(r3)
 
 done:
-	        blr		;  return
+			blr		;  return
 
 */
 typedef struct {

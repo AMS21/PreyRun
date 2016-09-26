@@ -1,29 +1,8 @@
 #pragma once
 #include "../game/game_local.h"
+#include "StdLib.hpp"
 
 // Credits to Ivan Molodetskikh (Yalter) and Chong Jiang Wei (Matherunner) for their interprocess.cpp from BunnymodXT (https://github.com/YaLTeR/BunnymodXT/blob/master/BunnymodXT/Windows/interprocess.cpp)
-
-// Realy hacking way to use stdlib functions
-#undef strcmp
-#undef strncmp
-#undef StrCmpN
-#undef strcmpi
-#undef StrCmpI
-#undef stricmp
-#undef _stricmp
-#undef strcasecmp
-#undef strnicmp
-#undef _strnicmp
-#undef _memicmp
-#undef StrCmpNI
-#undef snprintf
-#undef _snprintf
-#undef vsnprintf
-#undef _vsnprintf
-
-#include <vector>
-#include <cstring>
-#include <chrono>
 
 #define PREYSPLIT_PIPE_NAME "PreyRun-PreySplit"
 
@@ -62,20 +41,3 @@ namespace pr
 
 	Time GetTime();
 }
-
-#define strcmp			idStr::Cmp		// use_idStr_Cmp
-#define strncmp			use_idStr_Cmpn
-#define StrCmpN			use_idStr_Cmpn
-#define strcmpi			use_idStr_Icmp
-#define StrCmpI			use_idStr_Icmp
-#define stricmp			idStr::Icmp		// use_idStr_Icmp
-#define _stricmp		use_idStr_Icmp
-#define strcasecmp		use_idStr_Icmp
-#define strnicmp		use_idStr_Icmpn
-#define _strnicmp		use_idStr_Icmpn
-#define _memicmp		use_idStr_Icmpn
-#define StrCmpNI		use_idStr_Icmpn
-#define snprintf		use_idStr_snPrintf
-#define _snprintf		use_idStr_snPrintf
-#define vsnprintf		use_idStr_vsnPrintf
-#define _vsnprintf		use_idStr_vsnPrintf

@@ -104,7 +104,7 @@ class hhPilotVehicleInterface : public idClass {
 		virtual void		ClearBufferedCmds() {}
 
 		//Called from pilot
-        virtual bool		ControllingVehicle() const;
+		virtual bool		ControllingVehicle() const;
 		virtual void		ReleaseControl();
 		virtual hhVehicle*	GetVehicle() const;
 		virtual void		TakeControl( hhVehicle* vehicle, idActor* pilot );
@@ -255,6 +255,10 @@ public:
 	bool					ConsumePower( int amount );
 	bool					HasPower( int amount ) const;
 	bool					NeedsPower() const { return currentPower < spawnArgs.GetFloat("maxPower");	}
+
+	// PreyRun BEGIN
+	int						GetCurrentPower() const { return currentPower; };
+	// PreyRun END
 
 	virtual bool			WillAcceptPilot( idActor *act ) = 0;
 	virtual void			AcceptPilot( hhPilotVehicleInterface* pilotInterface );

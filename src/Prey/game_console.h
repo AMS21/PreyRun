@@ -135,7 +135,7 @@ public:
 	virtual void			ConsoleActivated();
 	virtual void			Ticker();
 protected:
-    void					Event_SpawnMonster();
+	void					Event_SpawnMonster();
 	idEntityPtr<idAI>		currentMonster;
 	int						maxMonsters;
 	int						numMonsters;

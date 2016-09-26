@@ -382,7 +382,7 @@ void hhTractorBeam::Update() {
 					hhPlayer *targetPl = static_cast<hhPlayer *>(GetTarget());
 
 
-                    idQuat plOri = targetPl->GetViewAngles().ToQuat();
+					idQuat plOri = targetPl->GetViewAngles().ToQuat();
 					idVec3 targetPos = owner->GetOrigin();
 					targetPos.z -= 80.0f;
 

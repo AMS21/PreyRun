@@ -4,10 +4,14 @@
 #include "prey_local.h"
 //#include "../prey/win32/fxdlg.h"
 
+// PreyRun BEGIN
+#include "../PreyRun/Hooking.hpp"
+// PreyRun END
+
 extern idCVar com_forceGenericSIMD;
 
 //HUMANHEAD: aob - needed for networking to send the least amount of bits
-const int DECL_MAX_TYPES_NUM_BITS		= hhMath::BitsForInteger( DECL_MAX_TYPES );
+const int DECL_MAX_TYPES_NUM_BITS = hhMath::BitsForInteger(DECL_MAX_TYPES);
 //HUMANHEAD END
 
 //=============================================================================
@@ -19,7 +23,7 @@ const int DECL_MAX_TYPES_NUM_BITS		= hhMath::BitsForInteger( DECL_MAX_TYPES );
 //	hhGameLocal::Init
 //
 //---------------------------------------------------
-void hhGameLocal::Init( void ) {
+void hhGameLocal::Init(void) {
 
 	//HUMANHEAD rww - moved into idGameLocal::Init, this should be done after the managed heap is initialized.
 	//ddaManager = new hhDDAManager;	//must be before calling idGameLocal::Init(), otherwise if the map can't load, will cause a crash.
@@ -50,7 +54,7 @@ void hhGameLocal::Init( void ) {
 //	hhGameLocal::Shutdown
 //
 //---------------------------------------------------
-void hhGameLocal::Shutdown( void ) {
+void hhGameLocal::Shutdown(void) {
 
 #if INGAME_DEBUGGER_ENABLED
 	debugger.Shutdown();		// HUMANHEAD pdm: Shut down the debugger before idDict gets shut down
@@ -70,14 +74,14 @@ void hhGameLocal::Shutdown( void ) {
 //	hhGameLocal::UnregisterEntity
 //
 //---------------------------------------------------
-void hhGameLocal::UnregisterEntity( idEntity *ent ) {
-	assert( ent );
+void hhGameLocal::UnregisterEntity(idEntity *ent) {
+	assert(ent);
 
-	if ( talonTargets.Find( ent ) ) {
-		talonTargets.Remove( ent );
+	if (talonTargets.Find(ent)) {
+		talonTargets.Remove(ent);
 	}
 
-	idGameLocal::UnregisterEntity( ent );
+	idGameLocal::UnregisterEntity(ent);
 }
 
 //---------------------------------------------------
@@ -85,37 +89,41 @@ void hhGameLocal::UnregisterEntity( idEntity *ent ) {
 //	hhGameLocal::MapShutdown
 //
 //---------------------------------------------------
-void hhGameLocal::MapShutdown( void ) {
+void hhGameLocal::MapShutdown(void) {
 	// PreyRun BEGIN
-	if (pr_timer_running)
+	if (pr_gametimer_running)
 	{
-		gameLocal.Printf("PreyRun: Timer: Paused, Map Shutdown\n");
-		pr_Timer.Stop();
+		Printf("PreyRun: Timer: Paused, Map Shutdown\n");
+		pr_gametimer.Stop();
+
+		if (pr_preysplit.GetBool() && pr_preysplit_mapchanged && pr_timer_methode.GetInteger() == PR_TIMER_METHODES::METHODE_REALTIMEATTACK)
+		{
+			pr_preysplit_mapchanged = false;
+			pr::WriteMapChange(pr::GetTime(), (idStr)GetMapName());
+		}
 
 #ifdef PR_DEBUG
-		auto time = PR_ms2time(pr_Timer.Milliseconds());
-		gameLocal.Printf("PreyRunDBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
-#endif // PR_DEBUG
-
-		// now done in idGameLocal::InitFromNewMap
-		/*pr::WriteMapChange(pr::GetTime(),(idStr) GetMapName());*/
-	}
-
-	if (pr_demo_timer_running&&pr_demo_timer.IsRunning())
-	{
-		pr_demo_timer.Stop();
-#ifdef PR_DEBUG
-		gameLocal.Printf("PreyRunDBG: Stopping demo Timer\n");
+		auto time = PR_ms2time(pr_gametimer.Milliseconds());
+		Printf("PreyRunDBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DEBUG
 	}
-	
+
+	if (pr_timedemo)
+	{
+		pr_timedemo = false;
+		pr::timeDemoShutdown();
+	}
+
 #ifdef PR_DEBUG
-	gameLocal.Printf("PreyRunDBG: Leaving map:%s\n", gameLocal.GetMapName());
-#endif
+	if (gamestate != GAMESTATE_NOMAP)
+	{
+		Printf("PreyRunDBG: Leaving map:%s\n", GetMapName());
+	}
+#endif // PR_DEBUG
 	// PreyRun END
 
 	//HUMANHEAD: mdc - added support for automatically dumping stats on map switch/game exit
-	if( !isMultiplayer && gamestate != GAMESTATE_NOMAP && g_dumpDDA.GetBool() ) {	//make sure we actually have a valid map to export
+	if (!isMultiplayer && gamestate != GAMESTATE_NOMAP && g_dumpDDA.GetBool()) {	//make sure we actually have a valid map to export
 		GetDDA()->Export(NULL);	//export the stats
 	}
 	//Always clear our tracking stats and create a default node
@@ -124,7 +132,7 @@ void hhGameLocal::MapShutdown( void ) {
 
 	idGameLocal::MapShutdown();
 
-	sunCorona			= NULL;
+	sunCorona = NULL;
 
 	talonTargets.Clear();
 }
@@ -134,16 +142,25 @@ void hhGameLocal::MapShutdown( void ) {
 //	hhGameLocal::InitFromNewMap
 //
 //---------------------------------------------------
-void hhGameLocal::InitFromNewMap( const char *mapName, idRenderWorld *renderWorld, idSoundWorld *soundWorld, bool isServer, bool isClient, int randseed ) {
-	
+void hhGameLocal::InitFromNewMap(const char *mapName, idRenderWorld *renderWorld, idSoundWorld *soundWorld, bool isServer, bool isClient, int randseed) {
+
 	// PreyRun BEGIN
-	if (pr_timer_running)
-	{
-		/*pr::WriteMapChange(pr::GetTime(), (idStr)mapName);*/
 #ifdef PR_DEBUG
-		gameLocal.Printf("PreyRun Debug: Starting Map: %s\n", mapName);
+	Printf("PreyRunDBG: Starting Map: %s\n", mapName);
 #endif // PR_DEBUG
-	}
+
+	// Clear all Autocmdzones when chaning level
+	pr::AutocmdzoneHandler::getInstance().Clear();
+
+	// Execute map config file
+	// example: map feedingtowera.map -> exec feedingtowera.cfg
+	idStr pr_str(mapName);
+
+	pr_str.Replace("maps/game/", "");
+	pr_str.Replace(".map", "");
+
+	sprintf(pr_str, "exec MapScript/%s.cfg", pr_str.c_str());
+	cmdSystem->BufferCommandText(CMD_EXEC_APPEND, pr_str);
 	// PreyRun END
 
 	//HUMANHEAD rww - throw up the prey logo if using the logitech lcd screen
@@ -164,15 +181,15 @@ void hhGameLocal::InitFromNewMap( const char *mapName, idRenderWorld *renderWorl
 
 	// CJR: Determine if this map is a LOTA map by looking for a special entity on the map
 	bIsLOTA = false;
-	if ( FindEntity( "LOTA_ThisMapIsLOTA" ) ) {
+	if (FindEntity("LOTA_ThisMapIsLOTA")) {
 		bIsLOTA = true;
 	}
 
+	// PreyRun BEGIN
 	if (pr_autopause.GetBool())
 	{
-		gameLocal.Printf("PreyRun: Autopause: paused map load\n");
-		cmdSystem->BufferCommandText(CMD_EXEC_NOW, "timescale 0");
-		//gameLocal.HandleESC((idUserInterface **) gameLocal.GetLocalPlayer()->hud);
+		Printf("PreyRun: Autopause: paused map load\n");
+		pr_freeze.SetBool(true);
 	}
 	// PreyRun END
 }
@@ -187,56 +204,56 @@ void hhGameLocal::InitFromNewMap( const char *mapName, idRenderWorld *renderWorl
 //
 // HUMANHEAD pdm: Override for doing our own precaching
 //=============================================================================
-void hhGameLocal::CacheDictionaryMedia( const idDict *dict ) {
-/*	HUMANHEAD mdc - fix so com_makingBuild stuff will work correctly... (this was causing too early of an out)
-	if ( dict == NULL ) {
-		return;
-	}
-*/
+void hhGameLocal::CacheDictionaryMedia(const idDict *dict) {
+	/*	HUMANHEAD mdc - fix so com_makingBuild stuff will work correctly... (this was causing too early of an out)
+		if ( dict == NULL ) {
+			return;
+		}
+	*/
 	const idKeyValue	*kv = NULL;
 	const idDecl		*decl = NULL;
 	idFile				*file = NULL;
 	idStr				fxName;
 	idStr				buffer;
 
-	idGameLocal::CacheDictionaryMedia( dict );
+	idGameLocal::CacheDictionaryMedia(dict);
 
-	if( dict == NULL ) {		//mdc - added early out
+	if (dict == NULL) {		//mdc - added early out
 		return;
 	}
-//HUMANHEAD mdc - skip caching if we are in development and not making a build
-	if( !g_precache.GetBool() && !sys_forceCache.GetBool() && !cvarSystem->GetCVarBool("com_makingBuild") ) {
+	//HUMANHEAD mdc - skip caching if we are in development and not making a build
+	if (!g_precache.GetBool() && !sys_forceCache.GetBool() && !cvarSystem->GetCVarBool("com_makingBuild")) {
 		return;
 	}
-//HUMANHEAD END
+	//HUMANHEAD END
 
 
-	// TEMP: precache clip models until they become model_clip
-	kv = dict->MatchPrefix( "clipmodel", NULL );
-	while( kv ) {
-		if ( kv->GetValue().Length() ) {
-			declManager->MediaPrint( "Precaching clipmodel: %s\n", kv->GetValue().c_str() );
-			renderModelManager->FindModel( kv->GetValue() );
+		// TEMP: precache clip models until they become model_clip
+	kv = dict->MatchPrefix("clipmodel", NULL);
+	while (kv) {
+		if (kv->GetValue().Length()) {
+			declManager->MediaPrint("Precaching clipmodel: %s\n", kv->GetValue().c_str());
+			renderModelManager->FindModel(kv->GetValue());
 		}
-		kv = dict->MatchPrefix( "clipmodel", kv );
+		kv = dict->MatchPrefix("clipmodel", kv);
 	}
 
 	//HUMANHEAD bjk: removed smoke_wound_. now using fx_wound and is cached in fx_. no seperate handling needed
 
-	kv = dict->MatchPrefix( "beam", NULL );
-	while( kv ) {
-		if ( kv->GetValue().Length() ) {
+	kv = dict->MatchPrefix("beam", NULL);
+	while (kv) {
+		if (kv->GetValue().Length()) {
 			if (kv->GetValue().Find(".beam") >= 0) {
-				declManager->MediaPrint( "Precaching beam %s\n", kv->GetValue().c_str() );
-				declManager->FindBeam( kv->GetValue() ); // Cache the beam decl
+				declManager->MediaPrint("Precaching beam %s\n", kv->GetValue().c_str());
+				declManager->FindBeam(kv->GetValue()); // Cache the beam decl
 				renderModelManager->FindModel(kv->GetValue()); // Ensure the beam model is cached as well, since beams are a combination of a decl and a rendermodel
 			}
 			else {	// Must be a reference to a beam entity
-				declManager->MediaPrint( "Precaching beam entityDef %s\n", kv->GetValue().c_str() );
-				FindEntityDef( kv->GetValue().c_str(), false );
+				declManager->MediaPrint("Precaching beam entityDef %s\n", kv->GetValue().c_str());
+				FindEntityDef(kv->GetValue().c_str(), false);
 			}
 		}
-		kv = dict->MatchPrefix( "beam", kv );
+		kv = dict->MatchPrefix("beam", kv);
 	}
 }
 
@@ -267,20 +284,20 @@ void hhGameLocal::SpawnAppendedMapEntities() {
 		idDict		args;
 
 		numEntities = mapFile->GetNumEntities();
-		if ( numEntities == 0 ) {
-			Error( "...no entities" );
+		if (numEntities == 0) {
+			Error("...no entities");
 		}
 
-		for ( int i = 1 ; i < numEntities ; i++ ) {	// skip worldspawn
-			mapEnt = mapFile->GetEntity( i );
+		for (int i = 1; i < numEntities; i++) {	// skip worldspawn
+			mapEnt = mapFile->GetEntity(i);
 			args = mapEnt->epairs;
 
-			if ( !InhibitEntitySpawn( args ) ) {
+			if (!InhibitEntitySpawn(args)) {
 				// precache any media specified in the map entity
-				gameLocal.CacheDictionaryMedia( &args );
+				gameLocal.CacheDictionaryMedia(&args);
 
 				//HUMANHEAD rww - ok on client
-				SpawnEntityDef( args, NULL, true, false, true );
+				SpawnEntityDef(args, NULL, true, false, true);
 			}
 		}
 
@@ -304,7 +321,7 @@ void hhGameLocal::SpawnAppendedMapEntities() {
 // hhGameLocal::RegisterTalonTarget
 //
 //=============================================================================
-void hhGameLocal::RegisterTalonTarget( idEntity *ent ) {
+void hhGameLocal::RegisterTalonTarget(idEntity *ent) {
 	talonTargets.Append(ent);
 }
 
@@ -313,7 +330,7 @@ void hhGameLocal::RegisterTalonTarget( idEntity *ent ) {
 // hhGameLocal::SpawnClientObject
 // rww - meant for spawning client ents only.
 //=============================================================================
-idEntity* hhGameLocal::SpawnClientObject( const char* objectName, idDict* additionalArgs ) {
+idEntity* hhGameLocal::SpawnClientObject(const char* objectName, idDict* additionalArgs) {
 	idDict	localArgs;
 	idDict* args = NULL;
 	idEntity* object = NULL;
@@ -323,15 +340,15 @@ idEntity* hhGameLocal::SpawnClientObject( const char* objectName, idDict* additi
 		clientEnt = false;
 	}
 
-	if( !objectName || !objectName[0]) {
-		Error( "hhGameLocal::SpawnObject: Invalid object name\n" );
+	if (!objectName || !objectName[0]) {
+		Error("hhGameLocal::SpawnObject: Invalid object name\n");
 	}
 
-	args = ( additionalArgs != NULL ) ? additionalArgs : &localArgs;
+	args = (additionalArgs != NULL) ? additionalArgs : &localArgs;
 
-	args->Set( "classname", objectName );
-	if( !SpawnEntityDef( *args, &object, true, clientEnt ) ) {
-		Error( "hhGameLocal::SpawnObject: Failed to spawn %s\n", objectName );
+	args->Set("classname", objectName);
+	if (!SpawnEntityDef(*args, &object, true, clientEnt)) {
+		Error("hhGameLocal::SpawnObject: Failed to spawn %s\n", objectName);
 	}
 
 	if (object) {
@@ -347,7 +364,7 @@ idEntity* hhGameLocal::SpawnClientObject( const char* objectName, idDict* additi
 // hhGameLocal::SpawnObject
 //
 //=============================================================================
-idEntity* hhGameLocal::SpawnObject( const char* objectName, idDict* additionalArgs ) {
+idEntity* hhGameLocal::SpawnObject(const char* objectName, idDict* additionalArgs) {
 	idDict	localArgs;
 	idDict* args = NULL;
 	idEntity* object = NULL;
@@ -356,15 +373,15 @@ idEntity* hhGameLocal::SpawnObject( const char* objectName, idDict* additionalAr
 	//the client should never, ever call SpawnObject.
 	assert(!gameLocal.isClient);
 
-	if( !objectName || !objectName[0]) {
-		Error( "hhGameLocal::SpawnObject: Invalid object name\n" );
+	if (!objectName || !objectName[0]) {
+		Error("hhGameLocal::SpawnObject: Invalid object name\n");
 	}
 
-	args = ( additionalArgs != NULL ) ? additionalArgs : &localArgs;
+	args = (additionalArgs != NULL) ? additionalArgs : &localArgs;
 
-	args->Set( "classname", objectName );
-	if( !SpawnEntityDef( *args, &object ) ) {
-		Error( "hhGameLocal::SpawnObject: Failed to spawn %s\n", objectName );
+	args->Set("classname", objectName);
+	if (!SpawnEntityDef(*args, &object)) {
+		Error("hhGameLocal::SpawnObject: Failed to spawn %s\n", objectName);
 	}
 
 	return object;
@@ -375,10 +392,10 @@ idEntity* hhGameLocal::SpawnObject( const char* objectName, idDict* additionalAr
 // hhGameLocal::RadiusDamage()
 //	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
 //
-void hhGameLocal::RadiusDamage( const idVec3 &origin, idEntity *inflictor, idEntity *attacker, idEntity *ignoreDamage, idEntity *ignorePush, const char *damageDefName, float dmgPower ) {
+void hhGameLocal::RadiusDamage(const idVec3 &origin, idEntity *inflictor, idEntity *attacker, idEntity *ignoreDamage, idEntity *ignorePush, const char *damageDefName, float dmgPower) {
 	float		distSquared, radiusSquared, damageScale, attackerDamageScale, attackerPushScale;
 	idEntity *	ent;
-	idEntity *	entityList[ MAX_GENTITIES ];
+	idEntity *	entityList[MAX_GENTITIES];
 	int			numListedEntities;
 	idBounds	bounds;
 	idVec3 		v, damagePoint, dir;
@@ -388,127 +405,129 @@ void hhGameLocal::RadiusDamage( const idVec3 &origin, idEntity *inflictor, idEnt
 	trace_t		result;
 	// HUMANHEAD END
 
-	const idDict *damageDef = FindEntityDefDict( damageDefName, false );
-	if ( !damageDef ) {
-		Warning( "Unknown damageDef '%s'", damageDefName );
+	const idDict *damageDef = FindEntityDefDict(damageDefName, false);
+	if (!damageDef) {
+		Warning("Unknown damageDef '%s'", damageDefName);
 		return;
 	}
 
-	damageDef->GetInt( "damage", "0", damage ); // HUMANHEAD JRM - changed to ZERO not 20 default
-	damageDef->GetInt( "radius", "50", radius );
-	damageDef->GetInt( "push", va( "%d", damage * 100 ), push );
-	damageDef->GetFloat( "attackerDamageScale", "0.5", attackerDamageScale );
-	damageDef->GetFloat( "attackerPushScale", "0", attackerPushScale );
+	damageDef->GetInt("damage", "0", damage); // HUMANHEAD JRM - changed to ZERO not 20 default
+	damageDef->GetInt("radius", "50", radius);
+	damageDef->GetInt("push", va("%d", damage * 100), push);
+	damageDef->GetFloat("attackerDamageScale", "0.5", attackerDamageScale);
+	damageDef->GetFloat("attackerPushScale", "0", attackerPushScale);
 
 	// HUMANHEAD aob
-	pushRadius = Max( 1.0f, damageDef->GetFloat("push_radius", va("%d", radius)) );
-	if ( damageDef->GetBool( "nopush" ) ) {
+	pushRadius = Max(1.0f, damageDef->GetFloat("push_radius", va("%d", radius)));
+	if (damageDef->GetBool("nopush")) {
 		push = 0;
 	}
 	// HUMANHEAD END
 
-	if ( radius < 1 ) {
+	if (radius < 1) {
 		radius = 1;
 	}
 	radiusSquared = radius*radius;
 
-	bounds = idBounds( origin ).Expand( radius );
+	bounds = idBounds(origin).Expand(radius);
 
 	// get all entities touching the bounds
-	numListedEntities = clip.EntitiesTouchingBounds( bounds, -1, entityList, MAX_GENTITIES );
+	numListedEntities = clip.EntitiesTouchingBounds(bounds, -1, entityList, MAX_GENTITIES);
 
-	if ( inflictor && inflictor->IsType( idAFAttachment::Type ) ) {
+	if (inflictor && inflictor->IsType(idAFAttachment::Type)) {
 		inflictor = static_cast<idAFAttachment*>(inflictor)->GetBody();
 	}
-	if ( attacker && attacker->IsType( idAFAttachment::Type ) ) {
+	if (attacker && attacker->IsType(idAFAttachment::Type)) {
 		attacker = static_cast<idAFAttachment*>(attacker)->GetBody();
 	}
-	if ( ignoreDamage && ignoreDamage->IsType( idAFAttachment::Type ) ) {
+	if (ignoreDamage && ignoreDamage->IsType(idAFAttachment::Type)) {
 		ignoreDamage = static_cast<idAFAttachment*>(ignoreDamage)->GetBody();
 	}
 
 	// apply damage to the entities
-	if( damage > 0 )	{ // HUMANHEAD JRM - only do damage if WE HAVE damage
-		for ( e = 0; e < numListedEntities; e++ ) {
-			ent = entityList[ e ];
-			assert( ent );
+	if (damage > 0) { // HUMANHEAD JRM - only do damage if WE HAVE damage
+		for (e = 0; e < numListedEntities; e++) {
+			ent = entityList[e];
+			assert(ent);
 
-			if ( !ent->fl.takedamage ) {
+			if (!ent->fl.takedamage) {
 				continue;
 			}
 
-			if ( ent == inflictor /*|| ( ent->IsType( idAFAttachment::Type ) && static_cast<idAFAttachment*>(ent)->GetBody() == inflictor )*/ ) {
+			if (ent == inflictor /*|| ( ent->IsType( idAFAttachment::Type ) && static_cast<idAFAttachment*>(ent)->GetBody() == inflictor )*/) {
 				continue;
 			}
 
-			if ( ent == ignoreDamage /*|| ( ent->IsType( idAFAttachment::Type ) && static_cast<idAFAttachment*>(ent)->GetBody() == ignoreDamage )*/ ) {
+			if (ent == ignoreDamage /*|| ( ent->IsType( idAFAttachment::Type ) && static_cast<idAFAttachment*>(ent)->GetBody() == ignoreDamage )*/) {
 				continue;
 			}
-			
-			if ( ent->IsType( idAFAttachment::Type ) ) {	// bjk: no double splash damage from heads
+
+			if (ent->IsType(idAFAttachment::Type)) {	// bjk: no double splash damage from heads
 				continue;
 			}
 
 			// don't damage a dead player
-			if ( isMultiplayer && ent->entityNumber < MAX_CLIENTS && ent->IsType( idPlayer::Type ) && static_cast< idPlayer * >( ent )->health < 0 ) {
+			if (isMultiplayer && ent->entityNumber < MAX_CLIENTS && ent->IsType(idPlayer::Type) && static_cast<idPlayer *>(ent)->health < 0) {
 				continue;
 			}
-			
+
 			// find the distance from the edge of the bounding box
-			for ( i = 0; i < 3; i++ ) {
-				if ( origin[ i ] < ent->GetPhysics()->GetAbsBounds()[0][ i ] ) {
-					v[ i ] = ent->GetPhysics()->GetAbsBounds()[0][ i ] - origin[ i ];
-				} else if ( origin[ i ] > ent->GetPhysics()->GetAbsBounds()[1][ i ] ) {
-					v[ i ] = origin[ i ] - ent->GetPhysics()->GetAbsBounds()[1][ i ];
-				} else {
-					v[ i ] = 0;
+			for (i = 0; i < 3; i++) {
+				if (origin[i] < ent->GetPhysics()->GetAbsBounds()[0][i]) {
+					v[i] = ent->GetPhysics()->GetAbsBounds()[0][i] - origin[i];
+				}
+				else if (origin[i] > ent->GetPhysics()->GetAbsBounds()[1][i]) {
+					v[i] = origin[i] - ent->GetPhysics()->GetAbsBounds()[1][i];
+				}
+				else {
+					v[i] = 0;
 				}
 			}
 
 			distSquared = v.LengthSqr();
-			if ( distSquared >= radiusSquared ) {
+			if (distSquared >= radiusSquared) {
 				continue;
 			}
 
 			//HUMANHEAD: aob - see if radius damage is blocked.  CanDamage is used by more than just RadiusDamage
-			clip.TracePoint( result, origin, (ent->GetPhysics()->GetAbsBounds()[0] + ent->GetPhysics()->GetAbsBounds()[1]) * 0.5f, CONTENTS_BLOCK_RADIUSDAMAGE, ignoreDamage );
-			if( result.fraction < 1.0f && result.c.entityNum != ent->entityNumber ) {
+			clip.TracePoint(result, origin, (ent->GetPhysics()->GetAbsBounds()[0] + ent->GetPhysics()->GetAbsBounds()[1]) * 0.5f, CONTENTS_BLOCK_RADIUSDAMAGE, ignoreDamage);
+			if (result.fraction < 1.0f && result.c.entityNum != ent->entityNumber) {
 				continue;
 			}
 			//HUMANHEAD END
 
 			bool canDamage = true;
-			if ( GERMAN_VERSION || g_nogore.GetBool() ) {
-				if ( ent->IsType(idActor::Type) ) {
-					idActor *actor = reinterpret_cast< idActor * > ( ent );
-					if ( actor->IsActiveAF() && !actor->spawnArgs.GetBool( "not_gory", "0" ) ) {
+			if (GERMAN_VERSION || g_nogore.GetBool()) {
+				if (ent->IsType(idActor::Type)) {
+					idActor *actor = reinterpret_cast<idActor *> (ent);
+					if (actor->IsActiveAF() && !actor->spawnArgs.GetBool("not_gory", "0")) {
 						canDamage = false;
 					}
 				}
 			}
 
 
-			if ( canDamage && ent->CanDamage( origin, damagePoint ) ) {
+			if (canDamage && ent->CanDamage(origin, damagePoint)) {
 				// push the center of mass higher than the origin so players
 				// get knocked into the air more
 				dir = ent->GetPhysics()->GetOrigin() - origin;
-				dir[ 2 ] += 24;
+				dir[2] += 24;
 
 				// get the damage scale
-				damageScale = dmgPower * ( 1.0f - (distSquared / radiusSquared) );
-				if ( ent == attacker || ( ent->IsType( idAFAttachment::Type ) && static_cast<idAFAttachment*>(ent)->GetBody() == attacker ) ) {
+				damageScale = dmgPower * (1.0f - (distSquared / radiusSquared));
+				if (ent == attacker || (ent->IsType(idAFAttachment::Type) && static_cast<idAFAttachment*>(ent)->GetBody() == attacker)) {
 					damageScale *= attackerDamageScale;
 				}
 
-				ent->Damage( inflictor, attacker, dir, damageDefName, damageScale, INVALID_JOINT );
-			} 
+				ent->Damage(inflictor, attacker, dir, damageDefName, damageScale, INVALID_JOINT);
+			}
 		}
 	} // HUMANHEAD END
 
 	// push physics objects
-	if ( push ) {
+	if (push) {
 		//HUMANHEAD: aob - changed radius to pushRadius
-		RadiusPush( origin, pushRadius, push * dmgPower, attacker, ignorePush, attackerPushScale, false );
+		RadiusPush(origin, pushRadius, push * dmgPower, attacker, ignorePush, attackerPushScale, false);
 	}
 }
 
@@ -518,10 +537,10 @@ hhGameLocal::RadiusPush
 	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
 ==============
 */
-void hhGameLocal::RadiusPush( const idVec3 &origin, const float radius, const float push, const idEntity *inflictor, const idEntity *ignore, float inflictorScale, const bool quake ) {
+void hhGameLocal::RadiusPush(const idVec3 &origin, const float radius, const float push, const idEntity *inflictor, const idEntity *ignore, float inflictorScale, const bool quake) {
 	int i, numListedClipModels;
 	idClipModel *clipModel;
-	idClipModel *clipModelList[ MAX_GENTITIES ];
+	idClipModel *clipModelList[MAX_GENTITIES];
 	idVec3 dir;
 	idBounds bounds;
 	modelTrace_t result;
@@ -529,82 +548,86 @@ void hhGameLocal::RadiusPush( const idVec3 &origin, const float radius, const fl
 	float scale;
 	trace_t	trace; 	//HUMANHEAD: aob
 
-	dir.Set( 0.0f, 0.0f, 1.0f );
+	dir.Set(0.0f, 0.0f, 1.0f);
 
-	bounds = idBounds( origin ).Expand( radius );
+	bounds = idBounds(origin).Expand(radius);
 
 	// get all clip models touching the bounds
-	numListedClipModels = clip.ClipModelsTouchingBounds( bounds, -1, clipModelList, MAX_GENTITIES );
+	numListedClipModels = clip.ClipModelsTouchingBounds(bounds, -1, clipModelList, MAX_GENTITIES);
 
-	if ( inflictor && inflictor->IsType( idAFAttachment::Type ) ) {
+	if (inflictor && inflictor->IsType(idAFAttachment::Type)) {
 		inflictor = static_cast<const idAFAttachment*>(inflictor)->GetBody();
 	}
-	if ( ignore && ignore->IsType( idAFAttachment::Type ) ) {
+	if (ignore && ignore->IsType(idAFAttachment::Type)) {
 		ignore = static_cast<const idAFAttachment*>(ignore)->GetBody();
 	}
 
 	// apply impact to all the clip models through their associated physics objects
-	for ( i = 0; i < numListedClipModels; i++ ) {
+	for (i = 0; i < numListedClipModels; i++) {
 
 		clipModel = clipModelList[i];
 
 		// never push render models
-		if ( clipModel->IsRenderModel() ) {
+		if (clipModel->IsRenderModel()) {
 			continue;
 		}
 
 		ent = clipModel->GetEntity();
 
 		// never push projectiles
-		if ( ent->IsType( idProjectile::Type ) ) {
+		if (ent->IsType(idProjectile::Type)) {
 			continue;
 		}
 
 		// players use "knockback" in idPlayer::Damage
-		if ( ent->IsType( idPlayer::Type ) && !quake ) {
+		if (ent->IsType(idPlayer::Type) && !quake) {
 			continue;
 		}
 
 		// don't push the ignore entity
-		if ( ent == ignore || ( ent->IsType( idAFAttachment::Type ) && static_cast<idAFAttachment*>(ent)->GetBody() == ignore ) ) {
+		if (ent == ignore || (ent->IsType(idAFAttachment::Type) && static_cast<idAFAttachment*>(ent)->GetBody() == ignore)) {
 			continue;
 		}
 
-		if ( gameRenderWorld->FastWorldTrace( result, origin, clipModel->GetAbsBounds().GetCenter() ) ) {
+		if (gameRenderWorld->FastWorldTrace(result, origin, clipModel->GetAbsBounds().GetCenter())) {
 			continue;
 		}
 
 		// Don't affect ragdolls in non-gore mode
-		if ( GERMAN_VERSION || g_nogore.GetBool() ) {
-			if ( ent->IsType(idActor::Type) ) {
-				idActor *actor = reinterpret_cast< idActor * > ( ent );
-				if ( actor->IsActiveAF() && !actor->spawnArgs.GetBool( "not_gory", "0" ) ) {
+		if (GERMAN_VERSION || g_nogore.GetBool()) {
+			if (ent->IsType(idActor::Type)) {
+				idActor *actor = reinterpret_cast<idActor *> (ent);
+				if (actor->IsActiveAF() && !actor->spawnArgs.GetBool("not_gory", "0")) {
 					continue;
 				}
 			}
 		}
 
 		// scale the push for the inflictor
-		if ( ent == inflictor || ( ent->IsType( idAFAttachment::Type ) && static_cast<idAFAttachment*>(ent)->GetBody() == inflictor ) ) {
+		if (ent == inflictor || (ent->IsType(idAFAttachment::Type) && static_cast<idAFAttachment*>(ent)->GetBody() == inflictor)) {
 			scale = inflictorScale;
-		} else if ( ent->IsType(hhMoveable::Type) ) {
+		}
+		else if (ent->IsType(hhMoveable::Type)) {
 			scale = ent->spawnArgs.GetFloat("radiusPush", "4.0");
-		} else if( !ent->IsType(idActor::Type) ) {
+		}
+		else if (!ent->IsType(idActor::Type)) {
 			scale = 4.0f;
-		} else {
+		}
+		else {
 			scale = 1.0f;
 		}
 
 		//HUMANHEAD: aob - see if radius damage is blocked
-		clip.TracePoint( trace, origin, clipModel->GetEntity()->GetOrigin(), CONTENTS_BLOCK_RADIUSDAMAGE, ignore );
-		if( trace.fraction < 1.0f && trace.c.entityNum != clipModel->GetEntity()->entityNumber ) {
+		clip.TracePoint(trace, origin, clipModel->GetEntity()->GetOrigin(), CONTENTS_BLOCK_RADIUSDAMAGE, ignore);
+		if (trace.fraction < 1.0f && trace.c.entityNum != clipModel->GetEntity()->entityNumber) {
 			continue;
 		}
 		//HUMANHEAD END
 
-		if ( quake ) {
-			clipModel->GetEntity()->ApplyImpulse( world, clipModel->GetId(), clipModel->GetOrigin(), scale * push * dir );
-		} else {
+		if (quake) {
+			clipModel->GetEntity()->ApplyImpulse(world, clipModel->GetId(), clipModel->GetOrigin(), scale * push * dir);
+		}
+		else {
 			//RadiusPushClipModel( origin, scale * push, clipModel );
 
 			//HUMANHEAD bjk
@@ -613,7 +636,7 @@ void hhGameLocal::RadiusPush( const idVec3 &origin, const float radius, const fl
 			impulse.z += 1.0f;
 			dist = 0.6f - 0.3f*dist;
 			impulse *= push * dist * scale;
-			clipModel->GetEntity()->ApplyImpulse( world, clipModel->GetId(), clipModel->GetOrigin(), impulse );
+			clipModel->GetEntity()->ApplyImpulse(world, clipModel->GetId(), clipModel->GetOrigin(), impulse);
 			//HUMANHEAD END
 		}
 	}
@@ -639,70 +662,70 @@ void hhGameLocal::LogitechLCDUpdate(void) {
 	logitechLCDUpdateTime = gameLocal.time + 50;
 
 	sys->LGLCD_DrawBegin();
-		if (logitechLCDDisplayAlt) { //primary/secondary ammo
-			char *ammoStr =		va("%s%s", common->GetLanguageDict()->GetString("#str_41150"), common->GetLanguageDict()->GetString("#str_41152")); //"Ammo:      N/A";
-			char *ammoAltStr =	va("%s%s", common->GetLanguageDict()->GetString("#str_41151"), common->GetLanguageDict()->GetString("#str_41152")); //"Alt. Ammo: N/A";
-			if (pl->weapon.IsValid()) {
-				int a = pl->weapon->AmmoAvailable();
+	if (logitechLCDDisplayAlt) { //primary/secondary ammo
+		char *ammoStr = va("%s%s", common->GetLanguageDict()->GetString("#str_41150"), common->GetLanguageDict()->GetString("#str_41152")); //"Ammo:      N/A";
+		char *ammoAltStr = va("%s%s", common->GetLanguageDict()->GetString("#str_41151"), common->GetLanguageDict()->GetString("#str_41152")); //"Alt. Ammo: N/A";
+		if (pl->weapon.IsValid()) {
+			int a = pl->weapon->AmmoAvailable();
+			if (a >= 0) {
+				if (a > 999) {
+					a = 999;
+				}
+				ammoStr = va("%s%i", common->GetLanguageDict()->GetString("#str_41150"), a); //"Ammo:      %i"
+			}
+			if (pl->weapon->GetAmmoType() != pl->weapon->GetAltAmmoType()) {
+				a = pl->weapon->AltAmmoAvailable();
 				if (a >= 0) {
 					if (a > 999) {
 						a = 999;
 					}
-					ammoStr =			va("%s%i", common->GetLanguageDict()->GetString("#str_41150"), a); //"Ammo:      %i"
-				}
-				if (pl->weapon->GetAmmoType() != pl->weapon->GetAltAmmoType()) {
-					a = pl->weapon->AltAmmoAvailable();
-					if (a >= 0) {
-						if (a > 999) {
-							a = 999;
-						}
-						ammoAltStr =	va("%s%i", common->GetLanguageDict()->GetString("#str_41151"), a); //"Alt. Ammo: %i"
-					}
+					ammoAltStr = va("%s%i", common->GetLanguageDict()->GetString("#str_41151"), a); //"Alt. Ammo: %i"
 				}
 			}
-
-			sys->LGLCD_DrawText(ammoStr, 46, 6, true);
-			sys->LGLCD_DrawText(ammoAltStr, 46, 22, true);
-
-			//draw the weapon icon (disabled for now, since it isn't very..recognizable)
-			//sys->LGLCD_DrawShape(3, 54, 0, 0, 0, 0, true);
 		}
-		else { //health/spirit
-			int v;
-			v = pl->health;
-			if (v > 999) {
-				v = 999;
-			}
-			else if (v < 0) {
-				v = 0;
-			}
-			sys->LGLCD_DrawText(va("%s%i", common->GetLanguageDict()->GetString("#str_41153"), v), 70, 6, true); //"Health: %i"
-			v = pl->GetSpiritPower();
-			if (v > 999) {
-				v = 999;
-			}
-			else if (v < 0) {
-				v = 0;
-			}
-			sys->LGLCD_DrawText(va("%s%i", common->GetLanguageDict()->GetString("#str_41154"), v), 70, 22, true); //"Spirit: %i"
 
-			//draw the tommy and talon
-			float eyePitch;
-			if (pl->InVehicle()) {
+		sys->LGLCD_DrawText(ammoStr, 46, 6, true);
+		sys->LGLCD_DrawText(ammoAltStr, 46, 22, true);
+
+		//draw the weapon icon (disabled for now, since it isn't very..recognizable)
+		//sys->LGLCD_DrawShape(3, 54, 0, 0, 0, 0, true);
+	}
+	else { //health/spirit
+		int v;
+		v = pl->health;
+		if (v > 999) {
+			v = 999;
+		}
+		else if (v < 0) {
+			v = 0;
+		}
+		sys->LGLCD_DrawText(va("%s%i", common->GetLanguageDict()->GetString("#str_41153"), v), 70, 6, true); //"Health: %i"
+		v = pl->GetSpiritPower();
+		if (v > 999) {
+			v = 999;
+		}
+		else if (v < 0) {
+			v = 0;
+		}
+		sys->LGLCD_DrawText(va("%s%i", common->GetLanguageDict()->GetString("#str_41154"), v), 70, 22, true); //"Spirit: %i"
+
+		//draw the tommy and talon
+		float eyePitch;
+		if (pl->InVehicle()) {
+			eyePitch = 0.0f;
+		}
+		else {
+			eyePitch = pl->GetEyeAxis()[2].ToAngles().pitch + 90.0f;
+			if (eyePitch < 1.0f && eyePitch > -1.0f) {
 				eyePitch = 0.0f;
 			}
-			else {
-				eyePitch = pl->GetEyeAxis()[2].ToAngles().pitch+90.0f;
-				if (eyePitch < 1.0f && eyePitch > -1.0f) {
-					eyePitch = 0.0f;
-				}
-			}
-			sys->LGLCD_DrawShape(2, 42, 0, 0, 0, (int)eyePitch, true);
 		}
+		sys->LGLCD_DrawShape(2, 42, 0, 0, 0, (int)eyePitch, true);
+	}
 
-		//draw the compass
-		sys->LGLCD_DrawShape(0, 0, 0, 0, 0, 0, false); //base
-		sys->LGLCD_DrawShape(1, 21, 21, 13, 1, (int)-pl->GetViewAngles().yaw, true); //line
+	//draw the compass
+	sys->LGLCD_DrawShape(0, 0, 0, 0, 0, 0, false); //base
+	sys->LGLCD_DrawShape(1, 21, 21, 13, 1, (int)-pl->GetViewAngles().yaw, true); //line
 	sys->LGLCD_DrawFinish(false);
 }
 //HUMANHEAD END
@@ -711,7 +734,7 @@ void hhGameLocal::LogitechLCDUpdate(void) {
 // RunFrame()
 //
 //	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
-gameReturn_t hhGameLocal::RunFrame( const usercmd_t *clientCmds ) {
+gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 	idEntity *	ent;
 	int			num;
 	float		ms;
@@ -725,22 +748,31 @@ gameReturn_t hhGameLocal::RunFrame( const usercmd_t *clientCmds ) {
 	const float thinkalpha = 0.98f;	// filter with historical timings
 	// HUMANHEAD END
 
+	// PreyRun BEGIN
+	if (pr_freeze.GetBool())
+	{
+		if (pr_gametimer.IsRunning()) { pr_gametimer.Stop(); }
+
+		return ret;
+	}
+	// PreyRun END
+
 	ret.sessionCommand[0] = 0;
 
 #ifdef _DEBUG
-	if ( isMultiplayer ) {
-		assert( !isClient );
-	}
+	if (isMultiplayer) {
+		assert(!isClient);
+}
 #endif
 
 	player = GetLocalPlayer();
 
-	if ( !isMultiplayer && g_stopTime.GetBool() ) {
+	if (!isMultiplayer && g_stopTime.GetBool()) {
 		// clear any debug lines from a previous frame
-		gameRenderWorld->DebugClearLines( time + 1 );
+		gameRenderWorld->DebugClearLines(time + 1);
 
 		// set the user commands for this frame
-		memcpy( usercmds, clientCmds, numClients * sizeof( usercmds[ 0 ] ) );
+		memcpy(usercmds, clientCmds, numClients * sizeof(usercmds[0]));
 
 		// Fake these categories so it still displays any that are in the history when time is stopped
 		{	PROFILE_SCOPE("Misc_Think", PROFMASK_NORMAL);		}
@@ -749,15 +781,16 @@ gameReturn_t hhGameLocal::RunFrame( const usercmd_t *clientCmds ) {
 		{	PROFILE_SCOPE("Animation", PROFMASK_NORMAL);		}
 		{	PROFILE_SCOPE("Scripting", PROFMASK_NORMAL);		}
 
-		if ( player ) {
+		if (player) {
 			player->Think();
-			if ( player->InVehicle() && player->GetVehicleInterface() ) {
-				if ( player->GetVehicleInterface()->GetVehicle() ) {
+			if (player->InVehicle() && player->GetVehicleInterface()) {
+				if (player->GetVehicleInterface()->GetVehicle()) {
 					player->GetVehicleInterface()->GetVehicle()->Think();
 				}
 			}
 		}
-	} else do {
+	}
+	else do {
 		// update the game time
 		framenum++;
 		previousTime = time;
@@ -765,10 +798,20 @@ gameReturn_t hhGameLocal::RunFrame( const usercmd_t *clientCmds ) {
 		realClientTime = time;
 		timeRandom = time; //HUMANHEAD rww
 
+		// PreyRun BEGIN
+		// only update the timer when PreySplit is eneabled and the timer is running
+		if (pr_preysplit.GetBool() && pr_gametimer_running)
+		{
+			pr::WriteTime(pr::GetTime());
+		}
+
+		pr::AutocmdzoneHandler::getInstance().Trigger();
+		// PreyRun END
+
 #ifdef GAME_DLL
 		// allow changing SIMD usage on the fly
-		if ( com_forceGenericSIMD.IsModified() ) {
-			idSIMD::InitProcessor( "game", com_forceGenericSIMD.GetBool() );
+		if (com_forceGenericSIMD.IsModified()) {
+			idSIMD::InitProcessor("game", com_forceGenericSIMD.GetBool());
 		}
 #endif
 
@@ -776,22 +819,22 @@ gameReturn_t hhGameLocal::RunFrame( const usercmd_t *clientCmds ) {
 		// are influenced by the player's actions
 		random.RandomInt();
 
-		if ( player ) {
+		if (player) {
 			// update the renderview so that any gui videos play from the right frame
 			view = player->GetRenderView();
-			if ( view ) {
-				gameRenderWorld->SetRenderView( view );
+			if (view) {
+				gameRenderWorld->SetRenderView(view);
 			}
 		}
 
 		// clear any debug lines from a previous frame
-		gameRenderWorld->DebugClearLines( time );
+		gameRenderWorld->DebugClearLines(time);
 
 		// clear any debug polygons from a previous frame
-		gameRenderWorld->DebugClearPolygons( time );
+		gameRenderWorld->DebugClearPolygons(time);
 
 		// set the user commands for this frame
-		memcpy( usercmds, clientCmds, numClients * sizeof( usercmds[ 0 ] ) );
+		memcpy(usercmds, clientCmds, numClients * sizeof(usercmds[0]));
 
 		// free old smoke particles
 		smokeParticles->FreeSmokes();
@@ -814,11 +857,11 @@ gameReturn_t hhGameLocal::RunFrame( const usercmd_t *clientCmds ) {
 
 		// HUMANHEAD pdm: This loop reworked to support debugger and dormant timings
 		// let entities think
-		if ( g_timeentities.GetFloat() || g_debugger.GetInteger() || g_dormanttests.GetBool()) {
+		if (g_timeentities.GetFloat() || g_debugger.GetInteger() || g_dormanttests.GetBool()) {
 			num = 0;
-			for( ent = activeEntities.Next(); ent != NULL; ent = ent->activeNode.Next() ) {
-				if ( g_cinematic.GetBool() && inCinematic && !ent->cinematic ) {
-					ent->GetPhysics()->UpdateTime( time );
+			for (ent = activeEntities.Next(); ent != NULL; ent = ent->activeNode.Next()) {
+				if (g_cinematic.GetBool() && inCinematic && !ent->cinematic) {
+					ent->GetPhysics()->UpdateTime(time);
 					continue;
 				}
 				dormant = false;
@@ -830,22 +873,22 @@ gameReturn_t hhGameLocal::RunFrame( const usercmd_t *clientCmds ) {
 				}
 
 				timer_singlethink.Clear();
-				if( !dormant ) {
+				if (!dormant) {
 					timer_singlethink.Start();
 					ent->Think();
 					timer_singlethink.Stop();
 				}
 
 				ms = timer_singlethink.Milliseconds();
-				if ( g_timeentities.GetFloat() && ms >= g_timeentities.GetFloat() ) {
-					gameLocal.Printf( "%d: entity '%s': %.1f ms\n", time, ent->name.c_str(), ms );
+				if (g_timeentities.GetFloat() && ms >= g_timeentities.GetFloat()) {
+					gameLocal.Printf("%d: entity '%s': %.1f ms\n", time, ent->name.c_str(), ms);
 				}
 				if (g_debugger.GetInteger() || g_dormanttests.GetBool()) {
-					ent->thinkMS = ent->thinkMS*thinkalpha + (1.0-thinkalpha)*ms;
+					ent->thinkMS = ent->thinkMS*thinkalpha + (1.0 - thinkalpha)*ms;
 				}
 				if (g_dormanttests.GetBool() && !ent->fl.neverDormant) {
 					float msDormant = timer_singledormant.Milliseconds();
-					ent->dormantMS = ent->dormantMS*thinkalpha + (1.0f-thinkalpha)*msDormant;
+					ent->dormantMS = ent->dormantMS*thinkalpha + (1.0f - thinkalpha)*msDormant;
 
 					if (ent->dormantMS > ent->thinkMS && !dormant) {
 						// If we're spending more time on dormant checks than on actually thinking,
@@ -855,25 +898,27 @@ gameReturn_t hhGameLocal::RunFrame( const usercmd_t *clientCmds ) {
 				}
 				num++;
 			}
-		} else {
-			if ( inCinematic ) {
+		}
+		else {
+			if (inCinematic) {
 				num = 0;
-				for( ent = activeEntities.Next(); ent != NULL; ent = ent->activeNode.Next() ) {
-					if ( g_cinematic.GetBool() && !ent->cinematic ) {
-						ent->GetPhysics()->UpdateTime( time );
+				for (ent = activeEntities.Next(); ent != NULL; ent = ent->activeNode.Next()) {
+					if (g_cinematic.GetBool() && !ent->cinematic) {
+						ent->GetPhysics()->UpdateTime(time);
 						continue;
 					}
 					// HUMANHEAD JRM
-					if( !ent->CheckDormant() ) {
+					if (!ent->CheckDormant()) {
 						ent->Think();
 					}
 					num++;
 				}
-			} else {
+			}
+			else {
 				num = 0;
-				for( ent = activeEntities.Next(); ent != NULL; ent = ent->activeNode.Next() ) {
+				for (ent = activeEntities.Next(); ent != NULL; ent = ent->activeNode.Next()) {
 					// HUMANHEAD JRM
-					if( !ent->CheckDormant() ) {
+					if (!ent->CheckDormant()) {
 						ent->Think();
 					}
 					num++;
@@ -882,12 +927,12 @@ gameReturn_t hhGameLocal::RunFrame( const usercmd_t *clientCmds ) {
 		}
 
 		// remove any entities that have stopped thinking
-		if ( numEntitiesToDeactivate ) {
+		if (numEntitiesToDeactivate) {
 			idEntity *next_ent;
 			int c = 0;
-			for( ent = activeEntities.Next(); ent != NULL; ent = next_ent ) {
+			for (ent = activeEntities.Next(); ent != NULL; ent = next_ent) {
 				next_ent = ent->activeNode.Next();
-				if ( !ent->thinkFlags ) {
+				if (!ent->thinkFlags) {
 					ent->activeNode.Remove();
 					c++;
 				}
@@ -911,54 +956,85 @@ gameReturn_t hhGameLocal::RunFrame( const usercmd_t *clientCmds ) {
 		FreePlayerPVS();
 
 		// do multiplayer related stuff
-		if ( isMultiplayer ) {
+		if (isMultiplayer) {
 			mpGame.Run();
 		}
 
 		// display how long it took to calculate the current game frame
-		if ( g_frametime.GetBool() ) {
-			Printf( "game %d: all:%.1f th:%.1f ev:%.1f %d ents \n",
+		if (g_frametime.GetBool()) {
+			Printf("game %d: all:%.1f th:%.1f ev:%.1f %d ents \n",
 				time, timer_think.Milliseconds() + timer_events.Milliseconds(),
-				timer_think.Milliseconds(), timer_events.Milliseconds(), num );
+				timer_think.Milliseconds(), timer_events.Milliseconds(), num);
 		}
 
 		// build the return value
 		ret.consistencyHash = 0;
 		ret.sessionCommand[0] = 0;
 
-		if ( !isMultiplayer && player ) {
+		if (!isMultiplayer && player) {
 			ret.health = player->health;
 			ret.heartRate = 0;	//player->heartRate;	// HUMANHEAD pdm: not used
-			ret.stamina = idMath::FtoiFast( player->stamina );
+			ret.stamina = idMath::FtoiFast(player->stamina);
 			// combat is a 0-100 value based on lastHitTime and lastDmgTime
 			// each make up 50% of the time spread over 10 seconds
 			ret.combat = 0;
-			if ( player->lastDmgTime > 0 && time < player->lastDmgTime + 10000 ) {
-				ret.combat += 50.0f * (float) ( time - player->lastDmgTime ) / 10000;
+			if (player->lastDmgTime > 0 && time < player->lastDmgTime + 10000) {
+				ret.combat += 50.0f * (float)(time - player->lastDmgTime) / 10000;
 			}
-			if ( player->lastHitTime > 0 && time < player->lastHitTime + 10000 ) {
-				ret.combat += 50.0f * (float) ( time - player->lastHitTime ) / 10000;
+			if (player->lastHitTime > 0 && time < player->lastHitTime + 10000) {
+				ret.combat += 50.0f * (float)(time - player->lastHitTime) / 10000;
 			}
 		}
 
 		// see if a target_sessionCommand has forced a changelevel
-		if ( sessionCommand.Length() ) {
-			strncpy( ret.sessionCommand, sessionCommand, sizeof( ret.sessionCommand ) );
+		if (sessionCommand.Length()) {
+			// PreyRun BEGIN
+			idStr cmd = sessionCommand;
+
+#ifdef PR_DEBUG
+			Printf("PreyRunDBG: Session command: %s\n", cmd.c_str());
+#endif // PR_DEBUG
+
+			if (cmd.Find("map ", 0, 4))
+			{
+				// The command to execute is map
+				pr_preysplit_mapchanged = true;
+
+				if (pr_timer_methode.GetInteger() == PR_TIMER_METHODES::METHODE_INDIVIDUALLEVEL && pr_gametimer_running && pr_gametimer.IsRunning() && pr_timer_autostop.GetBool())
+				{
+					pr_gametimer_running = false;
+					pr_gametimer.Stop();
+
+					if (pr_preysplit.GetBool())
+					{
+						pr::WriteGameEnd(pr::GetTime());
+					}
+
+					auto times = PR_ms2time(pr_gametimer.Milliseconds());
+
+					gameLocal.Printf("PreyRun: Timer: Individual Level end, time: %02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
+
+					// Prevent the map change so the player can see his time
+					sessionCommand.Clear();
+				}
+			}
+			// PreyRun END
+			strncpy(ret.sessionCommand, sessionCommand, sizeof(ret.sessionCommand));
 			break;
 		}
 
 		// make sure we don't loop forever when skipping a cinematic
-		if ( skipCinematic && ( time > cinematicMaxSkipTime ) ) {
-			Warning( "Exceeded maximum cinematic skip length.  Cinematic may be looping infinitely." );
+		if (skipCinematic && (time > cinematicMaxSkipTime)) {
+			Warning("Exceeded maximum cinematic skip length.  Cinematic may be looping infinitely.");
 			skipCinematic = false;
 			break;
 		}
-	} while( ( inCinematic || ( time < cinematicStopTime ) ) && skipCinematic );
+	} while ((inCinematic || (time < cinematicStopTime)) && skipCinematic);
 
 	ret.syncNextGameFrame = skipCinematic;
-	if ( skipCinematic ) {
-		soundSystem->SetMute( false );
-		skipCinematic = false;		
+	if (skipCinematic) {
+		soundSystem->SetMute(false);
+		skipCinematic = false;
 	}
 
 	// show any debug info for this frame
@@ -977,32 +1053,32 @@ gameReturn_t hhGameLocal::RunFrame( const usercmd_t *clientCmds ) {
 }
 
 //	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
-bool hhGameLocal::Draw( int clientNum ) {
+bool hhGameLocal::Draw(int clientNum) {
 	//HUMANHEAD rww - dedicated server update
 	if (clientNum == -1) {
-		gameSoundWorld->PlaceListener( vec3_origin, mat3_identity, -1, gameLocal.time, "Undefined" );
+		gameSoundWorld->PlaceListener(vec3_origin, mat3_identity, -1, gameLocal.time, "Undefined");
 		return false;
 	}
 	//HUMANHEAD END
 
-	if ( isMultiplayer ) {
-		return mpGame.Draw( clientNum );
+	if (isMultiplayer) {
+		return mpGame.Draw(clientNum);
 	}
 
 	//HUMANHEAD: aob - changed idPlayer to hhPlayer
-	hhPlayer *player = static_cast<hhPlayer *>(entities[ clientNum ]);
+	hhPlayer *player = static_cast<hhPlayer *>(entities[clientNum]);
 
-	if ( !player ) {
+	if (!player) {
 		return false;
 	}
 
 	// render the scene
 	// HUMANHEAD pdm: added case of vehicle determining the player hud
 	if (player->InVehicle()) {
-		player->playerView.RenderPlayerView( player->GetVehicleInterfaceLocal()->GetHUD() );
+		player->playerView.RenderPlayerView(player->GetVehicleInterfaceLocal()->GetHUD());
 	}
 	else {
-		player->playerView.RenderPlayerView( player->hud );
+		player->playerView.RenderPlayerView(player->hud);
 	}
 	// HUMANHEAD END
 
@@ -1015,19 +1091,19 @@ bool hhGameLocal::Draw( int clientNum ) {
 
 
 float hhGameLocal::GetTimeScale() const {
-	return hhMath::ClampFloat( VECTOR_EPSILON, 10.0f, cvarSystem->GetCVarFloat("timescale") );
+	return hhMath::ClampFloat(VECTOR_EPSILON, 10.0f, cvarSystem->GetCVarFloat("timescale"));
 }
 
 //
 // SimpleMonstersWithinRadius()
 // TODO: Use this exclusively and remove MonstersWithinRadius when old AI is removed
-int hhGameLocal::SimpleMonstersWithinRadius( const idVec3 org, float radius, idAI **monstList, int maxCount ) const {
-	idBounds bo( org );
+int hhGameLocal::SimpleMonstersWithinRadius(const idVec3 org, float radius, idAI **monstList, int maxCount) const {
+	idBounds bo(org);
 	int entCount = 0;
 
-	bo.ExpandSelf( radius );
-	for(int i=0;i<hhMonsterAI::allSimpleMonsters.Num();i++) {
-		if ( hhMonsterAI::allSimpleMonsters[i]->GetPhysics()->GetAbsBounds().IntersectsBounds( bo ) ) {
+	bo.ExpandSelf(radius);
+	for (int i = 0;i < hhMonsterAI::allSimpleMonsters.Num();i++) {
+		if (hhMonsterAI::allSimpleMonsters[i]->GetPhysics()->GetAbsBounds().IntersectsBounds(bo)) {
 			monstList[entCount++] = hhMonsterAI::allSimpleMonsters[i];
 		}
 	}
@@ -1038,11 +1114,11 @@ int hhGameLocal::SimpleMonstersWithinRadius( const idVec3 org, float radius, idA
 //
 // SpawnMapEntities()
 //
-void hhGameLocal::SpawnMapEntities( void ) {
-	if ( reactionHandler ) {
+void hhGameLocal::SpawnMapEntities(void) {
+	if (reactionHandler) {
 		delete reactionHandler;
 	}
-	reactionHandler	= new hhReactionHandler;
+	reactionHandler = new hhReactionHandler;
 	idGameLocal::SpawnMapEntities();
 }
 
@@ -1051,15 +1127,15 @@ void hhGameLocal::SpawnMapEntities( void ) {
 hhGameLocal::SendMessageAI
 ==============
 */
-void hhGameLocal::SendMessageAI( const idEntity* entity, const idVec3& origin, float radius, const idEventDef& message ) {
-	idAI *simplemonsters[ MAX_GENTITIES ];
+void hhGameLocal::SendMessageAI(const idEntity* entity, const idVec3& origin, float radius, const idEventDef& message) {
+	idAI *simplemonsters[MAX_GENTITIES];
 
-	if( radius < VECTOR_EPSILON || isClient ) {
+	if (radius < VECTOR_EPSILON || isClient) {
 		return;
 	}
-	for( int i = gameLocal.SimpleMonstersWithinRadius(origin, radius, simplemonsters) - 1; i >= 0; --i ) {
-		if( simplemonsters[i]->GetHealth() > 0 && simplemonsters[i]->IsActive() && !simplemonsters[i]->IsHidden() ) {
-			simplemonsters[i]->ProcessEvent( &message, entity );
+	for (int i = gameLocal.SimpleMonstersWithinRadius(origin, radius, simplemonsters) - 1; i >= 0; --i) {
+		if (simplemonsters[i]->GetHealth() > 0 && simplemonsters[i]->IsActive() && !simplemonsters[i]->IsHidden()) {
+			simplemonsters[i]->ProcessEvent(&message, entity);
 		}
 	}
 }
@@ -1069,8 +1145,8 @@ void hhGameLocal::SendMessageAI( const idEntity* entity, const idVec3& origin, f
 hhGameLocal::MatterTypeToMatterName
 ==============
 */
-const char* hhGameLocal::MatterTypeToMatterName( surfTypes_t type ) const {
-	return sufaceTypeNames[ type ];
+const char* hhGameLocal::MatterTypeToMatterName(surfTypes_t type) const {
+	return sufaceTypeNames[type];
 }
 
 /*
@@ -1078,8 +1154,8 @@ const char* hhGameLocal::MatterTypeToMatterName( surfTypes_t type ) const {
 hhGameLocal::MatterTypeToMatterKey
 ==============
 */
-const char* hhGameLocal::MatterTypeToMatterKey( const char* prefix, surfTypes_t type ) const {
-	return va( "%s_%s", prefix, MatterTypeToMatterName(type) );
+const char* hhGameLocal::MatterTypeToMatterKey(const char* prefix, surfTypes_t type) const {
+	return va("%s_%s", prefix, MatterTypeToMatterName(type));
 }
 
 /*
@@ -1087,12 +1163,12 @@ const char* hhGameLocal::MatterTypeToMatterKey( const char* prefix, surfTypes_t 
 hhGameLocal::MatterNameToMatterType
 ==============
 */
-surfTypes_t hhGameLocal::MatterNameToMatterType( const char* name ) const {
+surfTypes_t hhGameLocal::MatterNameToMatterType(const char* name) const {
 	surfTypes_t type = SURFTYPE_NONE;
 
-	for( int ix = 0; ix < MAX_SURFACE_TYPES; ++ix ) {
+	for (int ix = 0; ix < MAX_SURFACE_TYPES; ++ix) {
 		type = (surfTypes_t)ix;
-		if( idStr::Icmp(name, MatterTypeToMatterName(type)) ) {
+		if (idStr::Icmp(name, MatterTypeToMatterName(type))) {
 			continue;
 		}
 
@@ -1107,8 +1183,8 @@ surfTypes_t hhGameLocal::MatterNameToMatterType( const char* name ) const {
 hhGameLocal::GetMatterType
 ==============
 */
-surfTypes_t hhGameLocal::GetMatterType( const trace_t& trace, const char* descriptor ) const {
-	return GetMatterType( gameLocal.GetTraceEntity(trace), trace.c.material, descriptor );
+surfTypes_t hhGameLocal::GetMatterType(const trace_t& trace, const char* descriptor) const {
+	return GetMatterType(gameLocal.GetTraceEntity(trace), trace.c.material, descriptor);
 }
 
 /*
@@ -1116,15 +1192,15 @@ surfTypes_t hhGameLocal::GetMatterType( const trace_t& trace, const char* descri
 hhGameLocal::GetMatterType
 ==============
 */
-surfTypes_t hhGameLocal::GetMatterType( const idEntity *ent, const idMaterial *material, const char* descriptor ) const {
+surfTypes_t hhGameLocal::GetMatterType(const idEntity *ent, const idMaterial *material, const char* descriptor) const {
 	surfTypes_t type = SURFTYPE_NONE;
 	const char *matterName = NULL;
 	const idMaterial *remapped = material;
 
 	// If the entityDef has a matter specified, always use it
 	// Otherwise, use the materials matter.  If none, default to metal.
-	if( ent && ent->spawnArgs.GetString("matter", NULL, &matterName ) ) {
-		type = MatterNameToMatterType( matterName );
+	if (ent && ent->spawnArgs.GetString("matter", NULL, &matterName)) {
+		type = MatterNameToMatterType(matterName);
 	}
 	else {
 		if (ent && ent->GetSkin()) {
@@ -1134,7 +1210,7 @@ surfTypes_t hhGameLocal::GetMatterType( const idEntity *ent, const idMaterial *m
 	}
 
 	// OBS: Will never happen
-	if( !type ) {
+	if (!type) {
 #if 0
 		Warning("No matter for hit surface");
 		Warning(" Entity: %s", ent ? ent->name.c_str() : "none");
@@ -1142,9 +1218,9 @@ surfTypes_t hhGameLocal::GetMatterType( const idEntity *ent, const idMaterial *m
 		Warning(" Material: %s", material ? material->GetName() : "none");
 #endif
 		type = SURFTYPE_METAL;
-	}
+}
 
-	if( g_debugMatter.GetInteger() > 0 && descriptor && descriptor[0] ) {
+	if (g_debugMatter.GetInteger() > 0 && descriptor && descriptor[0]) {
 		Printf("%s: [%s] ent=[%s] mat=[%s]\n",
 			descriptor,
 			MatterTypeToMatterName(type),
@@ -1155,20 +1231,20 @@ surfTypes_t hhGameLocal::GetMatterType( const idEntity *ent, const idMaterial *m
 	return type;
 }
 
-void hhGameLocal::AlertAI( idEntity *ent ) {
-	if ( ent && ent->IsType( idActor::Type ) ) {
+void hhGameLocal::AlertAI(idEntity *ent) {
+	if (ent && ent->IsType(idActor::Type)) {
 		// alert them for the next frame
 		lastAIAlertTime = time + msec;
-		lastAIAlertEntity = static_cast<idActor *>( ent );
+		lastAIAlertEntity = static_cast<idActor *>(ent);
 		lastAIAlertRadius = 0;			//no radius required by default
 	}
 }
 
-void hhGameLocal::AlertAI( idEntity *ent, float radius ) {
-	if ( ent && ent->IsType( idActor::Type ) ) {
+void hhGameLocal::AlertAI(idEntity *ent, float radius) {
+	if (ent && ent->IsType(idActor::Type)) {
 		// alert them for the next frame
 		lastAIAlertTime = time + msec;
-		lastAIAlertEntity = static_cast<idActor *>( ent );
+		lastAIAlertEntity = static_cast<idActor *>(ent);
 		lastAIAlertRadius = radius;		//radius of effect
 	}
 }
@@ -1176,175 +1252,179 @@ void hhGameLocal::AlertAI( idEntity *ent, float radius ) {
 //================
 //hhGameLocal::Save
 //================
-void hhGameLocal::Save( idSaveGame *savefile ) const {
+void hhGameLocal::Save(idSaveGame *savefile) const {
 	int i, num = talonTargets.Num();
-	savefile->WriteInt( num );
-	for( i = 0; i < num; i++ ) {
-		savefile->WriteObject( talonTargets[i] );
+	savefile->WriteInt(num);
+	for (i = 0; i < num; i++) {
+		savefile->WriteObject(talonTargets[i]);
 	}
 
-	reactionHandler->Save( savefile );
-	savefile->WriteClipModel( dwWorldClipModel );
+	reactionHandler->Save(savefile);
+	savefile->WriteClipModel(dwWorldClipModel);
 	//HUMANHEAD rww
 #if _HH_INLINED_PROC_CLIPMODELS
 	savefile->WriteInt(inlinedProcClipModels.Num());
 	for (i = 0; i < inlinedProcClipModels.Num(); i++) {
 		savefile->WriteClipModel(inlinedProcClipModels[i]);
-	}
+}
 #endif
 	//HUMANHEAD END
-	savefile->WriteVec3( gravityNormal );
-	savefile->WriteObject( sunCorona );
-	ddaManager->Save( savefile );
-	savefile->WriteBool( bIsLOTA );
-	savefile->WriteFloat( lastAIAlertRadius );
+	savefile->WriteVec3(gravityNormal);
+	savefile->WriteObject(sunCorona);
+	ddaManager->Save(savefile);
+	savefile->WriteBool(bIsLOTA);
+	savefile->WriteFloat(lastAIAlertRadius);
 
 	num = staticClipModels.Num();
-	savefile->WriteInt( num );
-	for( i = 0; i < num; i++ ) {
-		savefile->WriteClipModel( staticClipModels[i] );
+	savefile->WriteInt(num);
+	for (i = 0; i < num; i++) {
+		savefile->WriteClipModel(staticClipModels[i]);
 	}
 
 	num = staticRenderEntities.Num();
-	savefile->WriteInt( num );
-	for( i = 0; i < num; i++ ) {
-		savefile->WriteRenderEntity( *staticRenderEntities[i] );
+	savefile->WriteInt(num);
+	for (i = 0; i < num; i++) {
+		savefile->WriteRenderEntity(*staticRenderEntities[i]);
 	}
 
-	savefile->WriteInt( hands.Num() );
-	for ( i = 0; i < hands.Num(); i++ ) {
-		hands[i].Save( savefile );
+	savefile->WriteInt(hands.Num());
+	for (i = 0; i < hands.Num(); i++) {
+		hands[i].Save(savefile);
 	}
 }
 
 //================
 //hhGameLocal::Restore
 //================
-void hhGameLocal::Restore( idRestoreGame *savefile ) {
+void hhGameLocal::Restore(idRestoreGame *savefile) {
 	idEntity *ent;
 	int i, num;
 	idClipModel *model;
 	renderEntity_t *renderEnt;
-	savefile->ReadInt( num );
-	talonTargets.SetNum( num );
-	for( i = 0; i < num; i++ ) {
-		savefile->ReadObject( reinterpret_cast<idClass *&> ( ent ) );
+	savefile->ReadInt(num);
+	talonTargets.SetNum(num);
+	for (i = 0; i < num; i++) {
+		savefile->ReadObject(reinterpret_cast<idClass *&> (ent));
 		talonTargets[i] = ent;
 	}
 
-	reactionHandler	= new hhReactionHandler;
-	reactionHandler->Restore( savefile );
-	savefile->ReadClipModel( dwWorldClipModel );
+	reactionHandler = new hhReactionHandler;
+	reactionHandler->Restore(savefile);
+	savefile->ReadClipModel(dwWorldClipModel);
 	//HUMANHEAD rww
 #if _HH_INLINED_PROC_CLIPMODELS
 	int numInlinedProcClipModels;
 	savefile->ReadInt(numInlinedProcClipModels);
 	for (i = 0; i < numInlinedProcClipModels; i++) {
 		savefile->ReadClipModel(inlinedProcClipModels[i]);
-	}
+}
 #endif
 	//HUMANHEAD END
-	savefile->ReadVec3( gravityNormal );
-	savefile->ReadObject( reinterpret_cast<idClass *&> ( sunCorona ) );
-	ddaManager->Restore ( savefile );
-	savefile->ReadBool( bIsLOTA );
-	savefile->ReadFloat( lastAIAlertRadius );
+	savefile->ReadVec3(gravityNormal);
+	savefile->ReadObject(reinterpret_cast<idClass *&> (sunCorona));
+	ddaManager->Restore(savefile);
+	savefile->ReadBool(bIsLOTA);
+	savefile->ReadFloat(lastAIAlertRadius);
 
-	savefile->ReadInt( num );
-	staticClipModels.DeleteContents( false );
-	staticClipModels.SetNum( num );
-	for( i = 0; i < num; i++ ) {
-		savefile->ReadClipModel( model );
+	savefile->ReadInt(num);
+	staticClipModels.DeleteContents(false);
+	staticClipModels.SetNum(num);
+	for (i = 0; i < num; i++) {
+		savefile->ReadClipModel(model);
 		staticClipModels[i] = model;
 	}
 
-	savefile->ReadInt( num );
-	staticRenderEntities.DeleteContents( false );
-	staticRenderEntities.SetNum( num );
-	for( i = 0; i < num; i++ ) {
+	savefile->ReadInt(num);
+	staticRenderEntities.DeleteContents(false);
+	staticRenderEntities.SetNum(num);
+	for (i = 0; i < num; i++) {
 		renderEnt = new renderEntity_t;
-		savefile->ReadRenderEntity( *renderEnt );
-		gameRenderWorld->AddEntityDef( renderEnt );
+		savefile->ReadRenderEntity(*renderEnt);
+		gameRenderWorld->AddEntityDef(renderEnt);
 		staticRenderEntities[i] = renderEnt;
 	}
 
-	savefile->ReadInt( num );
-	hands.SetNum( num );
-	for ( i = 0; i < num; i++ ) {
-		hands[i].Restore( savefile );
+	savefile->ReadInt(num);
+	hands.SetNum(num);
+	for (i = 0; i < num; i++) {
+		hands[i].Restore(savefile);
 	}
 }
 
-bool hhGameLocal::InhibitEntitySpawn( idDict &spawnArgs ) {
-	const char *modelName = spawnArgs.GetString( "model" );
-	int inlineEnt = spawnArgs.GetInt( "inline" );
+bool hhGameLocal::InhibitEntitySpawn(idDict &spawnArgs) {
+	const char *modelName = spawnArgs.GetString("model");
+	int inlineEnt = spawnArgs.GetInt("inline");
 
-	if( idStr::Icmp( spawnArgs.GetString( "classname", NULL ), "func_static" ) == 0 &&	// Only deal with func_static objects
-        !spawnArgs.GetBool( "neverInline", "0" ) &&										// and we're not flagged neverInline
-		( inlineEnt != 0 ||																// and we're flagged explicit inline
-		  world->spawnArgs.GetBool( "inlineAllStatics" ) ) ) {							//     or we're inlining all statics
+	if (idStr::Icmp(spawnArgs.GetString("classname", NULL), "func_static") == 0 &&	// Only deal with func_static objects
+		!spawnArgs.GetBool("neverInline", "0") &&										// and we're not flagged neverInline
+		(inlineEnt != 0 ||																// and we're flagged explicit inline
+			world->spawnArgs.GetBool("inlineAllStatics"))) {							//     or we're inlining all statics
 
 #if _HH_INLINED_PROC_CLIPMODELS
 		if (inlineEnt != 3) { //HUMANHEAD rww
 #endif
 			// Handle explicit clip models
 			idClipModel *model = NULL;
-			const char *temp = spawnArgs.GetString( "clipmodel", NULL );
+			const char *temp = spawnArgs.GetString("clipmodel", NULL);
 
-			if( temp ) {
-				if ( idClipModel::CheckModel( temp ) ) {
-					model = new idClipModel( temp );
+			if (temp) {
+				if (idClipModel::CheckModel(temp)) {
+					model = new idClipModel(temp);
 				}
 			}
 
-			if( model || !spawnArgs.GetBool( "noclipmodel", "0" ) ) {
+			if (model || !spawnArgs.GetBool("noclipmodel", "0")) {
 				// Get the origin and axis of the object
 				idMat3	axis;
 				// get the rotation matrix in either full form, or single angle form
-				if ( !spawnArgs.GetMatrix( "rotation", "1 0 0 0 1 0 0 0 1", axis ) ) {
-					float angle = spawnArgs.GetFloat( "angle" );
-					if ( angle != 0.0f ) {
-						axis = idAngles( 0.0f, angle, 0.0f ).ToMat3();
-					} else {
+				if (!spawnArgs.GetMatrix("rotation", "1 0 0 0 1 0 0 0 1", axis)) {
+					float angle = spawnArgs.GetFloat("angle");
+					if (angle != 0.0f) {
+						axis = idAngles(0.0f, angle, 0.0f).ToMat3();
+					}
+					else {
 						axis.Identity();
 					}
-				}		
+				}
 
-				idVec3	origin = spawnArgs.GetVector( "origin" );
+				idVec3	origin = spawnArgs.GetVector("origin");
 
 				// Create a clip model for the static object and position it correctly
-				if( !model ) {
-					model = new idClipModel( spawnArgs.GetString( "model" ) );
+				if (!model) {
+					model = new idClipModel(spawnArgs.GetString("model"));
 				}
-				if( spawnArgs.GetBool( "bulletsOnly", "0" ) ) {
-					model->SetContents( CONTENTS_SHOOTABLE|CONTENTS_SHOOTABLEBYARROW );
-				} else if( spawnArgs.GetBool( "solid", "1" ) ) {
-					model->SetContents( CONTENTS_SOLID );
-				} else {
-					model->SetContents( 0 );
+				if (spawnArgs.GetBool("bulletsOnly", "0")) {
+					model->SetContents(CONTENTS_SHOOTABLE | CONTENTS_SHOOTABLEBYARROW);
 				}
-				model->SetPosition( origin, axis );
-				model->SetEntity( world );
-				model->Link( clip );
-				staticClipModels.Append( model );
+				else if (spawnArgs.GetBool("solid", "1")) {
+					model->SetContents(CONTENTS_SOLID);
+				}
+				else {
+					model->SetContents(0);
+				}
+				model->SetPosition(origin, axis);
+				model->SetEntity(world);
+				model->Link(clip);
+				staticClipModels.Append(model);
 			}
 #if _HH_INLINED_PROC_CLIPMODELS
-		}
+			}
 #endif
 
-		if ( inlineEnt == 1 ) { // This means we must hand the model, too
+		if (inlineEnt == 1) { // This means we must hand the model, too
 			renderEntity_t *renderEnt = new renderEntity_t;
-			gameEdit->ParseSpawnArgsToRenderEntity( &spawnArgs, renderEnt );
-			HH_ASSERT( renderEnt->hModel && !renderEnt->callback && renderEnt->shaderParms[ SHADERPARM_ANY_DEFORM ] == DEFORMTYPE_NONE ); // Inlined statics can't have a callback
+			gameEdit->ParseSpawnArgsToRenderEntity(&spawnArgs, renderEnt);
+			HH_ASSERT(renderEnt->hModel && !renderEnt->callback && renderEnt->shaderParms[SHADERPARM_ANY_DEFORM] == DEFORMTYPE_NONE); // Inlined statics can't have a callback
 			renderEnt->entityNum = 0; // WorldSpawn
-			gameRenderWorld->AddEntityDef( renderEnt );
-			staticRenderEntities.Append( renderEnt );
+			gameRenderWorld->AddEntityDef(renderEnt);
+			staticRenderEntities.Append(renderEnt);
 		}
 
 		// Don't spawn an entity for an inlined static
 		return true;
-	} else {
-		return idGameLocal::InhibitEntitySpawn( spawnArgs );
+		}
+	else {
+		return idGameLocal::InhibitEntitySpawn(spawnArgs);
 	}
 }
 
@@ -1380,7 +1460,7 @@ idEntity *hhGameLocal::FindEntityOfType(const idTypeInfo &type, idEntity *last) 
 		ent = activeEntities.Next();
 	}
 
-	for( ; ent != NULL; ent = ent->activeNode.Next() ) {
+	for (; ent != NULL; ent = ent->activeNode.Next()) {
 		if (ent->IsType(type)) {
 			return ent;
 		}
@@ -1388,16 +1468,17 @@ idEntity *hhGameLocal::FindEntityOfType(const idTypeInfo &type, idEntity *last) 
 	return NULL;
 }
 
-float hhGameLocal::GetDDAValue( void ) {
-	if ( !ddaManager ) {
+float hhGameLocal::GetDDAValue(void) {
+	if (!ddaManager) {
 		return 0.5;
-	} else {
+	}
+	else {
 		return ddaManager->GetDifficulty();
-	}	
+	}
 }
 
 
-void hhGameLocal::ClearStaticData( void ) {
+void hhGameLocal::ClearStaticData(void) {
 	delete dwWorldClipModel; //rww - this needs to be done as well, dw clipmodel expects world as owner.
 	dwWorldClipModel = NULL;
 
@@ -1405,14 +1486,14 @@ void hhGameLocal::ClearStaticData( void ) {
 	inlinedProcClipModels.DeleteContents(true); //HUMANHEAD rww
 #endif
 
-	staticClipModels.DeleteContents( true ); // Clear any inlined static clip models
-	staticRenderEntities.DeleteContents( true ); // Clear any inlined static render entities
+	staticClipModels.DeleteContents(true); // Clear any inlined static clip models
+	staticRenderEntities.DeleteContents(true); // Clear any inlined static render entities
 }
 
 float hhGameLocal::TimeBasedRandomFloat(void) {
 	if (gameLocal.isMultiplayer) { //rand based on time step
-		timeRandom = (1103515245 * timeRandom + 12345)%(1<<31);
-		return (timeRandom)/( float )( (1<<31) + 1 );
+		timeRandom = (1103515245 * timeRandom + 12345) % (1 << 31);
+		return (timeRandom) / (float)((1 << 31) + 1);
 	}
 	else { //give sp complete randomness
 		return random.RandomFloat();
@@ -1420,9 +1501,9 @@ float hhGameLocal::TimeBasedRandomFloat(void) {
 }
 
 bool hhGameLocal::PlayerIsDeathwalking(void) {
-	HH_ASSERT( !isMultiplayer );
+	HH_ASSERT(!isMultiplayer);
 	hhPlayer *player = static_cast<hhPlayer *> (GetLocalPlayer());
-	HH_ASSERT( player );
+	HH_ASSERT(player);
 	return player->IsDeathWalking();
 }
 
@@ -1456,7 +1537,7 @@ bool hhGameLocal::SetTip(idUserInterface* gui, const char *binding, const char *
 
 	idStr keyMaterial, key;
 	bool keywide = false;
-	if ( !spawnArgs.GetString("mtr_override", "", keyMaterial) ) {
+	if (!spawnArgs.GetString("mtr_override", "", keyMaterial)) {
 		if (binding) {
 			GetTip(binding, keyMaterial, key, keywide);
 		}
@@ -1465,18 +1546,18 @@ bool hhGameLocal::SetTip(idUserInterface* gui, const char *binding, const char *
 	const char *translated = common->GetLanguageDict()->GetString(tip);
 
 	if (prefix != NULL) {
-		gui->SetStateBool( va("%s_keywide", prefix), keywide );
-		gui->SetStateString( va("%s_tip", prefix), translated ? translated : "" );
-		gui->SetStateString( va("%s_key", prefix), key.c_str() );
-		gui->SetStateString( va("%s_keyMaterial", prefix), keyMaterial.c_str() );
-		gui->SetStateString( va("%s_topMaterial", prefix), topMaterial ? topMaterial : "" );
+		gui->SetStateBool(va("%s_keywide", prefix), keywide);
+		gui->SetStateString(va("%s_tip", prefix), translated ? translated : "");
+		gui->SetStateString(va("%s_key", prefix), key.c_str());
+		gui->SetStateString(va("%s_keyMaterial", prefix), keyMaterial.c_str());
+		gui->SetStateString(va("%s_topMaterial", prefix), topMaterial ? topMaterial : "");
 	}
 	else {
-		gui->SetStateBool( "keywide", keywide );
-		gui->SetStateString( "tip", translated ? translated : "" );
-		gui->SetStateString( "key", key.c_str() );
-		gui->SetStateString( "keyMaterial", keyMaterial.c_str() );
-		gui->SetStateString( "topMaterial", topMaterial ? topMaterial : "" );
+		gui->SetStateBool("keywide", keywide);
+		gui->SetStateString("tip", translated ? translated : "");
+		gui->SetStateString("key", key.c_str());
+		gui->SetStateString("keyMaterial", keyMaterial.c_str());
+		gui->SetStateString("topMaterial", topMaterial ? topMaterial : "");
 	}
 
 	return (keyMaterial.Length() > 0);
