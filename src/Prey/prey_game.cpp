@@ -149,6 +149,8 @@ void hhGameLocal::InitFromNewMap(const char *mapName, idRenderWorld *renderWorld
 	Printf("PreyRunDBG: Starting Map: %s\n", mapName);
 #endif // PR_DEBUG
 
+	pr_timer_mapchanged = true;
+
 	// Clear all Autocmdzones when chaning level
 	pr::AutocmdzoneHandler::getInstance().Clear();
 

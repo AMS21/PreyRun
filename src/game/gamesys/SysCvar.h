@@ -37,6 +37,7 @@ extern bool pr_timedemo;
 extern idCVar pr_timer_autostart;
 extern idCVar pr_timer_autostop;
 extern idCVar pr_timer_methode;
+extern bool pr_timer_mapchanged;
 const enum PR_TIMER_METHODES
 {
 	METHODE_REALTIMEATTACK,

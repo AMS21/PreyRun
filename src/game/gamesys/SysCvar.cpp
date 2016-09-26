@@ -59,6 +59,7 @@ bool pr_gametimer_running{ false };
 idCVar pr_timer_autostart("PR_Timer_AutoStart", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly start the hud timer at run begin check PR_Timer_Methode for information when this might be");
 idCVar pr_timer_autostop("PR_Timer_AutoStop", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly stop the hud timer check PR_Timer_Methode for information when this might be");
 idCVar pr_timer_methode("PR_Timer_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Switch the diffrent timing methodes\n0 - RTA - Real Time Attack, the whole game from start (the first frame you can control Tommy) to finish (when the sphere boss is killed) with game time (default)\n1 - Individual Level, Starts when a map or savegame, is loaded and stops when the map has been completed");
+bool pr_timer_mapchanged{ false };
 
 idCVar pr_hud_timer("PR_hud_Timer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Shows the timer");
 idCVar pr_hud_timer_x("PR_hud_Timer_x", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 639);

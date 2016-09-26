@@ -1096,10 +1096,11 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 #endif // PR_DEBUG
 
 	// Individual Level timer
-	if (!pr_gametimer_running && pr_timer_autostart.GetBool() && pr_timer_methode.GetInteger() == PR_TIMER_METHODES::METHODE_INDIVIDUALLEVEL)
+	if (!pr_gametimer_running && pr_timer_autostart.GetBool() && pr_timer_mapchanged && pr_timer_methode.GetInteger() == PR_TIMER_METHODES::METHODE_INDIVIDUALLEVEL && (idStr)gameLocal.GetMapName() != idStr("maps/game/roadhouse.map"))
 	{
-		gameLocal.Printf("PreyRun: Timer: Auto starting\n");
+		gameLocal.Printf("PreyRun: Timer: Individual Level Auto starting\n");
 
+		pr_timer_mapchanged = false;
 		pr_gametimer_running = true;
 		pr_gametimer.Start();
 

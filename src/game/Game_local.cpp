@@ -1433,6 +1433,8 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 #ifdef PR_DEBUG
 	gameLocal.Printf("PreyRunDBG: Loading savegame %s from map %s\n", saveGameFile->GetName(), mapName);
 #endif // PR_DEBUG
+
+	pr_timer_mapchanged = true;
 	// PreyRun END
 
 	Printf("------- Game Map Init SaveGame -------\n");
