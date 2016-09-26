@@ -702,7 +702,7 @@ void hhPhysics_Player::SetPushed( int deltaTime ) {
 	idPhysics* physics = (groundTrace.fraction < 1.0f) ? gameLocal.entities[groundTrace.c.entityNum]->GetPhysics() : NULL;
 	bool parametricPhysics = (physics) ? physics->IsType(idPhysics_Parametric::Type) : false;
 	if( parametricPhysics && IsWallWalking() ) {
-        return;		
+		return;		
 	}
 
 	idPhysics_Player::SetPushed( deltaTime );

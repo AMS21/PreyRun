@@ -231,15 +231,15 @@ namespace pr
 	{
 		PR_time_t times;
 
-		if (pr_hudtimer.IsRunning())
+		if (pr_gametimer.IsRunning())
 		{
-			pr_hudtimer.Stop();
-			times = PR_ms2time(pr_hudtimer.Milliseconds());
-			pr_hudtimer.Start();
+			pr_gametimer.Stop();
+			times = PR_ms2time(pr_gametimer.Milliseconds());
+			pr_gametimer.Start();
 		}
 		else
 		{
-			times = PR_ms2time(pr_hudtimer.Milliseconds());
+			times = PR_ms2time(pr_gametimer.Milliseconds());
 		}
 
 		return Time{ times.hours, times.minutes, times.seconds, times.milliseconds };

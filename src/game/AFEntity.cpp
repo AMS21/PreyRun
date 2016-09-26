@@ -15,7 +15,7 @@
 ===============================================================================
 */
 
-CLASS_DECLARATION( idEntity, idMultiModelAF )
+CLASS_DECLARATION(idEntity, idMultiModelAF)
 END_CLASS
 
 /*
@@ -23,8 +23,8 @@ END_CLASS
 idMultiModelAF::Spawn
 ================
 */
-void idMultiModelAF::Spawn( void ) {
-	physicsObj.SetSelf( this );
+void idMultiModelAF::Spawn(void) {
+	physicsObj.SetSelf(this);
 }
 
 /*
@@ -32,12 +32,12 @@ void idMultiModelAF::Spawn( void ) {
 idMultiModelAF::~idMultiModelAF
 ================
 */
-idMultiModelAF::~idMultiModelAF( void ) {
+idMultiModelAF::~idMultiModelAF(void) {
 	int i;
 
-	for ( i = 0; i < modelDefHandles.Num(); i++ ) {
-		if ( modelDefHandles[i] != -1 ) {
-			gameRenderWorld->FreeEntityDef( modelDefHandles[i] );
+	for (i = 0; i < modelDefHandles.Num(); i++) {
+		if (modelDefHandles[i] != -1) {
+			gameRenderWorld->FreeEntityDef(modelDefHandles[i]);
 			modelDefHandles[i] = -1;
 		}
 	}
@@ -48,10 +48,10 @@ idMultiModelAF::~idMultiModelAF( void ) {
 idMultiModelAF::SetModelForId
 ================
 */
-void idMultiModelAF::SetModelForId( int id, const idStr &modelName ) {
-	modelHandles.AssureSize( id+1, NULL );
-	modelDefHandles.AssureSize( id+1, -1 );
-	modelHandles[id] = renderModelManager->FindModel( modelName );
+void idMultiModelAF::SetModelForId(int id, const idStr &modelName) {
+	modelHandles.AssureSize(id + 1, NULL);
+	modelDefHandles.AssureSize(id + 1, -1);
+	modelHandles[id] = renderModelManager->FindModel(modelName);
 }
 
 /*
@@ -59,31 +59,32 @@ void idMultiModelAF::SetModelForId( int id, const idStr &modelName ) {
 idMultiModelAF::Present
 ================
 */
-void idMultiModelAF::Present( void ) {
+void idMultiModelAF::Present(void) {
 	int i;
 
 	// don't present to the renderer if the entity hasn't changed
-	if ( !( thinkFlags & TH_UPDATEVISUALS ) ) {
+	if (!(thinkFlags & TH_UPDATEVISUALS)) {
 		return;
 	}
-	BecomeInactive( TH_UPDATEVISUALS );
+	BecomeInactive(TH_UPDATEVISUALS);
 
-	for ( i = 0; i < modelHandles.Num(); i++ ) {
+	for (i = 0; i < modelHandles.Num(); i++) {
 
-		if ( !modelHandles[i] ) {
+		if (!modelHandles[i]) {
 			continue;
 		}
 
-		renderEntity.origin = physicsObj.GetOrigin( i );
-		renderEntity.axis = physicsObj.GetAxis( i );
+		renderEntity.origin = physicsObj.GetOrigin(i);
+		renderEntity.axis = physicsObj.GetAxis(i);
 		renderEntity.hModel = modelHandles[i];
 		renderEntity.bodyId = i;
 
 		// add to refresh list
-		if ( modelDefHandles[i] == -1 ) {
-			modelDefHandles[i] = gameRenderWorld->AddEntityDef( &renderEntity );
-		} else {
-			gameRenderWorld->UpdateEntityDef( modelDefHandles[i], &renderEntity );
+		if (modelDefHandles[i] == -1) {
+			modelDefHandles[i] = gameRenderWorld->AddEntityDef(&renderEntity);
+		}
+		else {
+			gameRenderWorld->UpdateEntityDef(modelDefHandles[i], &renderEntity);
 		}
 	}
 }
@@ -93,7 +94,7 @@ void idMultiModelAF::Present( void ) {
 idMultiModelAF::Think
 ================
 */
-void idMultiModelAF::Think( void ) {
+void idMultiModelAF::Think(void) {
 	RunPhysics();
 	Present();
 }
@@ -107,7 +108,7 @@ void idMultiModelAF::Think( void ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idMultiModelAF, idChain )
+CLASS_DECLARATION(idMultiModelAF, idChain)
 END_CLASS
 
 /*
@@ -119,7 +120,7 @@ idChain::BuildChain
   this allows an object to be attached to multiple chains while keeping a single tree structure
 ================
 */
-void idChain::BuildChain( const idStr &name, const idVec3 &origin, float linkLength, float linkWidth, float density, int numLinks, bool bindToWorld ) {
+void idChain::BuildChain(const idStr &name, const idVec3 &origin, float linkLength, float linkWidth, float density, int numLinks, bool bindToWorld) {
 	int i;
 	float halfLinkLength = linkLength * 0.5f;
 	idTraceModel trm;
@@ -130,47 +131,47 @@ void idChain::BuildChain( const idStr &name, const idVec3 &origin, float linkLen
 	idVec3 org;
 
 	// create a trace model
-	trm = idTraceModel( linkLength, linkWidth );
-	trm.Translate( -trm.offset );
+	trm = idTraceModel(linkLength, linkWidth);
+	trm.Translate(-trm.offset);
 
-	org = origin - idVec3( 0, 0, halfLinkLength );
+	org = origin - idVec3(0, 0, halfLinkLength);
 
 	lastBody = NULL;
-	for ( i = 0; i < numLinks; i++ ) {
+	for (i = 0; i < numLinks; i++) {
 
 		// add body
-		clip = new idClipModel( trm );
-		clip->SetContents( CONTENTS_SOLID );
-		clip->Link( gameLocal.clip, this, 0, org, mat3_identity );
-		body = new idAFBody( name + idStr(i), clip, density );
-		physicsObj.AddBody( body );
+		clip = new idClipModel(trm);
+		clip->SetContents(CONTENTS_SOLID);
+		clip->Link(gameLocal.clip, this, 0, org, mat3_identity);
+		body = new idAFBody(name + idStr(i), clip, density);
+		physicsObj.AddBody(body);
 
 		// visual model for body
-		SetModelForId( physicsObj.GetBodyId( body ), spawnArgs.GetString( "model" ) );
+		SetModelForId(physicsObj.GetBodyId(body), spawnArgs.GetString("model"));
 
 		// add constraint
-		if ( bindToWorld ) {
-			if ( !lastBody ) {
-				uj = new idAFConstraint_UniversalJoint( name + idStr(i), body, lastBody );
-				uj->SetShafts( idVec3( 0, 0, -1 ), idVec3( 0, 0, 1 ) );
+		if (bindToWorld) {
+			if (!lastBody) {
+				uj = new idAFConstraint_UniversalJoint(name + idStr(i), body, lastBody);
+				uj->SetShafts(idVec3(0, 0, -1), idVec3(0, 0, 1));
 				//uj->SetConeLimit( idVec3( 0, 0, -1 ), 30.0f );
 				//uj->SetPyramidLimit( idVec3( 0, 0, -1 ), idVec3( 1, 0, 0 ), 90.0f, 30.0f );
 			}
 			else {
-				uj = new idAFConstraint_UniversalJoint( name + idStr(i), lastBody, body );
-				uj->SetShafts( idVec3( 0, 0, 1 ), idVec3( 0, 0, -1 ) );
+				uj = new idAFConstraint_UniversalJoint(name + idStr(i), lastBody, body);
+				uj->SetShafts(idVec3(0, 0, 1), idVec3(0, 0, -1));
 				//uj->SetConeLimit( idVec3( 0, 0, 1 ), 30.0f );
 			}
-			uj->SetAnchor( org + idVec3( 0, 0, halfLinkLength ) );
-			uj->SetFriction( 0.9f );
-			physicsObj.AddConstraint( uj );
+			uj->SetAnchor(org + idVec3(0, 0, halfLinkLength));
+			uj->SetFriction(0.9f);
+			physicsObj.AddConstraint(uj);
 		}
 		else {
-			if ( lastBody ) {
-				bsj = new idAFConstraint_BallAndSocketJoint( "joint" + idStr(i), lastBody, body );
-				bsj->SetAnchor( org + idVec3( 0, 0, halfLinkLength ) );
-				bsj->SetConeLimit( idVec3( 0, 0, 1 ), 60.0f, idVec3( 0, 0, 1 ) );
-				physicsObj.AddConstraint( bsj );
+			if (lastBody) {
+				bsj = new idAFConstraint_BallAndSocketJoint("joint" + idStr(i), lastBody, body);
+				bsj->SetAnchor(org + idVec3(0, 0, halfLinkLength));
+				bsj->SetConeLimit(idVec3(0, 0, 1), 60.0f, idVec3(0, 0, 1));
+				physicsObj.AddConstraint(bsj);
 			}
 		}
 
@@ -185,27 +186,27 @@ void idChain::BuildChain( const idStr &name, const idVec3 &origin, float linkLen
 idChain::Spawn
 ================
 */
-void idChain::Spawn( void ) {
+void idChain::Spawn(void) {
 	int numLinks;
 	float length, linkLength, linkWidth, density;
 	bool drop;
 	idVec3 origin;
 
-	spawnArgs.GetBool( "drop", "0", drop );
-	spawnArgs.GetInt( "links", "3", numLinks );
-	spawnArgs.GetFloat( "length", idStr( numLinks * 32.0f ), length );
-	spawnArgs.GetFloat( "width", "8", linkWidth );
-	spawnArgs.GetFloat( "density", "0.2", density );
+	spawnArgs.GetBool("drop", "0", drop);
+	spawnArgs.GetInt("links", "3", numLinks);
+	spawnArgs.GetFloat("length", idStr(numLinks * 32.0f), length);
+	spawnArgs.GetFloat("width", "8", linkWidth);
+	spawnArgs.GetFloat("density", "0.2", density);
 	linkLength = length / numLinks;
 	origin = GetPhysics()->GetOrigin();
 
 	// initialize physics
-	physicsObj.SetSelf( this );
-	physicsObj.SetGravity( gameLocal.GetGravity() );
-	physicsObj.SetClipMask( MASK_SOLID | CONTENTS_BODY );
-	SetPhysics( &physicsObj );
+	physicsObj.SetSelf(this);
+	physicsObj.SetGravity(gameLocal.GetGravity());
+	physicsObj.SetClipMask(MASK_SOLID | CONTENTS_BODY);
+	SetPhysics(&physicsObj);
 
-	BuildChain( "link", origin, linkLength, linkWidth, density, numLinks, !drop );
+	BuildChain("link", origin, linkLength, linkWidth, density, numLinks, !drop);
 }
 
 /*
@@ -217,7 +218,7 @@ void idChain::Spawn( void ) {
 */
 
 // HUMANHEAD pdm: Changed to hhAnimatedEntity
-CLASS_DECLARATION( hhAnimatedEntity, idAFAttachment )
+CLASS_DECLARATION(hhAnimatedEntity, idAFAttachment)
 END_CLASS
 
 /*
@@ -225,11 +226,11 @@ END_CLASS
 idAFAttachment::idAFAttachment
 =====================
 */
-idAFAttachment::idAFAttachment( void ) {
-	body			= NULL;
-	combatModel		= NULL;
-	idleAnim		= 0;
-	attachJoint		= INVALID_JOINT;
+idAFAttachment::idAFAttachment(void) {
+	body = NULL;
+	combatModel = NULL;
+	idleAnim = 0;
+	attachJoint = INVALID_JOINT;
 }
 
 /*
@@ -237,9 +238,9 @@ idAFAttachment::idAFAttachment( void ) {
 idAFAttachment::~idAFAttachment
 =====================
 */
-idAFAttachment::~idAFAttachment( void ) {
+idAFAttachment::~idAFAttachment(void) {
 
-	StopSound( SND_CHANNEL_ANY, false );
+	StopSound(SND_CHANNEL_ANY, false);
 
 	delete combatModel;
 	combatModel = NULL;
@@ -250,8 +251,8 @@ idAFAttachment::~idAFAttachment( void ) {
 idAFAttachment::Spawn
 =====================
 */
-void idAFAttachment::Spawn( void ) {
-	idleAnim = animator.GetAnim( "idle" );
+void idAFAttachment::Spawn(void) {
+	idleAnim = animator.GetAnim("idle");
 }
 
 /*
@@ -259,16 +260,16 @@ void idAFAttachment::Spawn( void ) {
 idAFAttachment::SetBody
 =====================
 */
-void idAFAttachment::SetBody( idEntity *bodyEnt, const char *model, jointHandle_t attachJoint ) {
+void idAFAttachment::SetBody(idEntity *bodyEnt, const char *model, jointHandle_t attachJoint) {
 	bool bleed;
 
 	body = bodyEnt;
 	this->attachJoint = attachJoint;
-	SetModel( model );
+	SetModel(model);
 	fl.takedamage = true;
 
-	bleed = body->spawnArgs.GetBool( "bleed" );
-	spawnArgs.SetBool( "bleed", bleed );
+	bleed = body->spawnArgs.GetBool("bleed");
+	spawnArgs.SetBool("bleed", bleed);
 }
 
 /*
@@ -276,7 +277,7 @@ void idAFAttachment::SetBody( idEntity *bodyEnt, const char *model, jointHandle_
 idAFAttachment::ClearBody
 =====================
 */
-void idAFAttachment::ClearBody( void ) {
+void idAFAttachment::ClearBody(void) {
 	body = NULL;
 	attachJoint = INVALID_JOINT;
 	Hide();
@@ -287,7 +288,7 @@ void idAFAttachment::ClearBody( void ) {
 idAFAttachment::GetBody
 =====================
 */
-idEntity *idAFAttachment::GetBody( void ) const {
+idEntity *idAFAttachment::GetBody(void) const {
 	return body;
 }
 
@@ -298,10 +299,10 @@ idAFAttachment::Save
 archive object for savegame file
 ================
 */
-void idAFAttachment::Save( idSaveGame *savefile ) const {
-	savefile->WriteObject( body );
-	savefile->WriteInt( idleAnim );
-	savefile->WriteJoint( attachJoint );
+void idAFAttachment::Save(idSaveGame *savefile) const {
+	savefile->WriteObject(body);
+	savefile->WriteInt(idleAnim);
+	savefile->WriteJoint(attachJoint);
 }
 
 /*
@@ -311,10 +312,10 @@ idAFAttachment::Restore
 unarchives object from save game file
 ================
 */
-void idAFAttachment::Restore( idRestoreGame *savefile ) {
-	savefile->ReadObject( reinterpret_cast<idClass *&>( body ) );
-	savefile->ReadInt( idleAnim );
-	savefile->ReadJoint( attachJoint );
+void idAFAttachment::Restore(idRestoreGame *savefile) {
+	savefile->ReadObject(reinterpret_cast<idClass *&>(body));
+	savefile->ReadInt(idleAnim);
+	savefile->ReadJoint(attachJoint);
 
 	SetCombatModel();
 	LinkCombat();
@@ -325,7 +326,7 @@ void idAFAttachment::Restore( idRestoreGame *savefile ) {
 idAFAttachment::Hide
 ================
 */
-void idAFAttachment::Hide( void ) {
+void idAFAttachment::Hide(void) {
 	idEntity::Hide();
 	UnlinkCombat();
 }
@@ -335,7 +336,7 @@ void idAFAttachment::Hide( void ) {
 idAFAttachment::Show
 ================
 */
-void idAFAttachment::Show( void ) {
+void idAFAttachment::Show(void) {
 	idEntity::Show();
 	LinkCombat();
 }
@@ -347,11 +348,11 @@ idAFAttachment::Damage
 Pass damage to body at the bindjoint
 ============
 */
-void idAFAttachment::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &dir, 
-	const char *damageDefName, const float damageScale, const int location ) {
-	
-	if ( body ) {
-		body->Damage( inflictor, attacker, dir, damageDefName, damageScale, attachJoint );
+void idAFAttachment::Damage(idEntity *inflictor, idEntity *attacker, const idVec3 &dir,
+	const char *damageDefName, const float damageScale, const int location) {
+
+	if (body) {
+		body->Damage(inflictor, attacker, dir, damageDefName, damageScale, attachJoint);
 	}
 }
 
@@ -360,11 +361,11 @@ void idAFAttachment::Damage( idEntity *inflictor, idEntity *attacker, const idVe
 idAFAttachment::AddDamageEffect
 ================
 */
-void idAFAttachment::AddDamageEffect( const trace_t &collision, const idVec3 &velocity, const char *damageDefName, bool broadcast ) { //HUMANHEAD rww - added broadcast
-	if ( body ) {
+void idAFAttachment::AddDamageEffect(const trace_t &collision, const idVec3 &velocity, const char *damageDefName, bool broadcast) { //HUMANHEAD rww - added broadcast
+	if (body) {
 		trace_t c = collision;
-		c.c.id = JOINT_HANDLE_TO_CLIPMODEL_ID( attachJoint );
-		body->AddDamageEffect( c, velocity, damageDefName, broadcast );
+		c.c.id = JOINT_HANDLE_TO_CLIPMODEL_ID(attachJoint);
+		body->AddDamageEffect(c, velocity, damageDefName, broadcast);
 	}
 }
 
@@ -373,11 +374,12 @@ void idAFAttachment::AddDamageEffect( const trace_t &collision, const idVec3 &ve
 idAFAttachment::GetImpactInfo
 ================
 */
-void idAFAttachment::GetImpactInfo( idEntity *ent, int id, const idVec3 &point, impactInfo_t *info ) {
-	if ( body ) {
-		body->GetImpactInfo( ent, JOINT_HANDLE_TO_CLIPMODEL_ID( attachJoint ), point, info );
-	} else {
-		idEntity::GetImpactInfo( ent, id, point, info );
+void idAFAttachment::GetImpactInfo(idEntity *ent, int id, const idVec3 &point, impactInfo_t *info) {
+	if (body) {
+		body->GetImpactInfo(ent, JOINT_HANDLE_TO_CLIPMODEL_ID(attachJoint), point, info);
+	}
+	else {
+		idEntity::GetImpactInfo(ent, id, point, info);
 	}
 }
 
@@ -386,11 +388,12 @@ void idAFAttachment::GetImpactInfo( idEntity *ent, int id, const idVec3 &point, 
 idAFAttachment::ApplyImpulse
 ================
 */
-void idAFAttachment::ApplyImpulse( idEntity *ent, int id, const idVec3 &point, const idVec3 &impulse ) {
-	if ( body ) {
-		body->ApplyImpulse( ent, JOINT_HANDLE_TO_CLIPMODEL_ID( attachJoint ), point, impulse );
-	} else {
-		idEntity::ApplyImpulse( ent, id, point, impulse );
+void idAFAttachment::ApplyImpulse(idEntity *ent, int id, const idVec3 &point, const idVec3 &impulse) {
+	if (body) {
+		body->ApplyImpulse(ent, JOINT_HANDLE_TO_CLIPMODEL_ID(attachJoint), point, impulse);
+	}
+	else {
+		idEntity::ApplyImpulse(ent, id, point, impulse);
 	}
 }
 
@@ -399,11 +402,12 @@ void idAFAttachment::ApplyImpulse( idEntity *ent, int id, const idVec3 &point, c
 idAFAttachment::AddForce
 ================
 */
-void idAFAttachment::AddForce( idEntity *ent, int id, const idVec3 &point, const idVec3 &force ) {
-	if ( body ) {
-		body->AddForce( ent, JOINT_HANDLE_TO_CLIPMODEL_ID( attachJoint ), point, force );
-	} else {
-		idEntity::AddForce( ent, id, point, force );
+void idAFAttachment::AddForce(idEntity *ent, int id, const idVec3 &point, const idVec3 &force) {
+	if (body) {
+		body->AddForce(ent, JOINT_HANDLE_TO_CLIPMODEL_ID(attachJoint), point, force);
+	}
+	else {
+		idEntity::AddForce(ent, id, point, force);
 	}
 }
 
@@ -412,9 +416,9 @@ void idAFAttachment::AddForce( idEntity *ent, int id, const idVec3 &point, const
 idAFAttachment::PlayIdleAnim
 ================
 */
-void idAFAttachment::PlayIdleAnim( int blendTime ) {
-	if ( idleAnim && ( idleAnim != animator.CurrentAnim( ANIMCHANNEL_ALL )->AnimNum() ) ) {
-		animator.CycleAnim( ANIMCHANNEL_ALL, idleAnim, gameLocal.time, blendTime );
+void idAFAttachment::PlayIdleAnim(int blendTime) {
+	if (idleAnim && (idleAnim != animator.CurrentAnim(ANIMCHANNEL_ALL)->AnimNum())) {
+		animator.CycleAnim(ANIMCHANNEL_ALL, idleAnim, gameLocal.time, blendTime);
 	}
 }
 
@@ -423,10 +427,10 @@ void idAFAttachment::PlayIdleAnim( int blendTime ) {
 idAfAttachment::Think
 ================
 */
-void idAFAttachment::Think( void ) {
+void idAFAttachment::Think(void) {
 	// HUMANHEAD pdm: Changed to hhAnimatedEntity
 	hhAnimatedEntity::Think();
-	if ( thinkFlags & TH_UPDATEPARTICLES ) {
+	if (thinkFlags & TH_UPDATEPARTICLES) {
 		UpdateDamageEffects();
 	}
 }
@@ -436,14 +440,15 @@ void idAFAttachment::Think( void ) {
 idAFAttachment::SetCombatModel
 ================
 */
-void idAFAttachment::SetCombatModel( void ) {
-	if ( combatModel ) {
+void idAFAttachment::SetCombatModel(void) {
+	if (combatModel) {
 		combatModel->Unlink();
-		combatModel->LoadModel( modelDefHandle );
-	} else {
-		combatModel = new idClipModel( modelDefHandle );
+		combatModel->LoadModel(modelDefHandle);
 	}
-	combatModel->SetOwner( body );
+	else {
+		combatModel = new idClipModel(modelDefHandle);
+	}
+	combatModel->SetOwner(body);
 }
 
 /*
@@ -451,7 +456,7 @@ void idAFAttachment::SetCombatModel( void ) {
 idAFAttachment::GetCombatModel
 ================
 */
-idClipModel *idAFAttachment::GetCombatModel( void ) const {
+idClipModel *idAFAttachment::GetCombatModel(void) const {
 	return combatModel;
 }
 
@@ -460,13 +465,13 @@ idClipModel *idAFAttachment::GetCombatModel( void ) const {
 idAFAttachment::LinkCombat
 ================
 */
-void idAFAttachment::LinkCombat( void ) {
-	if ( fl.hidden ) {
+void idAFAttachment::LinkCombat(void) {
+	if (fl.hidden) {
 		return;
 	}
 
-	if ( combatModel ) {
-		combatModel->Link( gameLocal.clip, this, 0, renderEntity.origin, renderEntity.axis, modelDefHandle );
+	if (combatModel) {
+		combatModel->Link(gameLocal.clip, this, 0, renderEntity.origin, renderEntity.axis, modelDefHandle);
 	}
 }
 
@@ -475,8 +480,8 @@ void idAFAttachment::LinkCombat( void ) {
 idAFAttachment::UnlinkCombat
 ================
 */
-void idAFAttachment::UnlinkCombat( void ) {
-	if ( combatModel ) {
+void idAFAttachment::UnlinkCombat(void) {
+	if (combatModel) {
 		combatModel->Unlink();
 	}
 }
@@ -489,43 +494,43 @@ void idAFAttachment::UnlinkCombat( void ) {
 ===============================================================================
 */
 
-const idEventDef EV_SetConstraintPosition( "SetConstraintPosition", "sv" );
-const idEventDef EV_SetCollision( "setAFCollision", "d" );	// HUMANHEAD pdm
+const idEventDef EV_SetConstraintPosition("SetConstraintPosition", "sv");
+const idEventDef EV_SetCollision("setAFCollision", "d");	// HUMANHEAD pdm
 
 // HUMANHEAD pdm: Changed to hhAnimatedEntity
-CLASS_DECLARATION( hhAnimatedEntity, idAFEntity_Base )
-	EVENT( EV_SetConstraintPosition,	idAFEntity_Base::Event_SetConstraintPosition )
-	EVENT( EV_SetCollision,				idAFEntity_Base::Event_SetCollision )			// HUMANHEAD pdm
+CLASS_DECLARATION(hhAnimatedEntity, idAFEntity_Base)
+EVENT(EV_SetConstraintPosition, idAFEntity_Base::Event_SetConstraintPosition)
+EVENT(EV_SetCollision, idAFEntity_Base::Event_SetCollision)			// HUMANHEAD pdm
 END_CLASS
 
 // HUMANHEAD nla - forward decar's for Evil C++
-class hhDoor { 
- public:
- 	static  idTypeInfo Type;
+class hhDoor {
+public:
+	static  idTypeInfo Type;
 };
 
 // HUMANHEAD mdl:  I hate these partial decls, but I need them for the other door types too
 class hhModelDoor {
- public:
-	 static  idTypeInfo Type;
+public:
+	static  idTypeInfo Type;
 };
 
 class hhProxDoor {
- public:
-	 static  idTypeInfo Type;
+public:
+	static  idTypeInfo Type;
 };
 
 // HUMANHEAD END
 
-static const float BOUNCE_SOUND_MIN_VELOCITY	= 80.0f;
-static const float BOUNCE_SOUND_MAX_VELOCITY	= 200.0f;
+static const float BOUNCE_SOUND_MIN_VELOCITY = 80.0f;
+static const float BOUNCE_SOUND_MAX_VELOCITY = 200.0f;
 
 /*
 ================
 idAFEntity_Base::idAFEntity_Base
 ================
 */
-idAFEntity_Base::idAFEntity_Base( void ) {
+idAFEntity_Base::idAFEntity_Base(void) {
 	combatModel = NULL;
 	combatModelContents = 0;
 	nextSoundTime = 0;
@@ -539,7 +544,7 @@ idAFEntity_Base::idAFEntity_Base( void ) {
 idAFEntity_Base::~idAFEntity_Base
 ================
 */
-idAFEntity_Base::~idAFEntity_Base( void ) {
+idAFEntity_Base::~idAFEntity_Base(void) {
 	delete combatModel;
 	combatModel = NULL;
 }
@@ -549,18 +554,18 @@ idAFEntity_Base::~idAFEntity_Base( void ) {
 idAFEntity_Base::Save
 ================
 */
-void idAFEntity_Base::Save( idSaveGame *savefile ) const {
-	savefile->WriteInt( combatModelContents );
-	savefile->WriteClipModel( combatModel );
-	savefile->WriteVec3( spawnOrigin );
-	savefile->WriteMat3( spawnAxis );
-	savefile->WriteInt( nextSoundTime );
-	af.Save( savefile );
+void idAFEntity_Base::Save(idSaveGame *savefile) const {
+	savefile->WriteInt(combatModelContents);
+	savefile->WriteClipModel(combatModel);
+	savefile->WriteVec3(spawnOrigin);
+	savefile->WriteMat3(spawnAxis);
+	savefile->WriteInt(nextSoundTime);
+	af.Save(savefile);
 	// HUMANHEAD mdl
-	savefile->WriteBool( impulseFromSelf );
-	savefile->WriteInt( numSplats );
-	for ( int i = 0; i < 16; i++ ) {
-		savefile->WriteVec3( splats[i] );
+	savefile->WriteBool(impulseFromSelf);
+	savefile->WriteInt(numSplats);
+	for (int i = 0; i < 16; i++) {
+		savefile->WriteVec3(splats[i]);
 	}
 	// HUMANHEAD END
 }
@@ -570,21 +575,21 @@ void idAFEntity_Base::Save( idSaveGame *savefile ) const {
 idAFEntity_Base::Restore
 ================
 */
-void idAFEntity_Base::Restore( idRestoreGame *savefile ) {
-	savefile->ReadInt( combatModelContents );
-	savefile->ReadClipModel( combatModel );
-	savefile->ReadVec3( spawnOrigin );
-	savefile->ReadMat3( spawnAxis );
-	savefile->ReadInt( nextSoundTime );
+void idAFEntity_Base::Restore(idRestoreGame *savefile) {
+	savefile->ReadInt(combatModelContents);
+	savefile->ReadClipModel(combatModel);
+	savefile->ReadVec3(spawnOrigin);
+	savefile->ReadMat3(spawnAxis);
+	savefile->ReadInt(nextSoundTime);
 	LinkCombat();
 
-	af.Restore( savefile );
+	af.Restore(savefile);
 
 	// HUMANHEAD mdl
-	savefile->ReadBool( impulseFromSelf );
-	savefile->ReadInt( numSplats );
-	for ( int i = 0; i < 16; i++ ) {
-		savefile->ReadVec3( splats[i] );
+	savefile->ReadBool(impulseFromSelf);
+	savefile->ReadInt(numSplats);
+	for (int i = 0; i < 16; i++) {
+		savefile->ReadVec3(splats[i]);
 	}
 	// HUMANHEAD END
 }
@@ -594,7 +599,7 @@ void idAFEntity_Base::Restore( idRestoreGame *savefile ) {
 idAFEntity_Base::Spawn
 ================
 */
-void idAFEntity_Base::Spawn( void ) {
+void idAFEntity_Base::Spawn(void) {
 	spawnOrigin = GetPhysics()->GetOrigin();
 	spawnAxis = GetPhysics()->GetAxis();
 	nextSoundTime = 0;
@@ -609,27 +614,27 @@ void idAFEntity_Base::Spawn( void ) {
 idAFEntity_Base::LoadAF
 ================
 */
-bool idAFEntity_Base::LoadAF( void ) {
+bool idAFEntity_Base::LoadAF(void) {
 	idStr fileName;
 
-	if ( !spawnArgs.GetString( "articulatedFigure", "*unknown*", fileName ) ) {
+	if (!spawnArgs.GetString("articulatedFigure", "*unknown*", fileName)) {
 		return false;
 	}
 
-	af.SetAnimator( GetAnimator() );
-	if ( !af.Load( this, fileName ) ) {
-		gameLocal.Error( "idAFEntity_Base::LoadAF: Couldn't load af file '%s' on entity '%s'", fileName.c_str(), name.c_str() );
+	af.SetAnimator(GetAnimator());
+	if (!af.Load(this, fileName)) {
+		gameLocal.Error("idAFEntity_Base::LoadAF: Couldn't load af file '%s' on entity '%s'", fileName.c_str(), name.c_str());
 	}
 
 	af.Start();
 
-	af.GetPhysics()->Rotate( spawnAxis.ToRotation() );
-	af.GetPhysics()->Translate( spawnOrigin );
+	af.GetPhysics()->Rotate(spawnAxis.ToRotation());
+	af.GetPhysics()->Translate(spawnOrigin);
 
-	LoadState( spawnArgs );
+	LoadState(spawnArgs);
 
 	af.UpdateAnimation();
-	animator.CreateFrame( gameLocal.time, true );
+	animator.CreateFrame(gameLocal.time, true);
 	UpdateVisuals();
 
 	return true;
@@ -640,16 +645,16 @@ bool idAFEntity_Base::LoadAF( void ) {
 idAFEntity_Base::Think
 ================
 */
-void idAFEntity_Base::Think( void ) {
+void idAFEntity_Base::Think(void) {
 	RunPhysics();
 	UpdateAnimation();
-	if ( thinkFlags & TH_UPDATEVISUALS ) {
+	if (thinkFlags & TH_UPDATEVISUALS) {
 		Present();
 		LinkCombat();
 	}
 
 	// HUMANHEAD nla - Added logic to allow things to touch triggers
-	if ( fl.touchTriggers ) {
+	if (fl.touchTriggers) {
 		TouchTriggers();
 	}
 	// HUMANHEAD END
@@ -663,8 +668,8 @@ void idAFEntity_Base::Think( void ) {
 idAFEntity_Base::BodyForClipModelId
 ================
 */
-int idAFEntity_Base::BodyForClipModelId( int id ) const {
-	return af.BodyForClipModelId( id );
+int idAFEntity_Base::BodyForClipModelId(int id) const {
+	return af.BodyForClipModelId(id);
 }
 
 /*
@@ -672,31 +677,31 @@ int idAFEntity_Base::BodyForClipModelId( int id ) const {
 idAFEntity_Base::SaveState
 ================
 */
-void idAFEntity_Base::SaveState( idDict &args ) const {
+void idAFEntity_Base::SaveState(idDict &args) const {
 	const idKeyValue *kv;
 
 	// save the ragdoll pose
-	af.SaveState( args );
+	af.SaveState(args);
 
 	// save all the bind constraints
-	kv = spawnArgs.MatchPrefix( "bindConstraint ", NULL );
-	while ( kv ) {
-		args.Set( kv->GetKey(), kv->GetValue() );
-		kv = spawnArgs.MatchPrefix( "bindConstraint ", kv );
+	kv = spawnArgs.MatchPrefix("bindConstraint ", NULL);
+	while (kv) {
+		args.Set(kv->GetKey(), kv->GetValue());
+		kv = spawnArgs.MatchPrefix("bindConstraint ", kv);
 	}
 
 	// save the bind if it exists
-	kv = spawnArgs.FindKey( "bind" );
-	if ( kv ) {
-		args.Set( kv->GetKey(), kv->GetValue() );
+	kv = spawnArgs.FindKey("bind");
+	if (kv) {
+		args.Set(kv->GetKey(), kv->GetValue());
 	}
-	kv = spawnArgs.FindKey( "bindToJoint" );
-	if ( kv ) {
-		args.Set( kv->GetKey(), kv->GetValue() );
+	kv = spawnArgs.FindKey("bindToJoint");
+	if (kv) {
+		args.Set(kv->GetKey(), kv->GetValue());
 	}
-	kv = spawnArgs.FindKey( "bindToBody" );
-	if ( kv ) {
-		args.Set( kv->GetKey(), kv->GetValue() );
+	kv = spawnArgs.FindKey("bindToBody");
+	if (kv) {
+		args.Set(kv->GetKey(), kv->GetValue());
 	}
 }
 
@@ -705,8 +710,8 @@ void idAFEntity_Base::SaveState( idDict &args ) const {
 idAFEntity_Base::LoadState
 ================
 */
-void idAFEntity_Base::LoadState( const idDict &args ) {
-	af.LoadState( args );
+void idAFEntity_Base::LoadState(const idDict &args) {
+	af.LoadState(args);
 }
 
 /*
@@ -714,7 +719,7 @@ void idAFEntity_Base::LoadState( const idDict &args ) {
 idAFEntity_Base::AddBindConstraints
 ================
 */
-void idAFEntity_Base::AddBindConstraints( void ) {
+void idAFEntity_Base::AddBindConstraints(void) {
 	af.AddBindConstraints();
 }
 
@@ -724,8 +729,8 @@ HUMANHEAD bjk
 idAFEntity_Base::AddBindConstraints
 ================
 */
-void idAFEntity_Base::AddBindConstraint( constraintType_t type, int bodyId, jointHandle_t joint ) {
-	af.AddBindConstraint( type, bodyId, joint, GetBindMaster() );
+void idAFEntity_Base::AddBindConstraint(constraintType_t type, int bodyId, jointHandle_t joint) {
+	af.AddBindConstraint(type, bodyId, joint, GetBindMaster());
 }
 
 /*
@@ -733,7 +738,7 @@ void idAFEntity_Base::AddBindConstraint( constraintType_t type, int bodyId, join
 idAFEntity_Base::RemoveBindConstraints
 ================
 */
-void idAFEntity_Base::RemoveBindConstraints( void ) {
+void idAFEntity_Base::RemoveBindConstraints(void) {
 	af.RemoveBindConstraints();
 }
 
@@ -742,11 +747,12 @@ void idAFEntity_Base::RemoveBindConstraints( void ) {
 idAFEntity_Base::GetImpactInfo
 ================
 */
-void idAFEntity_Base::GetImpactInfo( idEntity *ent, int id, const idVec3 &point, impactInfo_t *info ) {
-	if ( af.IsActive() ) {
-		af.GetImpactInfo( ent, id, point, info );
-	} else {
-		idEntity::GetImpactInfo( ent, id, point, info );
+void idAFEntity_Base::GetImpactInfo(idEntity *ent, int id, const idVec3 &point, impactInfo_t *info) {
+	if (af.IsActive()) {
+		af.GetImpactInfo(ent, id, point, info);
+	}
+	else {
+		idEntity::GetImpactInfo(ent, id, point, info);
 	}
 }
 
@@ -755,17 +761,17 @@ void idAFEntity_Base::GetImpactInfo( idEntity *ent, int id, const idVec3 &point,
 idAFEntity_Base::ApplyImpulse
 ================
 */
-void idAFEntity_Base::ApplyImpulse( idEntity *ent, int id, const idVec3 &point, const idVec3 &impulse ) {
-	if ( af.IsLoaded() ) {
+void idAFEntity_Base::ApplyImpulse(idEntity *ent, int id, const idVec3 &point, const idVec3 &impulse) {
+	if (af.IsLoaded()) {
 		// HUMANHEAD nla 
 		// mdl:  Changed so CheckImpulse can now reject an impulse for no-gore mode
-		if ( CheckImpulse( ent ) ) {			// Allow ragdolls to know if a force is from itself, or outside.  Prevents ragdoll "issues" with the number of bodies in a ragdoll.
-			af.ApplyImpulse( ent, id, point, impulse );
+		if (CheckImpulse(ent)) {			// Allow ragdolls to know if a force is from itself, or outside.  Prevents ragdoll "issues" with the number of bodies in a ragdoll.
+			af.ApplyImpulse(ent, id, point, impulse);
 		}
 		// HUMANHEAD END
 	}
-	if ( !af.IsActive() ) {
-		idEntity::ApplyImpulse( ent, id, point, impulse );
+	if (!af.IsActive()) {
+		idEntity::ApplyImpulse(ent, id, point, impulse);
 	}
 }
 
@@ -774,12 +780,12 @@ void idAFEntity_Base::ApplyImpulse( idEntity *ent, int id, const idVec3 &point, 
 idAFEntity_Base::AddForce
 ================
 */
-void idAFEntity_Base::AddForce( idEntity *ent, int id, const idVec3 &point, const idVec3 &force ) {
-	if ( af.IsLoaded() ) {
-		af.AddForce( ent, id, point, force );
+void idAFEntity_Base::AddForce(idEntity *ent, int id, const idVec3 &point, const idVec3 &force) {
+	if (af.IsLoaded()) {
+		af.AddForce(ent, id, point, force);
 	}
-	if ( !af.IsActive() ) {
-		idEntity::AddForce( ent, id, point, force );
+	if (!af.IsActive()) {
+		idEntity::AddForce(ent, id, point, force);
 	}
 }
 
@@ -788,30 +794,30 @@ void idAFEntity_Base::AddForce( idEntity *ent, int id, const idVec3 &point, cons
 idAFEntity_Base::Collide
 ================
 */
-bool idAFEntity_Base::Collide( const trace_t &collision, const idVec3 &velocity ) {
+bool idAFEntity_Base::Collide(const trace_t &collision, const idVec3 &velocity) {
 	float v, f;
 
-	if ( af.IsActive() ) {
-		v = -( velocity * collision.c.normal );
-		if ( v > BOUNCE_SOUND_MIN_VELOCITY && gameLocal.time > nextSoundTime ) {
-			f = v > BOUNCE_SOUND_MAX_VELOCITY ? 1.0f : idMath::Sqrt( v - BOUNCE_SOUND_MIN_VELOCITY ) * ( 1.0f / idMath::Sqrt( BOUNCE_SOUND_MAX_VELOCITY - BOUNCE_SOUND_MIN_VELOCITY ) );
-			if ( StartSound( "snd_bounce", SND_CHANNEL_ANY, 0, false, NULL ) ) {
+	if (af.IsActive()) {
+		v = -(velocity * collision.c.normal);
+		if (v > BOUNCE_SOUND_MIN_VELOCITY && gameLocal.time > nextSoundTime) {
+			f = v > BOUNCE_SOUND_MAX_VELOCITY ? 1.0f : idMath::Sqrt(v - BOUNCE_SOUND_MIN_VELOCITY) * (1.0f / idMath::Sqrt(BOUNCE_SOUND_MAX_VELOCITY - BOUNCE_SOUND_MIN_VELOCITY));
+			if (StartSound("snd_bounce", SND_CHANNEL_ANY, 0, false, NULL)) {
 				// don't set the volume unless there is a bounce sound as it overrides the entire channel
 				// which causes footsteps on ai's to not honor their shader parms
-				SetSoundVolume( f );
+				SetSoundVolume(f);
 			}
 			nextSoundTime = gameLocal.time + 500;
 		}
-		if ( g_bloodEffects.GetBool() && g_ragdollDecals.GetBool() && v > 2.0f && spawnArgs.GetBool("produces_splats") && numSplats < 16 ) {
+		if (g_bloodEffects.GetBool() && g_ragdollDecals.GetBool() && v > 2.0f && spawnArgs.GetBool("produces_splats") && numSplats < 16) {
 			bool close = false;
-			for(int i=0;i<numSplats;i++) {
+			for (int i = 0;i < numSplats;i++) {
 				idVec3 dist = splats[i] - collision.c.point;
-				if( dist * dist < 35.0f )
+				if (dist * dist < 35.0f)
 					close = true;
 			}
-			if( !close ) {
-				idStr decal = spawnArgs.RandomPrefix( "mtr_splat", gameLocal.random );
-				gameLocal.ProjectDecal(collision.c.point, -collision.c.normal, 10.0f, true, spawnArgs.GetFloat("splat_size", "20"), decal );
+			if (!close) {
+				idStr decal = spawnArgs.RandomPrefix("mtr_splat", gameLocal.random);
+				gameLocal.ProjectDecal(collision.c.point, -collision.c.normal, 10.0f, true, spawnArgs.GetFloat("splat_size", "20"), decal);
 				splats[numSplats] = collision.c.point;
 				numSplats++;
 			}
@@ -826,12 +832,12 @@ bool idAFEntity_Base::Collide( const trace_t &collision, const idVec3 &velocity 
 idAFEntity_Base::GetPhysicsToVisualTransform
 ================
 */
-bool idAFEntity_Base::GetPhysicsToVisualTransform( idVec3 &origin, idMat3 &axis ) {
-	if ( af.IsActive() ) {
-		af.GetPhysicsToVisualTransform( origin, axis );
+bool idAFEntity_Base::GetPhysicsToVisualTransform(idVec3 &origin, idMat3 &axis) {
+	if (af.IsActive()) {
+		af.GetPhysicsToVisualTransform(origin, axis);
 		return true;
 	}
-	return idEntity::GetPhysicsToVisualTransform( origin, axis );
+	return idEntity::GetPhysicsToVisualTransform(origin, axis);
 }
 
 /*
@@ -839,9 +845,9 @@ bool idAFEntity_Base::GetPhysicsToVisualTransform( idVec3 &origin, idMat3 &axis 
 idAFEntity_Base::UpdateAnimationControllers
 ================
 */
-bool idAFEntity_Base::UpdateAnimationControllers( void ) {
-	if ( af.IsActive() ) {
-		if ( af.UpdateAnimation() ) {
+bool idAFEntity_Base::UpdateAnimationControllers(void) {
+	if (af.IsActive()) {
+		if (af.UpdateAnimation()) {
 			return true;
 		}
 	}
@@ -854,9 +860,9 @@ idAFEntity_Base::CheckImpulse
 	HUMANHEAD nla
 =============
 */
-bool idAFEntity_Base::CheckImpulse( idEntity *impulseSource ) {
+bool idAFEntity_Base::CheckImpulse(idEntity *impulseSource) {
 	if (GERMAN_VERSION || g_nogore.GetBool()) {
-		if ( !spawnArgs.GetBool( "not_gory", "0" ) && impulseSource->IsType( hhProjectile::Type ) ) {
+		if (!spawnArgs.GetBool("not_gory", "0") && impulseSource->IsType(hhProjectile::Type)) {
 			return false;
 		}
 	}
@@ -872,12 +878,13 @@ bool idAFEntity_Base::CheckImpulse( idEntity *impulseSource ) {
 idAFEntity_Base::SetCombatModel
 ================
 */
-void idAFEntity_Base::SetCombatModel( void ) {
-	if ( combatModel ) {
+void idAFEntity_Base::SetCombatModel(void) {
+	if (combatModel) {
 		combatModel->Unlink();
-		combatModel->LoadModel( modelDefHandle );
-	} else {
-		combatModel = new idClipModel( modelDefHandle );
+		combatModel->LoadModel(modelDefHandle);
+	}
+	else {
+		combatModel = new idClipModel(modelDefHandle);
 	}
 }
 
@@ -886,7 +893,7 @@ void idAFEntity_Base::SetCombatModel( void ) {
 idAFEntity_Base::GetCombatModel
 ================
 */
-idClipModel *idAFEntity_Base::GetCombatModel( void ) const {
+idClipModel *idAFEntity_Base::GetCombatModel(void) const {
 	return combatModel;
 }
 
@@ -895,16 +902,17 @@ idClipModel *idAFEntity_Base::GetCombatModel( void ) const {
 idAFEntity_Base::SetCombatContents
 ================
 */
-void idAFEntity_Base::SetCombatContents( bool enable ) {
-	assert( combatModel );
-	if ( enable && combatModelContents ) {
-		assert( !combatModel->GetContents() );
-		combatModel->SetContents( combatModelContents );
+void idAFEntity_Base::SetCombatContents(bool enable) {
+	assert(combatModel);
+	if (enable && combatModelContents) {
+		assert(!combatModel->GetContents());
+		combatModel->SetContents(combatModelContents);
 		combatModelContents = 0;
-	} else if ( !enable && combatModel->GetContents() ) {
-		assert( !combatModelContents );
+	}
+	else if (!enable && combatModel->GetContents()) {
+		assert(!combatModelContents);
 		combatModelContents = combatModel->GetContents();
-		combatModel->SetContents( 0 );
+		combatModel->SetContents(0);
 	}
 }
 
@@ -913,12 +921,12 @@ void idAFEntity_Base::SetCombatContents( bool enable ) {
 idAFEntity_Base::LinkCombat
 ================
 */
-void idAFEntity_Base::LinkCombat( void ) {
-	if ( fl.hidden ) {
+void idAFEntity_Base::LinkCombat(void) {
+	if (fl.hidden) {
 		return;
 	}
-	if ( combatModel ) {
-		combatModel->Link( gameLocal.clip, this, 0, renderEntity.origin, renderEntity.axis, modelDefHandle );
+	if (combatModel) {
+		combatModel->Link(gameLocal.clip, this, 0, renderEntity.origin, renderEntity.axis, modelDefHandle);
 	}
 }
 
@@ -927,8 +935,8 @@ void idAFEntity_Base::LinkCombat( void ) {
 idAFEntity_Base::UnlinkCombat
 ================
 */
-void idAFEntity_Base::UnlinkCombat( void ) {
-	if ( combatModel ) {
+void idAFEntity_Base::UnlinkCombat(void) {
+	if (combatModel) {
 		combatModel->Unlink();
 	}
 }
@@ -938,7 +946,7 @@ void idAFEntity_Base::UnlinkCombat( void ) {
 idAFEntity_Base::FreeModelDef
 ================
 */
-void idAFEntity_Base::FreeModelDef( void ) {
+void idAFEntity_Base::FreeModelDef(void) {
 	UnlinkCombat();
 	idEntity::FreeModelDef();
 }
@@ -948,8 +956,8 @@ void idAFEntity_Base::FreeModelDef( void ) {
 idAFEntity_Base::ShowEditingDialog
 ===============
 */
-void idAFEntity_Base::ShowEditingDialog( void ) {
-	common->InitTool( EDITOR_AF, &spawnArgs );
+void idAFEntity_Base::ShowEditingDialog(void) {
+	common->InitTool(EDITOR_AF, &spawnArgs);
 }
 
 /*
@@ -964,7 +972,7 @@ idAFEntity_Base::DropAFs
   where * is an aribtrary string.
 ================
 */
-void idAFEntity_Base::DropAFs( idEntity *ent, const char *type, idList<idEntity *> *list ) {
+void idAFEntity_Base::DropAFs(idEntity *ent, const char *type, idList<idEntity *> *list) {
 	const idKeyValue *kv;
 	const char *skinName;
 	idEntity *newEnt;
@@ -973,30 +981,30 @@ void idAFEntity_Base::DropAFs( idEntity *ent, const char *type, idList<idEntity 
 	const idDeclSkin *skin;
 
 	// drop the articulated figures
-	kv = ent->spawnArgs.MatchPrefix( va( "def_drop%sAF", type ), NULL );
-	while ( kv ) {
+	kv = ent->spawnArgs.MatchPrefix(va("def_drop%sAF", type), NULL);
+	while (kv) {
 
-		args.Set( "classname", kv->GetValue() );
-		gameLocal.SpawnEntityDef( args, &newEnt );
+		args.Set("classname", kv->GetValue());
+		gameLocal.SpawnEntityDef(args, &newEnt);
 
-		if ( newEnt && newEnt->IsType( idAFEntity_Base::Type ) ) {
+		if (newEnt && newEnt->IsType(idAFEntity_Base::Type)) {
 			af = static_cast<idAFEntity_Base *>(newEnt);
-			af->GetPhysics()->SetOrigin( ent->GetPhysics()->GetOrigin() );
-			af->GetPhysics()->SetAxis( ent->GetPhysics()->GetAxis() );
-			af->af.SetupPose( ent, gameLocal.time, false ); // HUMANHEAD mdl:  Added false to disable physics check
-			if ( list ) {
-				list->Append( af );
+			af->GetPhysics()->SetOrigin(ent->GetPhysics()->GetOrigin());
+			af->GetPhysics()->SetAxis(ent->GetPhysics()->GetAxis());
+			af->af.SetupPose(ent, gameLocal.time, false); // HUMANHEAD mdl:  Added false to disable physics check
+			if (list) {
+				list->Append(af);
 			}
 		}
 
-		kv = ent->spawnArgs.MatchPrefix( va( "def_drop%sAF", type ), kv );
+		kv = ent->spawnArgs.MatchPrefix(va("def_drop%sAF", type), kv);
 	}
 
 	// change the skin to hide all the dropped articulated figures
-	skinName = ent->spawnArgs.GetString( va( "skin_drop%s", type ) );
-	if ( skinName[0] ) {
-		skin = declManager->FindSkin( skinName );
-		ent->SetSkin( skin );
+	skinName = ent->spawnArgs.GetString(va("skin_drop%s", type));
+	if (skinName[0]) {
+		skin = declManager->FindSkin(skinName);
+		ent->SetSkin(skin);
 	}
 }
 
@@ -1005,8 +1013,8 @@ void idAFEntity_Base::DropAFs( idEntity *ent, const char *type, idList<idEntity 
 idAFEntity_Base::Event_SetConstraintPosition
 ================
 */
-void idAFEntity_Base::Event_SetConstraintPosition( const char *name, const idVec3 &pos ) {
-	af.SetConstraintPosition( name, pos );
+void idAFEntity_Base::Event_SetConstraintPosition(const char *name, const idVec3 &pos) {
+	af.SetConstraintPosition(name, pos);
 }
 
 /*
@@ -1017,12 +1025,12 @@ idAFEntity_Gibbable
 ===============================================================================
 */
 
-const idEventDef EV_Gib( "gib", "s" );
-const idEventDef EV_Gibbed( "<gibbed>" );
+const idEventDef EV_Gib("gib", "s");
+const idEventDef EV_Gibbed("<gibbed>");
 
-CLASS_DECLARATION( idAFEntity_Base, idAFEntity_Gibbable )
-	EVENT( EV_Gib,		idAFEntity_Gibbable::Event_Gib )
-	EVENT( EV_Gibbed,	idAFEntity_Base::Event_Remove )
+CLASS_DECLARATION(idAFEntity_Base, idAFEntity_Gibbable)
+EVENT(EV_Gib, idAFEntity_Gibbable::Event_Gib)
+EVENT(EV_Gibbed, idAFEntity_Base::Event_Remove)
 END_CLASS
 
 
@@ -1031,7 +1039,7 @@ END_CLASS
 idAFEntity_Gibbable::idAFEntity_Gibbable
 ================
 */
-idAFEntity_Gibbable::idAFEntity_Gibbable( void ) {
+idAFEntity_Gibbable::idAFEntity_Gibbable(void) {
 	skeletonModel = NULL;
 	skeletonModelDefHandle = -1;
 	gibbed = false;
@@ -1043,8 +1051,8 @@ idAFEntity_Gibbable::~idAFEntity_Gibbable
 ================
 */
 idAFEntity_Gibbable::~idAFEntity_Gibbable() {
-	if ( skeletonModelDefHandle != -1 ) {
-		gameRenderWorld->FreeEntityDef( skeletonModelDefHandle );
+	if (skeletonModelDefHandle != -1) {
+		gameRenderWorld->FreeEntityDef(skeletonModelDefHandle);
 		skeletonModelDefHandle = -1;
 	}
 }
@@ -1054,11 +1062,11 @@ idAFEntity_Gibbable::~idAFEntity_Gibbable() {
 idAFEntity_Gibbable::Save
 ================
 */
-void idAFEntity_Gibbable::Save( idSaveGame *savefile ) const {
-	savefile->WriteBool( gibbed );
-	savefile->WriteBool( combatModel != NULL );
+void idAFEntity_Gibbable::Save(idSaveGame *savefile) const {
+	savefile->WriteBool(gibbed);
+	savefile->WriteBool(combatModel != NULL);
 	// HUMANHEAD mdl
-	savefile->WriteInt( gibHealth );
+	savefile->WriteInt(gibHealth);
 	// HUMANHEAD END
 }
 
@@ -1067,19 +1075,19 @@ void idAFEntity_Gibbable::Save( idSaveGame *savefile ) const {
 idAFEntity_Gibbable::Restore
 ================
 */
-void idAFEntity_Gibbable::Restore( idRestoreGame *savefile ) {
+void idAFEntity_Gibbable::Restore(idRestoreGame *savefile) {
 	bool hasCombatModel;
 
-	savefile->ReadBool( gibbed );
-	savefile->ReadBool( hasCombatModel );
+	savefile->ReadBool(gibbed);
+	savefile->ReadBool(hasCombatModel);
 
 	// HUMANHEAD mdl
-	savefile->ReadInt( gibHealth );
+	savefile->ReadInt(gibHealth);
 	// HUMANHEAD END
 
 	InitSkeletonModel();
 
-	if ( hasCombatModel ) {
+	if (hasCombatModel) {
 		SetCombatModel();
 		LinkCombat();
 	}
@@ -1090,12 +1098,12 @@ void idAFEntity_Gibbable::Restore( idRestoreGame *savefile ) {
 idAFEntity_Gibbable::Spawn
 ================
 */
-void idAFEntity_Gibbable::Spawn( void ) {
+void idAFEntity_Gibbable::Spawn(void) {
 	InitSkeletonModel();
 
 	gibbed = false;
 	// HUMANHEAD mdl
-	gibHealth = spawnArgs.GetInt( "gibhealth", "0" );
+	gibHealth = spawnArgs.GetInt("gibhealth", "0");
 	// HUMANHEAD END
 }
 
@@ -1104,27 +1112,28 @@ void idAFEntity_Gibbable::Spawn( void ) {
 idAFEntity_Gibbable::InitSkeletonModel
 ================
 */
-void idAFEntity_Gibbable::InitSkeletonModel( void ) {
+void idAFEntity_Gibbable::InitSkeletonModel(void) {
 	const char *modelName;
 	const idDeclModelDef *modelDef;
 
 	skeletonModel = NULL;
 	skeletonModelDefHandle = -1;
 
-	modelName = spawnArgs.GetString( "model_gib" );
+	modelName = spawnArgs.GetString("model_gib");
 
 	modelDef = NULL;
-	if ( modelName[0] != '\0' ) {
-		modelDef = static_cast<const idDeclModelDef *>( declManager->FindType( DECL_MODELDEF, modelName, false ) );
-		if ( modelDef ) {
+	if (modelName[0] != '\0') {
+		modelDef = static_cast<const idDeclModelDef *>(declManager->FindType(DECL_MODELDEF, modelName, false));
+		if (modelDef) {
 			skeletonModel = modelDef->ModelHandle();
-		} else {
-			skeletonModel = renderModelManager->FindModel( modelName );
 		}
-		if ( skeletonModel != NULL && renderEntity.hModel != NULL ) {
-			if ( skeletonModel->NumJoints() != renderEntity.hModel->NumJoints() ) {
-				gameLocal.Error( "gib model '%s' has different number of joints than model '%s'",
-									skeletonModel->Name(), renderEntity.hModel->Name() );
+		else {
+			skeletonModel = renderModelManager->FindModel(modelName);
+		}
+		if (skeletonModel != NULL && renderEntity.hModel != NULL) {
+			if (skeletonModel->NumJoints() != renderEntity.hModel->NumJoints()) {
+				gameLocal.Error("gib model '%s' has different number of joints than model '%s'",
+					skeletonModel->Name(), renderEntity.hModel->Name());
 			}
 		}
 	}
@@ -1135,28 +1144,29 @@ void idAFEntity_Gibbable::InitSkeletonModel( void ) {
 idAFEntity_Gibbable::Present
 ================
 */
-void idAFEntity_Gibbable::Present( void ) {
+void idAFEntity_Gibbable::Present(void) {
 	PROFILE_SCOPE("Present", PROFMASK_NORMAL);
 	renderEntity_t skeleton;
 
-	if ( !gameLocal.isNewFrame ) {
+	if (!gameLocal.isNewFrame) {
 		return;
 	}
 
 	// don't present to the renderer if the entity hasn't changed
-	if ( !( thinkFlags & TH_UPDATEVISUALS ) ) {
+	if (!(thinkFlags & TH_UPDATEVISUALS)) {
 		return;
 	}
 
 	// update skeleton model
-	if ( gibbed && !IsHidden() && skeletonModel != NULL ) {
+	if (gibbed && !IsHidden() && skeletonModel != NULL) {
 		skeleton = renderEntity;
 		skeleton.hModel = skeletonModel;
 		// add to refresh list
-		if ( skeletonModelDefHandle == -1 ) {
-			skeletonModelDefHandle = gameRenderWorld->AddEntityDef( &skeleton );
-		} else {
-			gameRenderWorld->UpdateEntityDef( skeletonModelDefHandle, &skeleton );
+		if (skeletonModelDefHandle == -1) {
+			skeletonModelDefHandle = gameRenderWorld->AddEntityDef(&skeleton);
+		}
+		else {
+			gameRenderWorld->UpdateEntityDef(skeletonModelDefHandle, &skeleton);
 		}
 	}
 
@@ -1168,21 +1178,21 @@ void idAFEntity_Gibbable::Present( void ) {
 idAFEntity_Gibbable::Damage
 ================
 */
-void idAFEntity_Gibbable::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &dir, const char *damageDefName, const float damageScale, const int location ) {
-	if ( !fl.takedamage ) {
+void idAFEntity_Gibbable::Damage(idEntity *inflictor, idEntity *attacker, const idVec3 &dir, const char *damageDefName, const float damageScale, const int location) {
+	if (!fl.takedamage) {
 		return;
 	}
-	idAFEntity_Base::Damage( inflictor, attacker, dir, damageDefName, damageScale, location );
+	idAFEntity_Base::Damage(inflictor, attacker, dir, damageDefName, damageScale, location);
 
 	// HUMANHEAD mdl
-	const idDict *damageDef = gameLocal.FindEntityDefDict( damageDefName );
-	if ( !damageDef ) {
-		gameLocal.Error( "Unknown damageDef '%s'\n", damageDefName );
+	const idDict *damageDef = gameLocal.FindEntityDefDict(damageDefName);
+	if (!damageDef) {
+		gameLocal.Error("Unknown damageDef '%s'\n", damageDefName);
 	}
 	// HUMANHEAD END
 
-	if ( gibHealth != 0 && health < gibHealth && damageDef->GetBool( "gib" ) && spawnArgs.GetBool( "gib" ) ) { // HUMANHEAD mdl:  Changed to gibHealth instead of -20, and added damageDef gib check
-		Gib( dir, damageDefName );
+	if (gibHealth != 0 && health < gibHealth && damageDef->GetBool("gib") && spawnArgs.GetBool("gib")) { // HUMANHEAD mdl:  Changed to gibHealth instead of -20, and added damageDef gib check
+		Gib(dir, damageDefName);
 	}
 }
 
@@ -1191,55 +1201,56 @@ void idAFEntity_Gibbable::Damage( idEntity *inflictor, idEntity *attacker, const
 idAFEntity_Gibbable::SpawnGibs
 =====================
 */
-void idAFEntity_Gibbable::SpawnGibs( const idVec3 &dir, const char *damageDefName ) {
+void idAFEntity_Gibbable::SpawnGibs(const idVec3 &dir, const char *damageDefName) {
 	int i;
 	bool gibNonSolid;
 	idVec3 entityCenter, velocity;
 	idList<idEntity *> list;
 
-	assert( !gameLocal.isClient );
+	assert(!gameLocal.isClient);
 
-	const idDict *damageDef = gameLocal.FindEntityDefDict( damageDefName );
-	if ( !damageDef ) {
-		gameLocal.Error( "Unknown damageDef '%s'", damageDefName );
+	const idDict *damageDef = gameLocal.FindEntityDefDict(damageDefName);
+	if (!damageDef) {
+		gameLocal.Error("Unknown damageDef '%s'", damageDefName);
 	}
 
 	// spawn gib articulated figures
-	idAFEntity_Base::DropAFs( this, "gib", &list );
+	idAFEntity_Base::DropAFs(this, "gib", &list);
 
 	// spawn gib items
-	idMoveableItem::DropItems( this, "gib", &list );
+	idMoveableItem::DropItems(this, "gib", &list);
 
 	// HUMANHEAD mdl
-	gibNonSolid = damageDef->GetBool( "gibNonSolid" ); // Moved this up from below
-	const char *debris = spawnArgs.GetString( "def_gibDebrisSpawner" );
+	gibNonSolid = damageDef->GetBool("gibNonSolid"); // Moved this up from below
+	const char *debris = spawnArgs.GetString("def_gibDebrisSpawner");
 	float duration = 4.0f; // Default to 4 seconds, original Doom3 time to live
-	if ( debris && *debris ) {
-		hhUtils::SpawnDebrisMass( debris, this->GetOrigin(), &this->GetAxis()[2], &dir, -1, gibNonSolid, &duration, this ); //rww - now using entity ptr
+	if (debris && *debris) {
+		hhUtils::SpawnDebrisMass(debris, this->GetOrigin(), &this->GetAxis()[2], &dir, -1, gibNonSolid, &duration, this); //rww - now using entity ptr
 	}
 	// HUMANHEAD END
 
 	// blow out the gibs in the given direction away from the center of the entity
 	entityCenter = GetPhysics()->GetAbsBounds().GetCenter();
-	for ( i = 0; i < list.Num(); i++ ) {
-		if ( gibNonSolid ) {
-			list[i]->GetPhysics()->SetContents( 0 );
-			list[i]->GetPhysics()->SetClipMask( 0 );
+	for (i = 0; i < list.Num(); i++) {
+		if (gibNonSolid) {
+			list[i]->GetPhysics()->SetContents(0);
+			list[i]->GetPhysics()->SetClipMask(0);
 			list[i]->GetPhysics()->UnlinkClip();
 			list[i]->GetPhysics()->PutToRest();
-		} else {
-			list[i]->GetPhysics()->SetContents( CONTENTS_CORPSE );
-			list[i]->GetPhysics()->SetClipMask( CONTENTS_SOLID );
+		}
+		else {
+			list[i]->GetPhysics()->SetContents(CONTENTS_CORPSE);
+			list[i]->GetPhysics()->SetClipMask(CONTENTS_SOLID);
 			velocity = list[i]->GetPhysics()->GetAbsBounds().GetCenter() - entityCenter;
 			velocity.NormalizeFast();
-			velocity += ( i & 1 ) ? dir : -dir;
-			list[i]->GetPhysics()->SetLinearVelocity( velocity * 75.0f );
+			velocity += (i & 1) ? dir : -dir;
+			list[i]->GetPhysics()->SetLinearVelocity(velocity * 75.0f);
 		}
 		list[i]->GetRenderEntity()->noShadow = true;
 		// HUMANHEAD mdl:  Removed time of death and added duration from debris spawner
 		//list[i]->GetRenderEntity()->shaderParms[ SHADERPARM_TIME_OF_DEATH ] = gameLocal.time * 0.001f; // HUMANHEAD mdl:  We never want this set on gib pieces
-		if ( duration != 0.0f ) {
-			list[i]->PostEventSec( &EV_Remove, duration );
+		if (duration != 0.0f) {
+			list[i]->PostEventSec(&EV_Remove, duration);
 		}
 		// HUMANHEAD END
 	}
@@ -1250,54 +1261,56 @@ void idAFEntity_Gibbable::SpawnGibs( const idVec3 &dir, const char *damageDefNam
 idAFEntity_Gibbable::Gib
 ============
 */
-void idAFEntity_Gibbable::Gib( const idVec3 &dir, const char *damageDefName ) {
+void idAFEntity_Gibbable::Gib(const idVec3 &dir, const char *damageDefName) {
 	// only gib once
-	if ( gibbed ) {
+	if (gibbed) {
 		return;
 	}
 
-	const idDict *damageDef = gameLocal.FindEntityDefDict( damageDefName );
-	if ( !damageDef ) {
-		gameLocal.Error( "Unknown damageDef '%s'", damageDefName );
+	const idDict *damageDef = gameLocal.FindEntityDefDict(damageDefName);
+	if (!damageDef) {
+		gameLocal.Error("Unknown damageDef '%s'", damageDefName);
 	}
 
 #if HUMANHEAD
-	GetAFPhysics()->SetContents( 0 );
-	GetAFPhysics()->SetClipMask( 0 );
+	GetAFPhysics()->SetContents(0);
+	GetAFPhysics()->SetClipMask(0);
 	GetAFPhysics()->UnlinkClip();
-	if ( af.IsLoaded() ) { // HUMANHEAD mdl:  Added IsLoaded() check
+	if (af.IsLoaded()) { // HUMANHEAD mdl:  Added IsLoaded() check
 		GetAFPhysics()->PutToRest();
 	}
 #else
-	if ( damageDef->GetBool( "gibNonSolid" ) ) {
-		GetAFPhysics()->SetContents( 0 );
-		GetAFPhysics()->SetClipMask( 0 );
+	if (damageDef->GetBool("gibNonSolid")) {
+		GetAFPhysics()->SetContents(0);
+		GetAFPhysics()->SetClipMask(0);
 		GetAFPhysics()->UnlinkClip();
 		GetAFPhysics()->PutToRest();
-	} else {
-		GetAFPhysics()->SetContents( CONTENTS_CORPSE );
-		GetAFPhysics()->SetClipMask( CONTENTS_SOLID );
+	}
+	else {
+		GetAFPhysics()->SetContents(CONTENTS_CORPSE);
+		GetAFPhysics()->SetClipMask(CONTENTS_SOLID);
 	}
 #endif
 
 	UnlinkCombat();
 
-	if ( g_bloodEffects.GetBool() ) {
-		if ( gameLocal.time > gameLocal.GetGibTime() ) {
-			gameLocal.SetGibTime( gameLocal.time + GIB_DELAY );
-			SpawnGibs( dir, damageDefName );
+	if (g_bloodEffects.GetBool()) {
+		if (gameLocal.time > gameLocal.GetGibTime()) {
+			gameLocal.SetGibTime(gameLocal.time + GIB_DELAY);
+			SpawnGibs(dir, damageDefName);
 			renderEntity.noShadow = true;
-			renderEntity.shaderParms[ SHADERPARM_TIME_OF_DEATH ] = gameLocal.time * 0.001f;
-			StartSound( "snd_gibbed", SND_CHANNEL_ANY, 0, false, NULL );
+			renderEntity.shaderParms[SHADERPARM_TIME_OF_DEATH] = gameLocal.time * 0.001f;
+			StartSound("snd_gibbed", SND_CHANNEL_ANY, 0, false, NULL);
 			gibbed = true;
 		}
-	} else {
+	}
+	else {
 		gibbed = true;
 	}
 
 
 	Hide(); // HUMANHEAD mdl:  Hide the entity but wait 4 seconds before removing so snd_gibbed will play
-	PostEventSec( &EV_Gibbed, 4.0f );
+	PostEventSec(&EV_Gibbed, 4.0f);
 }
 
 /*
@@ -1305,41 +1318,41 @@ void idAFEntity_Gibbable::Gib( const idVec3 &dir, const char *damageDefName ) {
 idAFEntity_Gibbable::Event_Gib
 ============
 */
-void idAFEntity_Gibbable::Event_Gib( const char *damageDefName ) {
-	Gib( idVec3( 0, 0, 1 ), damageDefName );
+void idAFEntity_Gibbable::Event_Gib(const char *damageDefName) {
+	Gib(idVec3(0, 0, 1), damageDefName);
 }
 
 /*
 =============
 idAFEntity_Gibbable::CheckRagdollDamage
-  Returns false if nothing was done, 
+  Returns false if nothing was done,
   Returns true if was removed
 HUMANHEAD nla
 =============
 */
-bool idAFEntity_Gibbable::CheckRagdollDamage( idEntity *inflictor, idEntity *attacker, const idVec3 &dir, const char *damageDefName, int location ) {
+bool idAFEntity_Gibbable::CheckRagdollDamage(idEntity *inflictor, idEntity *attacker, const idVec3 &dir, const char *damageDefName, int location) {
 
-	if ( !af.IsLoaded() || !af.IsActive() ) {
+	if (!af.IsLoaded() || !af.IsActive()) {
 		return false;
 	}
 
 	// HUMANHEAD mdl:  Check to see if the damageDef is supposed to gib
-	const idDict *damageDef = gameLocal.FindEntityDefDict( damageDefName );
-	if ( !damageDef ) {
-		gameLocal.Error( "Unknown damageDef '%s'", damageDefName );
+	const idDict *damageDef = gameLocal.FindEntityDefDict(damageDefName);
+	if (!damageDef) {
+		gameLocal.Error("Unknown damageDef '%s'", damageDefName);
 	}
-	if ( !damageDef->GetBool( "gib" ) ) {
+	if (!damageDef->GetBool("gib")) {
 		return false;
 	}
 	// HUMANHEAD END
 
-	if ( inflictor && ( inflictor->IsType( hhDoor::Type ) || inflictor->IsType( hhModelDoor::Type ) || inflictor->IsType( hhProxDoor::Type ) ) ) { // HUMANHEAD mdl:  Added additional checks for hhModelDoor and hhProxDoor
-		Gib( dir, damageDefName );
+	if (inflictor && (inflictor->IsType(hhDoor::Type) || inflictor->IsType(hhModelDoor::Type) || inflictor->IsType(hhProxDoor::Type))) { // HUMANHEAD mdl:  Added additional checks for hhModelDoor and hhProxDoor
+		Gib(dir, damageDefName);
 		return true;
 	}
-	
-	if ( gibHealth && health < gibHealth ) {
-		Gib( dir, damageDefName );
+
+	if (gibHealth && health < gibHealth) {
+		Gib(dir, damageDefName);
 		return true;
 	}
 
@@ -1354,8 +1367,8 @@ bool idAFEntity_Gibbable::CheckRagdollDamage( idEntity *inflictor, idEntity *att
 ===============================================================================
 */
 
-CLASS_DECLARATION( idAFEntity_Gibbable, idAFEntity_Generic )
-	EVENT( EV_Activate,			idAFEntity_Generic::Event_Activate )
+CLASS_DECLARATION(idAFEntity_Gibbable, idAFEntity_Generic)
+EVENT(EV_Activate, idAFEntity_Generic::Event_Activate)
 END_CLASS
 
 /*
@@ -1363,7 +1376,7 @@ END_CLASS
 idAFEntity_Generic::idAFEntity_Generic
 ================
 */
-idAFEntity_Generic::idAFEntity_Generic( void ) {
+idAFEntity_Generic::idAFEntity_Generic(void) {
 	keepRunningPhysics = false;
 }
 
@@ -1372,7 +1385,7 @@ idAFEntity_Generic::idAFEntity_Generic( void ) {
 idAFEntity_Generic::~idAFEntity_Generic
 ================
 */
-idAFEntity_Generic::~idAFEntity_Generic( void ) {
+idAFEntity_Generic::~idAFEntity_Generic(void) {
 }
 
 /*
@@ -1380,8 +1393,8 @@ idAFEntity_Generic::~idAFEntity_Generic( void ) {
 idAFEntity_Generic::Save
 ================
 */
-void idAFEntity_Generic::Save( idSaveGame *savefile ) const {
-	savefile->WriteBool( keepRunningPhysics );
+void idAFEntity_Generic::Save(idSaveGame *savefile) const {
+	savefile->WriteBool(keepRunningPhysics);
 }
 
 /*
@@ -1389,8 +1402,8 @@ void idAFEntity_Generic::Save( idSaveGame *savefile ) const {
 idAFEntity_Generic::Restore
 ================
 */
-void idAFEntity_Generic::Restore( idRestoreGame *savefile ) {
-	savefile->ReadBool( keepRunningPhysics );
+void idAFEntity_Generic::Restore(idRestoreGame *savefile) {
+	savefile->ReadBool(keepRunningPhysics);
 }
 
 /*
@@ -1398,11 +1411,11 @@ void idAFEntity_Generic::Restore( idRestoreGame *savefile ) {
 idAFEntity_Generic::Think
 ================
 */
-void idAFEntity_Generic::Think( void ) {
+void idAFEntity_Generic::Think(void) {
 	idAFEntity_Base::Think();
 
-	if ( keepRunningPhysics ) {
-		BecomeActive( TH_PHYSICS );
+	if (keepRunningPhysics) {
+		BecomeActive(TH_PHYSICS);
 	}
 }
 
@@ -1411,17 +1424,17 @@ void idAFEntity_Generic::Think( void ) {
 idAFEntity_Generic::Spawn
 ================
 */
-void idAFEntity_Generic::Spawn( void ) {
-	if ( !LoadAF() ) {
-		gameLocal.Error( "Couldn't load af file on entity '%s'", name.c_str() );
+void idAFEntity_Generic::Spawn(void) {
+	if (!LoadAF()) {
+		gameLocal.Error("Couldn't load af file on entity '%s'", name.c_str());
 	}
 
 	SetCombatModel();
 
-	SetPhysics( af.GetPhysics() );
+	SetPhysics(af.GetPhysics());
 
 	af.GetPhysics()->PutToRest();
-	if ( !spawnArgs.GetBool( "nodrop", "0" ) ) {
+	if (!spawnArgs.GetBool("nodrop", "0")) {
 		af.GetPhysics()->Activate();
 	}
 
@@ -1433,7 +1446,7 @@ void idAFEntity_Generic::Spawn( void ) {
 idAFEntity_Generic::Event_Activate
 ================
 */
-void idAFEntity_Generic::Event_Activate( idEntity *activator ) {
+void idAFEntity_Generic::Event_Activate(idEntity *activator) {
 	float delay;
 	idVec3 init_velocity, init_avelocity;
 
@@ -1442,21 +1455,23 @@ void idAFEntity_Generic::Event_Activate( idEntity *activator ) {
 	af.GetPhysics()->EnableImpact();
 	af.GetPhysics()->Activate();
 
-	spawnArgs.GetVector( "init_velocity", "0 0 0", init_velocity );
-	spawnArgs.GetVector( "init_avelocity", "0 0 0", init_avelocity );
+	spawnArgs.GetVector("init_velocity", "0 0 0", init_velocity);
+	spawnArgs.GetVector("init_avelocity", "0 0 0", init_avelocity);
 
-	delay = spawnArgs.GetFloat( "init_velocityDelay", "0" );
-	if ( delay == 0.0f ) {
-		af.GetPhysics()->SetLinearVelocity( init_velocity );
-	} else {
-		PostEventSec( &EV_SetLinearVelocity, delay, init_velocity );
+	delay = spawnArgs.GetFloat("init_velocityDelay", "0");
+	if (delay == 0.0f) {
+		af.GetPhysics()->SetLinearVelocity(init_velocity);
+	}
+	else {
+		PostEventSec(&EV_SetLinearVelocity, delay, init_velocity);
 	}
 
-	delay = spawnArgs.GetFloat( "init_avelocityDelay", "0" );
-	if ( delay == 0.0f ) {
-		af.GetPhysics()->SetAngularVelocity( init_avelocity );
-	} else {
-		PostEventSec( &EV_SetAngularVelocity, delay, init_avelocity );
+	delay = spawnArgs.GetFloat("init_avelocityDelay", "0");
+	if (delay == 0.0f) {
+		af.GetPhysics()->SetAngularVelocity(init_avelocity);
+	}
+	else {
+		PostEventSec(&EV_SetAngularVelocity, delay, init_avelocity);
 	}
 }
 
@@ -1469,9 +1484,9 @@ void idAFEntity_Generic::Event_Activate( idEntity *activator ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idAFEntity_Gibbable, idAFEntity_WithAttachedHead )
-	EVENT( EV_Gib,				idAFEntity_WithAttachedHead::Event_Gib )
-	EVENT( EV_Activate,			idAFEntity_WithAttachedHead::Event_Activate )
+CLASS_DECLARATION(idAFEntity_Gibbable, idAFEntity_WithAttachedHead)
+EVENT(EV_Gib, idAFEntity_WithAttachedHead::Event_Gib)
+EVENT(EV_Activate, idAFEntity_WithAttachedHead::Event_Activate)
 END_CLASS
 
 /*
@@ -1489,9 +1504,9 @@ idAFEntity_WithAttachedHead::~idAFEntity_WithAttachedHead
 ================
 */
 idAFEntity_WithAttachedHead::~idAFEntity_WithAttachedHead() {
-	if ( head.GetEntity() ) {
+	if (head.GetEntity()) {
 		head.GetEntity()->ClearBody();
-		head.GetEntity()->PostEventMS( &EV_Remove, 0 );
+		head.GetEntity()->PostEventMS(&EV_Remove, 0);
 	}
 }
 
@@ -1500,27 +1515,27 @@ idAFEntity_WithAttachedHead::~idAFEntity_WithAttachedHead() {
 idAFEntity_WithAttachedHead::Spawn
 ================
 */
-void idAFEntity_WithAttachedHead::Spawn( void ) {
+void idAFEntity_WithAttachedHead::Spawn(void) {
 	SetupHead();
 
 	LoadAF();
 
 	SetCombatModel();
 
-	SetPhysics( af.GetPhysics() );
+	SetPhysics(af.GetPhysics());
 
 	af.GetPhysics()->PutToRest();
-	if ( !spawnArgs.GetBool( "nodrop", "0" ) ) {
+	if (!spawnArgs.GetBool("nodrop", "0")) {
 		af.GetPhysics()->Activate();
 	}
 
 	fl.takedamage = true;
 
-	if ( head.GetEntity() ) {
-		int anim = head.GetEntity()->GetAnimator()->GetAnim( "dead" );
+	if (head.GetEntity()) {
+		int anim = head.GetEntity()->GetAnimator()->GetAnim("dead");
 
-		if ( anim ) {
-			head.GetEntity()->GetAnimator()->SetFrame( ANIMCHANNEL_ALL, anim, 0, gameLocal.time, 0 );
+		if (anim) {
+			head.GetEntity()->GetAnimator()->SetFrame(ANIMCHANNEL_ALL, anim, 0, gameLocal.time, 0);
 		}
 	}
 }
@@ -1530,8 +1545,8 @@ void idAFEntity_WithAttachedHead::Spawn( void ) {
 idAFEntity_WithAttachedHead::Save
 ================
 */
-void idAFEntity_WithAttachedHead::Save( idSaveGame *savefile ) const {
-	head.Save( savefile );
+void idAFEntity_WithAttachedHead::Save(idSaveGame *savefile) const {
+	head.Save(savefile);
 }
 
 /*
@@ -1539,8 +1554,8 @@ void idAFEntity_WithAttachedHead::Save( idSaveGame *savefile ) const {
 idAFEntity_WithAttachedHead::Restore
 ================
 */
-void idAFEntity_WithAttachedHead::Restore( idRestoreGame *savefile ) {
-	head.Restore( savefile );
+void idAFEntity_WithAttachedHead::Restore(idRestoreGame *savefile) {
+	head.Restore(savefile);
 }
 
 /*
@@ -1548,7 +1563,7 @@ void idAFEntity_WithAttachedHead::Restore( idRestoreGame *savefile ) {
 idAFEntity_WithAttachedHead::SetupHead
 ================
 */
-void idAFEntity_WithAttachedHead::SetupHead( void ) {
+void idAFEntity_WithAttachedHead::SetupHead(void) {
 	idAFAttachment		*headEnt;
 	idStr				jointName;
 	const char			*headModel;
@@ -1563,36 +1578,36 @@ void idAFEntity_WithAttachedHead::SetupHead( void ) {
 	//HUMANHEAD END
 
 	// HUMANHEAD pdm: changed from def_head to model_head for precaching
-	headModel = spawnArgs.GetString( "model_head", "" );
-	if ( headModel[ 0 ] ) {
-		jointName = spawnArgs.GetString( "head_joint" );
-		joint = animator.GetJointHandle( jointName );
-		if ( joint == INVALID_JOINT ) {
-			gameLocal.Error( "Joint '%s' not found for 'head_joint' on '%s'", jointName.c_str(), name.c_str() );
+	headModel = spawnArgs.GetString("model_head", "");
+	if (headModel[0]) {
+		jointName = spawnArgs.GetString("head_joint");
+		joint = animator.GetJointHandle(jointName);
+		if (joint == INVALID_JOINT) {
+			gameLocal.Error("Joint '%s' not found for 'head_joint' on '%s'", jointName.c_str(), name.c_str());
 		}
 
-		headEnt = static_cast<idAFAttachment *>( gameLocal.SpawnEntityType( idAFAttachment::Type, NULL ) );
-		headEnt->SetName( va( "%s_head", name.c_str() ) );
-		headEnt->SetBody( this, headModel, joint );
+		headEnt = static_cast<idAFAttachment *>(gameLocal.SpawnEntityType(idAFAttachment::Type, NULL));
+		headEnt->SetName(va("%s_head", name.c_str()));
+		headEnt->SetBody(this, headModel, joint);
 		headEnt->SetCombatModel();
 		head = headEnt;
 
 		// HUMANHEAD CJR:  Set up scale on the head
 		float scale = 1.0f;
-		if ( spawnArgs.FindKey("scale") ) {
-			scale = spawnArgs.GetFloat("scale", "1.0" );
-			headEnt->SetShaderParm( SHADERPARM_ANY_DEFORM, DEFORMTYPE_SCALE );
-			headEnt->SetShaderParm( SHADERPARM_ANY_DEFORM_PARM1, scale );
+		if (spawnArgs.FindKey("scale")) {
+			scale = spawnArgs.GetFloat("scale", "1.0");
+			headEnt->SetShaderParm(SHADERPARM_ANY_DEFORM, DEFORMTYPE_SCALE);
+			headEnt->SetShaderParm(SHADERPARM_ANY_DEFORM_PARM1, scale);
 		} // HUMANHEAD END
 
-		animator.GetJointTransform( joint, gameLocal.time, origin, axis );
-		origin = renderEntity.origin + origin * ( renderEntity.axis * scale ); // HUMANHEAD CJR:  Factor in scale
-		headEnt->SetOrigin( origin );
-		headEnt->SetAxis( renderEntity.axis );
-		headEnt->BindToJoint( this, joint, true );
+		animator.GetJointTransform(joint, gameLocal.time, origin, axis);
+		origin = renderEntity.origin + origin * (renderEntity.axis * scale); // HUMANHEAD CJR:  Factor in scale
+		headEnt->SetOrigin(origin);
+		headEnt->SetAxis(renderEntity.axis);
+		headEnt->BindToJoint(this, joint, true);
 
 		// HUMANHEAD pdm:  Copy the skin to the head as well
-		headEnt->SetSkin( this->GetSkin() );
+		headEnt->SetSkin(this->GetSkin());
 		// END HUMANHEAD
 	}
 }
@@ -1602,7 +1617,7 @@ void idAFEntity_WithAttachedHead::SetupHead( void ) {
 idAFEntity_WithAttachedHead::Think
 ================
 */
-void idAFEntity_WithAttachedHead::Think( void ) {
+void idAFEntity_WithAttachedHead::Think(void) {
 	idAFEntity_Base::Think();
 }
 
@@ -1611,18 +1626,18 @@ void idAFEntity_WithAttachedHead::Think( void ) {
 idAFEntity_WithAttachedHead::LinkCombat
 ================
 */
-void idAFEntity_WithAttachedHead::LinkCombat( void ) {
+void idAFEntity_WithAttachedHead::LinkCombat(void) {
 	idAFAttachment *headEnt;
 
-	if ( fl.hidden ) {
+	if (fl.hidden) {
 		return;
 	}
 
-	if ( combatModel ) {
-		combatModel->Link( gameLocal.clip, this, 0, renderEntity.origin, renderEntity.axis, modelDefHandle );
+	if (combatModel) {
+		combatModel->Link(gameLocal.clip, this, 0, renderEntity.origin, renderEntity.axis, modelDefHandle);
 	}
 	headEnt = head.GetEntity();
-	if ( headEnt ) {
+	if (headEnt) {
 		headEnt->LinkCombat();
 	}
 }
@@ -1632,14 +1647,14 @@ void idAFEntity_WithAttachedHead::LinkCombat( void ) {
 idAFEntity_WithAttachedHead::UnlinkCombat
 ================
 */
-void idAFEntity_WithAttachedHead::UnlinkCombat( void ) {
+void idAFEntity_WithAttachedHead::UnlinkCombat(void) {
 	idAFAttachment *headEnt;
 
-	if ( combatModel ) {
+	if (combatModel) {
 		combatModel->Unlink();
 	}
 	headEnt = head.GetEntity();
-	if ( headEnt ) {
+	if (headEnt) {
 		headEnt->UnlinkCombat();
 	}
 }
@@ -1649,9 +1664,9 @@ void idAFEntity_WithAttachedHead::UnlinkCombat( void ) {
 idAFEntity_WithAttachedHead::Hide
 ================
 */
-void idAFEntity_WithAttachedHead::Hide( void ) {
+void idAFEntity_WithAttachedHead::Hide(void) {
 	idAFEntity_Base::Hide();
-	if ( head.GetEntity() ) {
+	if (head.GetEntity()) {
 		head.GetEntity()->Hide();
 	}
 	UnlinkCombat();
@@ -1662,9 +1677,9 @@ void idAFEntity_WithAttachedHead::Hide( void ) {
 idAFEntity_WithAttachedHead::Show
 ================
 */
-void idAFEntity_WithAttachedHead::Show( void ) {
+void idAFEntity_WithAttachedHead::Show(void) {
 	idAFEntity_Base::Show();
-	if ( head.GetEntity() ) {
+	if (head.GetEntity()) {
 		head.GetEntity()->Show();
 	}
 	LinkCombat();
@@ -1675,12 +1690,12 @@ void idAFEntity_WithAttachedHead::Show( void ) {
 idAFEntity_WithAttachedHead::ProjectOverlay
 ================
 */
-void idAFEntity_WithAttachedHead::ProjectOverlay( const idVec3 &origin, const idVec3 &dir, float size, const char *material ) {
+void idAFEntity_WithAttachedHead::ProjectOverlay(const idVec3 &origin, const idVec3 &dir, float size, const char *material) {
 
-	idEntity::ProjectOverlay( origin, dir, size, material );
+	idEntity::ProjectOverlay(origin, dir, size, material);
 
-	if ( head.GetEntity() ) {
-		head.GetEntity()->ProjectOverlay( origin, dir, size, material );
+	if (head.GetEntity()) {
+		head.GetEntity()->ProjectOverlay(origin, dir, size, material);
 	}
 }
 
@@ -1689,13 +1704,13 @@ void idAFEntity_WithAttachedHead::ProjectOverlay( const idVec3 &origin, const id
 idAFEntity_WithAttachedHead::Gib
 ============
 */
-void idAFEntity_WithAttachedHead::Gib( const idVec3 &dir, const char *damageDefName ) {
+void idAFEntity_WithAttachedHead::Gib(const idVec3 &dir, const char *damageDefName) {
 	// only gib once
-	if ( gibbed ) {
+	if (gibbed) {
 		return;
 	}
-	idAFEntity_Gibbable::Gib( dir, damageDefName );
-	if ( head.GetEntity() ) {
+	idAFEntity_Gibbable::Gib(dir, damageDefName);
+	if (head.GetEntity()) {
 		head.GetEntity()->Hide();
 	}
 }
@@ -1705,8 +1720,8 @@ void idAFEntity_WithAttachedHead::Gib( const idVec3 &dir, const char *damageDefN
 idAFEntity_WithAttachedHead::Event_Gib
 ============
 */
-void idAFEntity_WithAttachedHead::Event_Gib( const char *damageDefName ) {
-	Gib( idVec3( 0, 0, 1 ), damageDefName );
+void idAFEntity_WithAttachedHead::Event_Gib(const char *damageDefName) {
+	Gib(idVec3(0, 0, 1), damageDefName);
 }
 
 /*
@@ -1714,7 +1729,7 @@ void idAFEntity_WithAttachedHead::Event_Gib( const char *damageDefName ) {
 idAFEntity_WithAttachedHead::Event_Activate
 ================
 */
-void idAFEntity_WithAttachedHead::Event_Activate( idEntity *activator ) {
+void idAFEntity_WithAttachedHead::Event_Activate(idEntity *activator) {
 	float delay;
 	idVec3 init_velocity, init_avelocity;
 
@@ -1723,21 +1738,23 @@ void idAFEntity_WithAttachedHead::Event_Activate( idEntity *activator ) {
 	af.GetPhysics()->EnableImpact();
 	af.GetPhysics()->Activate();
 
-	spawnArgs.GetVector( "init_velocity", "0 0 0", init_velocity );
-	spawnArgs.GetVector( "init_avelocity", "0 0 0", init_avelocity );
+	spawnArgs.GetVector("init_velocity", "0 0 0", init_velocity);
+	spawnArgs.GetVector("init_avelocity", "0 0 0", init_avelocity);
 
-	delay = spawnArgs.GetFloat( "init_velocityDelay", "0" );
-	if ( delay == 0.0f ) {
-		af.GetPhysics()->SetLinearVelocity( init_velocity );
-	} else {
-		PostEventSec( &EV_SetLinearVelocity, delay, init_velocity );
+	delay = spawnArgs.GetFloat("init_velocityDelay", "0");
+	if (delay == 0.0f) {
+		af.GetPhysics()->SetLinearVelocity(init_velocity);
+	}
+	else {
+		PostEventSec(&EV_SetLinearVelocity, delay, init_velocity);
 	}
 
-	delay = spawnArgs.GetFloat( "init_avelocityDelay", "0" );
-	if ( delay == 0.0f ) {
-		af.GetPhysics()->SetAngularVelocity( init_avelocity );
-	} else {
-		PostEventSec( &EV_SetAngularVelocity, delay, init_avelocity );
+	delay = spawnArgs.GetFloat("init_avelocityDelay", "0");
+	if (delay == 0.0f) {
+		af.GetPhysics()->SetAngularVelocity(init_avelocity);
+	}
+	else {
+		PostEventSec(&EV_SetAngularVelocity, delay, init_avelocity);
 	}
 }
 
@@ -1750,7 +1767,7 @@ void idAFEntity_WithAttachedHead::Event_Activate( idEntity *activator ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idAFEntity_Base, idAFEntity_Vehicle )
+CLASS_DECLARATION(idAFEntity_Base, idAFEntity_Vehicle)
 END_CLASS
 
 /*
@@ -1758,14 +1775,14 @@ END_CLASS
 idAFEntity_Vehicle::idAFEntity_Vehicle
 ================
 */
-idAFEntity_Vehicle::idAFEntity_Vehicle( void ) {
-	player				= NULL;
-	eyesJoint			= INVALID_JOINT;
-	steeringWheelJoint	= INVALID_JOINT;
-	wheelRadius			= 0.0f;
-	steerAngle			= 0.0f;
-	steerSpeed			= 0.0f;
-	dustSmoke			= NULL;
+idAFEntity_Vehicle::idAFEntity_Vehicle(void) {
+	player = NULL;
+	eyesJoint = INVALID_JOINT;
+	steeringWheelJoint = INVALID_JOINT;
+	wheelRadius = 0.0f;
+	steerAngle = 0.0f;
+	steerSpeed = 0.0f;
+	dustSmoke = NULL;
 }
 
 /*
@@ -1773,36 +1790,36 @@ idAFEntity_Vehicle::idAFEntity_Vehicle( void ) {
 idAFEntity_Vehicle::Spawn
 ================
 */
-void idAFEntity_Vehicle::Spawn( void ) {
-	const char *eyesJointName = spawnArgs.GetString( "eyesJoint", "eyes" );
-	const char *steeringWheelJointName = spawnArgs.GetString( "steeringWheelJoint", "steeringWheel" );
+void idAFEntity_Vehicle::Spawn(void) {
+	const char *eyesJointName = spawnArgs.GetString("eyesJoint", "eyes");
+	const char *steeringWheelJointName = spawnArgs.GetString("steeringWheelJoint", "steeringWheel");
 
 	LoadAF();
 
 	SetCombatModel();
 
-	SetPhysics( af.GetPhysics() );
+	SetPhysics(af.GetPhysics());
 
 	fl.takedamage = true;
 
-	if ( !eyesJointName[0] ) {
-		gameLocal.Error( "idAFEntity_Vehicle '%s' no eyes joint specified", name.c_str() );
+	if (!eyesJointName[0]) {
+		gameLocal.Error("idAFEntity_Vehicle '%s' no eyes joint specified", name.c_str());
 	}
-	eyesJoint = animator.GetJointHandle( eyesJointName );
-	if ( !steeringWheelJointName[0] ) {
-		gameLocal.Error( "idAFEntity_Vehicle '%s' no steering wheel joint specified", name.c_str() );
+	eyesJoint = animator.GetJointHandle(eyesJointName);
+	if (!steeringWheelJointName[0]) {
+		gameLocal.Error("idAFEntity_Vehicle '%s' no steering wheel joint specified", name.c_str());
 	}
-	steeringWheelJoint = animator.GetJointHandle( steeringWheelJointName );
+	steeringWheelJoint = animator.GetJointHandle(steeringWheelJointName);
 
-	spawnArgs.GetFloat( "wheelRadius", "20", wheelRadius );
-	spawnArgs.GetFloat( "steerSpeed", "5", steerSpeed ); 
+	spawnArgs.GetFloat("wheelRadius", "20", wheelRadius);
+	spawnArgs.GetFloat("steerSpeed", "5", steerSpeed);
 
 	player = NULL;
 	steerAngle = 0.0f;
 
-	const char *smokeName = spawnArgs.GetString( "smoke_vehicle_dust", "muzzlesmoke" );
-	if ( *smokeName != '\0' ) {
-		dustSmoke = static_cast<const idDeclParticle *>( declManager->FindType( DECL_PARTICLE, smokeName ) );
+	const char *smokeName = spawnArgs.GetString("smoke_vehicle_dust", "muzzlesmoke");
+	if (*smokeName != '\0') {
+		dustSmoke = static_cast<const idDeclParticle *>(declManager->FindType(DECL_PARTICLE, smokeName));
 	}
 }
 
@@ -1811,26 +1828,26 @@ void idAFEntity_Vehicle::Spawn( void ) {
 idAFEntity_Vehicle::Use
 ================
 */
-void idAFEntity_Vehicle::Use( idPlayer *other ) {
+void idAFEntity_Vehicle::Use(idPlayer *other) {
 	idVec3 origin;
 	idMat3 axis;
 
-	if ( player ) {
-		if ( player == other ) {
+	if (player) {
+		if (player == other) {
 			other->Unbind();
 			player = NULL;
 
-			af.GetPhysics()->SetComeToRest( true );
+			af.GetPhysics()->SetComeToRest(true);
 		}
 	}
 	else {
 		player = other;
-		animator.GetJointTransform( eyesJoint, gameLocal.time, origin, axis );
+		animator.GetJointTransform(eyesJoint, gameLocal.time, origin, axis);
 		origin = renderEntity.origin + origin * renderEntity.axis;
-		player->GetPhysics()->SetOrigin( origin );
-		player->BindToBody( this, 0, true );
+		player->GetPhysics()->SetOrigin(origin);
+		player->BindToBody(this, 0, true);
 
-		af.GetPhysics()->SetComeToRest( false );
+		af.GetPhysics()->SetComeToRest(false);
 		af.GetPhysics()->Activate();
 	}
 }
@@ -1840,17 +1857,19 @@ void idAFEntity_Vehicle::Use( idPlayer *other ) {
 idAFEntity_Vehicle::GetSteerAngle
 ================
 */
-float idAFEntity_Vehicle::GetSteerAngle( void ) {
+float idAFEntity_Vehicle::GetSteerAngle(void) {
 	float idealSteerAngle, angleDelta;
 
-	idealSteerAngle = player->usercmd.rightmove * ( 30.0f / 128.0f );
+	idealSteerAngle = player->usercmd.rightmove * (30.0f / 128.0f);
 	angleDelta = idealSteerAngle - steerAngle;
 
-	if ( angleDelta > steerSpeed ) {
+	if (angleDelta > steerSpeed) {
 		steerAngle += steerSpeed;
-	} else if ( angleDelta < -steerSpeed ) {
+	}
+	else if (angleDelta < -steerSpeed) {
 		steerAngle -= steerSpeed;
-	} else {
+	}
+	else {
 		steerAngle = idealSteerAngle;
 	}
 
@@ -1866,7 +1885,7 @@ float idAFEntity_Vehicle::GetSteerAngle( void ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idAFEntity_Vehicle, idAFEntity_VehicleSimple )
+CLASS_DECLARATION(idAFEntity_Vehicle, idAFEntity_VehicleSimple)
 END_CLASS
 
 /*
@@ -1874,9 +1893,9 @@ END_CLASS
 idAFEntity_VehicleSimple::idAFEntity_VehicleSimple
 ================
 */
-idAFEntity_VehicleSimple::idAFEntity_VehicleSimple( void ) {
+idAFEntity_VehicleSimple::idAFEntity_VehicleSimple(void) {
 	int i;
-	for ( i = 0; i < 4; i++ ) {
+	for (i = 0; i < 4; i++) {
 		suspension[i] = NULL;
 	}
 }
@@ -1886,7 +1905,7 @@ idAFEntity_VehicleSimple::idAFEntity_VehicleSimple( void ) {
 idAFEntity_VehicleSimple::~idAFEntity_VehicleSimple
 ================
 */
-idAFEntity_VehicleSimple::~idAFEntity_VehicleSimple( void ) {
+idAFEntity_VehicleSimple::~idAFEntity_VehicleSimple(void) {
 	delete wheelModel;
 	wheelModel = NULL;
 }
@@ -1896,50 +1915,50 @@ idAFEntity_VehicleSimple::~idAFEntity_VehicleSimple( void ) {
 idAFEntity_VehicleSimple::Spawn
 ================
 */
-void idAFEntity_VehicleSimple::Spawn( void ) {
+void idAFEntity_VehicleSimple::Spawn(void) {
 	static const char *wheelJointKeys[] = {
 		"wheelJointFrontLeft",
 		"wheelJointFrontRight",
 		"wheelJointRearLeft",
 		"wheelJointRearRight"
 	};
-	static idVec3 wheelPoly[4] = { idVec3( 2, 2, 0 ), idVec3( 2, -2, 0 ), idVec3( -2, -2, 0 ), idVec3( -2, 2, 0 ) };
+	static idVec3 wheelPoly[4] = { idVec3(2, 2, 0), idVec3(2, -2, 0), idVec3(-2, -2, 0), idVec3(-2, 2, 0) };
 
 	int i;
 	idVec3 origin;
 	idMat3 axis;
 	idTraceModel trm;
 
-	trm.SetupPolygon( wheelPoly, 4 );
-	trm.Translate( idVec3( 0, 0, -wheelRadius ) );
-	wheelModel = new idClipModel( trm );
+	trm.SetupPolygon(wheelPoly, 4);
+	trm.Translate(idVec3(0, 0, -wheelRadius));
+	wheelModel = new idClipModel(trm);
 
-	for ( i = 0; i < 4; i++ ) {
-		const char *wheelJointName = spawnArgs.GetString( wheelJointKeys[i], "" );
-		if ( !wheelJointName[0] ) {
-			gameLocal.Error( "idAFEntity_VehicleSimple '%s' no '%s' specified", name.c_str(), wheelJointKeys[i] );
+	for (i = 0; i < 4; i++) {
+		const char *wheelJointName = spawnArgs.GetString(wheelJointKeys[i], "");
+		if (!wheelJointName[0]) {
+			gameLocal.Error("idAFEntity_VehicleSimple '%s' no '%s' specified", name.c_str(), wheelJointKeys[i]);
 		}
-		wheelJoints[i] = animator.GetJointHandle( wheelJointName );
-		if ( wheelJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "idAFEntity_VehicleSimple '%s' can't find wheel joint '%s'", name.c_str(), wheelJointName );
+		wheelJoints[i] = animator.GetJointHandle(wheelJointName);
+		if (wheelJoints[i] == INVALID_JOINT) {
+			gameLocal.Error("idAFEntity_VehicleSimple '%s' can't find wheel joint '%s'", name.c_str(), wheelJointName);
 		}
 
-		GetAnimator()->GetJointTransform( wheelJoints[i], 0, origin, axis );
+		GetAnimator()->GetJointTransform(wheelJoints[i], 0, origin, axis);
 		origin = renderEntity.origin + origin * renderEntity.axis;
 
 		suspension[i] = new idAFConstraint_Suspension();
-		suspension[i]->Setup( va( "suspension%d", i ), af.GetPhysics()->GetBody( 0 ), origin, af.GetPhysics()->GetAxis( 0 ), wheelModel );
-		suspension[i]->SetSuspension(	g_vehicleSuspensionUp.GetFloat(),
-										g_vehicleSuspensionDown.GetFloat(),
-										g_vehicleSuspensionKCompress.GetFloat(),
-										g_vehicleSuspensionDamping.GetFloat(),
-										g_vehicleTireFriction.GetFloat() );
+		suspension[i]->Setup(va("suspension%d", i), af.GetPhysics()->GetBody(0), origin, af.GetPhysics()->GetAxis(0), wheelModel);
+		suspension[i]->SetSuspension(g_vehicleSuspensionUp.GetFloat(),
+			g_vehicleSuspensionDown.GetFloat(),
+			g_vehicleSuspensionKCompress.GetFloat(),
+			g_vehicleSuspensionDamping.GetFloat(),
+			g_vehicleTireFriction.GetFloat());
 
-		af.GetPhysics()->AddConstraint( suspension[i] );
+		af.GetPhysics()->AddConstraint(suspension[i]);
 	}
 
-	memset( wheelAngles, 0, sizeof( wheelAngles ) );
-	BecomeActive( TH_THINK );
+	memset(wheelAngles, 0, sizeof(wheelAngles));
+	BecomeActive(TH_THINK);
 }
 
 /*
@@ -1947,104 +1966,107 @@ void idAFEntity_VehicleSimple::Spawn( void ) {
 idAFEntity_VehicleSimple::Think
 ================
 */
-void idAFEntity_VehicleSimple::Think( void ) {
+void idAFEntity_VehicleSimple::Think(void) {
 	int i;
 	float force = 0.0f, velocity = 0.0f, steerAngle = 0.0f;
 	idVec3 origin;
 	idMat3 axis;
 	idRotation wheelRotation, steerRotation;
 
-	if ( thinkFlags & TH_THINK ) {
+	if (thinkFlags & TH_THINK) {
 
-		if ( player ) {
+		if (player) {
 			// capture the input from a player
 			velocity = g_vehicleVelocity.GetFloat();
-			if ( player->usercmd.forwardmove < 0 ) {
+			if (player->usercmd.forwardmove < 0) {
 				velocity = -velocity;
 			}
-			force = idMath::Fabs( player->usercmd.forwardmove * g_vehicleForce.GetFloat() ) * (1.0f / 128.0f);
+			force = idMath::Fabs(player->usercmd.forwardmove * g_vehicleForce.GetFloat()) * (1.0f / 128.0f);
 			steerAngle = GetSteerAngle();
 		}
 
 		// update the wheel motor force and steering
-		for ( i = 0; i < 2; i++ ) {
+		for (i = 0; i < 2; i++) {
 
 			// front wheel drive
-			if ( velocity != 0.0f ) {
-				suspension[i]->EnableMotor( true );
-			} else {
-				suspension[i]->EnableMotor( false );
+			if (velocity != 0.0f) {
+				suspension[i]->EnableMotor(true);
 			}
-			suspension[i]->SetMotorVelocity( velocity );
-			suspension[i]->SetMotorForce( force );
+			else {
+				suspension[i]->EnableMotor(false);
+			}
+			suspension[i]->SetMotorVelocity(velocity);
+			suspension[i]->SetMotorForce(force);
 
 			// update the wheel steering
-			suspension[i]->SetSteerAngle( steerAngle );
+			suspension[i]->SetSteerAngle(steerAngle);
 		}
 
 		// adjust wheel velocity for better steering because there are no differentials between the wheels
-		if ( steerAngle < 0.0f ) {
-			suspension[0]->SetMotorVelocity( velocity * 0.5f );
-		} else if ( steerAngle > 0.0f ) {
-			suspension[1]->SetMotorVelocity( velocity * 0.5f );
+		if (steerAngle < 0.0f) {
+			suspension[0]->SetMotorVelocity(velocity * 0.5f);
+		}
+		else if (steerAngle > 0.0f) {
+			suspension[1]->SetMotorVelocity(velocity * 0.5f);
 		}
 
 		// update suspension with latest cvar settings
-		for ( i = 0; i < 4; i++ ) {
-			suspension[i]->SetSuspension(	g_vehicleSuspensionUp.GetFloat(),
-											g_vehicleSuspensionDown.GetFloat(),
-											g_vehicleSuspensionKCompress.GetFloat(),
-											g_vehicleSuspensionDamping.GetFloat(),
-											g_vehicleTireFriction.GetFloat() );
+		for (i = 0; i < 4; i++) {
+			suspension[i]->SetSuspension(g_vehicleSuspensionUp.GetFloat(),
+				g_vehicleSuspensionDown.GetFloat(),
+				g_vehicleSuspensionKCompress.GetFloat(),
+				g_vehicleSuspensionDamping.GetFloat(),
+				g_vehicleTireFriction.GetFloat());
 		}
 
 		// run the physics
 		RunPhysics();
 
 		// move and rotate the wheels visually
-		for ( i = 0; i < 4; i++ ) {
-			idAFBody *body = af.GetPhysics()->GetBody( 0 );
+		for (i = 0; i < 4; i++) {
+			idAFBody *body = af.GetPhysics()->GetBody(0);
 
 			origin = suspension[i]->GetWheelOrigin();
-			velocity = body->GetPointVelocity( origin ) * body->GetWorldAxis()[0];
-			wheelAngles[i] += velocity * MS2SEC( gameLocal.msec ) / wheelRadius;
+			velocity = body->GetPointVelocity(origin) * body->GetWorldAxis()[0];
+			wheelAngles[i] += velocity * MS2SEC(gameLocal.msec) / wheelRadius;
 
 			// additional rotation about the wheel axis
-			wheelRotation.SetAngle( RAD2DEG( wheelAngles[i] ) );
-			wheelRotation.SetVec( 0, -1, 0 );
+			wheelRotation.SetAngle(RAD2DEG(wheelAngles[i]));
+			wheelRotation.SetVec(0, -1, 0);
 
-			if ( i < 2 ) {
+			if (i < 2) {
 				// rotate the wheel for steering
-				steerRotation.SetAngle( steerAngle );
-				steerRotation.SetVec( 0, 0, 1 );
+				steerRotation.SetAngle(steerAngle);
+				steerRotation.SetVec(0, 0, 1);
 				// set wheel rotation
-				animator.SetJointAxis( wheelJoints[i], JOINTMOD_WORLD, wheelRotation.ToMat3() * steerRotation.ToMat3() );
-			} else {
+				animator.SetJointAxis(wheelJoints[i], JOINTMOD_WORLD, wheelRotation.ToMat3() * steerRotation.ToMat3());
+			}
+			else {
 				// set wheel rotation
-				animator.SetJointAxis( wheelJoints[i], JOINTMOD_WORLD, wheelRotation.ToMat3() );
+				animator.SetJointAxis(wheelJoints[i], JOINTMOD_WORLD, wheelRotation.ToMat3());
 			}
 
 			// set wheel position for suspension
-			origin = ( origin - renderEntity.origin ) * renderEntity.axis.Transpose();
-			GetAnimator()->SetJointPos( wheelJoints[i], JOINTMOD_WORLD_OVERRIDE, origin );
+			origin = (origin - renderEntity.origin) * renderEntity.axis.Transpose();
+			GetAnimator()->SetJointPos(wheelJoints[i], JOINTMOD_WORLD_OVERRIDE, origin);
 		}
-/*
-		// spawn dust particle effects
-		if ( force != 0.0f && !( gameLocal.framenum & 7 ) ) {
-			int numContacts;
-			idAFConstraint_Contact *contacts[2];
-			for ( i = 0; i < 4; i++ ) {
-				numContacts = af.GetPhysics()->GetBodyContactConstraints( wheels[i]->GetClipModel()->GetId(), contacts, 2 );
-				for ( int j = 0; j < numContacts; j++ ) {
-					gameLocal.smokeParticles->EmitSmoke( dustSmoke, gameLocal.time, gameLocal.random.RandomFloat(), contacts[j]->GetContact().point, contacts[j]->GetContact().normal.ToMat3() );
+		/*
+				// spawn dust particle effects
+				if ( force != 0.0f && !( gameLocal.framenum & 7 ) ) {
+					int numContacts;
+					idAFConstraint_Contact *contacts[2];
+					for ( i = 0; i < 4; i++ ) {
+						numContacts = af.GetPhysics()->GetBodyContactConstraints( wheels[i]->GetClipModel()->GetId(), contacts, 2 );
+						for ( int j = 0; j < numContacts; j++ ) {
+							gameLocal.smokeParticles->EmitSmoke( dustSmoke, gameLocal.time, gameLocal.random.RandomFloat(), contacts[j]->GetContact().point, contacts[j]->GetContact().normal.ToMat3() );
+						}
+					}
 				}
-			}
-		}
-*/
+		*/
 	}
 
 	UpdateAnimation();
-	if ( thinkFlags & TH_UPDATEVISUALS ) {
+	if (thinkFlags & TH_UPDATEVISUALS) {
 		Present();
 		LinkCombat();
 	}
@@ -2059,7 +2081,7 @@ void idAFEntity_VehicleSimple::Think( void ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idAFEntity_Vehicle, idAFEntity_VehicleFourWheels )
+CLASS_DECLARATION(idAFEntity_Vehicle, idAFEntity_VehicleFourWheels)
 END_CLASS
 
 
@@ -2068,16 +2090,16 @@ END_CLASS
 idAFEntity_VehicleFourWheels::idAFEntity_VehicleFourWheels
 ================
 */
-idAFEntity_VehicleFourWheels::idAFEntity_VehicleFourWheels( void ) {
+idAFEntity_VehicleFourWheels::idAFEntity_VehicleFourWheels(void) {
 	int i;
 
-	for ( i = 0; i < 4; i++ ) {
-		wheels[i]		= NULL;
-		wheelJoints[i]	= INVALID_JOINT;
-		wheelAngles[i]	= 0.0f;
+	for (i = 0; i < 4; i++) {
+		wheels[i] = NULL;
+		wheelJoints[i] = INVALID_JOINT;
+		wheelAngles[i] = 0.0f;
 	}
-	steering[0]			= NULL;
-	steering[1]			= NULL;
+	steering[0] = NULL;
+	steering[1] = NULL;
 }
 
 /*
@@ -2085,7 +2107,7 @@ idAFEntity_VehicleFourWheels::idAFEntity_VehicleFourWheels( void ) {
 idAFEntity_VehicleFourWheels::Spawn
 ================
 */
-void idAFEntity_VehicleFourWheels::Spawn( void ) {
+void idAFEntity_VehicleFourWheels::Spawn(void) {
 	int i;
 	static const char *wheelBodyKeys[] = {
 		"wheelBodyFrontLeft",
@@ -2106,38 +2128,38 @@ void idAFEntity_VehicleFourWheels::Spawn( void ) {
 
 	const char *wheelBodyName, *wheelJointName, *steeringHingeName;
 
-	for ( i = 0; i < 4; i++ ) {
-		wheelBodyName = spawnArgs.GetString( wheelBodyKeys[i], "" );
-		if ( !wheelBodyName[0] ) {
-			gameLocal.Error( "idAFEntity_VehicleFourWheels '%s' no '%s' specified", name.c_str(), wheelBodyKeys[i] );
+	for (i = 0; i < 4; i++) {
+		wheelBodyName = spawnArgs.GetString(wheelBodyKeys[i], "");
+		if (!wheelBodyName[0]) {
+			gameLocal.Error("idAFEntity_VehicleFourWheels '%s' no '%s' specified", name.c_str(), wheelBodyKeys[i]);
 		}
-		wheels[i] = af.GetPhysics()->GetBody( wheelBodyName );
-		if ( !wheels[i] ) {
-			gameLocal.Error( "idAFEntity_VehicleFourWheels '%s' can't find wheel body '%s'", name.c_str(), wheelBodyName );
+		wheels[i] = af.GetPhysics()->GetBody(wheelBodyName);
+		if (!wheels[i]) {
+			gameLocal.Error("idAFEntity_VehicleFourWheels '%s' can't find wheel body '%s'", name.c_str(), wheelBodyName);
 		}
-		wheelJointName = spawnArgs.GetString( wheelJointKeys[i], "" );
-		if ( !wheelJointName[0] ) {
-			gameLocal.Error( "idAFEntity_VehicleFourWheels '%s' no '%s' specified", name.c_str(), wheelJointKeys[i] );
+		wheelJointName = spawnArgs.GetString(wheelJointKeys[i], "");
+		if (!wheelJointName[0]) {
+			gameLocal.Error("idAFEntity_VehicleFourWheels '%s' no '%s' specified", name.c_str(), wheelJointKeys[i]);
 		}
-		wheelJoints[i] = animator.GetJointHandle( wheelJointName );
-		if ( wheelJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "idAFEntity_VehicleFourWheels '%s' can't find wheel joint '%s'", name.c_str(), wheelJointName );
-		}
-	}
-
-	for ( i = 0; i < 2; i++ ) {
-		steeringHingeName = spawnArgs.GetString( steeringHingeKeys[i], "" );
-		if ( !steeringHingeName[0] ) {
-			gameLocal.Error( "idAFEntity_VehicleFourWheels '%s' no '%s' specified", name.c_str(), steeringHingeKeys[i] );
-		}
-		steering[i] = static_cast<idAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint( steeringHingeName ));
-		if ( !steering[i] ) {
-			gameLocal.Error( "idAFEntity_VehicleFourWheels '%s': can't find steering hinge '%s'", name.c_str(), steeringHingeName );
+		wheelJoints[i] = animator.GetJointHandle(wheelJointName);
+		if (wheelJoints[i] == INVALID_JOINT) {
+			gameLocal.Error("idAFEntity_VehicleFourWheels '%s' can't find wheel joint '%s'", name.c_str(), wheelJointName);
 		}
 	}
 
-	memset( wheelAngles, 0, sizeof( wheelAngles ) );
-	BecomeActive( TH_THINK );
+	for (i = 0; i < 2; i++) {
+		steeringHingeName = spawnArgs.GetString(steeringHingeKeys[i], "");
+		if (!steeringHingeName[0]) {
+			gameLocal.Error("idAFEntity_VehicleFourWheels '%s' no '%s' specified", name.c_str(), steeringHingeKeys[i]);
+		}
+		steering[i] = static_cast<idAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint(steeringHingeName));
+		if (!steering[i]) {
+			gameLocal.Error("idAFEntity_VehicleFourWheels '%s': can't find steering hinge '%s'", name.c_str(), steeringHingeName);
+		}
+	}
+
+	memset(wheelAngles, 0, sizeof(wheelAngles));
+	BecomeActive(TH_THINK);
 }
 
 /*
@@ -2145,83 +2167,83 @@ void idAFEntity_VehicleFourWheels::Spawn( void ) {
 idAFEntity_VehicleFourWheels::Think
 ================
 */
-void idAFEntity_VehicleFourWheels::Think( void ) {
+void idAFEntity_VehicleFourWheels::Think(void) {
 	int i;
 	float force = 0.0f, velocity = 0.0f, steerAngle = 0.0f;
 	idVec3 origin;
 	idMat3 axis;
 	idRotation rotation;
 
-	if ( thinkFlags & TH_THINK ) {
+	if (thinkFlags & TH_THINK) {
 
-		if ( player ) {
+		if (player) {
 			// capture the input from a player
 			velocity = g_vehicleVelocity.GetFloat();
-			if ( player->usercmd.forwardmove < 0 ) {
+			if (player->usercmd.forwardmove < 0) {
 				velocity = -velocity;
 			}
-			force = idMath::Fabs( player->usercmd.forwardmove * g_vehicleForce.GetFloat() ) * (1.0f / 128.0f);
+			force = idMath::Fabs(player->usercmd.forwardmove * g_vehicleForce.GetFloat()) * (1.0f / 128.0f);
 			steerAngle = GetSteerAngle();
 		}
 
 		// update the wheel motor force
-		for ( i = 0; i < 2; i++ ) {
-			wheels[2+i]->SetContactMotorVelocity( velocity );
-			wheels[2+i]->SetContactMotorForce( force );
+		for (i = 0; i < 2; i++) {
+			wheels[2 + i]->SetContactMotorVelocity(velocity);
+			wheels[2 + i]->SetContactMotorForce(force);
 		}
 
 		// adjust wheel velocity for better steering because there are no differentials between the wheels
-		if ( steerAngle < 0.0f ) {
-			wheels[2]->SetContactMotorVelocity( velocity * 0.5f );
+		if (steerAngle < 0.0f) {
+			wheels[2]->SetContactMotorVelocity(velocity * 0.5f);
 		}
-		else if ( steerAngle > 0.0f ) {
-			wheels[3]->SetContactMotorVelocity( velocity * 0.5f );
+		else if (steerAngle > 0.0f) {
+			wheels[3]->SetContactMotorVelocity(velocity * 0.5f);
 		}
 
 		// update the wheel steering
-		steering[0]->SetSteerAngle( steerAngle );
-		steering[1]->SetSteerAngle( steerAngle );
-		for ( i = 0; i < 2; i++ ) {
-			steering[i]->SetSteerSpeed( 3.0f );
+		steering[0]->SetSteerAngle(steerAngle);
+		steering[1]->SetSteerAngle(steerAngle);
+		for (i = 0; i < 2; i++) {
+			steering[i]->SetSteerSpeed(3.0f);
 		}
 
 		// update the steering wheel
-		animator.GetJointTransform( steeringWheelJoint, gameLocal.time, origin, axis );
-		rotation.SetVec( axis[2] );
-		rotation.SetAngle( -steerAngle );
-		animator.SetJointAxis( steeringWheelJoint, JOINTMOD_WORLD, rotation.ToMat3() );
+		animator.GetJointTransform(steeringWheelJoint, gameLocal.time, origin, axis);
+		rotation.SetVec(axis[2]);
+		rotation.SetAngle(-steerAngle);
+		animator.SetJointAxis(steeringWheelJoint, JOINTMOD_WORLD, rotation.ToMat3());
 
 		// run the physics
 		RunPhysics();
 
 		// rotate the wheels visually
-		for ( i = 0; i < 4; i++ ) {
-			if ( force == 0.0f ) {
+		for (i = 0; i < 4; i++) {
+			if (force == 0.0f) {
 				velocity = wheels[i]->GetLinearVelocity() * wheels[i]->GetWorldAxis()[0];
 			}
-			wheelAngles[i] += velocity * MS2SEC( gameLocal.msec ) / wheelRadius;
+			wheelAngles[i] += velocity * MS2SEC(gameLocal.msec) / wheelRadius;
 			// give the wheel joint an additional rotation about the wheel axis
-			rotation.SetAngle( RAD2DEG( wheelAngles[i] ) );
-			axis = af.GetPhysics()->GetAxis( 0 );
-			rotation.SetVec( (wheels[i]->GetWorldAxis() * axis.Transpose())[2] );
-			animator.SetJointAxis( wheelJoints[i], JOINTMOD_WORLD, rotation.ToMat3() );
+			rotation.SetAngle(RAD2DEG(wheelAngles[i]));
+			axis = af.GetPhysics()->GetAxis(0);
+			rotation.SetVec((wheels[i]->GetWorldAxis() * axis.Transpose())[2]);
+			animator.SetJointAxis(wheelJoints[i], JOINTMOD_WORLD, rotation.ToMat3());
 		}
 
 		// spawn dust particle effects
-		if ( force != 0.0f && !( gameLocal.framenum & 7 ) ) {
+		if (force != 0.0f && !(gameLocal.framenum & 7)) {
 			int numContacts;
 			idAFConstraint_Contact *contacts[2];
-			for ( i = 0; i < 4; i++ ) {
-				numContacts = af.GetPhysics()->GetBodyContactConstraints( wheels[i]->GetClipModel()->GetId(), contacts, 2 );
-				for ( int j = 0; j < numContacts; j++ ) {
-					gameLocal.smokeParticles->EmitSmoke( dustSmoke, gameLocal.time, gameLocal.random.RandomFloat(), contacts[j]->GetContact().point, contacts[j]->GetContact().normal.ToMat3() );
+			for (i = 0; i < 4; i++) {
+				numContacts = af.GetPhysics()->GetBodyContactConstraints(wheels[i]->GetClipModel()->GetId(), contacts, 2);
+				for (int j = 0; j < numContacts; j++) {
+					gameLocal.smokeParticles->EmitSmoke(dustSmoke, gameLocal.time, gameLocal.random.RandomFloat(), contacts[j]->GetContact().point, contacts[j]->GetContact().normal.ToMat3());
 				}
 			}
 		}
 	}
 
 	UpdateAnimation();
-	if ( thinkFlags & TH_UPDATEVISUALS ) {
+	if (thinkFlags & TH_UPDATEVISUALS) {
 		Present();
 		LinkCombat();
 	}
@@ -2236,26 +2258,26 @@ void idAFEntity_VehicleFourWheels::Think( void ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idAFEntity_Vehicle, idAFEntity_VehicleSixWheels )
+CLASS_DECLARATION(idAFEntity_Vehicle, idAFEntity_VehicleSixWheels)
 END_CLASS
 
-	/*
+/*
 ================
 idAFEntity_VehicleSixWheels::idAFEntity_VehicleSixWheels
 ================
 */
-idAFEntity_VehicleSixWheels::idAFEntity_VehicleSixWheels( void ) {
+idAFEntity_VehicleSixWheels::idAFEntity_VehicleSixWheels(void) {
 	int i;
 
-	for ( i = 0; i < 6; i++ ) {
-		wheels[i]		= NULL;
-		wheelJoints[i]	= INVALID_JOINT;
-		wheelAngles[i]	= 0.0f;
+	for (i = 0; i < 6; i++) {
+		wheels[i] = NULL;
+		wheelJoints[i] = INVALID_JOINT;
+		wheelAngles[i] = 0.0f;
 	}
-	steering[0]			= NULL;
-	steering[1]			= NULL;
-	steering[2]			= NULL;
-	steering[3]			= NULL;
+	steering[0] = NULL;
+	steering[1] = NULL;
+	steering[2] = NULL;
+	steering[3] = NULL;
 }
 
 /*
@@ -2263,7 +2285,7 @@ idAFEntity_VehicleSixWheels::idAFEntity_VehicleSixWheels( void ) {
 idAFEntity_VehicleSixWheels::Spawn
 ================
 */
-void idAFEntity_VehicleSixWheels::Spawn( void ) {
+void idAFEntity_VehicleSixWheels::Spawn(void) {
 	int i;
 	static const char *wheelBodyKeys[] = {
 		"wheelBodyFrontLeft",
@@ -2290,38 +2312,38 @@ void idAFEntity_VehicleSixWheels::Spawn( void ) {
 
 	const char *wheelBodyName, *wheelJointName, *steeringHingeName;
 
-	for ( i = 0; i < 6; i++ ) {
-		wheelBodyName = spawnArgs.GetString( wheelBodyKeys[i], "" );
-		if ( !wheelBodyName[0] ) {
-			gameLocal.Error( "idAFEntity_VehicleSixWheels '%s' no '%s' specified", name.c_str(), wheelBodyKeys[i] );
+	for (i = 0; i < 6; i++) {
+		wheelBodyName = spawnArgs.GetString(wheelBodyKeys[i], "");
+		if (!wheelBodyName[0]) {
+			gameLocal.Error("idAFEntity_VehicleSixWheels '%s' no '%s' specified", name.c_str(), wheelBodyKeys[i]);
 		}
-		wheels[i] = af.GetPhysics()->GetBody( wheelBodyName );
-		if ( !wheels[i] ) {
-			gameLocal.Error( "idAFEntity_VehicleSixWheels '%s' can't find wheel body '%s'", name.c_str(), wheelBodyName );
+		wheels[i] = af.GetPhysics()->GetBody(wheelBodyName);
+		if (!wheels[i]) {
+			gameLocal.Error("idAFEntity_VehicleSixWheels '%s' can't find wheel body '%s'", name.c_str(), wheelBodyName);
 		}
-		wheelJointName = spawnArgs.GetString( wheelJointKeys[i], "" );
-		if ( !wheelJointName[0] ) {
-			gameLocal.Error( "idAFEntity_VehicleSixWheels '%s' no '%s' specified", name.c_str(), wheelJointKeys[i] );
+		wheelJointName = spawnArgs.GetString(wheelJointKeys[i], "");
+		if (!wheelJointName[0]) {
+			gameLocal.Error("idAFEntity_VehicleSixWheels '%s' no '%s' specified", name.c_str(), wheelJointKeys[i]);
 		}
-		wheelJoints[i] = animator.GetJointHandle( wheelJointName );
-		if ( wheelJoints[i] == INVALID_JOINT ) {
-			gameLocal.Error( "idAFEntity_VehicleSixWheels '%s' can't find wheel joint '%s'", name.c_str(), wheelJointName );
-		}
-	}
-
-	for ( i = 0; i < 4; i++ ) {
-		steeringHingeName = spawnArgs.GetString( steeringHingeKeys[i], "" );
-		if ( !steeringHingeName[0] ) {
-			gameLocal.Error( "idAFEntity_VehicleSixWheels '%s' no '%s' specified", name.c_str(), steeringHingeKeys[i] );
-		}
-		steering[i] = static_cast<idAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint( steeringHingeName ));
-		if ( !steering[i] ) {
-			gameLocal.Error( "idAFEntity_VehicleSixWheels '%s': can't find steering hinge '%s'", name.c_str(), steeringHingeName );
+		wheelJoints[i] = animator.GetJointHandle(wheelJointName);
+		if (wheelJoints[i] == INVALID_JOINT) {
+			gameLocal.Error("idAFEntity_VehicleSixWheels '%s' can't find wheel joint '%s'", name.c_str(), wheelJointName);
 		}
 	}
 
-	memset( wheelAngles, 0, sizeof( wheelAngles ) );
-	BecomeActive( TH_THINK );
+	for (i = 0; i < 4; i++) {
+		steeringHingeName = spawnArgs.GetString(steeringHingeKeys[i], "");
+		if (!steeringHingeName[0]) {
+			gameLocal.Error("idAFEntity_VehicleSixWheels '%s' no '%s' specified", name.c_str(), steeringHingeKeys[i]);
+		}
+		steering[i] = static_cast<idAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint(steeringHingeName));
+		if (!steering[i]) {
+			gameLocal.Error("idAFEntity_VehicleSixWheels '%s': can't find steering hinge '%s'", name.c_str(), steeringHingeName);
+		}
+	}
+
+	memset(wheelAngles, 0, sizeof(wheelAngles));
+	BecomeActive(TH_THINK);
 }
 
 /*
@@ -2329,89 +2351,89 @@ void idAFEntity_VehicleSixWheels::Spawn( void ) {
 idAFEntity_VehicleSixWheels::Think
 ================
 */
-void idAFEntity_VehicleSixWheels::Think( void ) {
+void idAFEntity_VehicleSixWheels::Think(void) {
 	int i;
 	float force = 0.0f, velocity = 0.0f, steerAngle = 0.0f;
 	idVec3 origin;
 	idMat3 axis;
 	idRotation rotation;
 
-	if ( thinkFlags & TH_THINK ) {
+	if (thinkFlags & TH_THINK) {
 
-		if ( player ) {
+		if (player) {
 			// capture the input from a player
 			velocity = g_vehicleVelocity.GetFloat();
-			if ( player->usercmd.forwardmove < 0 ) {
+			if (player->usercmd.forwardmove < 0) {
 				velocity = -velocity;
 			}
-			force = idMath::Fabs( player->usercmd.forwardmove * g_vehicleForce.GetFloat() ) * (1.0f / 128.0f);
+			force = idMath::Fabs(player->usercmd.forwardmove * g_vehicleForce.GetFloat()) * (1.0f / 128.0f);
 			steerAngle = GetSteerAngle();
 		}
 
 		// update the wheel motor force
-		for ( i = 0; i < 6; i++ ) {
-			wheels[i]->SetContactMotorVelocity( velocity );
-			wheels[i]->SetContactMotorForce( force );
+		for (i = 0; i < 6; i++) {
+			wheels[i]->SetContactMotorVelocity(velocity);
+			wheels[i]->SetContactMotorForce(force);
 		}
 
 		// adjust wheel velocity for better steering because there are no differentials between the wheels
-		if ( steerAngle < 0.0f ) {
-			for ( i = 0; i < 3; i++ ) {
-				wheels[(i<<1)]->SetContactMotorVelocity( velocity * 0.5f );
+		if (steerAngle < 0.0f) {
+			for (i = 0; i < 3; i++) {
+				wheels[(i << 1)]->SetContactMotorVelocity(velocity * 0.5f);
 			}
 		}
-		else if ( steerAngle > 0.0f ) {
-			for ( i = 0; i < 3; i++ ) {
-				wheels[1+(i<<1)]->SetContactMotorVelocity( velocity * 0.5f );
+		else if (steerAngle > 0.0f) {
+			for (i = 0; i < 3; i++) {
+				wheels[1 + (i << 1)]->SetContactMotorVelocity(velocity * 0.5f);
 			}
 		}
 
 		// update the wheel steering
-		steering[0]->SetSteerAngle( steerAngle );
-		steering[1]->SetSteerAngle( steerAngle );
-		steering[2]->SetSteerAngle( -steerAngle );
-		steering[3]->SetSteerAngle( -steerAngle );
-		for ( i = 0; i < 4; i++ ) {
-			steering[i]->SetSteerSpeed( 3.0f );
+		steering[0]->SetSteerAngle(steerAngle);
+		steering[1]->SetSteerAngle(steerAngle);
+		steering[2]->SetSteerAngle(-steerAngle);
+		steering[3]->SetSteerAngle(-steerAngle);
+		for (i = 0; i < 4; i++) {
+			steering[i]->SetSteerSpeed(3.0f);
 		}
 
 		// update the steering wheel
-		animator.GetJointTransform( steeringWheelJoint, gameLocal.time, origin, axis );
-		rotation.SetVec( axis[2] );
-		rotation.SetAngle( -steerAngle );
-		animator.SetJointAxis( steeringWheelJoint, JOINTMOD_WORLD, rotation.ToMat3() );
+		animator.GetJointTransform(steeringWheelJoint, gameLocal.time, origin, axis);
+		rotation.SetVec(axis[2]);
+		rotation.SetAngle(-steerAngle);
+		animator.SetJointAxis(steeringWheelJoint, JOINTMOD_WORLD, rotation.ToMat3());
 
 		// run the physics
 		RunPhysics();
 
 		// rotate the wheels visually
-		for ( i = 0; i < 6; i++ ) {
-			if ( force == 0.0f ) {
+		for (i = 0; i < 6; i++) {
+			if (force == 0.0f) {
 				velocity = wheels[i]->GetLinearVelocity() * wheels[i]->GetWorldAxis()[0];
 			}
-			wheelAngles[i] += velocity * MS2SEC( gameLocal.msec ) / wheelRadius;
+			wheelAngles[i] += velocity * MS2SEC(gameLocal.msec) / wheelRadius;
 			// give the wheel joint an additional rotation about the wheel axis
-			rotation.SetAngle( RAD2DEG( wheelAngles[i] ) );
-			axis = af.GetPhysics()->GetAxis( 0 );
-			rotation.SetVec( (wheels[i]->GetWorldAxis() * axis.Transpose())[2] );
-			animator.SetJointAxis( wheelJoints[i], JOINTMOD_WORLD, rotation.ToMat3() );
+			rotation.SetAngle(RAD2DEG(wheelAngles[i]));
+			axis = af.GetPhysics()->GetAxis(0);
+			rotation.SetVec((wheels[i]->GetWorldAxis() * axis.Transpose())[2]);
+			animator.SetJointAxis(wheelJoints[i], JOINTMOD_WORLD, rotation.ToMat3());
 		}
 
 		// spawn dust particle effects
-		if ( force != 0.0f && !( gameLocal.framenum & 7 ) ) {
+		if (force != 0.0f && !(gameLocal.framenum & 7)) {
 			int numContacts;
 			idAFConstraint_Contact *contacts[2];
-			for ( i = 0; i < 6; i++ ) {
-				numContacts = af.GetPhysics()->GetBodyContactConstraints( wheels[i]->GetClipModel()->GetId(), contacts, 2 );
-				for ( int j = 0; j < numContacts; j++ ) {
-					gameLocal.smokeParticles->EmitSmoke( dustSmoke, gameLocal.time, gameLocal.random.RandomFloat(), contacts[j]->GetContact().point, contacts[j]->GetContact().normal.ToMat3() );
+			for (i = 0; i < 6; i++) {
+				numContacts = af.GetPhysics()->GetBodyContactConstraints(wheels[i]->GetClipModel()->GetId(), contacts, 2);
+				for (int j = 0; j < numContacts; j++) {
+					gameLocal.smokeParticles->EmitSmoke(dustSmoke, gameLocal.time, gameLocal.random.RandomFloat(), contacts[j]->GetContact().point, contacts[j]->GetContact().normal.ToMat3());
 				}
 			}
 		}
 	}
 
 	UpdateAnimation();
-	if ( thinkFlags & TH_UPDATEVISUALS ) {
+	if (thinkFlags & TH_UPDATEVISUALS) {
 		Present();
 		LinkCombat();
 	}
@@ -2426,7 +2448,7 @@ void idAFEntity_VehicleSixWheels::Think( void ) {
 ===============================================================================
 */
 
-CLASS_DECLARATION( idAFEntity_Base, idAFEntity_SteamPipe )
+CLASS_DECLARATION(idAFEntity_Base, idAFEntity_SteamPipe)
 END_CLASS
 
 
@@ -2435,12 +2457,12 @@ END_CLASS
 idAFEntity_SteamPipe::idAFEntity_SteamPipe
 ================
 */
-idAFEntity_SteamPipe::idAFEntity_SteamPipe( void ) {
-	steamBody			= 0;
-	steamForce			= 0.0f;
-	steamUpForce		= 0.0f;
-	steamModelDefHandle	= -1;
-	memset( &steamRenderEntity, 0, sizeof( steamRenderEntity ) );
+idAFEntity_SteamPipe::idAFEntity_SteamPipe(void) {
+	steamBody = 0;
+	steamForce = 0.0f;
+	steamUpForce = 0.0f;
+	steamModelDefHandle = -1;
+	memset(&steamRenderEntity, 0, sizeof(steamRenderEntity));
 }
 
 /*
@@ -2448,9 +2470,9 @@ idAFEntity_SteamPipe::idAFEntity_SteamPipe( void ) {
 idAFEntity_SteamPipe::~idAFEntity_SteamPipe
 ================
 */
-idAFEntity_SteamPipe::~idAFEntity_SteamPipe( void ) {
-	if ( steamModelDefHandle >= 0 ){
-		gameRenderWorld->FreeEntityDef( steamModelDefHandle );
+idAFEntity_SteamPipe::~idAFEntity_SteamPipe(void) {
+	if (steamModelDefHandle >= 0) {
+		gameRenderWorld->FreeEntityDef(steamModelDefHandle);
 	}
 }
 
@@ -2459,7 +2481,7 @@ idAFEntity_SteamPipe::~idAFEntity_SteamPipe( void ) {
 idAFEntity_SteamPipe::Save
 ================
 */
-void idAFEntity_SteamPipe::Save( idSaveGame *savefile ) const {
+void idAFEntity_SteamPipe::Save(idSaveGame *savefile) const {
 }
 
 /*
@@ -2467,7 +2489,7 @@ void idAFEntity_SteamPipe::Save( idSaveGame *savefile ) const {
 idAFEntity_SteamPipe::Restore
 ================
 */
-void idAFEntity_SteamPipe::Restore( idRestoreGame *savefile ) {
+void idAFEntity_SteamPipe::Restore(idRestoreGame *savefile) {
 	Spawn();
 }
 
@@ -2476,7 +2498,7 @@ void idAFEntity_SteamPipe::Restore( idRestoreGame *savefile ) {
 idAFEntity_SteamPipe::Spawn
 ================
 */
-void idAFEntity_SteamPipe::Spawn( void ) {
+void idAFEntity_SteamPipe::Spawn(void) {
 	idVec3 steamDir;
 	const char *steamBodyName;
 
@@ -2484,21 +2506,21 @@ void idAFEntity_SteamPipe::Spawn( void ) {
 
 	SetCombatModel();
 
-	SetPhysics( af.GetPhysics() );
+	SetPhysics(af.GetPhysics());
 
 	fl.takedamage = true;
 
-	steamBodyName = spawnArgs.GetString( "steamBody", "" );
-	steamForce = spawnArgs.GetFloat( "steamForce", "2000" );
-	steamUpForce = spawnArgs.GetFloat( "steamUpForce", "10" );
-	steamDir = af.GetPhysics()->GetAxis( steamBody )[2];
-	steamBody = af.GetPhysics()->GetBodyId( steamBodyName );
-	force.SetPosition( af.GetPhysics(), steamBody, af.GetPhysics()->GetOrigin( steamBody ) );
-	force.SetForce( steamDir * -steamForce );
+	steamBodyName = spawnArgs.GetString("steamBody", "");
+	steamForce = spawnArgs.GetFloat("steamForce", "2000");
+	steamUpForce = spawnArgs.GetFloat("steamUpForce", "10");
+	steamDir = af.GetPhysics()->GetAxis(steamBody)[2];
+	steamBody = af.GetPhysics()->GetBodyId(steamBodyName);
+	force.SetPosition(af.GetPhysics(), steamBody, af.GetPhysics()->GetOrigin(steamBody));
+	force.SetForce(steamDir * -steamForce);
 
 	InitSteamRenderEntity();
 
-	BecomeActive( TH_THINK );
+	BecomeActive(TH_THINK);
 }
 
 /*
@@ -2506,36 +2528,37 @@ void idAFEntity_SteamPipe::Spawn( void ) {
 idAFEntity_SteamPipe::InitSteamRenderEntity
 ================
 */
-void idAFEntity_SteamPipe::InitSteamRenderEntity( void ) {
+void idAFEntity_SteamPipe::InitSteamRenderEntity(void) {
 	const char	*temp;
 	const idDeclModelDef *modelDef;
 
-	memset( &steamRenderEntity, 0, sizeof( steamRenderEntity ) );
-	steamRenderEntity.shaderParms[ SHADERPARM_RED ]		= 1.0f;
-	steamRenderEntity.shaderParms[ SHADERPARM_GREEN ]	= 1.0f;
-	steamRenderEntity.shaderParms[ SHADERPARM_BLUE ]	= 1.0f;
+	memset(&steamRenderEntity, 0, sizeof(steamRenderEntity));
+	steamRenderEntity.shaderParms[SHADERPARM_RED] = 1.0f;
+	steamRenderEntity.shaderParms[SHADERPARM_GREEN] = 1.0f;
+	steamRenderEntity.shaderParms[SHADERPARM_BLUE] = 1.0f;
 	modelDef = NULL;
-	temp = spawnArgs.GetString ( "model_steam" );
-	if ( *temp != '\0' ) {
-		if ( !strstr( temp, "." ) ) {
-			modelDef = static_cast<const idDeclModelDef *>( declManager->FindType( DECL_MODELDEF, temp, false ) );
-			if ( modelDef ) {
+	temp = spawnArgs.GetString("model_steam");
+	if (*temp != '\0') {
+		if (!strstr(temp, ".")) {
+			modelDef = static_cast<const idDeclModelDef *>(declManager->FindType(DECL_MODELDEF, temp, false));
+			if (modelDef) {
 				steamRenderEntity.hModel = modelDef->ModelHandle();
 			}
 		}
 
-		if ( !steamRenderEntity.hModel ) {
-			steamRenderEntity.hModel = renderModelManager->FindModel( temp );
+		if (!steamRenderEntity.hModel) {
+			steamRenderEntity.hModel = renderModelManager->FindModel(temp);
 		}
 
-		if ( steamRenderEntity.hModel ) {
-			steamRenderEntity.bounds = steamRenderEntity.hModel->Bounds( &steamRenderEntity );
-		} else {
+		if (steamRenderEntity.hModel) {
+			steamRenderEntity.bounds = steamRenderEntity.hModel->Bounds(&steamRenderEntity);
+		}
+		else {
 			steamRenderEntity.bounds.Zero();
 		}
-		steamRenderEntity.origin = af.GetPhysics()->GetOrigin( steamBody );
-		steamRenderEntity.axis = af.GetPhysics()->GetAxis( steamBody );
-		steamModelDefHandle = gameRenderWorld->AddEntityDef( &steamRenderEntity );
+		steamRenderEntity.origin = af.GetPhysics()->GetOrigin(steamBody);
+		steamRenderEntity.axis = af.GetPhysics()->GetAxis(steamBody);
+		steamModelDefHandle = gameRenderWorld->AddEntityDef(&steamRenderEntity);
 	}
 }
 
@@ -2544,22 +2567,22 @@ void idAFEntity_SteamPipe::InitSteamRenderEntity( void ) {
 idAFEntity_SteamPipe::Think
 ================
 */
-void idAFEntity_SteamPipe::Think( void ) {
+void idAFEntity_SteamPipe::Think(void) {
 	idVec3 steamDir;
 
-	if ( thinkFlags & TH_THINK ) {
+	if (thinkFlags & TH_THINK) {
 		steamDir.x = gameLocal.random.CRandomFloat() * steamForce;
 		steamDir.y = gameLocal.random.CRandomFloat() * steamForce;
 		steamDir.z = steamUpForce;
-		force.SetForce( steamDir );
-		force.Evaluate( gameLocal.time );
+		force.SetForce(steamDir);
+		force.Evaluate(gameLocal.time);
 		//gameRenderWorld->DebugArrow( colorWhite, af.GetPhysics()->GetOrigin( steamBody ), af.GetPhysics()->GetOrigin( steamBody ) - 10.0f * steamDir, 4 );
 	}
 
-	if ( steamModelDefHandle >= 0 ){
-		steamRenderEntity.origin = af.GetPhysics()->GetOrigin( steamBody );
-		steamRenderEntity.axis = af.GetPhysics()->GetAxis( steamBody );
-		gameRenderWorld->UpdateEntityDef( steamModelDefHandle, &steamRenderEntity );
+	if (steamModelDefHandle >= 0) {
+		steamRenderEntity.origin = af.GetPhysics()->GetOrigin(steamBody);
+		steamRenderEntity.axis = af.GetPhysics()->GetAxis(steamBody);
+		gameRenderWorld->UpdateEntityDef(steamModelDefHandle, &steamRenderEntity);
 	}
 
 	idAFEntity_Base::Think();
@@ -2574,12 +2597,12 @@ void idAFEntity_SteamPipe::Think( void ) {
 ===============================================================================
 */
 
-const idEventDef EV_SetFingerAngle( "setFingerAngle", "f" );
-const idEventDef EV_StopFingers( "stopFingers" );
+const idEventDef EV_SetFingerAngle("setFingerAngle", "f");
+const idEventDef EV_StopFingers("stopFingers");
 
-CLASS_DECLARATION( idAFEntity_Base, idAFEntity_ClawFourFingers )
-	EVENT( EV_SetFingerAngle,		idAFEntity_ClawFourFingers::Event_SetFingerAngle )
-	EVENT( EV_StopFingers,			idAFEntity_ClawFourFingers::Event_StopFingers )
+CLASS_DECLARATION(idAFEntity_Base, idAFEntity_ClawFourFingers)
+EVENT(EV_SetFingerAngle, idAFEntity_ClawFourFingers::Event_SetFingerAngle)
+EVENT(EV_StopFingers, idAFEntity_ClawFourFingers::Event_StopFingers)
 END_CLASS
 
 static const char *clawConstraintNames[] = {
@@ -2591,11 +2614,11 @@ static const char *clawConstraintNames[] = {
 idAFEntity_ClawFourFingers::idAFEntity_ClawFourFingers
 ================
 */
-idAFEntity_ClawFourFingers::idAFEntity_ClawFourFingers( void ) {
-	fingers[0]	= NULL;
-	fingers[1]	= NULL;
-	fingers[2]	= NULL;
-	fingers[3]	= NULL;
+idAFEntity_ClawFourFingers::idAFEntity_ClawFourFingers(void) {
+	fingers[0] = NULL;
+	fingers[1] = NULL;
+	fingers[2] = NULL;
+	fingers[3] = NULL;
 }
 
 /*
@@ -2603,11 +2626,11 @@ idAFEntity_ClawFourFingers::idAFEntity_ClawFourFingers( void ) {
 idAFEntity_ClawFourFingers::Save
 ================
 */
-void idAFEntity_ClawFourFingers::Save( idSaveGame *savefile ) const {
+void idAFEntity_ClawFourFingers::Save(idSaveGame *savefile) const {
 	int i;
 
-	for ( i = 0; i < 4; i++ ) {
-		fingers[i]->Save( savefile );
+	for (i = 0; i < 4; i++) {
+		fingers[i]->Save(savefile);
 	}
 }
 
@@ -2616,12 +2639,12 @@ void idAFEntity_ClawFourFingers::Save( idSaveGame *savefile ) const {
 idAFEntity_ClawFourFingers::Restore
 ================
 */
-void idAFEntity_ClawFourFingers::Restore( idRestoreGame *savefile ) {
+void idAFEntity_ClawFourFingers::Restore(idRestoreGame *savefile) {
 	int i;
 
-	for ( i = 0; i < 4; i++ ) {
-		fingers[i] = static_cast<idAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint( clawConstraintNames[i] ));
-		fingers[i]->Restore( savefile );
+	for (i = 0; i < 4; i++) {
+		fingers[i] = static_cast<idAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint(clawConstraintNames[i]));
+		fingers[i]->Restore(savefile);
 	}
 
 	SetCombatModel();
@@ -2633,23 +2656,23 @@ void idAFEntity_ClawFourFingers::Restore( idRestoreGame *savefile ) {
 idAFEntity_ClawFourFingers::Spawn
 ================
 */
-void idAFEntity_ClawFourFingers::Spawn( void ) {
+void idAFEntity_ClawFourFingers::Spawn(void) {
 	int i;
 
 	LoadAF();
 
 	SetCombatModel();
 
-	af.GetPhysics()->LockWorldConstraints( true );
-	af.GetPhysics()->SetForcePushable( true );
-	SetPhysics( af.GetPhysics() );
+	af.GetPhysics()->LockWorldConstraints(true);
+	af.GetPhysics()->SetForcePushable(true);
+	SetPhysics(af.GetPhysics());
 
 	fl.takedamage = true;
 
-	for ( i = 0; i < 4; i++ ) {
-		fingers[i] = static_cast<idAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint( clawConstraintNames[i] ));
-		if ( !fingers[i] ) {
-			gameLocal.Error( "idClaw_FourFingers '%s': can't find claw constraint '%s'", name.c_str(), clawConstraintNames[i] );
+	for (i = 0; i < 4; i++) {
+		fingers[i] = static_cast<idAFConstraint_Hinge *>(af.GetPhysics()->GetConstraint(clawConstraintNames[i]));
+		if (!fingers[i]) {
+			gameLocal.Error("idClaw_FourFingers '%s': can't find claw constraint '%s'", name.c_str(), clawConstraintNames[i]);
 		}
 	}
 }
@@ -2659,12 +2682,12 @@ void idAFEntity_ClawFourFingers::Spawn( void ) {
 idAFEntity_ClawFourFingers::Event_SetFingerAngle
 ================
 */
-void idAFEntity_ClawFourFingers::Event_SetFingerAngle( float angle ) {
+void idAFEntity_ClawFourFingers::Event_SetFingerAngle(float angle) {
 	int i;
 
-	for ( i = 0; i < 4; i++ ) {
-		fingers[i]->SetSteerAngle( angle );
-		fingers[i]->SetSteerSpeed( 0.5f );
+	for (i = 0; i < 4; i++) {
+		fingers[i]->SetSteerAngle(angle);
+		fingers[i]->SetSteerSpeed(0.5f);
 	}
 	af.GetPhysics()->Activate();
 }
@@ -2674,11 +2697,11 @@ void idAFEntity_ClawFourFingers::Event_SetFingerAngle( float angle ) {
 idAFEntity_ClawFourFingers::Event_StopFingers
 ================
 */
-void idAFEntity_ClawFourFingers::Event_StopFingers( void ) {
+void idAFEntity_ClawFourFingers::Event_StopFingers(void) {
 	int i;
 
-	for ( i = 0; i < 4; i++ ) {
-		fingers[i]->SetSteerAngle( fingers[i]->GetAngle() );
+	for (i = 0; i < 4; i++) {
+		fingers[i]->SetSteerAngle(fingers[i]->GetAngle());
 	}
 }
 
@@ -2697,7 +2720,7 @@ void idAFEntity_ClawFourFingers::Event_StopFingers( void ) {
 idGameEdit::AF_SpawnEntity
 ================
 */
-bool idGameEdit::AF_SpawnEntity( const char *fileName ) {
+bool idGameEdit::AF_SpawnEntity(const char *fileName) {
 	idDict args;
 	idPlayer *player;
 	idAFEntity_Generic *ent;
@@ -2706,48 +2729,49 @@ bool idGameEdit::AF_SpawnEntity( const char *fileName ) {
 	float yaw;
 
 	player = gameLocal.GetLocalPlayer();
-	if ( !player || !gameLocal.CheatsOk( false ) ) {
+	if (!player || !gameLocal.CheatsOk(false)) {
 		return false;
 	}
 
-	af = static_cast<const idDeclAF *>( declManager->FindType( DECL_AF, fileName ) );
-	if ( !af ) {
+	af = static_cast<const idDeclAF *>(declManager->FindType(DECL_AF, fileName));
+	if (!af) {
 		return false;
 	}
 
 	yaw = player->viewAngles.yaw;
-	args.Set( "angle", va( "%f", yaw + 180 ) );
-	org = player->GetPhysics()->GetOrigin() + idAngles( 0, yaw, 0 ).ToForward() * 80 + idVec3( 0, 0, 1 );
-	args.Set( "origin", org.ToString() );
+	args.Set("angle", va("%f", yaw + 180));
+	org = player->GetPhysics()->GetOrigin() + idAngles(0, yaw, 0).ToForward() * 80 + idVec3(0, 0, 1);
+	args.Set("origin", org.ToString());
 	// HUMANHEAD nla - Need them to spawn a hhAFEntity
 #ifdef HUMANHEAD
-	args.Set( "spawnclass", "hhAFEntity" );
+	args.Set("spawnclass", "hhAFEntity");
 #else
-	args.Set( "spawnclass", "idAFEntity_Generic" );
+	args.Set("spawnclass", "idAFEntity_Generic");
 #endif	// HUMANHEAD END
-	if ( af->model[0] ) {
-		args.Set( "model", af->model.c_str() );
-	} else {
-		args.Set( "model", fileName );
+	if (af->model[0]) {
+		args.Set("model", af->model.c_str());
 	}
-	if ( af->skin[0] ) {
-		args.Set( "skin", af->skin.c_str() );
+	else {
+		args.Set("model", fileName);
 	}
-	args.Set( "articulatedFigure", fileName );
-	args.Set( "nodrop", "1" );
+	if (af->skin[0]) {
+		args.Set("skin", af->skin.c_str());
+	}
+	args.Set("articulatedFigure", fileName);
+	args.Set("nodrop", "1");
 	// HUMANHEAD nla - Need them to spawn a hhAFEntity
 #ifdef HUMANHEAD
-	ent = static_cast<idAFEntity_Generic *>( gameLocal.SpawnObject( "ragdoll_base", &args ) );
+	ent = static_cast<idAFEntity_Generic *>(gameLocal.SpawnObject("ragdoll_base", &args));
 #else
-	ent = static_cast<idAFEntity_Generic *>(gameLocal.SpawnEntityType( idAFEntity_Generic::Type, &args));
+	ent = static_cast<idAFEntity_Generic *>(gameLocal.SpawnEntityType(idAFEntity_Generic::Type, &args));
 #endif	// HUMANHEAD END
 
 	// always update this entity
-	ent->BecomeActive( TH_THINK );
+	ent->BecomeActive(TH_THINK);
 	ent->KeepRunningPhysics();
 	ent->fl.forcePhysicsUpdate = true;
 
-	player->dragEntity.SetSelected( ent );
+	player->dragEntity.SetSelected(ent);
 
 	return true;
 }
@@ -2757,7 +2781,7 @@ bool idGameEdit::AF_SpawnEntity( const char *fileName ) {
 idGameEdit::AF_UpdateEntities
 ================
 */
-void idGameEdit::AF_UpdateEntities( const char *fileName ) {
+void idGameEdit::AF_UpdateEntities(const char *fileName) {
 	idEntity *ent;
 	idAFEntity_Base *af;
 	idStr name;
@@ -2766,10 +2790,10 @@ void idGameEdit::AF_UpdateEntities( const char *fileName ) {
 	name.StripFileExtension();
 
 	// reload any idAFEntity_Generic which uses the given articulated figure file
-	for( ent = gameLocal.spawnedEntities.Next(); ent != NULL; ent = ent->spawnNode.Next() ) {
-		if ( ent->IsType( idAFEntity_Base::Type ) ) {
+	for (ent = gameLocal.spawnedEntities.Next(); ent != NULL; ent = ent->spawnNode.Next()) {
+		if (ent->IsType(idAFEntity_Base::Type)) {
 			af = static_cast<idAFEntity_Base *>(ent);
-			if ( name.Icmp( af->GetAFName() ) == 0 ) {
+			if (name.Icmp(af->GetAFName()) == 0) {
 				af->LoadAF();
 				af->GetAFPhysics()->PutToRest();
 			}
@@ -2782,27 +2806,27 @@ void idGameEdit::AF_UpdateEntities( const char *fileName ) {
 idGameEdit::AF_UndoChanges
 ================
 */
-void idGameEdit::AF_UndoChanges( void ) {
+void idGameEdit::AF_UndoChanges(void) {
 	int i, c;
 	idEntity *ent;
 	idAFEntity_Base *af;
 	idDeclAF *decl;
 
-	c = declManager->GetNumDecls( DECL_AF );
-	for ( i = 0; i < c; i++ ) {
-		decl = static_cast<idDeclAF *>( const_cast<idDecl *>( declManager->DeclByIndex( DECL_AF, i, false ) ) );
-		if ( !decl->modified ) {
+	c = declManager->GetNumDecls(DECL_AF);
+	for (i = 0; i < c; i++) {
+		decl = static_cast<idDeclAF *>(const_cast<idDecl *>(declManager->DeclByIndex(DECL_AF, i, false)));
+		if (!decl->modified) {
 			continue;
 		}
 
 		decl->Invalidate();
-		declManager->FindType( DECL_AF, decl->GetName() );
+		declManager->FindType(DECL_AF, decl->GetName());
 
 		// reload all AF entities using the file
-		for( ent = gameLocal.spawnedEntities.Next(); ent != NULL; ent = ent->spawnNode.Next() ) {
-			if ( ent->IsType( idAFEntity_Base::Type ) ) {
+		for (ent = gameLocal.spawnedEntities.Next(); ent != NULL; ent = ent->spawnNode.Next()) {
+			if (ent->IsType(idAFEntity_Base::Type)) {
 				af = static_cast<idAFEntity_Base *>(ent);
-				if ( idStr::Icmp( decl->GetName(), af->GetAFName() ) == 0 ) {
+				if (idStr::Icmp(decl->GetName(), af->GetAFName()) == 0) {
 					af->LoadAF();
 				}
 			}
@@ -2820,16 +2844,16 @@ typedef struct {
 	const idMD5Joint *joints;
 } jointTransformData_t;
 
-static bool GetJointTransform( void *model, const idJointMat *frame, const char *jointName, idVec3 &origin, idMat3 &axis ) {
+static bool GetJointTransform(void *model, const idJointMat *frame, const char *jointName, idVec3 &origin, idMat3 &axis) {
 	int i;
 	jointTransformData_t *data = reinterpret_cast<jointTransformData_t *>(model);
 
-	for ( i = 0; i < data->ent->numJoints; i++ ) {
-		if ( data->joints[i].name.Icmp( jointName ) == 0 ) {
+	for (i = 0; i < data->ent->numJoints; i++) {
+		if (data->joints[i].name.Icmp(jointName) == 0) {
 			break;
 		}
 	}
-	if ( i >= data->ent->numJoints ) {
+	if (i >= data->ent->numJoints) {
 		return false;
 	}
 	origin = frame[i].ToVec3();
@@ -2842,12 +2866,12 @@ static bool GetJointTransform( void *model, const idJointMat *frame, const char 
 GetArgString
 ================
 */
-static const char *GetArgString( const idDict &args, const idDict *defArgs, const char *key ) {
+static const char *GetArgString(const idDict &args, const idDict *defArgs, const char *key) {
 	const char *s;
 
-	s = args.GetString( key );
-	if ( !s[0] && defArgs ) {
-		s = defArgs->GetString( key );
+	s = args.GetString(key);
+	if (!s[0] && defArgs) {
+		s = defArgs->GetString(key);
 	}
 	return s;
 }
@@ -2857,7 +2881,7 @@ static const char *GetArgString( const idDict &args, const idDict *defArgs, cons
 idGameEdit::AF_CreateMesh
 ================
 */
-idRenderModel *idGameEdit::AF_CreateMesh( const idDict &args, idVec3 &meshOrigin, idMat3 &meshAxis, bool &poseIsSet ) {
+idRenderModel *idGameEdit::AF_CreateMesh(const idDict &args, idVec3 &meshOrigin, idMat3 &meshAxis, bool &poseIsSet) {
 	int i, jointNum;
 	const idDeclAF *af;
 	const idDeclAF_Body *fb;
@@ -2884,82 +2908,83 @@ idRenderModel *idGameEdit::AF_CreateMesh( const idDict &args, idVec3 &meshOrigin
 	meshOrigin.Zero();
 	meshAxis.Identity();
 
-	classname = args.GetString( "classname" );
-	defArgs = gameLocal.FindEntityDefDict( classname );
-	if ( !defArgs ) {
-		gameLocal.Error( "Unknown classname '%s'", classname );
+	classname = args.GetString("classname");
+	defArgs = gameLocal.FindEntityDefDict(classname);
+	if (!defArgs) {
+		gameLocal.Error("Unknown classname '%s'", classname);
 	}
 
 	// get the articulated figure
-	afName = GetArgString( args, defArgs, "articulatedFigure" );
-	af = static_cast<const idDeclAF *>( declManager->FindType( DECL_AF, afName ) );
-	if ( !af ) {
+	afName = GetArgString(args, defArgs, "articulatedFigure");
+	af = static_cast<const idDeclAF *>(declManager->FindType(DECL_AF, afName));
+	if (!af) {
 		return NULL;
 	}
 
 	// get the md5 model
-	modelName = GetArgString( args, defArgs, "model" );
-	modelDef = static_cast< const idDeclModelDef *>( declManager->FindType( DECL_MODELDEF, modelName, false ) );
-	if ( !modelDef ) {
+	modelName = GetArgString(args, defArgs, "model");
+	modelDef = static_cast<const idDeclModelDef *>(declManager->FindType(DECL_MODELDEF, modelName, false));
+	if (!modelDef) {
 		return NULL;
 	}
 
 	// make sure model hasn't been purged
-	if ( modelDef->ModelHandle() && !modelDef->ModelHandle()->IsLoaded() ) {
+	if (modelDef->ModelHandle() && !modelDef->ModelHandle()->IsLoaded()) {
 		modelDef->ModelHandle()->LoadModel();
 	}
 
 	// get the md5
 	md5 = modelDef->ModelHandle();
-	if ( !md5 || md5->IsDefaultModel() ) {
+	if (!md5 || md5->IsDefaultModel()) {
 		return NULL;
 	}
 
 	// get the articulated figure pose anim
-	int animNum = modelDef->GetAnim( "af_pose" );
-	if ( !animNum ) {
+	int animNum = modelDef->GetAnim("af_pose");
+	if (!animNum) {
 		return NULL;
 	}
-	const idAnim *anim = modelDef->GetAnim( animNum );
-	if ( !anim ) {
+	const idAnim *anim = modelDef->GetAnim(animNum);
+	if (!anim) {
 		return NULL;
 	}
-	MD5anim = anim->MD5Anim( 0 );
+	MD5anim = anim->MD5Anim(0);
 	MD5joints = md5->GetJoints();
 	numMD5joints = md5->NumJoints();
 
 	// setup a render entity
-	memset( &ent, 0, sizeof( ent ) );
+	memset(&ent, 0, sizeof(ent));
 	ent.customSkin = modelDef->GetSkin();
 	ent.bounds.Clear();
 	ent.numJoints = numMD5joints;
-	ent.joints = ( idJointMat * )_alloca16( ent.numJoints * sizeof( *ent.joints ) );
+	ent.joints = (idJointMat *)_alloca16(ent.numJoints * sizeof(*ent.joints));
 
 	// create animation from of the af_pose
-	ANIM_CreateAnimFrame( md5, MD5anim, ent.numJoints, ent.joints, 1, modelDef->GetVisualOffset(), false );
+	ANIM_CreateAnimFrame(md5, MD5anim, ent.numJoints, ent.joints, 1, modelDef->GetVisualOffset(), false);
 
 	// buffers to store the initial origin and axis for each body
-	bodyOrigin = (idVec3 *) _alloca16( af->bodies.Num() * sizeof( idVec3 ) );
-	bodyAxis = (idMat3 *) _alloca16( af->bodies.Num() * sizeof( idMat3 ) );
-	newBodyOrigin = (idVec3 *) _alloca16( af->bodies.Num() * sizeof( idVec3 ) );
-	newBodyAxis = (idMat3 *) _alloca16( af->bodies.Num() * sizeof( idMat3 ) );
+	bodyOrigin = (idVec3 *)_alloca16(af->bodies.Num() * sizeof(idVec3));
+	bodyAxis = (idMat3 *)_alloca16(af->bodies.Num() * sizeof(idMat3));
+	newBodyOrigin = (idVec3 *)_alloca16(af->bodies.Num() * sizeof(idVec3));
+	newBodyAxis = (idMat3 *)_alloca16(af->bodies.Num() * sizeof(idMat3));
 
 	// finish the AF positions
 	data.ent = &ent;
 	data.joints = MD5joints;
-	af->Finish( GetJointTransform, ent.joints, &data );
+	af->Finish(GetJointTransform, ent.joints, &data);
 
 	// get the initial origin and axis for each AF body
-	for ( i = 0; i < af->bodies.Num(); i++ ) {
+	for (i = 0; i < af->bodies.Num(); i++) {
 		fb = af->bodies[i];
 
-		if ( fb->modelType == TRM_BONE ) {
+		if (fb->modelType == TRM_BONE) {
 			// axis of bone trace model
 			axis[2] = fb->v2.ToVec3() - fb->v1.ToVec3();
 			axis[2].Normalize();
-			axis[2].NormalVectors( axis[0], axis[1] );
+			axis[2].NormalVectors(axis[0], axis[1]);
 			axis[1] = -axis[1];
-		} else {
+		}
+		else {
 			axis = fb->angles.ToMat3();
 		}
 
@@ -2968,99 +2993,100 @@ idRenderModel *idGameEdit::AF_CreateMesh( const idDict &args, idVec3 &meshOrigin
 	}
 
 	// get any new body transforms stored in the key/value pairs
-	for ( arg = args.MatchPrefix( "body ", NULL ); arg; arg = args.MatchPrefix( "body ", arg ) ) {
+	for (arg = args.MatchPrefix("body ", NULL); arg; arg = args.MatchPrefix("body ", arg)) {
 		name = arg->GetKey();
-		name.Strip( "body " );
-		for ( i = 0; i < af->bodies.Num(); i++ ) {
+		name.Strip("body ");
+		for (i = 0; i < af->bodies.Num(); i++) {
 			fb = af->bodies[i];
-			if ( fb->name.Icmp( name ) == 0 ) {
+			if (fb->name.Icmp(name) == 0) {
 				break;
 			}
 		}
-		if ( i >= af->bodies.Num() ) {
+		if (i >= af->bodies.Num()) {
 			continue;
 		}
-		sscanf( arg->GetValue(), "%f %f %f %f %f %f", &origin.x, &origin.y, &origin.z, &angles.pitch, &angles.yaw, &angles.roll );
+		sscanf(arg->GetValue(), "%f %f %f %f %f %f", &origin.x, &origin.y, &origin.z, &angles.pitch, &angles.yaw, &angles.roll);
 
-		if ( fb->jointName.Icmp( "origin" ) == 0 ) {
+		if (fb->jointName.Icmp("origin") == 0) {
 			meshAxis = bodyAxis[i].Transpose() * angles.ToMat3();
 			meshOrigin = origin - bodyOrigin[i] * meshAxis;
 			poseIsSet = true;
-		} else {
+		}
+		else {
 			newBodyOrigin[i] = origin;
 			newBodyAxis[i] = angles.ToMat3();
 		}
 	}
 
 	// save the original joints
-	originalJoints = ( idJointMat * )_alloca16( numMD5joints * sizeof( originalJoints[0] ) );
-	memcpy( originalJoints, ent.joints, numMD5joints * sizeof( originalJoints[0] ) );
+	originalJoints = (idJointMat *)_alloca16(numMD5joints * sizeof(originalJoints[0]));
+	memcpy(originalJoints, ent.joints, numMD5joints * sizeof(originalJoints[0]));
 
 	// buffer to store the joint mods
-	jointMod = (declAFJointMod_t *) _alloca16( numMD5joints * sizeof( declAFJointMod_t ) );
-	memset( jointMod, -1, numMD5joints * sizeof( declAFJointMod_t ) );
-	modifiedOrigin = (idVec3 *) _alloca16( numMD5joints * sizeof( idVec3 ) );
-	memset( modifiedOrigin, 0, numMD5joints * sizeof( idVec3 ) );
-	modifiedAxis = (idMat3 *) _alloca16( numMD5joints * sizeof( idMat3 ) );
-	memset( modifiedAxis, 0, numMD5joints * sizeof( idMat3 ) );
+	jointMod = (declAFJointMod_t *)_alloca16(numMD5joints * sizeof(declAFJointMod_t));
+	memset(jointMod, -1, numMD5joints * sizeof(declAFJointMod_t));
+	modifiedOrigin = (idVec3 *)_alloca16(numMD5joints * sizeof(idVec3));
+	memset(modifiedOrigin, 0, numMD5joints * sizeof(idVec3));
+	modifiedAxis = (idMat3 *)_alloca16(numMD5joints * sizeof(idMat3));
+	memset(modifiedAxis, 0, numMD5joints * sizeof(idMat3));
 
 	// get all the joint modifications
-	for ( i = 0; i < af->bodies.Num(); i++ ) {
+	for (i = 0; i < af->bodies.Num(); i++) {
 		fb = af->bodies[i];
 
-		if ( fb->jointName.Icmp( "origin" ) == 0 ) {
+		if (fb->jointName.Icmp("origin") == 0) {
 			continue;
 		}
 
-		for ( jointNum = 0; jointNum < numMD5joints; jointNum++ ) {
-			if ( MD5joints[jointNum].name.Icmp( fb->jointName ) == 0 ) {
+		for (jointNum = 0; jointNum < numMD5joints; jointNum++) {
+			if (MD5joints[jointNum].name.Icmp(fb->jointName) == 0) {
 				break;
 			}
 		}
 
-		if ( jointNum >= 0 && jointNum < ent.numJoints ) {
-			jointMod[ jointNum ] = fb->jointMod;
-			modifiedAxis[ jointNum ] = ( bodyAxis[i] * originalJoints[jointNum].ToMat3().Transpose() ).Transpose() * ( newBodyAxis[i] * meshAxis.Transpose() );
+		if (jointNum >= 0 && jointNum < ent.numJoints) {
+			jointMod[jointNum] = fb->jointMod;
+			modifiedAxis[jointNum] = (bodyAxis[i] * originalJoints[jointNum].ToMat3().Transpose()).Transpose() * (newBodyAxis[i] * meshAxis.Transpose());
 			// FIXME: calculate correct modifiedOrigin
-			modifiedOrigin[ jointNum ] = originalJoints[ jointNum ].ToVec3();
- 		}
+			modifiedOrigin[jointNum] = originalJoints[jointNum].ToVec3();
+		}
 	}
 
 	// apply joint modifications to the skeleton
 	MD5joint = MD5joints + 1;
-	for( i = 1; i < numMD5joints; i++, MD5joint++ ) {
+	for (i = 1; i < numMD5joints; i++, MD5joint++) {
 
 		parentNum = MD5joint->parent - MD5joints;
-		idMat3 parentAxis = originalJoints[ parentNum ].ToMat3();
+		idMat3 parentAxis = originalJoints[parentNum].ToMat3();
 		idMat3 localm = originalJoints[i].ToMat3() * parentAxis.Transpose();
-		idVec3 localt = ( originalJoints[i].ToVec3() - originalJoints[ parentNum ].ToVec3() ) * parentAxis.Transpose();
+		idVec3 localt = (originalJoints[i].ToVec3() - originalJoints[parentNum].ToVec3()) * parentAxis.Transpose();
 
-		switch( jointMod[i] ) {
-			case DECLAF_JOINTMOD_ORIGIN: {
-				ent.joints[ i ].SetRotation( localm * ent.joints[ parentNum ].ToMat3() );
-				ent.joints[ i ].SetTranslation( modifiedOrigin[ i ] );
-				break;
-			}
-			case DECLAF_JOINTMOD_AXIS: {
-				ent.joints[ i ].SetRotation( modifiedAxis[ i ] );
-				ent.joints[ i ].SetTranslation( ent.joints[ parentNum ].ToVec3() + localt * ent.joints[ parentNum ].ToMat3() );
-				break;
-			}
-			case DECLAF_JOINTMOD_BOTH: {
-				ent.joints[ i ].SetRotation( modifiedAxis[ i ] );
-				ent.joints[ i ].SetTranslation( modifiedOrigin[ i ] );
-				break;
-			}
-			default: {
-				ent.joints[ i ].SetRotation( localm * ent.joints[ parentNum ].ToMat3() );
-				ent.joints[ i ].SetTranslation( ent.joints[ parentNum ].ToVec3() + localt * ent.joints[ parentNum ].ToMat3() );
-				break;
-			}
+		switch (jointMod[i]) {
+		case DECLAF_JOINTMOD_ORIGIN: {
+			ent.joints[i].SetRotation(localm * ent.joints[parentNum].ToMat3());
+			ent.joints[i].SetTranslation(modifiedOrigin[i]);
+			break;
+		}
+		case DECLAF_JOINTMOD_AXIS: {
+			ent.joints[i].SetRotation(modifiedAxis[i]);
+			ent.joints[i].SetTranslation(ent.joints[parentNum].ToVec3() + localt * ent.joints[parentNum].ToMat3());
+			break;
+		}
+		case DECLAF_JOINTMOD_BOTH: {
+			ent.joints[i].SetRotation(modifiedAxis[i]);
+			ent.joints[i].SetTranslation(modifiedOrigin[i]);
+			break;
+		}
+		default: {
+			ent.joints[i].SetRotation(localm * ent.joints[parentNum].ToMat3());
+			ent.joints[i].SetTranslation(ent.joints[parentNum].ToVec3() + localt * ent.joints[parentNum].ToMat3());
+			break;
+		}
 		}
 	}
 
 	// instantiate a mesh using the joint information from the render entity
-	return md5->InstantiateDynamicModel( &ent, NULL, NULL );
+	return md5->InstantiateDynamicModel(&ent, NULL, NULL);
 }
 
 // HUMANHEAD pdm: method for turning off ragdoll collision

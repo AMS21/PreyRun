@@ -20,11 +20,22 @@ All game cvars should be defined here.
 */
 
 // PreyRun BEGIN
+#include "../../PreyRun/AutoCmd.hpp"
+
 idCVar pr_autojump("PR_AutoJump", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "automaticly jumps when holding spacebar");
-idCVar pr_autopause("PR_AutoPause", "0", CVAR_GAME | CVAR_BOOL, "Automaticly pauses after map load");
+idCVar pr_autopause("PR_AutoPause", "0", CVAR_GAME | CVAR_BOOL, "Automaticly pauses the game after map load, set PR_Freeze to 0 to continue");
 idCVar pr_preysplit("PR_PreySplit", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Enables support for interaction with PreySplit a LiveSplit component");
 idCVar pr_preysplit_update("PR_PreySplit_update", "41", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The time in milliseconds PreyRun shoud update the game timer of PreySplit", 0, 1000);
-bool pr_preysplit_pipeopen;
+bool pr_preysplit_pipeopen{ false };
+bool pr_preysplit_mapchanged{ false };
+#ifdef PR_DEVELOP
+idCVar pr_fixedseed("PR_FixedSeed", "0", CVAR_GAME | CVAR_BOOL, "Forces the RNG seed to PR_FixedSeed_Value");
+idCVar pr_fixedseed_value("PR_FixedSeed_Value", "0", CVAR_GAME | CVAR_INTEGER, "The Value the RNG seed shoud be set to if pr_fixedseed is set to 1");
+#endif PR_DEVELOP
+
+idCVar pr_freeze("PR_Freeze", "0", CVAR_GAME | CVAR_BOOL, "Completley freezes the game until pr_Freeze is set to 0");
+
+idCVar pr_autocmd_show("PR_AutoCmd_Show", "0", CVAR_GAME | CVAR_INTEGER, "Display autocmd zones, Note that developer must be set to 1");
 
 // HUD BEGIN
 
@@ -33,18 +44,21 @@ idCVar pr_hud_speedometer("PR_hud_Speedometer", "1", CVAR_GAME | CVAR_BOOL | CVA
 idCVar pr_hud_speedometer_r("PR_hud_Speedometer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the red value of the speedometer", 0, 255);
 idCVar pr_hud_speedometer_g("PR_hud_Speedometer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the green value of the speedometer", 0, 255);
 idCVar pr_hud_speedometer_b("PR_hud_Speedometer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the blue value of the speedometer", 0, 255);
+#ifdef PR_DEVELOP
 idCVar pr_hud_speedometer_precision("PR_hud_Speedometer_Precision", "6", CVAR_GAME | CVAR_INTEGER /*| CVAR_ARCHIVE*/, "the amount of numbers shown after the comma", 0, 6);
+#endif // PR_DEVELOP
 idCVar pr_hud_speedometer_x("PR_hud_Speedometer_x", "310", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer x coordinate", 0, 639);
 idCVar pr_hud_speedometer_y("PR_hud_Speedometer_y", "460", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "posiont of the speedometer y coordinate", 0, 479);
 
 // Timer
-idTimer pr_hudtimer; // The actual timer
+idTimer pr_gametimer; // The actual timer
 idTimer pr_demo_timer;
-bool pr_timedemo;
-bool pr_timer_running = false;
+bool pr_timedemo{ false };
+bool pr_gametimer_running{ false };
 
-idCVar pr_timer_autostart("PR_Timer_AutoStart", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly start the hud timer at run begin");
-idCVar pr_timer_autostop("PR_Timer_AutoStop", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly stop the hud timer when the sphere boss dies");
+idCVar pr_timer_autostart("PR_Timer_AutoStart", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly start the hud timer at run begin check PR_Timer_Methode for information when this might be");
+idCVar pr_timer_autostop("PR_Timer_AutoStop", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly stop the hud timer check PR_Timer_Methode for information when this might be");
+idCVar pr_timer_methode("PR_Timer_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Switch the diffrent timing methodes\n0 - RTA - Real Time Attack, the whole game from start (the first frame you can control Tommy) to finish (when the sphere boss is killed) with game time (default)\n1 - Individual Level, Starts when a map or savegame, is loaded and stops when the map has been completed");
 
 idCVar pr_hud_timer("PR_hud_Timer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Shows the timer");
 idCVar pr_hud_timer_x("PR_hud_Timer_x", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 639);
@@ -54,7 +68,7 @@ idCVar pr_hud_timer_g("PR_hud_Timer_g", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARC
 idCVar pr_hud_timer_b("PR_hud_Timer_b", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer color", 0, 255);
 
 // JumpSpeed
-idCVar pr_hud_jumpspeed("PR_hud_jumpspeed", 0, CVAR_GAME | CVAR_BOOL|CVAR_ARCHIVE, "Shows jumpspeed");
+idCVar pr_hud_jumpspeed("PR_hud_JumpSpeed", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Shows jumpspeed");
 
 // Viewangles
 idCVar pr_hud_viewangles("PR_hud_ViewAngles", "0", CVAR_GAME | CVAR_BOOL, "Shows viewangles");
@@ -75,13 +89,23 @@ idCVar pr_hud_ammo("PR_hud_Ammo", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Sh
 idCVar pr_hud_health("PR_hud_Health", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Shows health in numbers");
 
 // SpiritPower
-idCVar pr_hud_spiritpower("PR_hud_SpiritPower",0,CVAR_GAME|CVAR_BOOL|CVAR_ARCHIVE,"Shows the spirit power in numbers");
+idCVar pr_hud_spiritpower("PR_hud_SpiritPower", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Shows the spirit power in numbers");
 
 // Distance
-idCVar pr_hud_distance("PR_hud_Distance", 0, CVAR_GAME | CVAR_BOOL, "Shows the distance between your eyes and the object aimed at");
+idCVar pr_hud_distance("PR_hud_Distance", "0", CVAR_GAME | CVAR_BOOL, "Shows the distance between your eyes and the object aimed at");
+
+// Custom hud element
+idCVar pr_hud_custom("PR_hud_Custom", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of the custom hud element");
+idCVar pr_hud_custom_x("PR_hud_Custom_x", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "X position of the custom hud element", 0, 639);
+idCVar pr_hud_custom_y("PR_hud_Custom_y", "250", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Y position of the custom hud element", 0, 479);
+idCVar pr_hud_custom_r("PR_hud_Custom_r", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Custom hud element color", 0, 255);
+idCVar pr_hud_custom_g("PR_hud_Custom_g", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Custom hud element color", 0, 255);
+idCVar pr_hud_custom_b("PR_hud_Custom_b", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Custom hud element color", 0, 255);
+idCVar pr_hud_custom_text("PR_hud_Custom_text", "", CVAR_GAME, "The text to display");
 
 #ifdef PR_DEBUG
 idCVar pr_dbg_hud_drawtime("pr_dbg_hud_drawtime", "0", CVAR_GAME | CVAR_BOOL, "*Debug*: Shows the time in milliseconds it took to draw the hud");
+idTimer pr_dbg_timer;
 #endif // PR_DEBUG
 
 // HUD END

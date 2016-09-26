@@ -1,8 +1,0 @@
-changelog
-- closes and opens PreySplit pipe
-- pr_hud_jumpspeed
-- pr_timedemo
-- pr_hud_distance
-
-FIXME:
-Crashes when getting from feedingtowerc to lotaa

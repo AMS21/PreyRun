@@ -217,3 +217,9 @@
 //#define HUMANHEAD_TESTSAVEGAME
 
 // HUMANHEAD END
+
+// PreyRun BEGIN
+#ifdef PR_DEBUG
+#define PR_DEVELOP // Used to mark code which is still being developed
+#endif // PR_DEBUG
+// PreyRun END

@@ -17,8 +17,4 @@ namespace pr
 
 	void timeDemoInit();
 	void timeDemoShutdown();
-
-	// Static functions
-	
-	void static WriteToMemory(DWORD addressToWrite, const char* valueToWrite, int byteNum);
 }

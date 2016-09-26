@@ -14,13 +14,15 @@
 
 class idRandom {
 public:
-						idRandom( int seed = 0 );
+	// PreyRun BEGIN
+						idRandom( int seed = 0/*, bool keepSeed = false */);
+	// PreyRun END
 
 	void				SetSeed( int seed );
 	int					GetSeed( void ) const;
 
 	int					RandomInt( void );			// random integer in the range [0, MAX_RAND]
-	int					RandomInt( int max );		// random integer in the range [0, max[
+	int					RandomInt( int max );		// random integer in the range [0, max]
 	float				RandomFloat( void );		// random number in the range [0.0f, 1.0f]
 	float				CRandomFloat( void );		// random number in the range [-1.0f, 1.0f]
 
@@ -28,13 +30,23 @@ public:
 
 private:
 	int					seed;
+
+	// PreyRun BEGIN
+	//bool					keepSeed;
+	// PreyRun END
 };
 
-ID_INLINE idRandom::idRandom( int seed ) {
+ID_INLINE idRandom::idRandom( int seed/*, bool keepSeed*/ ) {
 	this->seed = seed;
+	//// PreyRun BEGIN
+	//this->keepSeed = keepSeed;
+	//// PreyRun END
 }
 
 ID_INLINE void idRandom::SetSeed( int seed ) {
+	//// PreyRun BEGIN
+	//if (this->keepSeed) { return; }
+	//// PreyRun END
 	this->seed = seed;
 }
 
@@ -43,6 +55,12 @@ ID_INLINE int idRandom::GetSeed( void ) const {
 }
 
 ID_INLINE int idRandom::RandomInt( void ) {
+	// PreyRun BEGIN
+	//if (keepSeed)
+	//{
+	//	return ((69069 * seed + 1) & idRandom::MAX_RAND);
+	//}
+	// PreyRun END
 	seed = 69069 * seed + 1;
 	return ( seed & idRandom::MAX_RAND );
 }

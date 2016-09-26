@@ -5,26 +5,43 @@
 #define __SYS_CVAR_H__
 
 // PreyRun BEGIN
+#include "../../PreyRun/AutoCmd.hpp"
+
 extern idCVar pr_autojump;
 extern idCVar pr_autopause;
 extern idCVar pr_preysplit;
 extern idCVar pr_preysplit_update;
 extern bool pr_preysplit_pipeopen;
+extern bool pr_preysplit_mapchanged;
+#ifdef PR_DEVELOP
+extern idCVar pr_fixedseed;
+extern idCVar pr_fixedseed_value;
+extern idCVar pr_freeze;
+#endif PR_DEVELOP
 // Speedometer
 extern idCVar pr_hud_speedometer;
 extern idCVar pr_hud_speedometer_r;
 extern idCVar pr_hud_speedometer_g;
 extern idCVar pr_hud_speedometer_b;
+#ifdef PR_DEVELOP
 extern idCVar pr_hud_speedometer_precision;
+#endif // PR_DEVELOP
 extern idCVar pr_hud_speedometer_x;
 extern idCVar pr_hud_speedometer_y;
+extern idCVar pr_autocmd_show;
 // Timer
-extern idTimer pr_hudtimer;
-extern bool pr_timer_running;
+extern idTimer pr_gametimer;
+extern bool pr_gametimer_running;
 extern bool pr_timedemo;
 
 extern idCVar pr_timer_autostart;
 extern idCVar pr_timer_autostop;
+extern idCVar pr_timer_methode;
+const enum PR_TIMER_METHODES
+{
+	METHODE_REALTIMEATTACK,
+	METHODE_INDIVIDUALLEVEL
+};
 
 extern idCVar pr_hud_timer;
 extern idCVar pr_hud_timer_x;
@@ -50,9 +67,18 @@ extern idCVar pr_hud_health;
 extern idCVar pr_hud_spiritpower;
 // Distance
 extern idCVar pr_hud_distance;
+// Custom Hud Element
+extern idCVar pr_hud_custom;
+extern idCVar pr_hud_custom_text;
+extern idCVar pr_hud_custom_x;
+extern idCVar pr_hud_custom_y;
+extern idCVar pr_hud_custom_r;
+extern idCVar pr_hud_custom_g;
+extern idCVar pr_hud_custom_b;
 
 #ifdef PR_DEBUG
 extern idCVar pr_dbg_hud_drawtime;
+extern idTimer pr_dbg_timer;
 #endif // PR_DEBUG
 // PreyRun END
 

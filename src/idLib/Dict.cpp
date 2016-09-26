@@ -55,7 +55,7 @@ void idDict::Copy( const idDict &other ) {
 
 	if ( args.Num() ) {
 		found = (int *) _alloca16( other.args.Num() * sizeof( int ) );
-        for ( i = 0; i < n; i++ ) {
+		for ( i = 0; i < n; i++ ) {
 			found[i] = FindKeyIndex( other.args[i].GetKey() );
 		}
 	} else {
@@ -226,7 +226,7 @@ void idDict::CompareArgs(const idDict &other) const {
 			{
 				if (strcmp(val, otherVal.c_str()))
 				{
-                    idLib::common->Printf("Key '%s' has different values on dicts. this->key is '%s', other->key is '%s'\n",
+					idLib::common->Printf("Key '%s' has different values on dicts. this->key is '%s', other->key is '%s'\n",
 						key, val, otherVal.c_str());
 				}
 			}

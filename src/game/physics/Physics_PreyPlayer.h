@@ -102,7 +102,7 @@ class hhPhysics_Player: public idPhysics_Player
 	protected:
 		void				EvaluateOwnerCamera( const int timeStep );
 		void				SetOwnerCameraTarget( const idVec3& Origin, const idMat3& Axis, int iInterpFlags );
-        void				LinkClip( const idVec3& Origin, const idMat3& Axis );
+		void				LinkClip( const idVec3& Origin, const idMat3& Axis );
 		virtual idVec3		DetermineJumpVelocity();
 		void				BuildWallwalkTraceOriginTable( const idMat3& Axis );
 		void				PerformGroundTrace( trace_t& TraceInfo, const idVec3& Start );

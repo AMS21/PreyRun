@@ -1,4 +1,3 @@
-
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
@@ -672,7 +671,7 @@ void hhPlayer::UpdateHud(idUserInterface *_hud) {
 	pickupTimeFadeOutStart = PICKUPTIME_FADEOUT_START * scale;
 	pickupTimeFadeOutStop = PICKUPTIME_FADEOUT_END * scale;
 
-	// Determine fade in color for icons
+	// Determine fade in colour for icons
 	if (c > 0) {
 		for (i = 0; i < c; i++) {
 			inventory.pickupItemNames[i].time += gameLocal.msec;
@@ -710,7 +709,7 @@ void hhPlayer::UpdateHud(idUserInterface *_hud) {
 		}
 	}
 
-	// HUMANHEAD pdm: Changed aim logic to always show color-coded aimee
+	// HUMANHEAD pdm: Changed aim logic to always show colour-coded aimee
 	if (MPAim != -1 && gameLocal.entities[MPAim]
 		&& gameLocal.entities[MPAim]->IsType(idPlayer::Type)) {
 
@@ -961,7 +960,7 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 	{
 		pr::InitPreySplitPipe();
 	}
-	// PreySplit pipe soudnt be open but is
+	// PreySplit pipe shoudnt be open but is
 	else if (!pr_preysplit.GetBool() && pr_preysplit_pipeopen)
 	{
 		pr::ShutdownPreySplitPipe();
@@ -972,7 +971,9 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 	_hud->SetStateFloat("pr_hud_speedometer_r", pr_hud_speedometer_r.GetFloat());
 	_hud->SetStateFloat("pr_hud_speedometer_g", pr_hud_speedometer_g.GetFloat());
 	_hud->SetStateFloat("pr_hud_speedometer_b", pr_hud_speedometer_b.GetFloat());
+#ifdef PR_DEVELOP
 	_hud->SetStateInt("pr_hud_speedometer_precision", pr_hud_speedometer_precision.GetInteger());
+#endif // PR_DEVELOP
 	_hud->SetStateInt("pr_hud_speedometer_x", pr_hud_speedometer_x.GetInteger());
 	_hud->SetStateInt("pr_hud_speedometer_y", pr_hud_speedometer_y.GetInteger());
 	// Timer
@@ -1000,6 +1001,14 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 	_hud->SetStateBool("pr_hud_spiritpower", pr_hud_spiritpower.GetBool());
 	// Distance
 	_hud->SetStateBool("pr_hud_distance", pr_hud_distance.GetBool());
+	// Custom Hud Element
+	_hud->SetStateBool("pr_hud_custom", pr_hud_custom.GetBool());
+	_hud->SetStateString("pr_hud_custom_text", pr_hud_custom_text.GetString());
+	_hud->SetStateInt("pr_hud_custom_x", pr_hud_custom_x.GetInteger());
+	_hud->SetStateInt("pr_hud_custom_y", pr_hud_custom_y.GetInteger());
+	_hud->SetStateFloat("pr_hud_custom_r", pr_hud_custom_r.GetFloat());
+	_hud->SetStateFloat("pr_hud_custom_g", pr_hud_custom_g.GetFloat());
+	_hud->SetStateFloat("pr_hud_custom_b", pr_hud_custom_b.GetFloat());
 	// PreyRun END
 
 	_hud->SetStateBool("invehicle", InVehicle());
@@ -1074,29 +1083,45 @@ hhPlayer::DrawHUD
 */
 void hhPlayer::DrawHUD(idUserInterface *_hud) {
 	// PreyRun BEGIN
+	if (pr_freeze.GetBool() && pr_gametimer.IsRunning())
+	{
+		pr_gametimer.Stop();
+	}
+
 #ifdef PR_DEBUG
 	if (pr_dbg_hud_drawtime.GetBool())
 	{
 		pr_dbg_timer.Start();
 	}
 #endif // PR_DEBUG
+
+	// Individual Level timer
+	if (!pr_gametimer_running && pr_timer_autostart.GetBool() && pr_timer_methode.GetInteger() == PR_TIMER_METHODES::METHODE_INDIVIDUALLEVEL)
+	{
+		gameLocal.Printf("PreyRun: Timer: Auto starting\n");
+
+		pr_gametimer_running = true;
+		pr_gametimer.Start();
+
+		if (pr_preysplit.GetBool())
+		{
+			pr::WriteTimerStart(pr::GetTime());
+		}
+	}
+
+
 	// Might not be the optimal solution because when the game decides to not draw the hud the timer cant resume but it gives better times then hooking InitFromMap()
-	if (pr_timer_running && !pr_hudtimer.IsRunning())
+	if (pr_gametimer_running && !pr_gametimer.IsRunning() && !pr_freeze.GetBool())
 	{
 		gameLocal.Printf("PreyRun: Timer: Resuming\n");
-		pr_hudtimer.Start();
+		pr_gametimer.Start();
 
 #ifdef PR_DEBUG
-		auto time = PR_ms2time(pr_hudtimer.Milliseconds());
+		auto time = PR_ms2time(pr_gametimer.Milliseconds());
 		gameLocal.Printf("PreyRunDBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
 
 		gameLocal.Printf("PreyRunDBG: Changed map to: %s\n", gameLocal.GetMapName());
 #endif // PR_DEBUG
-	}
-
-	if (pr_preysplit.GetBool())
-	{
-		pr::WriteTime(pr::GetTime());
 	}
 	// PreyRun END
 
@@ -1169,27 +1194,27 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		int pr_t_x = _hud->GetStateInt("pr_hud_timer_x", "0");
 		int pr_t_y = _hud->GetStateInt("pr_hud_timer_y", "235");
 
-		if (pr_hudtimer.IsRunning())
+		if (pr_gametimer.IsRunning())
 		{
-			pr_hudtimer.Stop();
-			auto times = PR_ms2time(pr_hudtimer.Milliseconds());
-			pr_hudtimer.Start();
+			pr_gametimer.Stop();
+			auto times = PR_ms2time(pr_gametimer.Milliseconds());
+			pr_gametimer.Start();
 
 			idStr strText;
 
 			sprintf(strText, "%02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
 
-			renderSystem->DrawSmallStringExt(pr_t_x, pr_t_y, strText.c_str(), idVec4(PR_calcStuff(pr_t_r), PR_calcStuff(pr_t_g), PR_calcStuff(pr_t_b), 1), false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(pr_t_x, pr_t_y, strText.c_str(), idVec4(PR_toPreyColour(pr_t_r), PR_toPreyColour(pr_t_g), PR_toPreyColour(pr_t_b), 1), false, declManager->FindMaterial("textures/bigchars"));
 		}
 		else
 		{
-			auto times = PR_ms2time(pr_hudtimer.Milliseconds());
+			auto times = PR_ms2time(pr_gametimer.Milliseconds());
 
 			idStr strText;
 
 			sprintf(strText, "%02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
 
-			renderSystem->DrawSmallStringExt(pr_t_x, pr_t_y, strText.c_str(), idVec4(PR_calcStuff(pr_t_r), PR_calcStuff(pr_t_g), PR_calcStuff(pr_t_b), 1), false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(pr_t_x, pr_t_y, strText.c_str(), idVec4(PR_toPreyColour(pr_t_r), PR_toPreyColour(pr_t_g), PR_toPreyColour(pr_t_b), 1), false, declManager->FindMaterial("textures/bigchars"));
 		}
 	}
 
@@ -1199,7 +1224,9 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		float pr_sm_r = _hud->GetStateFloat("pr_hud_speedometer_r", "255");
 		float pr_sm_g = _hud->GetStateFloat("pr_hud_speedometer_g", "255");
 		float pr_sm_b = _hud->GetStateFloat("pr_hud_speedometer_b", "255");
-		/*int pr_sm_prec=_hud->GetStateInt("pr_hud_speedometer_precision", "6");*/
+#ifdef PR_DEVELOP
+		int pr_sm_prec=_hud->GetStateInt("pr_hud_speedometer_precision", "6");
+#endif // PR_DEVELOP
 		int pr_sm_x = _hud->GetStateInt("pr_hud_speedometer_x", "320");
 		int pr_sm_y = _hud->GetStateInt("pr_hud_speedometer_y", "470");
 
@@ -1218,7 +1245,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			sprintf(strText, "%.2f", (float)idMath::Sqrt(vel.x * vel.x + vel.y * vel.y));
 
 		}
-		renderSystem->DrawSmallStringExt(pr_sm_x, pr_sm_y, strText.c_str(), idVec4(PR_calcStuff(pr_sm_r), PR_calcStuff(pr_sm_g), PR_calcStuff(pr_sm_b), 1), false, declManager->FindMaterial("textures/bigchars"));
+		renderSystem->DrawSmallStringExt(pr_sm_x, pr_sm_y, strText.c_str(), idVec4(PR_toPreyColour(pr_sm_r), PR_toPreyColour(pr_sm_g), PR_toPreyColour(pr_sm_b), 1), false, declManager->FindMaterial("textures/bigchars"));
 	}
 
 	// JumpSpeed
@@ -1240,7 +1267,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 		}
 
-		renderSystem->DrawSmallStringExt(310, 445, strText.c_str(), idVec4(PR_calcStuff(255), PR_calcStuff(255), PR_calcStuff(63.75), 1), false, declManager->FindMaterial("textures/bigchars"));
+		renderSystem->DrawSmallStringExt(310, 445, strText.c_str(), idVec4(PR_toPreyColour(255), PR_toPreyColour(255), PR_toPreyColour(63.75), 1), false, declManager->FindMaterial("textures/bigchars"));
 	}
 
 	// Viewangles
@@ -1363,22 +1390,41 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 	// Ammo
 	if (_hud->GetStateBool("pr_hud_ammo", "0"))
 	{
-		// when tring to get the ammo while in a Shuttle/Vehicle = crash
 		if (InVehicle())
 		{
-			//PR_FIXME: Get ammo while in Shuttle
-			//GetVehicleInterfaceLocal()->GetVehicle()->
+			// CurrentPower == Ammo
+
+			// Max 600000
+			// 1 Shot is = 3500
+			auto cpower = GetVehicleInterfaceLocal()->GetVehicle()->GetCurrentPower();
+
+			idVec4 colour;
+			idStr strAmmo;
+
+			sprintf(strAmmo, "%03d", cpower / 3500);
+
+			if (cpower > 0)
+			{
+				colour = PR_COLOUR_WHITE;
+			}
+			else
+			{
+				colour = PR_COLOUR_RED;
+			}
+
+			renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
 		}
 		else
 		{
 
 			switch (currentWeapon)
 			{
-			case 2: // Rifle
+			case PR_WEAPONS::WPN_RIFLE: // Rifle
+			case PR_WEAPONS::WPN_SHOTGUN: // Shotgun
 			{
 				int clip = weapon->AmmoInClip();
 				int avail = weapon->AmmoAvailable();
-				idVec4 color;
+				idVec4 colour;
 				idStr strAmmo;
 
 				sprintf(strAmmo, "%02d | %02d", clip, avail - clip);
@@ -1387,70 +1433,52 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				// very ugly there might be a better solution to this than if then else trees
 				if (clip > 0)
 				{
-					color.Set(1, 1, 1, 1);
+					colour = PR_COLOUR_WHITE;
 				}
 				else
 				{
 					if (avail > 0)
 					{
-						color.Set(1, 1, 0.25, 1);
+						colour = PR_COLOUR_YELLOW;
 					}
 					else
 					{
-						color.Set(1, 0, 0, 1);
+						colour = PR_COLOUR_RED;
 					}
 				}
 
-				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
 
 				break;
 			}
-			case 3: // Grendade
+			case PR_WEAPONS::WPN_CRAWLER: // Grendade
+			case PR_WEAPONS::WPN_LEECHER: // Leecher
+			case PR_WEAPONS::WPN_ROCKETLAUNCHER: // RocketLauncher
 			{
 				int avail = weapon->AmmoAvailable();
-				idVec4 color;
+				idVec4 colour;
 				idStr strAmmo;
 
 				sprintf(strAmmo, "     %02d", avail);
 
 				if (avail > 0)
 				{
-					color.Set(1, 1, 1, 1);
+					colour = PR_COLOUR_WHITE;
 				}
 				else
 				{
-					color.Set(1, 0, 0, 1);
+					colour = PR_COLOUR_RED;
 				}
 
-				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
 				break;
 			}
-			case 4: // Leecher
-			{
-				int avail = weapon->AmmoAvailable();
-				idVec4 color;
-				idStr strAmmo;
-
-				sprintf(strAmmo, "     %02d", avail);
-
-				if (avail > 0)
-				{
-					color.Set(1, 1, 1, 1);
-				}
-				else
-				{
-					color.Set(1, 0, 0, 1);
-				}
-
-				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
-				break;
-			}
-			case 5: // Minigun
+			case PR_WEAPONS::WPN_MINIGUN: // Minigun
 			{
 				int avail = weapon->AmmoAvailable();
 				int altAvail = weapon->AltAmmoAvailable();
-				idVec4 color;
-				idVec4 color2;
+				idVec4 colour;
+				idVec4 colour2;
 				idStr strAmmo;
 				idStr strAmmo2;
 
@@ -1459,73 +1487,24 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 				if (avail > 0)
 				{
-					color.Set(1, 1, 1, 1);
+					colour = PR_COLOUR_WHITE;
 				}
 				else
 				{
-					color.Set(1, 0, 0, 1);
+					colour = PR_COLOUR_RED;
 				}
 
 				if (altAvail > 0)
 				{
-					color2.Set(1, 1, 1, 1);
+					colour2 = PR_COLOUR_WHITE;
 				}
 				else
 				{
-					color2.Set(1, 0, 0, 1);
+					colour2 = PR_COLOUR_RED;
 				}
 
-
-				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
-				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS2_Y, strAmmo2, color2, false, declManager->FindMaterial("textures/bigchars"));
-				break;
-			}
-			case 6: // Shotgun
-			{
-				int clip = weapon->AmmoInClip();
-				int avail = weapon->AmmoAvailable();
-				idVec4 color;
-				idStr strAmmo;
-
-				sprintf(strAmmo, "%02d | %02d", clip, avail - clip);
-
-				if (clip > 0)
-				{
-					color.Set(1, 1, 1, 1);
-				}
-				else
-				{
-					if (avail > 0)
-					{
-						color.Set(1, 1, 0.25, 1);
-					}
-					else
-					{
-						color.Set(1, 0, 0, 1);
-					}
-				}
-
-				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
-				break;
-			}
-			case 7: // RocketLauncher
-			{
-				int avail = weapon->AmmoAvailable();
-				idVec4 color;
-				idStr strAmmo;
-
-				sprintf(strAmmo, "     %02d", avail);
-
-				if (avail > 0)
-				{
-					color.Set(1, 1, 1, 1);
-				}
-				else
-				{
-					color.Set(1, 0, 0, 1);
-				}
-
-				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, color, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS2_Y, strAmmo2, colour2, false, declManager->FindMaterial("textures/bigchars"));
 				break;
 			}
 			default: // Wrench or no weapon
@@ -1535,49 +1514,78 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 	}
 
 	// Health
-	// PR_FIXME: Get health of shuttle
 	if (_hud->GetStateBool("pr_hud_health", "0"))
 	{
 		// Player is alive, Dead != Deathwalking
 		if (!IsDead())
 		{
 			idStr strHealth;
-			idVec4 color;
+			idVec4 colour;
 
-			auto health = GetHealth();
-			auto maxHealth = GetMaxHealth();
-
-			// health regen
-			if (health < 25)
+			if (InVehicle())
 			{
-				color.Set(1, 1, 0.25, 1);
+				auto health = GetVehicleInterfaceLocal()->GetVehicle()->health;
+				auto maxHealth = GetVehicleInterfaceLocal()->GetVehicle()->spawnHealth;
+
+				sprintf(strHealth, "%03d | %03d", health, maxHealth);
+
+				if (health == 0)
+				{
+					colour = PR_COLOUR_RED;
+				}
+				else
+				{
+					colour = PR_COLOUR_WHITE;
+				}
 			}
 			else
 			{
-				color.Set(1, 1, 1, 1);
+				auto health = GetHealth();
+				auto maxHealth = GetMaxHealth();
+
+				// below 25 your hp regenerates back up
+				if (health < 25)
+				{
+					colour = PR_COLOUR_YELLOW;
+				}
+				else
+				{
+					colour = PR_COLOUR_WHITE;
+				}
+
+				sprintf(strHealth, "%03d | %03d", health, maxHealth);
 			}
 
-			sprintf(strHealth, "%03d | %03d", health, maxHealth);
-
-			renderSystem->DrawSmallStringExt(70, 448, strHealth, color, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(70, 448, strHealth, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
 		}
 	}
 
+	// SpiritPower
 	if (_hud->GetStateBool("pr_hud_spiritpower", "0"))
 	{
 		if (!IsDead() && inventory.requirements.bCanSpiritWalk)
 		{
 			idStr strSpirit;
-#ifdef PR_DEBUG
-			gameLocal.Printf("SpiritPower: %d", GetSpiritPower());
-#endif // PR_DEBUG
+			idVec4 colour;
+
+			auto spiritpwr = GetSpiritPower();
+
+			if (spiritpwr > 0)
+			{
+				colour = PR_COLOUR_WHITE;
+			}
+			else
+			{
+				colour = PR_COLOUR_RED;
+			}
 
 			sprintf(strSpirit, "%03d | 100", GetSpiritPower());
 
-			renderSystem->DrawSmallStringExt(70, 433, strSpirit, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(70, 433, strSpirit, colour, false, declManager->FindMaterial("textures/bigchars"));
 		}
 	}
 
+	// Distance
 	if (_hud->GetStateBool("pr_hud_distance", "0"))
 	{
 		trace_t trace;
@@ -1619,30 +1627,44 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		}
 	}
 
+	// Custom Hud Element
+	if (_hud->GetStateBool("pr_hud_custom", "0"))
+	{
+		int pr_cstm_x = _hud->GetStateInt("pr_hud_custom_x", "320");
+		int pr_cstm_y = _hud->GetStateInt("pr_hud_custom_y", "470");
+		float pr_cstm_r = _hud->GetStateFloat("pr_hud_custom_r", "255");
+		float pr_cstm_g = _hud->GetStateFloat("pr_hud_custom_g", "255");
+		float pr_cstm_b = _hud->GetStateFloat("pr_hud_custom_b", "255");
+
+		auto pr_cstm_text = _hud->GetStateString("pr_hud_custom_text", "");
+
+		renderSystem->DrawSmallStringExt(pr_cstm_x, pr_cstm_y, pr_cstm_text, idVec4(PR_toPreyColour(pr_cstm_r), PR_toPreyColour(pr_cstm_g), PR_toPreyColour(pr_cstm_b), 1), false, declManager->FindMaterial("textures/bigchars"));
+	}
+
 #ifdef PR_DEBUG
 	if (pr_dbg_hud_drawtime.GetBool())
 	{
 		pr_dbg_timer.Stop();
 
 		idStr str;
-		idVec4 color{ 1,1,1,1 };
+		idVec4 colour{ 1,1,1,1 };
 		auto time{ pr_dbg_timer.Milliseconds() };
 
-		if (time > PR_DBG_HUDDRAWTIME_YELLOW)
+		if (time >= PR_DBG_HUDDRAWTIME_YELLOW)
 		{
-			if (time > PR_DBG_HUDDRAWTIME_RED)
+			if (time >= PR_DBG_HUDDRAWTIME_RED)
 			{
-				color.Set(1, 0, 0, 1);
+				colour = PR_COLOUR_RED;
 			}
 			else
 			{
-				color.Set(1, 1, 0.25, 1);
+				colour = PR_COLOUR_YELLOW;
 			}
 		}
 
 		sprintf(str, "%f ms", pr_dbg_timer.Milliseconds());
 
-		renderSystem->DrawSmallStringExt(460, 0, str, color, false, declManager->FindMaterial("textures/bigchars"));
+		renderSystem->DrawSmallStringExt(460, 0, str, colour, false, declManager->FindMaterial("textures/bigchars"));
 
 		pr_dbg_timer.Clear();
 	}
@@ -1652,9 +1674,9 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 }
 
 // PreyRun BEGIN
-inline float PR_calcStuff(float f)
+__forceinline float PR_toPreyColour(float f)
 {
-	return f / 255;
+	return f / 255.F;
 }
 // PreyRun END
 
@@ -3160,8 +3182,8 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 			else {
 				localViewAngles.pitch -= fadd;
 			}
-	}
 		}
+	}
 	else {
 		lastAutoLevelTime = gameLocal.time;
 	}
@@ -3209,7 +3231,7 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 	loggedViewAngles[gameLocal.framenum & (NUM_LOGGED_VIEW_ANGLES - 1)] = localViewAngles;
 
 	return localViewAngles;
-	}
+}
 
 /*
 ================
@@ -3518,8 +3540,8 @@ void hhPlayer::PerformImpulse(int impulse) {
 			if (developer.GetBool() && (gameLocal.time - deathWalkTime > spawnArgs.GetInt("deathWalkMinTime", "4000"))) { // Force the player to stay in deathwalk for a short period of time
 				deathWalkFlash = 0.0f;
 				PostEventMS(&EV_PrepareToResurrect, 0);
+			}
 		}
-	}
 		else if (inventory.requirements.bCanSpiritWalk) {
 			ToggleSpiritWalk();
 		}
@@ -3534,8 +3556,8 @@ void hhPlayer::PerformImpulse(int impulse) {
 #endif // VENOM END
 		break;
 	}
-}
 	}
+}
 
 void hhPlayer::Present() {
 	idPlayer::Present();
@@ -5890,9 +5912,9 @@ void hhPlayer::Move(void) {
 								physicsObj.SetOrigin(flippedOrigin);
 								physicsObj.SetAxis(flippedAxis);
 								physicsObj.CheckWallWalk(true);*/
+			}
 		}
 	}
-}
 #endif
 	// HUMANHEAD END
 

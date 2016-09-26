@@ -1749,12 +1749,11 @@ void idPhysics_Player::SetMovementType(const pmtype_t type) {
 	// PreyRun BEGIN
 	// Autostart the game IF autosplit is turend on we havent started yet, were on the correct map and the users movement type was set to freeze (cutscene) is now set to normal
 
-	// Casting GetMapName() to idStr might not be the optimal solution but you cant compare cstrings
-	if (pr_timer_running && pr_timer_autostart.GetBool() && (idStr)gameLocal.GetMapName() == idStr ("maps/game/roadhouse.map") && type == PM_NORMAL && current.movementType == PM_FREEZE)
+	// Casting GetMapName() to idStr might not be the optimal solution but you cant compare cstrings (you can but its a real pain in the ass)
 	{
 		gameLocal.Printf("PreyRun: Timer: Auto starting\n");
-		pr_timer_running = true;
-		pr_hudtimer.Start();
+		pr_gametimer_running = true;
+		pr_gametimer.Start();
 
 		if (pr_preysplit.GetBool())
 		{
