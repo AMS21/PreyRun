@@ -16,8 +16,8 @@ extern bool pr_preysplit_mapchanged;
 #ifdef PR_DEVELOP
 extern idCVar pr_fixedseed;
 extern idCVar pr_fixedseed_value;
-extern idCVar pr_freeze;
 #endif PR_DEVELOP
+extern idCVar pr_freeze;
 // Speedometer
 extern idCVar pr_hud_speedometer;
 extern idCVar pr_hud_speedometer_r;
