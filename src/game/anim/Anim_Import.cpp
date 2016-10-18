@@ -395,7 +395,7 @@ int idModelExport::ParseExportSection( idParser &parser ) {
 			return 0;
 		}
 
-        parser.ReadToken( &token );
+		parser.ReadToken( &token );
 		if ( token.Icmp( g_exportMask.GetString() ) ) {
 			parser.SkipBracedSection();
 			return 0;

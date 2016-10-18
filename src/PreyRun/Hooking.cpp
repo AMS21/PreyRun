@@ -11,13 +11,13 @@ namespace pr
 		//access type and restores it after memory is written
 		unsigned long OldProtection;
 		//give that address read and write permissions and store the old permissions at oldProtection
-		VirtualProtect((LPVOID)(addressToWrite), byteNum, PAGE_EXECUTE_READWRITE, &OldProtection);
+		VirtualProtect(reinterpret_cast<LPVOID>(addressToWrite), byteNum, PAGE_EXECUTE_READWRITE, &OldProtection);
 
 		//write the memory into the program and overwrite previous value
-		memcpy((LPVOID)addressToWrite, valueToWrite, byteNum);
+		memcpy(reinterpret_cast<LPVOID>(addressToWrite), valueToWrite, byteNum);
 
 		//reset the permissions of the address back to oldProtection after writting memory
-		VirtualProtect((LPVOID)(addressToWrite), byteNum, OldProtection, NULL);
+		VirtualProtect(reinterpret_cast<LPVOID>(addressToWrite), byteNum, OldProtection, NULL);
 	}
 
 	void timeDemoInit()

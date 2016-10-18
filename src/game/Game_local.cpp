@@ -10,21 +10,6 @@
 #include "../framework/BuildVersion.h" // HUMANHEAD mdl
 //HUMANHEAD END
 
-// PreyRun BEGIN
-PR_time_t PR_ms2time(unsigned x)
-{
-	PR_time_t ts;
-	ts.hours = x / (60 * 60 * 1000);
-	x = x - ts.hours*(60 * 60 * 1000);
-	ts.minutes = x / (60 * 1000);
-	x = x - ts.minutes*(60 * 1000);
-	ts.seconds = x / 1000;
-	ts.milliseconds = x - ts.seconds * 1000;
-
-	return ts;
-}
-// PreyRun END
-
 #ifdef GAME_DLL
 
 idSys *						sys = NULL;
@@ -399,6 +384,7 @@ void idGameLocal::Init(void) {
 
 #ifdef PR_DEBUG
 	Printf("Running extra PreyRun debug functionality!\n");
+	Printf("Compiled on %s %s\n", __DATE__, __TIME__);
 #endif // PR_DEBUG
 	// PreyRun END
 }
@@ -420,6 +406,7 @@ void idGameLocal::Shutdown(void) {
 
 	// PreyRun BEGIN
 	pr::ShutdownPreySplitPipe();
+	pr::ClearBackupTimer();
 	// PreyRun END
 
 	mpGame.Shutdown();
@@ -1435,6 +1422,10 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 #endif // PR_DEBUG
 
 	pr_timer_mapchanged = true;
+
+	// Timer recovery
+	pr::LoadBackupTimer(mapName);
+
 	// PreyRun END
 
 	Printf("------- Game Map Init SaveGame -------\n");
@@ -5480,3 +5471,18 @@ void idGameLocal::ClearTimePlayed(void) {
 	playTimeStart = -1;
 }
 // HUMANHEAD END
+
+// PreyRun BEGIN
+PR_time_t PR_ms2time(unsigned x)
+{
+	PR_time_t ts;
+	ts.hours = x / (60 * 60 * 1000);
+	x = x - ts.hours*(60 * 60 * 1000);
+	ts.minutes = x / (60 * 1000);
+	x = x - ts.minutes*(60 * 1000);
+	ts.seconds = x / 1000;
+	ts.milliseconds = x - ts.seconds * 1000;
+
+	return ts;
+}
+// PreyRun END

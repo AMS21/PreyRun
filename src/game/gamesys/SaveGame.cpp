@@ -48,6 +48,14 @@ idSaveGame::idSaveGame( idFile *savefile ) {
 	// Put NULL at the start of the list so we can skip over it.
 	objects.Clear();
 	objects.Append( NULL );
+
+	// PreyRun BEGIN
+#ifdef PR_DEBUG
+	gameLocal.Printf("PreyRun DBG: Saved game: %s\n", savefile->GetName());
+#endif // PR_DEBUG
+	pr_reload_latestsave = savefile->GetName();
+	pr_reload_ready = true;
+	// PreyRun END
 }
 
 /*
@@ -212,7 +220,7 @@ void idSaveGame::WriteString( const char *string ) {
 
 	len = strlen( string );
 	WriteInt( len );
-    file->Write( string, len );
+	file->Write( string, len );
 }
 
 /*
@@ -787,6 +795,14 @@ idRestoreGame::RestoreGame
 */
 idRestoreGame::idRestoreGame( idFile *savefile ) {
 	file = savefile;
+
+	// PreyRun BEGIN
+#ifdef PR_DEBUG
+	gameLocal.Printf("PreyRun DBG: Loading savefile: %s\n", savefile->GetFullPath());
+#endif // PR_DEBUG
+	pr_reload_latestsave = savefile->GetName();
+	pr_reload_ready = true;
+	// PreyRun END
 }
 
 /*

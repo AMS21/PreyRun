@@ -1,6 +1,7 @@
 #pragma once
 #include "../game/game_local.h"
 #include "StdLib.hpp" // std::vector
+#include <regex>
 
 typedef idStr cmdType;
 
@@ -10,8 +11,8 @@ namespace pr
 	class AutocmdzoneHandler
 	{
 	public:
-		AutocmdzoneHandler(AutocmdzoneHandler const &) = delete;
-		AutocmdzoneHandler & operator= (AutocmdzoneHandler const &) = delete;
+		AutocmdzoneHandler(AutocmdzoneHandler const&) = delete;
+		AutocmdzoneHandler& operator=(AutocmdzoneHandler const&) = delete;
 
 		// Iterator stuff
 		auto begin() -> decltype(auto) { return acz.begin(); }
@@ -31,11 +32,11 @@ namespace pr
 		void Trigger();
 
 		void Add(idVec3 pos1_, idVec3 pos2_, cmdType cmds_);
-		inline void Remove(int index) { acz.erase(acz.begin() + index); };
-		inline void Clear() { this->acz.clear(); };
+		void Remove(int index) { acz.erase(acz.begin() + index); };
+		void Clear() { this->acz.clear(); };
 		void Edit(int num, idVec3 pos1_, idVec3 pos2_, cmdType cmds_);
 
-		inline int NumOfZones() { return acz.size(); };
+		int NumOfZones() const { return acz.size(); };
 	private:
 		AutocmdzoneHandler();
 
@@ -43,24 +44,25 @@ namespace pr
 		{
 		public:
 			Autocmdzone();
+
 			Autocmdzone(idVec3 pos1_, idVec3 pos2_, cmdType cmds_)
-				: pos1{ pos1_ }, pos2{ pos2_ }, cmds{ cmds_ } {};
+				: pos1{ pos1_ }, pos2{ pos2_ }, cmds{ cmds_ }, activated(false) {}
 
 			// Actually run the cmd
 			void Run();
 
 			// Draw the zone
-			void Draw();
+			void Draw() const;
 
-			inline idVec3 GetPos1() { return pos1; };
-			inline idVec3 GetPos2() { return pos2; };
-			inline cmdType GetCmds() { return cmds; };
-			inline bool GetActivated() { return activated; };
+			idVec3 GetPos1() const { return pos1; };
+			idVec3 GetPos2() const { return pos2; };
+			cmdType GetCmds() const { return cmds; };
+			bool GetActivated() const { return activated; };
 
-			inline void SetPos1(idVec3 val) { this->pos1 = val; };
-			inline void SetPos2(idVec3 val) { this->pos2 = val; };
-			inline void SetCmds(cmdType val) { this->cmds = val; };
-			inline void SetActivated(bool val) { this->activated = val; };
+			void SetPos1(idVec3 val) { this->pos1 = val; };
+			void SetPos2(idVec3 val) { this->pos2 = val; };
+			void SetCmds(cmdType val) { this->cmds = val; };
+			void SetActivated(bool val) { this->activated = val; };
 
 		private:
 			idVec3 pos1; // Begin point
@@ -75,5 +77,7 @@ namespace pr
 	public:
 		using iterator = decltype(acz)::iterator;
 		using const_iterator = decltype(acz)::const_iterator;
+
+		Autocmdzone at(int index) { return acz.at(index); }
 	};
 }

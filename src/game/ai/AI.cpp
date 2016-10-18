@@ -749,7 +749,7 @@ void idAI::Restore( idRestoreGame *savefile ) {
 	savefile->ReadStaticObject( vehicleInterfaceLocal );
 	SetVehicleInterface( &vehicleInterfaceLocal );
 	hhVehicle *vehicle;
-    savefile->ReadObject( reinterpret_cast<idClass *&> ( vehicle ) );
+	savefile->ReadObject( reinterpret_cast<idClass *&> ( vehicle ) );
 	if (vehicle) {
 		vehicle->RestorePilot( &vehicleInterfaceLocal );
 	}
@@ -1192,14 +1192,14 @@ void idAI::Think( void ) {
 			}
 		}
 
-	    //HUMANHEAD: aob - vehicle updates our viewAxis
-	    if( !InVehicle() ) {
-		    current_yaw += deltaViewAngles.yaw;
-		    ideal_yaw = idMath::AngleNormalize180( ideal_yaw + deltaViewAngles.yaw );
-		    deltaViewAngles.Zero();
-		    viewAxis = idAngles( 0, current_yaw, 0 ).ToMat3();
-	    }
-	    //HUMANHEAD END
+		//HUMANHEAD: aob - vehicle updates our viewAxis
+		if( !InVehicle() ) {
+			current_yaw += deltaViewAngles.yaw;
+			ideal_yaw = idMath::AngleNormalize180( ideal_yaw + deltaViewAngles.yaw );
+			deltaViewAngles.Zero();
+			viewAxis = idAngles( 0, current_yaw, 0 ).ToMat3();
+		}
+		//HUMANHEAD END
 
 		if ( num_cinematics ) {
 			if ( !IsHidden() && torsoAnim.AnimDone( 0 ) ) {
@@ -1220,9 +1220,9 @@ void idAI::Think( void ) {
 			// clear the ik before we do anything else so the skeleton doesn't get updated twice
 			walkIK.ClearJointMods();
 
-		    // HUMANHEAD NLA
-		    physicsObj.ResetNumTouchEnt(0);
-		    // HUMANHEAD END
+			// HUMANHEAD NLA
+			physicsObj.ResetNumTouchEnt(0);
+			// HUMANHEAD END
 			switch( move.moveType ) {
 			case MOVETYPE_DEAD :
 				// dead monsters
@@ -1232,7 +1232,7 @@ void idAI::Think( void ) {
 
 			case MOVETYPE_FLY :
 				// flying monsters
-                                // HUMANHEAD JRM
+								// HUMANHEAD JRM
 				//UpdateEnemyPosition();
 				UpdateAIScript();
 				FlyMove();
@@ -1242,7 +1242,7 @@ void idAI::Think( void ) {
 
 			case MOVETYPE_STATIC :
 				// static monsters
-                                // HUMANHEAD JRM
+								// HUMANHEAD JRM
 				//UpdateEnemyPosition();
 				UpdateAIScript();
 				StaticMove();
@@ -1252,7 +1252,7 @@ void idAI::Think( void ) {
 
 			case MOVETYPE_ANIM :
 				// animation based movement
-                                // HUMANHEAD JRM
+								// HUMANHEAD JRM
 				//UpdateEnemyPosition();
 				UpdateAIScript();
 				AnimMove();
@@ -1262,7 +1262,7 @@ void idAI::Think( void ) {
 
 			case MOVETYPE_SLIDE :
 				// velocity based movement
-                                // HUMANHEAD JRM
+								// HUMANHEAD JRM
 				//UpdateEnemyPosition();
 				UpdateAIScript();
 				SlideMove();
@@ -1270,9 +1270,9 @@ void idAI::Think( void ) {
 				CheckBlink();
 				break;
 			}
-		    // HUMANHEAD NLA
-		    ClientImpacts();
-		    // HUMANHEAD END
+			// HUMANHEAD NLA
+			ClientImpacts();
+			// HUMANHEAD END
 		}
 
 		// clear pain flag so that we recieve any damage between now and the next time we run the script
@@ -2248,7 +2248,7 @@ bool idAI::StepDirection( float dir ) {
 			if ( z <= ceilingPos.z ) {
 				start.x = org.x;
 				start.y = org.y;
-                start.z = z;
+				start.z = z;
 			} else {
 				start = ceilingPos;
 			}
@@ -2335,7 +2335,7 @@ bool idAI::NewWanderDir( const idVec3 &dest ) {
 	if ( gameLocal.random.RandomInt() & 1 ) {
 		for( tdir = 0; tdir <= 315; tdir += 45 ) {
 			if ( tdir != turnaround && StepDirection( tdir ) ) {
-                return true;
+				return true;
 			}
 		}
 	} else {
@@ -3155,7 +3155,7 @@ void idAI::AdjustFlyHeight( idVec3 &vel, const idVec3 &goalPos ) {
 			vel.z += addVel.z;
 			goLower = true;
 		}
-        
+		
 		if ( ai_debugMove.GetBool() ) {
 			gameRenderWorld->DebugBounds( goLower ? colorRed : colorGreen, physicsObj.GetBounds(), path.endPos, gameLocal.msec );
 		}
@@ -3737,15 +3737,15 @@ void idAI::Activate( idEntity *activator ) {
 	} else {
 		AI_ACTIVATED = true;
 #ifdef HUMANHEAD
-	    // HUMANHEAD PDM: Allow activation by any actor, not just players
-	    if ( activator && activator->IsType( idActor::Type ) ) {
-		    idActor *actor = static_cast<idActor *>( activator );
-		    //HUMANHEAD: jrm - check if we don't have an enemy
-		    if ( !enemy.IsValid() && ReactionTo( actor ) & ATTACK_ON_ACTIVATE ) {
-			    SetEnemy( actor );
-			    SetEnemyPosition();
-		    }
-	    }
+		// HUMANHEAD PDM: Allow activation by any actor, not just players
+		if ( activator && activator->IsType( idActor::Type ) ) {
+			idActor *actor = static_cast<idActor *>( activator );
+			//HUMANHEAD: jrm - check if we don't have an enemy
+			if ( !enemy.IsValid() && ReactionTo( actor ) & ATTACK_ON_ACTIVATE ) {
+				SetEnemy( actor );
+				SetEnemyPosition();
+			}
+		}
 #else
 		if ( !activator || !activator->IsType( idPlayer::Type ) ) {
 			player = gameLocal.GetLocalPlayer();
@@ -3760,7 +3760,7 @@ void idAI::Activate( idEntity *activator ) {
 
 		// update the script in cinematics so that entities don't start anims or show themselves a frame late.
 		if ( cinematic ) {
-            UpdateAIScript();
+			UpdateAIScript();
 
 			// make sure our model gets updated
 			animator.ForceUpdate();
@@ -5033,7 +5033,7 @@ bool idAI::UpdateAnimationControllers( void ) {
 
 	idEntity *focusEnt = focusEntity.GetEntity();
 	if ( !allowJointMod || !allowEyeFocus || ( gameLocal.time >= focusTime ) ) {
-	    focusPos = GetEyePosition() + orientationJointAxis[ 0 ] * 512.0f;
+		focusPos = GetEyePosition() + orientationJointAxis[ 0 ] * 512.0f;
 	} else if ( focusEnt == NULL ) {
 		// keep looking at last position until focusTime is up
 		focusPos = currentFocusPos;

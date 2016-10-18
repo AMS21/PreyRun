@@ -9,8 +9,8 @@
 //	hhVehicleThruster
 //
 //==========================================================================
-CLASS_DECLARATION( idEntity, hhVehicleThruster )
-	EVENT( EV_Broadcast_AssignFx,		hhVehicleThruster::Event_AssignFxSmoke )
+CLASS_DECLARATION(idEntity, hhVehicleThruster)
+EVENT(EV_Broadcast_AssignFx, hhVehicleThruster::Event_AssignFxSmoke)
 END_CLASS
 
 hhVehicleThruster::hhVehicleThruster() {
@@ -38,7 +38,7 @@ void hhVehicleThruster::Save(idSaveGame *savefile) const {
 	savefile->WriteVec3(localVelocity);
 }
 
-void hhVehicleThruster::Restore( idRestoreGame *savefile ) {
+void hhVehicleThruster::Restore(idRestoreGame *savefile) {
 	owner.Restore(savefile);
 	fxSmoke.Restore(savefile);
 	savefile->ReadVec3(localOffset);
@@ -49,7 +49,7 @@ void hhVehicleThruster::Restore( idRestoreGame *savefile ) {
 	savefile->ReadVec3(localVelocity);
 }
 
-void hhVehicleThruster::WriteToSnapshot( idBitMsgDelta &msg ) const {
+void hhVehicleThruster::WriteToSnapshot(idBitMsgDelta &msg) const {
 	WriteBindToSnapshot(msg);
 	GetPhysics()->WriteToSnapshot(msg);
 
@@ -76,7 +76,7 @@ void hhVehicleThruster::WriteToSnapshot( idBitMsgDelta &msg ) const {
 	msg.WriteBits(IsHidden(), 1);
 }
 
-void hhVehicleThruster::ReadFromSnapshot( const idBitMsgDelta &msg ) {
+void hhVehicleThruster::ReadFromSnapshot(const idBitMsgDelta &msg) {
 	ReadBindFromSnapshot(msg);
 	GetPhysics()->ReadFromSnapshot(msg);
 
@@ -104,18 +104,20 @@ void hhVehicleThruster::ReadFromSnapshot( const idBitMsgDelta &msg ) {
 	if (hidden != IsHidden()) {
 		if (hidden) {
 			Hide();
-		} else {
+		}
+		else {
 			Show();
 		}
 	}
 
 	if (fxSmoke.IsValid() && fxSmoke.GetEntity() && fxSmoke->IsType(idEntityFx::Type)) {
 		if (fxSmoke->IsHidden() != IsHidden()) {
-			fxSmoke->BecomeActive( TH_THINK );
+			fxSmoke->BecomeActive(TH_THINK);
 			if (IsHidden()) {
 				fxSmoke->Nozzle(false);
 				fxSmoke->fl.hidden = true;
-			} else {
+			}
+			else {
 				fxSmoke->Nozzle(true);
 				fxSmoke->fl.hidden = false;
 			}
@@ -123,24 +125,24 @@ void hhVehicleThruster::ReadFromSnapshot( const idBitMsgDelta &msg ) {
 	}
 }
 
-void hhVehicleThruster::ClientPredictionThink( void ) {
+void hhVehicleThruster::ClientPredictionThink(void) {
 	Think();
 }
 
 void hhVehicleThruster::SetSmoker(bool bSmoker, idVec3 &offset, idVec3 &dir) {
 	localOffset = offset;
 	localDirection = dir;
-	if ( bSmoker && (!fxSmoke.IsValid() || !fxSmoke.GetEntity()) ) {
+	if (bSmoker && (!fxSmoke.IsValid() || !fxSmoke.GetEntity())) {
 		hhFxInfo fxInfo;
 		const char *smokeName;
-		smokeName = spawnArgs.GetString( "fx_smoke" );
+		smokeName = spawnArgs.GetString("fx_smoke");
 		if (smokeName && *smokeName) {
 			fxInfo.SetStart(false);
 			fxInfo.RemoveWhenDone(false);
-			fxInfo.SetEntity( this );
+			fxInfo.SetEntity(this);
 			idVec3 loc = owner->GetOrigin() + localOffset * owner->GetAxis();
 			idMat3 axis = (localDirection * owner->GetAxis()).ToMat3();
-			BroadcastFxInfo( smokeName, loc, axis, &fxInfo, &EV_Broadcast_AssignFx, false );
+			BroadcastFxInfo(smokeName, loc, axis, &fxInfo, &EV_Broadcast_AssignFx, false);
 		}
 	}
 	else if (!bSmoker && fxSmoke.IsValid() && fxSmoke.GetEntity()) {
@@ -152,7 +154,7 @@ void hhVehicleThruster::SetSmoker(bool bSmoker, idVec3 &offset, idVec3 &dir) {
 void hhVehicleThruster::SetThruster(bool on) {
 
 	if (fxSmoke.IsValid() && fxSmoke.GetEntity()) {
-		fxSmoke->Nozzle( on );
+		fxSmoke->Nozzle(on);
 	}
 
 	on ? Show() : Hide();
@@ -167,7 +169,7 @@ void hhVehicleThruster::SetDying(bool bDying) {
 	}
 }
 
-void hhVehicleThruster::Update( const idVec3 &vel ) {
+void hhVehicleThruster::Update(const idVec3 &vel) {
 	if (bSoundMaster) {
 		localVelocity = vel;
 		bool on = localVelocity != vec3_origin;
@@ -185,14 +187,14 @@ void hhVehicleThruster::Update( const idVec3 &vel ) {
 
 }
 
-bool hhVehicleThruster::GetPhysicsToSoundTransform( idVec3 &origin, idMat3 &axis ) {
+bool hhVehicleThruster::GetPhysicsToSoundTransform(idVec3 &origin, idMat3 &axis) {
 	idVec3 toSound;
 	idVec3 toPilot;
 	if (owner.IsValid()) {
 		axis.Identity();
 		toSound = -localVelocity;	// Position thrust sounds in the opposite direction as thrust velocity
 		toSound.Normalize();
-		toPilot = (owner->GetOrigin() - GetOrigin()) + (owner->spawnArgs.GetVector("offset_pilot") + idVec3(0,0,1)*owner->spawnArgs.GetFloat("pilot_eyeHeight"))*owner->GetAxis();
+		toPilot = (owner->GetOrigin() - GetOrigin()) + (owner->spawnArgs.GetVector("offset_pilot") + idVec3(0, 0, 1)*owner->spawnArgs.GetFloat("pilot_eyeHeight"))*owner->GetAxis();
 		origin = toPilot + (toSound * owner->GetAxis() * soundDistance);
 		return true;
 	}
@@ -200,7 +202,7 @@ bool hhVehicleThruster::GetPhysicsToSoundTransform( idVec3 &origin, idMat3 &axis
 
 }
 
-void hhVehicleThruster::Event_AssignFxSmoke( hhEntityFx* fx ) {
+void hhVehicleThruster::Event_AssignFxSmoke(hhEntityFx* fx) {
 	fxSmoke = fx;
 }
 
@@ -209,11 +211,11 @@ void hhVehicleThruster::Event_AssignFxSmoke( hhEntityFx* fx ) {
 //	hhPilotVehicleInterface
 //
 //==========================================================================
-CLASS_DECLARATION( idClass, hhPilotVehicleInterface )
+CLASS_DECLARATION(idClass, hhPilotVehicleInterface)
 END_CLASS
 
 hhPilotVehicleInterface::hhPilotVehicleInterface() {
-	UnderScriptControl( false );
+	UnderScriptControl(false);
 }
 
 //rww - added to handle when a player is destroyed before a vehicle (only in mp i guess)
@@ -227,29 +229,29 @@ hhPilotVehicleInterface::~hhPilotVehicleInterface() {
 }
 
 void hhPilotVehicleInterface::Save(idSaveGame *savefile) const {
-		pilot.Save(savefile);
-		vehicle.Save(savefile);
-		savefile->WriteBool(underScriptControl);
+	pilot.Save(savefile);
+	vehicle.Save(savefile);
+	savefile->WriteBool(underScriptControl);
 }
 
-void hhPilotVehicleInterface::Restore( idRestoreGame *savefile ) {
-		pilot.Restore(savefile);
-		vehicle.Restore(savefile);
-		savefile->ReadBool(underScriptControl);
+void hhPilotVehicleInterface::Restore(idRestoreGame *savefile) {
+	pilot.Restore(savefile);
+	vehicle.Restore(savefile);
+	savefile->ReadBool(underScriptControl);
 }
 
-void hhPilotVehicleInterface::RetrievePilotInput( usercmd_t& cmds, idAngles& viewAngles ) {
-	if( pilot.IsValid() ) {
-		pilot->GetPilotInput( cmds, viewAngles );
+void hhPilotVehicleInterface::RetrievePilotInput(usercmd_t& cmds, idAngles& viewAngles) {
+	if (pilot.IsValid()) {
+		pilot->GetPilotInput(cmds, viewAngles);
 	}
 }
 
-void hhPilotVehicleInterface::TakeControl( hhVehicle* theVehicle, idActor* thePilot ) {
+void hhPilotVehicleInterface::TakeControl(hhVehicle* theVehicle, idActor* thePilot) {
 	vehicle = theVehicle;
 	pilot = thePilot;
 
-	if( theVehicle ) {
-		theVehicle->AcceptPilot( this );
+	if (theVehicle) {
+		theVehicle->AcceptPilot(this);
 	}
 }
 
@@ -262,13 +264,13 @@ void hhPilotVehicleInterface::ReleaseControl() {
 }
 
 idVec3 hhPilotVehicleInterface::DeterminePilotOrigin() const {
-	assert( vehicle.IsValid() );
+	assert(vehicle.IsValid());
 
 	return vehicle->DeterminePilotOrigin();
 }
 
 idMat3 hhPilotVehicleInterface::DeterminePilotAxis() const {
-	assert( vehicle.IsValid() );
+	assert(vehicle.IsValid());
 
 	return vehicle->DeterminePilotAxis();
 }
@@ -285,31 +287,31 @@ idActor* hhPilotVehicleInterface::GetPilot() const {
 	return pilot.GetEntity();
 }
 
-bool hhPilotVehicleInterface::InvalidVehicleImpulse( int impulse ) {
-	switch( impulse ) {
-		case IMPULSE_0:
-		case IMPULSE_1:
-		case IMPULSE_2:
-		case IMPULSE_3:
-		case IMPULSE_4:
-		case IMPULSE_5:
-		case IMPULSE_6:
-		case IMPULSE_7:
-		case IMPULSE_8:
-		case IMPULSE_9:
-		case IMPULSE_10:
-		case IMPULSE_11:
-		case IMPULSE_12:
-		case IMPULSE_13:
-		case IMPULSE_14:
-		case IMPULSE_15:
-		case IMPULSE_16:
-		case IMPULSE_19:
-		case IMPULSE_25:
-		case IMPULSE_40:
-		case IMPULSE_54:
-			return true;
-	}	
+bool hhPilotVehicleInterface::InvalidVehicleImpulse(int impulse) {
+	switch (impulse) {
+	case IMPULSE_0:
+	case IMPULSE_1:
+	case IMPULSE_2:
+	case IMPULSE_3:
+	case IMPULSE_4:
+	case IMPULSE_5:
+	case IMPULSE_6:
+	case IMPULSE_7:
+	case IMPULSE_8:
+	case IMPULSE_9:
+	case IMPULSE_10:
+	case IMPULSE_11:
+	case IMPULSE_12:
+	case IMPULSE_13:
+	case IMPULSE_14:
+	case IMPULSE_15:
+	case IMPULSE_16:
+	case IMPULSE_19:
+	case IMPULSE_25:
+	case IMPULSE_40:
+	case IMPULSE_54:
+		return true;
+	}
 
 	return false;
 }
@@ -319,7 +321,7 @@ bool hhPilotVehicleInterface::InvalidVehicleImpulse( int impulse ) {
 //	hhAIVehicleInterface
 //
 //==========================================================================
-CLASS_DECLARATION( hhPilotVehicleInterface, hhAIVehicleInterface )
+CLASS_DECLARATION(hhPilotVehicleInterface, hhAIVehicleInterface)
 END_CLASS
 
 hhAIVehicleInterface::hhAIVehicleInterface(void) {
@@ -339,7 +341,7 @@ void hhAIVehicleInterface::Save(idSaveGame *savefile) const {
 
 }
 
-void hhAIVehicleInterface::Restore( idRestoreGame *savefile ) {
+void hhAIVehicleInterface::Restore(idRestoreGame *savefile) {
 	savefile->ReadUsercmd(bufferedCmds);
 	savefile->ReadAngles(bufferedViewAngles);
 	savefile->ReadBool(stateFiring);
@@ -350,8 +352,8 @@ void hhAIVehicleInterface::Restore( idRestoreGame *savefile ) {
 	savefile->ReadVec3(stateThrustDestination);
 }
 
-void hhAIVehicleInterface::TakeControl( hhVehicle* vehicle, idActor* pilot ) {
-	hhPilotVehicleInterface::TakeControl( vehicle, pilot );
+void hhAIVehicleInterface::TakeControl(hhVehicle* vehicle, idActor* pilot) {
+	hhPilotVehicleInterface::TakeControl(vehicle, pilot);
 
 	ClearBufferedCmds();
 	bufferedViewAngles = (pilot) ? pilot->GetAxis().ToAngles() : ang_zero;
@@ -365,19 +367,19 @@ void hhAIVehicleInterface::AltFire(bool on) {
 	stateAltFiring = on;
 }
 
-void hhAIVehicleInterface::OrientTowards( const idVec3 &loc, float speed ) {
+void hhAIVehicleInterface::OrientTowards(const idVec3 &loc, float speed) {
 	stateOrientDestination = loc;
-	stateOrientSpeed = idMath::ClampFloat( 0.0f, 1.0f, speed );
+	stateOrientSpeed = idMath::ClampFloat(0.0f, 1.0f, speed);
 }
 
-void hhAIVehicleInterface::ThrustTowards( const idVec3 &loc, float speed ) {
+void hhAIVehicleInterface::ThrustTowards(const idVec3 &loc, float speed) {
 	stateThrustDestination = loc;
-	stateThrustSpeed = idMath::ClampFloat( 0.0f, 1.0f, speed );
+	stateThrustSpeed = idMath::ClampFloat(0.0f, 1.0f, speed);
 }
 
-void hhAIVehicleInterface::RetrievePilotInput( usercmd_t& cmds, idAngles& viewAngles ) {
+void hhAIVehicleInterface::RetrievePilotInput(usercmd_t& cmds, idAngles& viewAngles) {
 
-	if( !ControllingVehicle() ) {
+	if (!ControllingVehicle()) {
 		return;
 	}
 
@@ -393,7 +395,7 @@ void hhAIVehicleInterface::RetrievePilotInput( usercmd_t& cmds, idAngles& viewAn
 	cmds.buttons |= (stateAltFiring ? BUTTON_ATTACK_ALT : 0);
 
 	// Handle thrusting
-	if ( stateThrustSpeed > 0.0f ) {
+	if (stateThrustSpeed > 0.0f) {
 		idVec3 targetDir = stateThrustDestination - eyePos;
 
 		// Use proportional control system to ease into destination
@@ -411,42 +413,42 @@ void hhAIVehicleInterface::RetrievePilotInput( usercmd_t& cmds, idAngles& viewAn
 	}
 
 	// Handle orienting: Using direction vectors to interpolate our orientation to our moving target orientation
-	viewAngles.pitch = -idMath::AngleNormalize180( vehicle->GetAxis()[0].ToPitch() );
+	viewAngles.pitch = -idMath::AngleNormalize180(vehicle->GetAxis()[0].ToPitch());
 	viewAngles.yaw = vehicle->GetAxis()[0].ToYaw();
 	viewAngles.roll = 0.0f;
 
-	if ( stateOrientSpeed > 0.0f ) {
+	if (stateOrientSpeed > 0.0f) {
 		idVec3 localDir;
-		idAngles idealViewAngles( ang_zero );
+		idAngles idealViewAngles(ang_zero);
 		idVec3 targetDir = stateOrientDestination - eyePos;
 		targetDir.Normalize();
 		float degrees = stateOrientSpeed * 360.0f * MS2SEC(gameLocal.msec);
 
-		vehicle->GetPhysics()->GetAxis().ProjectVector( targetDir, localDir );
+		vehicle->GetPhysics()->GetAxis().ProjectVector(targetDir, localDir);
 		idealViewAngles.yaw = localDir.ToYaw();
-		idealViewAngles.pitch = -idMath::AngleNormalize180( localDir.ToPitch() );
+		idealViewAngles.pitch = -idMath::AngleNormalize180(localDir.ToPitch());
 
 		idAngles deltaViewAngles = (idealViewAngles - viewAngles).Normalize180();
-		deltaViewAngles.Clamp( idAngles(-degrees, -degrees, 0.0f), idAngles(degrees, degrees, 0.0f) );
-		if( !deltaViewAngles.Compare(ang_zero, VECTOR_EPSILON) ) {
+		deltaViewAngles.Clamp(idAngles(-degrees, -degrees, 0.0f), idAngles(degrees, degrees, 0.0f));
+		if (!deltaViewAngles.Compare(ang_zero, VECTOR_EPSILON)) {
 			viewAngles += deltaViewAngles;
 			bufferedViewAngles = viewAngles;	// Save for next time
 		}
 	}
 }
 
-void hhAIVehicleInterface::BufferPilotCmds( const usercmd_t* cmds, const idAngles* viewAngles ) {
-	if( cmds ) {
+void hhAIVehicleInterface::BufferPilotCmds(const usercmd_t* cmds, const idAngles* viewAngles) {
+	if (cmds) {
 		bufferedCmds = *cmds;
 	}
 
-	if( viewAngles ) {
+	if (viewAngles) {
 		bufferedViewAngles = *viewAngles;
 	}
 }
 
 void hhAIVehicleInterface::ClearBufferedCmds() {
-	memset( &bufferedCmds, 0, sizeof(usercmd_t) );
+	memset(&bufferedCmds, 0, sizeof(usercmd_t));
 	stateFiring = false;
 	stateAltFiring = false;
 	stateOrientSpeed = 0.0f;
@@ -454,7 +456,7 @@ void hhAIVehicleInterface::ClearBufferedCmds() {
 }
 
 bool hhAIVehicleInterface::IsVehicleDocked() const {
-	return vehicle.IsValid() && vehicle->IsDocked(); 
+	return vehicle.IsValid() && vehicle->IsDocked();
 }
 
 //==========================================================================
@@ -462,7 +464,7 @@ bool hhAIVehicleInterface::IsVehicleDocked() const {
 //	hhPlayerVehicleInterface
 //
 //==========================================================================
-CLASS_DECLARATION( hhPilotVehicleInterface, hhPlayerVehicleInterface )
+CLASS_DECLARATION(hhPilotVehicleInterface, hhPlayerVehicleInterface)
 END_CLASS
 
 hhPlayerVehicleInterface::hhPlayerVehicleInterface() {
@@ -480,13 +482,13 @@ void hhPlayerVehicleInterface::Save(idSaveGame *savefile) const {
 	savefile->WriteBool(uniqueHud);
 	savefile->WriteUserInterface(hud, uniqueHud);
 
-	savefile->WriteFloat( translationAlpha.GetStartTime() );	// idInterpolate<float>
-	savefile->WriteFloat( translationAlpha.GetDuration() );
-	savefile->WriteFloat( translationAlpha.GetStartValue() );
-	savefile->WriteFloat( translationAlpha.GetEndValue() );
+	savefile->WriteFloat(translationAlpha.GetStartTime());	// idInterpolate<float>
+	savefile->WriteFloat(translationAlpha.GetDuration());
+	savefile->WriteFloat(translationAlpha.GetStartValue());
+	savefile->WriteFloat(translationAlpha.GetEndValue());
 }
 
-void hhPlayerVehicleInterface::Restore( idRestoreGame *savefile ) {
+void hhPlayerVehicleInterface::Restore(idRestoreGame *savefile) {
 	float set;
 
 	savefile->ReadStaticObject(weaponHandState);
@@ -494,35 +496,35 @@ void hhPlayerVehicleInterface::Restore( idRestoreGame *savefile ) {
 	savefile->ReadBool(uniqueHud);
 	savefile->ReadUserInterface(hud);
 
-	savefile->ReadFloat( set );			// idInterpolate<float>
-	translationAlpha.SetStartTime( set );
-	savefile->ReadFloat( set );
-	translationAlpha.SetDuration( set );
-	savefile->ReadFloat( set );
+	savefile->ReadFloat(set);			// idInterpolate<float>
+	translationAlpha.SetStartTime(set);
+	savefile->ReadFloat(set);
+	translationAlpha.SetDuration(set);
+	savefile->ReadFloat(set);
 	translationAlpha.SetStartValue(set);
-	savefile->ReadFloat( set );
-	translationAlpha.SetEndValue( set );
+	savefile->ReadFloat(set);
+	translationAlpha.SetEndValue(set);
 }
 
-void hhPlayerVehicleInterface::UpdateControlHand( const usercmd_t& cmds ) {
-	if( controlHand.IsValid() ) {
-		controlHand->UpdateControlDirection( idVec3(Sign(cmds.forwardmove), Sign(cmds.rightmove), Sign(cmds.upmove)) );
+void hhPlayerVehicleInterface::UpdateControlHand(const usercmd_t& cmds) {
+	if (controlHand.IsValid()) {
+		controlHand->UpdateControlDirection(idVec3(Sign(cmds.forwardmove), Sign(cmds.rightmove), Sign(cmds.upmove)));
 	}
 }
 
-void hhPlayerVehicleInterface::CreateControlHand( hhPlayer* pilot, const char* handName ) {
+void hhPlayerVehicleInterface::CreateControlHand(hhPlayer* pilot, const char* handName) {
 	//RemoveHand();
-	
-	if( !handName || !handName[0] ) {
+
+	if (!handName || !handName[0]) {
 		return;
 	}
 
-	weaponHandState.SetPlayer( pilot );
-	weaponHandState.SetWeaponTransition( 1 );
-	weaponHandState.Archive( NULL, 0, handName, 1 );
+	weaponHandState.SetPlayer(pilot);
+	weaponHandState.SetWeaponTransition(1);
+	weaponHandState.Archive(NULL, 0, handName, 1);
 
-	if ( pilot->hand.IsValid() && pilot->hand->IsType( hhControlHand::Type ) ) {
-		controlHand = static_cast<hhControlHand*>( pilot->hand.GetEntity() );	
+	if (pilot->hand.IsValid() && pilot->hand->IsType(hhControlHand::Type)) {
+		controlHand = static_cast<hhControlHand*>(pilot->hand.GetEntity());
 	}
 	else {
 		controlHand = NULL;
@@ -532,28 +534,28 @@ void hhPlayerVehicleInterface::CreateControlHand( hhPlayer* pilot, const char* h
 }
 
 void hhPlayerVehicleInterface::RemoveHand() {
-	if( controlHand.IsValid() ) {
+	if (controlHand.IsValid()) {
 		//controlHand->RemoveHand();
 		controlHand = NULL;
 	}
 	weaponHandState.RestoreFromArchive();
 }
 
-void hhPlayerVehicleInterface::RetrievePilotInput( usercmd_t& cmds, idAngles& viewAngles ) {
-	if( pilot.IsValid() ) {
-		hhPilotVehicleInterface::RetrievePilotInput( cmds, viewAngles );
-		UpdateControlHand( cmds );
+void hhPlayerVehicleInterface::RetrievePilotInput(usercmd_t& cmds, idAngles& viewAngles) {
+	if (pilot.IsValid()) {
+		hhPilotVehicleInterface::RetrievePilotInput(cmds, viewAngles);
+		UpdateControlHand(cmds);
 	}
 }
 
-void hhPlayerVehicleInterface::TakeControl( hhVehicle* vehicle, idActor* pilot ) {
-	hhPilotVehicleInterface::TakeControl( vehicle, pilot );
+void hhPlayerVehicleInterface::TakeControl(hhVehicle* vehicle, idActor* pilot) {
+	hhPilotVehicleInterface::TakeControl(vehicle, pilot);
 
-	if( vehicle ) {
-		idStr hudName = vehicle->spawnArgs.GetString( "gui_hud" );
-		if( hudName.Length() ) {
+	if (vehicle) {
+		idStr hudName = vehicle->spawnArgs.GetString("gui_hud");
+		if (hudName.Length()) {
 			uniqueHud = vehicle->spawnArgs.GetBool("uniqueguihud", "1");
-			hud = uiManager->FindGui( hudName.c_str(), true, uniqueHud, !uniqueHud );
+			hud = uiManager->FindGui(hudName.c_str(), true, uniqueHud, !uniqueHud);
 
 			bool isPilotLocal = false;
 			idPlayer *localPl = gameLocal.GetLocalPlayer();
@@ -563,27 +565,28 @@ void hhPlayerVehicleInterface::TakeControl( hhVehicle* vehicle, idActor* pilot )
 				}
 			}
 			if (isPilotLocal) {
-				translationAlpha.Init( gameLocal.time, 0, 0.0f, 0.0f );
-				hud->Activate( true, gameLocal.GetTime() );
+				translationAlpha.Init(gameLocal.time, 0, 0.0f, 0.0f);
+				hud->Activate(true, gameLocal.GetTime());
 				pilot->fl.clientEvents = true; //rww - hack
-				pilot->PostEventMS( &EV_StartHudTranslation, 1000 );
+				pilot->PostEventMS(&EV_StartHudTranslation, 1000);
 				pilot->fl.clientEvents = false; //rww - hack
 			}
 		}
 
 		if (!gameLocal.isClient) {
-			CreateControlHand( static_cast<hhPlayer*>(pilot), vehicle->spawnArgs.GetString("def_hand") );
+			CreateControlHand(static_cast<hhPlayer*>(pilot), vehicle->spawnArgs.GetString("def_hand"));
 		}
 	}
 }
 
 void hhPlayerVehicleInterface::ReleaseControl() {
-	if( vehicle.IsValid() ) {
+	if (vehicle.IsValid()) {
 		hud = NULL;
 		uniqueHud = true;
 		if (!gameLocal.isClient) {
 			RemoveHand();
-		} else {
+		}
+		else {
 			if (controlHand.IsValid() && controlHand.GetEntity()) {
 				controlHand->Hide();
 			}
@@ -593,18 +596,18 @@ void hhPlayerVehicleInterface::ReleaseControl() {
 	hhPilotVehicleInterface::ReleaseControl();
 }
 
-void hhPlayerVehicleInterface::DrawHUD( idUserInterface* _hud ) {
-	if( vehicle.IsValid() && vehicle->IsVehicle() && _hud ) {
+void hhPlayerVehicleInterface::DrawHUD(idUserInterface* _hud) {
+	if (vehicle.IsValid() && vehicle->IsVehicle() && _hud) {
 		float alpha = translationAlpha.GetCurrentValue(gameLocal.GetTime());
-		_hud->SetStateFloat( "translationAlpha", alpha );
-		_hud->SetStateBool( "translationProject", false );
+		_hud->SetStateFloat("translationAlpha", alpha);
+		_hud->SetStateBool("translationProject", false);
 
-		vehicle->DrawHUD( _hud );
+		vehicle->DrawHUD(_hud);
 	}
 }
 
 void hhPlayerVehicleInterface::StartHUDTranslation() {
-	translationAlpha.Init( gameLocal.time, 1000, 0.0f, 1.0f );
+	translationAlpha.Init(gameLocal.time, 1000, 0.0f, 1.0f);
 }
 
 
@@ -615,7 +618,7 @@ void hhPlayerVehicleInterface::StartHUDTranslation() {
 //==========================================================================
 
 const idEventDef EV_VehicleExplode("<vehicleexplode>", "efff");
-const idEventDef EV_Vehicle_FireCannon( "fireCannon" );
+const idEventDef EV_Vehicle_FireCannon("fireCannon");
 
 const idEventDef EV_VehicleGetIn("getIn", "e");			// Script Commands
 const idEventDef EV_VehicleGetOut("getOut");
@@ -628,18 +631,18 @@ const idEventDef EV_VehicleStopThrustingTOwards("stopThrustingTowards");
 const idEventDef EV_VehicleReleaseControl("releaseControl");
 const idEventDef EV_Vehicle_EjectPilot("ejectPilot");
 
-ABSTRACT_DECLARATION( hhRenderEntity, hhVehicle )
-	EVENT( EV_Vehicle_FireCannon,		hhVehicle::Event_FireCannon )
-	EVENT( EV_VehicleExplode,			hhVehicle::Event_Explode )
-	EVENT( EV_VehicleGetIn,				hhVehicle::Event_GetIn )
-	EVENT( EV_VehicleGetOut,			hhVehicle::Event_GetOut )
-	EVENT( EV_VehicleFire,				hhVehicle::Event_Fire )
-	EVENT( EV_VehicleAltFire,			hhVehicle::Event_AltFire )
-	EVENT( EV_VehicleOrientTowards,		hhVehicle::Event_OrientTowards )
-	EVENT( EV_VehicleThrustTowards,		hhVehicle::Event_ThrustTowards )
-	EVENT( EV_VehicleReleaseControl,	hhVehicle::Event_ReleaseScriptControl )
-	EVENT( EV_Vehicle_EjectPilot,		hhVehicle::Event_EjectPilot )
-	EVENT( EV_ResetGravity,				hhVehicle::Event_ResetGravity )
+ABSTRACT_DECLARATION(hhRenderEntity, hhVehicle)
+EVENT(EV_Vehicle_FireCannon, hhVehicle::Event_FireCannon)
+EVENT(EV_VehicleExplode, hhVehicle::Event_Explode)
+EVENT(EV_VehicleGetIn, hhVehicle::Event_GetIn)
+EVENT(EV_VehicleGetOut, hhVehicle::Event_GetOut)
+EVENT(EV_VehicleFire, hhVehicle::Event_Fire)
+EVENT(EV_VehicleAltFire, hhVehicle::Event_AltFire)
+EVENT(EV_VehicleOrientTowards, hhVehicle::Event_OrientTowards)
+EVENT(EV_VehicleThrustTowards, hhVehicle::Event_ThrustTowards)
+EVENT(EV_VehicleReleaseControl, hhVehicle::Event_ReleaseScriptControl)
+EVENT(EV_Vehicle_EjectPilot, hhVehicle::Event_EjectPilot)
+EVENT(EV_ResetGravity, hhVehicle::Event_ResetGravity)
 END_CLASS
 
 hhVehicle::~hhVehicle() {
@@ -652,19 +655,20 @@ hhVehicle::~hhVehicle() {
 }
 
 void hhVehicle::Spawn() {
-	memset( &oldCmds, 0, sizeof(usercmd_t) );
-	thrusterCost = spawnArgs.GetInt( "thrusterCost" );
-	currentPower = spawnArgs.GetInt( "maxPower" );
-	thrustFactor = spawnArgs.GetFloat( "thrustFactor" );
-	dockBoostFactor = spawnArgs.GetFloat( "dockBoostFactor" );
-	if ( gameLocal.isMultiplayer ) {
+	memset(&oldCmds, 0, sizeof(usercmd_t));
+	thrusterCost = spawnArgs.GetInt("thrusterCost");
+	currentPower = spawnArgs.GetInt("maxPower");
+	thrustFactor = spawnArgs.GetFloat("thrustFactor");
+	dockBoostFactor = spawnArgs.GetFloat("dockBoostFactor");
+	if (gameLocal.isMultiplayer) {
 		noDamage = false;
-	} else {
-		noDamage = spawnArgs.GetBool( "noDamage", "0" );
+	}
+	else {
+		noDamage = spawnArgs.GetBool("noDamage", "0");
 	}
 
-	bDamageSelfOnCollision = spawnArgs.GetBool( "damageSelfOnCollision" );
-	bDamageOtherOnCollision = spawnArgs.GetBool( "damageOtherOnCollision" );
+	bDamageSelfOnCollision = spawnArgs.GetBool("damageSelfOnCollision");
+	bDamageOtherOnCollision = spawnArgs.GetBool("damageOtherOnCollision");
 
 	lastAttackTime = 0;
 	fl.neverDormant = false;
@@ -677,7 +681,7 @@ void hhVehicle::Spawn() {
 	bDisallowAttackUntilRelease = false;
 	bDisallowAltAttackUntilRelease = false;
 
-	InitializeAttackFuncs();	
+	InitializeAttackFuncs();
 
 	//rww - i see no reason why the dock should be set upon spawning the vehicle.
 	//also would cause issues in mp where only one shuttle should be docked at a time.
@@ -697,13 +701,13 @@ void hhVehicle::Spawn() {
 
 	BecomeConsole();
 
-	physicsObj.SetOrigin( GetPhysics()->GetOrigin() );
+	physicsObj.SetOrigin(GetPhysics()->GetOrigin());
 
-	SetAxis( GetPhysics()->GetAxis() );
-	physicsObj.SetAxis( GetPhysics()->GetAxis() );
-	SetPhysics( &physicsObj );
+	SetAxis(GetPhysics()->GetAxis());
+	physicsObj.SetAxis(GetPhysics()->GetAxis());
+	SetPhysics(&physicsObj);
 
-	if ( spawnArgs.GetInt( "nodrop" ) ) {
+	if (spawnArgs.GetInt("nodrop")) {
 		physicsObj.PutToRest();
 	}
 	else {
@@ -715,10 +719,11 @@ void hhVehicle::Save(idSaveGame *savefile) const {
 	savefile->WriteStaticObject(physicsObj);
 	savefile->WriteMat3(modelAxis);
 
-	if( fireController ) {
+	if (fireController) {
 		savefile->WriteBool(true);
 		savefile->WriteStaticObject(*fireController);
-	} else {
+	}
+	else {
 		savefile->WriteBool(false);
 	}
 
@@ -757,18 +762,19 @@ void hhVehicle::Save(idSaveGame *savefile) const {
 	savefile->WriteBool(noDamage);
 }
 
-void hhVehicle::Restore( idRestoreGame *savefile ) {
+void hhVehicle::Restore(idRestoreGame *savefile) {
 	savefile->ReadStaticObject(physicsObj);
 	RestorePhysics(&physicsObj);
 
 	savefile->ReadMat3(modelAxis);
 
 	bool test;
-	savefile->ReadBool( test );
+	savefile->ReadBool(test);
 	if (test) {
 		fireController = CreateFireController();
 		savefile->ReadStaticObject(*fireController);
-	} else {
+	}
+	else {
 		SAFE_DELETE_PTR(fireController);
 	}
 
@@ -807,10 +813,10 @@ void hhVehicle::Restore( idRestoreGame *savefile ) {
 	savefile->ReadBool(noDamage);
 }
 
-const idEventDef* hhVehicle::GetAttackFunc( const char* funcName ) {
+const idEventDef* hhVehicle::GetAttackFunc(const char* funcName) {
 	function_t* function = NULL;
 
-	if( !funcName || !funcName[0] ) {
+	if (!funcName || !funcName[0]) {
 		return NULL;
 	}
 
@@ -819,12 +825,12 @@ const idEventDef* hhVehicle::GetAttackFunc( const char* funcName ) {
 		return NULL;
 	}
 
-	function = gameLocal.program.FindFunction( funcName, funcType );
-	if( !function || !function->eventdef ) {
+	function = gameLocal.program.FindFunction(funcName, funcType);
+	if (!function || !function->eventdef) {
 		return NULL;
 	}
 
-	HH_ASSERT( RespondsTo(*function->eventdef) );
+	HH_ASSERT(RespondsTo(*function->eventdef));
 
 	return function->eventdef;
 }
@@ -832,16 +838,16 @@ const idEventDef* hhVehicle::GetAttackFunc( const char* funcName ) {
 void hhVehicle::InitializeAttackFuncs() {
 	idStr funcName;
 	attackFunc = finishedAttackingFunc = altAttackFunc = finishedAltAttackingFunc = NULL;
-	
+
 	funcName = spawnArgs.GetString("attackFunc");
 	if (funcName.Length()) {
-		attackFunc = GetAttackFunc( funcName.c_str() );
-		finishedAttackingFunc = GetAttackFunc( (funcName + "Done").c_str() );
+		attackFunc = GetAttackFunc(funcName.c_str());
+		finishedAttackingFunc = GetAttackFunc((funcName + "Done").c_str());
 	}
 	funcName = spawnArgs.GetString("altAttackFunc");
 	if (funcName.Length()) {
-		altAttackFunc = GetAttackFunc( funcName.c_str() );
-		finishedAltAttackingFunc = GetAttackFunc( (funcName + "Done").c_str() );
+		altAttackFunc = GetAttackFunc(funcName.c_str());
+		finishedAltAttackingFunc = GetAttackFunc((funcName + "Done").c_str());
 	}
 }
 
@@ -849,10 +855,10 @@ void hhVehicle::Think() {
 	usercmd_t	pilotCmds;
 	idAngles	pilotViewAngles;
 
-	if( IsVehicle() && GetPilotInterface() ) {
-		GetPilotInterface()->RetrievePilotInput( pilotCmds, pilotViewAngles );
-		ProcessPilotInput( &pilotCmds, &pilotViewAngles );
-		GetPhysics()->SetAxis( mat3_identity );
+	if (IsVehicle() && GetPilotInterface()) {
+		GetPilotInterface()->RetrievePilotInput(pilotCmds, pilotViewAngles);
+		ProcessPilotInput(&pilotCmds, &pilotViewAngles);
+		GetPhysics()->SetAxis(mat3_identity);
 	}
 
 	hhRenderEntity::Think();
@@ -866,7 +872,7 @@ void hhVehicle::Present() {
 	hhRenderEntity::Present();
 }
 
-void hhVehicle::AcceptPilot( hhPilotVehicleInterface* pilotInterface ) {
+void hhVehicle::AcceptPilot(hhPilotVehicleInterface* pilotInterface) {
 	//assure that the vehicle is showing upon accepting a new pilot
 	Show();
 
@@ -874,22 +880,23 @@ void hhVehicle::AcceptPilot( hhPilotVehicleInterface* pilotInterface ) {
 
 	fl.neverDormant = true;
 	fl.takedamage = true;
-	StartSound( "snd_activation", SND_CHANNEL_ANY );
-	StartSound( "snd_inuse", SND_CHANNEL_MISC1 );
+	StartSound("snd_activation", SND_CHANNEL_ANY);
+	StartSound("snd_inuse", SND_CHANNEL_MISC1);
 
 	CreateDomeLight();
 	CreateHeadLight();
-	BecomeActive( TH_TICKER );
+	BecomeActive(TH_TICKER);
 
 	const idDict* infoDict = NULL;
-	if ( GetPilot() && GetPilot()->IsType(idAI::Type) ) {
-		infoDict = gameLocal.FindEntityDefDict( spawnArgs.GetString("def_fireInfoAI"), false );
-	} else {
-		infoDict = gameLocal.FindEntityDefDict( spawnArgs.GetString("def_fireInfo"), false );
+	if (GetPilot() && GetPilot()->IsType(idAI::Type)) {
+		infoDict = gameLocal.FindEntityDefDict(spawnArgs.GetString("def_fireInfoAI"), false);
+	}
+	else {
+		infoDict = gameLocal.FindEntityDefDict(spawnArgs.GetString("def_fireInfo"), false);
 	}
 	fireController = CreateFireController();
-	HH_ASSERT( fireController );
-	fireController->Init( infoDict, this, GetPilot() );
+	HH_ASSERT(fireController);
+	fireController->Init(infoDict, this, GetPilot());
 
 	// supress model in player views, but allow it in mirrors and remote views
 	if (GetPilot()->IsType(hhPlayer::Type)) {
@@ -899,31 +906,31 @@ void hhVehicle::AcceptPilot( hhPilotVehicleInterface* pilotInterface ) {
 	BecomeVehicle();
 }
 
-void hhVehicle::RestorePilot( hhPilotVehicleInterface* pilotInterface) { 
-	const idDict *infoDict = gameLocal.FindEntityDefDict( spawnArgs.GetString("def_fireInfo"), false );
-	assert( infoDict );
-	fireController->SetWeaponDict( infoDict );
-	this->pilotInterface = pilotInterface; 
+void hhVehicle::RestorePilot(hhPilotVehicleInterface* pilotInterface) {
+	const idDict *infoDict = gameLocal.FindEntityDefDict(spawnArgs.GetString("def_fireInfo"), false);
+	assert(infoDict);
+	fireController->SetWeaponDict(infoDict);
+	this->pilotInterface = pilotInterface;
 }
 
 
 void hhVehicle::EjectPilot() {
-	assert( IsVehicle() );
+	assert(IsVehicle());
 
-	SAFE_DELETE_PTR( fireController );
+	SAFE_DELETE_PTR(fireController);
 
 	fl.takedamage = false;
 	fl.neverDormant = false;
-	StopSound( SND_CHANNEL_MISC1 );
-	StartSound( "snd_deactivation", SND_CHANNEL_ANY );
+	StopSound(SND_CHANNEL_MISC1);
+	StartSound("snd_deactivation", SND_CHANNEL_ANY);
 
 	FreeDomeLight();
 	FreeHeadLight();
-	BecomeInactive( TH_TICKER );
+	BecomeInactive(TH_TICKER);
 
 
 	if (GetPilotInterface()->GetPilot()) { //rww - make sure pilot is valid
-		GetPilotInterface()->GetPilot()->ExitVehicle( this );
+		GetPilotInterface()->GetPilot()->ExitVehicle(this);
 		pilotInterface = NULL;
 	}
 
@@ -946,26 +953,26 @@ void hhVehicle::BecomeVehicle() {
 
 bool hhVehicle::CanBecomeVehicle(idActor *pilot) {
 	// Check to see if shuttle will fit
-	idEntity *touch[ MAX_GENTITIES ];
+	idEntity *touch[MAX_GENTITIES];
 	idBounds bounds, localBounds;
 
 	idVec3 location = GetOrigin();
 	localBounds[0] = spawnArgs.GetVector("mins");
 	localBounds[1] = spawnArgs.GetVector("maxs");
 
-//	idBox box(localBounds, location, GetAxis());
-//	gameRenderWorld->DebugBox(colorRed, box, 8000);
+	//	idBox box(localBounds, location, GetAxis());
+	//	gameRenderWorld->DebugBox(colorRed, box, 8000);
 
 	idTraceModel trm;
-	trm.SetupBox( localBounds );
-	idClipModel *clipModel = new idClipModel( trm );
+	trm.SetupBox(localBounds);
+	idClipModel *clipModel = new idClipModel(trm);
 	clipModel->Link(gameLocal.clip, this, 254, location, GetAxis());
 
 	int pilotClipMask = pilot ? pilot->GetPhysics()->GetClipMask() : 0;
 	pilotClipMask &= (~CONTENTS_HUNTERCLIP);	// Vehicles don't collide with hunterclip so they don't get hung up on dock borders
-	int num = hhUtils::EntitiesTouchingClipmodel( clipModel, touch, MAX_GENTITIES, CLIPMASK_VEHICLE | pilotClipMask );
+	int num = hhUtils::EntitiesTouchingClipmodel(clipModel, touch, MAX_GENTITIES, CLIPMASK_VEHICLE | pilotClipMask);
 	bool blocked = false;
-	for (int i=0; i<num; i++) {
+	for (int i = 0; i < num; i++) {
 		if (touch[i] && touch[i] != this && touch[i] != pilot && touch[i]->GetBindMaster() != pilot && (touch[i]->GetPhysics()->GetContents() & CLIPMASK_VEHICLE)) {
 			blocked = true;
 			//gameLocal.Printf("Blocked by %s\n", touch[i]->GetName());
@@ -986,11 +993,11 @@ bool hhVehicle::IsVehicle() const {
 void hhVehicle::BecomeConsole() {
 	SetConsolePhysics();
 
-	if( IsDocked() ) {
+	if (IsDocked()) {
 		//Feels like a hack.  Shouldn't the dock do this or at least be in SetConsolePhysics
-		SetAxis( dock->GetAxis() );
-		GetPhysics()->SetAxis( dock->GetAxis() );
-		SetOrigin( dock->GetOrigin() + dock->spawnArgs.GetVector("offset_console") * dock->GetAxis() );
+		SetAxis(dock->GetAxis());
+		GetPhysics()->SetAxis(dock->GetAxis());
+		SetOrigin(dock->GetOrigin() + dock->spawnArgs.GetVector("offset_console") * dock->GetAxis());
 
 		physicsObj.PutToRest();
 	}
@@ -1003,7 +1010,7 @@ bool hhVehicle::IsConsole() const {
 }
 
 idVec3 hhVehicle::GetPortalPoint() {
-	idVec3 offset = spawnArgs.GetVector("offset_pilot") + idVec3(0,0,1)*spawnArgs.GetFloat("pilot_eyeHeight");
+	idVec3 offset = spawnArgs.GetVector("offset_pilot") + idVec3(0, 0, 1)*spawnArgs.GetFloat("pilot_eyeHeight");
 	return GetOrigin() + offset * GetAxis();
 }
 
@@ -1012,61 +1019,61 @@ void hhVehicle::Portalled(idEntity *portal) {
 	if (pilot) {
 		// Update the view angles of the player so next time we get input, it won't reset our angles
 		if (pilot->IsType(hhPlayer::Type)) {
-			hhPlayer* player = static_cast<hhPlayer*>( pilot );
+			hhPlayer* player = static_cast<hhPlayer*>(pilot);
 			idVec3 origin = DeterminePilotOrigin();
 			idVec3 viewDir = GetAxis()[0];
 
 			// Don't know if all this is necessary, might be overkill, definitely need some of it though for 'shuttle through portal'
 			player->Unbind();
-			player->SetOrientation( origin, mat3_identity, viewDir, viewDir.ToAngles() );
-			player->SetUntransformedViewAxis( mat3_identity );
+			player->SetOrientation(origin, mat3_identity, viewDir, viewDir.ToAngles());
+			player->SetUntransformedViewAxis(mat3_identity);
 			player->Bind(this, true);
 		}
 	}
 }
 
 void hhVehicle::ResetGravity() {
-	if( IsVehicle() ) {
-		physicsObj.SetGravity( spawnArgs.GetVector("activeGravity") );
+	if (IsVehicle()) {
+		physicsObj.SetGravity(spawnArgs.GetVector("activeGravity"));
 	}
 	else {
-		physicsObj.SetGravity( spawnArgs.GetVector("inactiveGravity") );
+		physicsObj.SetGravity(spawnArgs.GetVector("inactiveGravity"));
 	}
 }
 
-void hhVehicle::SetAxis( const idMat3& axis ) {
+void hhVehicle::SetAxis(const idMat3& axis) {
 	modelAxis = axis;
 
 	UpdateVisuals();
 }
 
-void hhVehicle::InitPhysics() {	
-	physicsObj.SetSelf( this );
+void hhVehicle::InitPhysics() {
+	physicsObj.SetSelf(this);
 
 	physicsObj.SetFriction(
 		spawnArgs.GetFloat("friction_linear"),
 		spawnArgs.GetFloat("friction_angular"),
-		spawnArgs.GetFloat("friction_contact") );
+		spawnArgs.GetFloat("friction_contact"));
 }
 
 void hhVehicle::SetConsolePhysics() {
 	idTraceModel trm;
-	const char *clipModelName = spawnArgs.GetString( "clipmodel" );
-	assert( clipModelName[0] );
+	const char *clipModelName = spawnArgs.GetString("clipmodel");
+	assert(clipModelName[0]);
 
-	if ( !collisionModelManager->TrmFromModel( clipModelName, trm ) ) {
-		gameLocal.Error( "hhVehicle '%s' at (%s): cannot load collision model %s\n",
-			name.c_str(), GetPhysics()->GetOrigin().ToString(0), clipModelName );
+	if (!collisionModelManager->TrmFromModel(clipModelName, trm)) {
+		gameLocal.Error("hhVehicle '%s' at (%s): cannot load collision model %s\n",
+			name.c_str(), GetPhysics()->GetOrigin().ToString(0), clipModelName);
 		return;
 	}
 
-	physicsObj.SetClipModel( new idClipModel(trm), spawnArgs.GetFloat("density") );
+	physicsObj.SetClipModel(new idClipModel(trm), spawnArgs.GetFloat("density"));
 	physicsObj.DisableImpact();
-	physicsObj.SetBouncyness( 0.0f );
-	physicsObj.SetContents( CONTENTS_VEHICLE );
-	physicsObj.SetClipMask( CLIPMASK_VEHICLE | CONTENTS_PLAYERCLIP | CONTENTS_MONSTERCLIP );
-	physicsObj.SetLinearVelocity( vec3_zero );
-	physicsObj.SetAngularVelocity( vec3_zero );
+	physicsObj.SetBouncyness(0.0f);
+	physicsObj.SetContents(CONTENTS_VEHICLE);
+	physicsObj.SetClipMask(CLIPMASK_VEHICLE | CONTENTS_PLAYERCLIP | CONTENTS_MONSTERCLIP);
+	physicsObj.SetLinearVelocity(vec3_zero);
+	physicsObj.SetAngularVelocity(vec3_zero);
 
 	//Used as a cache for when noclipping
 	vehicleClipMask = physicsObj.GetClipMask();
@@ -1076,19 +1083,19 @@ void hhVehicle::SetConsolePhysics() {
 }
 
 void hhVehicle::SetVehiclePhysics() {
-	idBounds bounds( spawnArgs.GetVector("mins"), spawnArgs.GetVector("maxs") );
+	idBounds bounds(spawnArgs.GetVector("mins"), spawnArgs.GetVector("maxs"));
 
-	physicsObj.SetClipModel( new idClipModel(idTraceModel(bounds)), spawnArgs.GetFloat("density") );
-	physicsObj.SetAxis( mat3_identity );
+	physicsObj.SetClipModel(new idClipModel(idTraceModel(bounds)), spawnArgs.GetFloat("density"));
+	physicsObj.SetAxis(mat3_identity);
 	physicsObj.EnableImpact();
-	physicsObj.SetBouncyness( spawnArgs.GetFloat("bouncyness") );
-	physicsObj.SetContents( CONTENTS_VEHICLE );
+	physicsObj.SetBouncyness(spawnArgs.GetFloat("bouncyness"));
+	physicsObj.SetContents(CONTENTS_VEHICLE);
 
-	SetThrustBooster( spawnArgs.GetFloat("thrustMin"), spawnArgs.GetFloat("thrustMax"), spawnArgs.GetFloat("thrustAccel") );
+	SetThrustBooster(spawnArgs.GetFloat("thrustMin"), spawnArgs.GetFloat("thrustMax"), spawnArgs.GetFloat("thrustAccel"));
 
 	int pilotClipMask = (GetPilotInterface() && GetPilotInterface()->GetPilot()) ? GetPilotInterface()->GetPilot()->GetPhysics()->GetClipMask() : 0;
 	pilotClipMask &= (~CONTENTS_HUNTERCLIP);	// Vehicles don't collide with hunterclip so they don't get hung up on dock borders
-	physicsObj.SetClipMask( CLIPMASK_VEHICLE | pilotClipMask );
+	physicsObj.SetClipMask(CLIPMASK_VEHICLE | pilotClipMask);
 
 	//Used as a cache for when noclipping
 	vehicleClipMask = physicsObj.GetClipMask();
@@ -1098,17 +1105,17 @@ void hhVehicle::SetVehiclePhysics() {
 }
 
 void hhVehicle::SetConsoleModel() {
-	SetModel( spawnArgs.GetString("model") );
+	SetModel(spawnArgs.GetString("model"));
 }
 
 void hhVehicle::SetVehicleModel() {
-	SetModel( spawnArgs.GetString("model_active") );
+	SetModel(spawnArgs.GetString("model_active"));
 }
 
-float hhVehicle::CmdScale( const usercmd_t* cmd ) const {
+float hhVehicle::CmdScale(const usercmd_t* cmd) const {
 	float scale = 0.0f;
 
-	if( !cmd ) {
+	if (!cmd) {
 		return scale;
 	}
 
@@ -1116,7 +1123,7 @@ float hhVehicle::CmdScale( const usercmd_t* cmd ) const {
 
 	// Bound the cmd vector to a sphere whose radius is equal to the longest cmd axis
 	int desiredLength = max(max(abscmd[0], abscmd[1]), abscmd[2]);
-	if ( desiredLength != 0.0f ) {
+	if (desiredLength != 0.0f) {
 		float currentLength = abscmd.Length();
 		scale = desiredLength / currentLength;
 	}
@@ -1132,27 +1139,27 @@ void hhVehicle::SetThrustBooster(float minBooster, float maxBooster, float accel
 	thrustScale = 0.1f;
 }
 
-void hhVehicle::ProcessPilotInput( const usercmd_t* cmds, const idAngles* viewAngles ) {
+void hhVehicle::ProcessPilotInput(const usercmd_t* cmds, const idAngles* viewAngles) {
 	idVec3 impulse;
 
-	if( viewAngles ) {
-		SetAxis( viewAngles->ToMat3() );
+	if (viewAngles) {
+		SetAxis(viewAngles->ToMat3());
 	}
 
-	if( !cmds ) {
+	if (!cmds) {
 		return;
 	}
 
-	ProcessButtons( *cmds );
+	ProcessButtons(*cmds);
 
 	//Check vehicle here because we could have exited the vehicle in ProcessButtons
-	if( !IsVehicle() ) {
+	if (!IsVehicle()) {
 		return;
 	}
 
-	ProcessImpulses( *cmds );
+	ProcessImpulses(*cmds);
 
-	if ( gameLocal.time >= validThrustTime ) {
+	if (gameLocal.time >= validThrustTime) {
 		impulse = GetAxis()[0] * cmds->forwardmove * thrustFactor;
 		impulse -= GetAxis()[1] * cmds->rightmove * thrustFactor;
 		impulse += GetAxis()[2] * cmds->upmove * thrustFactor;
@@ -1162,27 +1169,29 @@ void hhVehicle::ProcessPilotInput( const usercmd_t* cmds, const idAngles* viewAn
 	}
 
 	// Apply booster to allow key taps to be very low thrust
-	thrustScale = idMath::ClampFloat( thrustMin, thrustMax, thrustScale * thrustAccel );
-	if( impulse.LengthSqr() >= VECTOR_EPSILON ) {
-		FireThrusters( impulse * CmdScale(cmds) * thrustScale * (60.0f * USERCMD_ONE_OVER_HZ) );
-	} else {
+	thrustScale = idMath::ClampFloat(thrustMin, thrustMax, thrustScale * thrustAccel);
+	if (impulse.LengthSqr() >= VECTOR_EPSILON) {
+		FireThrusters(impulse * CmdScale(cmds) * thrustScale * (60.0f * USERCMD_ONE_OVER_HZ));
+	}
+	else {
 		thrustScale = thrustMin;
 	}
 
-	memcpy( &oldCmds, cmds, sizeof(usercmd_t) );
+	memcpy(&oldCmds, cmds, sizeof(usercmd_t));
 }
 
-void hhVehicle::ProcessButtons( const usercmd_t& cmds ) {
+void hhVehicle::ProcessButtons(const usercmd_t& cmds) {
 
 	//This is needed in case we enter a dock while firing or using the tractor beam
-	if( (cmds.buttons & BUTTON_ATTACK) && !(oldCmds.buttons & BUTTON_ATTACK) ) {
+	if ((cmds.buttons & BUTTON_ATTACK) && !(oldCmds.buttons & BUTTON_ATTACK)) {
 		if (IsDocked() && dock->AllowsExit() && spawnArgs.GetBool("fireToExit")) {
 			if (!gameLocal.isClient) {
 				EjectPilot();
 			}
 			return;
 		}
-	} else if( (cmds.buttons & BUTTON_ATTACK_ALT) && !(oldCmds.buttons & BUTTON_ATTACK_ALT) ) {
+	}
+	else if ((cmds.buttons & BUTTON_ATTACK_ALT) && !(oldCmds.buttons & BUTTON_ATTACK_ALT)) {
 		if (IsDocked() && dock->AllowsExit() && spawnArgs.GetBool("altFireToExit")) {
 			if (!gameLocal.isClient) {
 				EjectPilot();
@@ -1195,21 +1204,22 @@ void hhVehicle::ProcessButtons( const usercmd_t& cmds ) {
 		if (!(cmds.buttons & BUTTON_ATTACK)) {
 			bDisallowAttackUntilRelease = false;
 		}
-		if( oldCmds.buttons & BUTTON_ATTACK ) {
+		if (oldCmds.buttons & BUTTON_ATTACK) {
 			oldCmds.buttons &= ~BUTTON_ATTACK;
-			if( finishedAttackingFunc ) {
-				ProcessEvent( finishedAttackingFunc );
+			if (finishedAttackingFunc) {
+				ProcessEvent(finishedAttackingFunc);
 			}
 		}
 	}
 	else {
-		if( (cmds.buttons & BUTTON_ATTACK) ) {
-			if( attackFunc ) {
-				ProcessEvent( attackFunc );
+		if ((cmds.buttons & BUTTON_ATTACK)) {
+			if (attackFunc) {
+				ProcessEvent(attackFunc);
 			}
-		} else if( oldCmds.buttons & BUTTON_ATTACK ) {
-			if( finishedAttackingFunc ) {
-				ProcessEvent( finishedAttackingFunc );
+		}
+		else if (oldCmds.buttons & BUTTON_ATTACK) {
+			if (finishedAttackingFunc) {
+				ProcessEvent(finishedAttackingFunc);
 			}
 		}
 	}
@@ -1218,75 +1228,77 @@ void hhVehicle::ProcessButtons( const usercmd_t& cmds ) {
 		if (!(cmds.buttons & BUTTON_ATTACK_ALT)) {
 			bDisallowAltAttackUntilRelease = false;
 		}
-		if ( oldCmds.buttons & BUTTON_ATTACK_ALT ) {
+		if (oldCmds.buttons & BUTTON_ATTACK_ALT) {
 			oldCmds.buttons &= ~BUTTON_ATTACK_ALT;
-			if( finishedAltAttackingFunc ) {
-				ProcessEvent( finishedAltAttackingFunc );
+			if (finishedAltAttackingFunc) {
+				ProcessEvent(finishedAltAttackingFunc);
 			}
 		}
 	}
 	else {
-		if( cmds.buttons & BUTTON_ATTACK_ALT ) {
-			if( altAttackFunc ) {
-				ProcessEvent( altAttackFunc );
+		if (cmds.buttons & BUTTON_ATTACK_ALT) {
+			if (altAttackFunc) {
+				ProcessEvent(altAttackFunc);
 			}
-		} else if( oldCmds.buttons & BUTTON_ATTACK_ALT ) {
-			if( finishedAltAttackingFunc ) {
-				ProcessEvent( finishedAltAttackingFunc );
+		}
+		else if (oldCmds.buttons & BUTTON_ATTACK_ALT) {
+			if (finishedAltAttackingFunc) {
+				ProcessEvent(finishedAltAttackingFunc);
 			}
 		}
 	}
 }
 
 void hhVehicle::DoPlayerImpulse(int impulse) {
-	if ( gameLocal.isClient && GetPilot() && GetPilot()->IsType(hhPlayer::Type) ) {
+	if (gameLocal.isClient && GetPilot() && GetPilot()->IsType(hhPlayer::Type)) {
 		idBitMsg	msg;
 		byte		msgBuf[MAX_EVENT_PARAM_SIZE];
 
 		hhPlayer *pl = static_cast<hhPlayer *>(GetPilot());
 
-		assert( pl->entityNumber == gameLocal.localClientNum );
-		msg.Init( msgBuf, sizeof( msgBuf ) );
+		assert(pl->entityNumber == gameLocal.localClientNum);
+		msg.Init(msgBuf, sizeof(msgBuf));
 		msg.BeginWriting();
-		msg.WriteBits( impulse, 6 );
-		pl->ClientSendEvent( hhPlayer::EVENT_IMPULSE, &msg );
+		msg.WriteBits(impulse, 6);
+		pl->ClientSendEvent(hhPlayer::EVENT_IMPULSE, &msg);
 	}
 
 	switch (impulse) {
-		case IMPULSE_16:
-			if (!gameLocal.isClient) {
-				Headlight( !bHeadlightOn );
-			}
-			break;
+	case IMPULSE_16:
+		if (!gameLocal.isClient) {
+			Headlight(!bHeadlightOn);
+		}
+		break;
 	}
 }
 
-void hhVehicle::ProcessImpulses( const usercmd_t& cmds ) {
-	if( (cmds.flags & UCF_IMPULSE_SEQUENCE) == (oldCmds.flags & UCF_IMPULSE_SEQUENCE) ) {
+void hhVehicle::ProcessImpulses(const usercmd_t& cmds) {
+	if ((cmds.flags & UCF_IMPULSE_SEQUENCE) == (oldCmds.flags & UCF_IMPULSE_SEQUENCE)) {
 		return;
 	}
 
 	DoPlayerImpulse(cmds.impulse); //rww - seperated into its own function because of networked impulse events
 }
 
-void hhVehicle::ApplyImpulse( idEntity* ent, int id, const idVec3& point, const idVec3& impulse ) {
-	hhRenderEntity::ApplyImpulse( ent, id, point, impulse );
+void hhVehicle::ApplyImpulse(idEntity* ent, int id, const idVec3& point, const idVec3& impulse) {
+	hhRenderEntity::ApplyImpulse(ent, id, point, impulse);
 }
 
-void hhVehicle::ApplyImpulse( const idVec3& impulse ) {
-	ApplyImpulse( gameLocal.world, 0, GetOrigin() + physicsObj.GetCenterOfMass(), impulse * physicsObj.GetMass() );
+void hhVehicle::ApplyImpulse(const idVec3& impulse) {
+	ApplyImpulse(gameLocal.world, 0, GetOrigin() + physicsObj.GetCenterOfMass(), impulse * physicsObj.GetMass());
 }
 
-void hhVehicle::UpdateModel( void ) {
+void hhVehicle::UpdateModel(void) {
 	idVec3 origin;
 	idMat3 axis;
 
-	if ( GetPhysicsToVisualTransform(origin, axis) ) {
+	if (GetPhysicsToVisualTransform(origin, axis)) {
 		//HUMANHEAD: aob
 		GetRenderEntity()->axis = axis * GetAxis();
 		GetRenderEntity()->origin = GetOrigin() + origin * GetRenderEntity()->axis;
 		//HUMANHEAD END
-	} else {
+	}
+	else {
 		//HUMANHEAD: aob
 		GetRenderEntity()->axis = GetAxis();
 		GetRenderEntity()->origin = GetOrigin();
@@ -1297,7 +1309,7 @@ void hhVehicle::UpdateModel( void ) {
 	ClearPVSAreas();
 
 	// ensure that we call Present this frame
-	BecomeActive( TH_UPDATEVISUALS );
+	BecomeActive(TH_UPDATEVISUALS);
 }
 
 void hhVehicle::CreateDomeLight() {
@@ -1308,20 +1320,20 @@ void hhVehicle::CreateDomeLight() {
 
 		idDict args;
 		idVec3 lightOrigin = GetPhysics()->GetOrigin() + light_offset * GetPhysics()->GetAxis();
-		args.SetVector( "origin", lightOrigin );
+		args.SetVector("origin", lightOrigin);
 
 		domelight = (idLight *)gameLocal.SpawnObject(objName, &args);
-		domelight->Bind( this, true );
+		domelight->Bind(this, true);
 		domelight->SetLightParm(SHADERPARM_TIMEOFFSET, -MS2SEC(gameLocal.time));
 	}
 }
 
 void hhVehicle::FreeDomeLight() {
-	SAFE_REMOVE( domelight );
+	SAFE_REMOVE(domelight);
 }
 
 void hhVehicle::CreateHeadLight() {
-	if ( spawnArgs.GetBool("headlight") ) {
+	if (spawnArgs.GetBool("headlight")) {
 		// This method is more oriented for presenting our own lights
 		// Depending on the speed cost of having seperate entities for lights, we may
 		// want to present our own, like the weapons
@@ -1336,16 +1348,16 @@ void hhVehicle::CreateHeadLight() {
 		light_target.Normalize();
 		idMat3 lightAxis = (light_target * GetPhysics()->GetAxis()).hhToMat3();
 
-		if ( light_shader.Length() ) {
-			args.Set( "texture", light_shader );
+		if (light_shader.Length()) {
+			args.Set("texture", light_shader);
 		}
-		args.SetVector( "origin", lightOrigin );
-		args.Set ("angles", lightAxis.ToAngles().ToString());
-		args.SetVector( "_color", light_color );
-		args.SetVector( "light_target", lightAxis[0] * light_frustum.x );
-		args.SetVector( "light_right", lightAxis[1] * light_frustum.y );
-		args.SetVector( "light_up", lightAxis[2] * light_frustum.z );
-		headlight = ( idLight * )gameLocal.SpawnEntityTypeClient( idLight::Type, &args );
+		args.SetVector("origin", lightOrigin);
+		args.Set("angles", lightAxis.ToAngles().ToString());
+		args.SetVector("_color", light_color);
+		args.SetVector("light_target", lightAxis[0] * light_frustum.x);
+		args.SetVector("light_right", lightAxis[1] * light_frustum.y);
+		args.SetVector("light_up", lightAxis[2] * light_frustum.z);
+		headlight = (idLight *)gameLocal.SpawnEntityTypeClient(idLight::Type, &args);
 
 		//rww - headlight is a pure local entity
 		assert(headlight.IsValid() && headlight.GetEntity());
@@ -1354,20 +1366,20 @@ void hhVehicle::CreateHeadLight() {
 
 		headlight->Bind(this, true);
 
-		headlight->SetLightParm( 6, 0.0f );					// fade out
-		headlight->SetLightParm( SHADERPARM_TIMEOFFSET, 0 );	// Initially faded out already
+		headlight->SetLightParm(6, 0.0f);					// fade out
+		headlight->SetLightParm(SHADERPARM_TIMEOFFSET, 0);	// Initially faded out already
 	}
 }
 
 void hhVehicle::FreeHeadLight() {
-	SAFE_REMOVE( headlight );
+	SAFE_REMOVE(headlight);
 }
 
-void hhVehicle::Headlight( bool on ) {
+void hhVehicle::Headlight(bool on) {
 	bHeadlightOn = on;
 	float timeOffset = -MS2SEC(gameLocal.time);
 
-	if( headlight.IsValid() ) {
+	if (headlight.IsValid()) {
 		headlight->SetLightParm(SHADERPARM_TIMEOFFSET, timeOffset);
 		SetShaderParm(7, timeOffset);
 
@@ -1382,7 +1394,7 @@ void hhVehicle::Headlight( bool on ) {
 	}
 }
 
-void hhVehicle::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &dir, const char *damageDefName, const float damageScale, const int location ) {
+void hhVehicle::Damage(idEntity *inflictor, idEntity *attacker, const idVec3 &dir, const char *damageDefName, const float damageScale, const int location) {
 	if (InGodMode() || InDialogMode()) {
 		return;
 	}
@@ -1392,20 +1404,21 @@ void hhVehicle::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &d
 			return;
 		}
 
-		hhPlayer *playerPilot = (GetPilot() && GetPilot()->IsType( hhPlayer::Type )) ? static_cast<hhPlayer*>(GetPilot()) : NULL;
-		hhPlayer *player = (attacker && attacker->IsType( hhPlayer::Type )) ? static_cast<hhPlayer*>(attacker) : NULL;
-		const idDict *damageDef = gameLocal.FindEntityDefDict( damageDefName );
-		if ( (gameLocal.gameType == GAME_TDM
+		hhPlayer *playerPilot = (GetPilot() && GetPilot()->IsType(hhPlayer::Type)) ? static_cast<hhPlayer*>(GetPilot()) : NULL;
+		hhPlayer *player = (attacker && attacker->IsType(hhPlayer::Type)) ? static_cast<hhPlayer*>(attacker) : NULL;
+		const idDict *damageDef = gameLocal.FindEntityDefDict(damageDefName);
+		if ((gameLocal.gameType == GAME_TDM
 			&& playerPilot
-			&& !gameLocal.serverInfo.GetBool( "si_teamDamage" )
+			&& !gameLocal.serverInfo.GetBool("si_teamDamage")
 			&& damageDef
-			&& !damageDef->GetBool( "noTeam" )
+			&& !damageDef->GetBool("noTeam")
 			&& player
-			&& player->team == playerPilot->team) ) {
+			&& player->team == playerPilot->team)) {
 			return;
 		}
-	} else {
-		if ( noDamage ) {
+	}
+	else {
+		if (noDamage) {
 			return;
 		}
 		if (attacker && attacker->IsType(idAI::Type) && GetPilot() == attacker) {
@@ -1414,13 +1427,13 @@ void hhVehicle::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &d
 	}
 
 	if (GetPilotInterface() && GetPilotInterface()->GetPilot()) {
-		const idDict *damageDef = gameLocal.FindEntityDefDict( damageDefName );
+		const idDict *damageDef = gameLocal.FindEntityDefDict(damageDefName);
 
 		if (gameLocal.isMultiplayer && IsType(hhShuttle::Type)) { //rww - in mp, let's try flickering the tractor beam on and off when hit
 			hhShuttle *shtlSelf = static_cast<hhShuttle *>(this);
 			if (shtlSelf->noTractorTime <= gameLocal.time && shtlSelf->TractorIsActive()) { //don't let it stay off for a long time from constant attack
 				float dmg = ((float)damageDef->GetInt("damage", "100"))*damageScale;
-				int dmgTime = (int)(dmg*12);
+				int dmgTime = (int)(dmg * 12);
 				//cap it to something reasonable on both ends
 				if (dmgTime < 100) {
 					dmgTime = 100;
@@ -1433,18 +1446,18 @@ void hhVehicle::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &d
 		}
 
 		// Let playerview know about the impact direction
-		if ( !damageDef ) {
-			gameLocal.Warning( "Unknown damageDef '%s'", damageDefName );
+		if (!damageDef) {
+			gameLocal.Warning("Unknown damageDef '%s'", damageDefName);
 			return;
 		}
 		idVec3 damage_from, localDamageVector;
 		damage_from = dir;
 		damage_from.Normalize();
-		if ( GetPilotInterface()->GetPilot()->IsType(hhPlayer::Type)) {
+		if (GetPilotInterface()->GetPilot()->IsType(hhPlayer::Type)) {
 			// Pass this on so we can get directional damage
 			hhPlayer *playerPilot = static_cast<hhPlayer*>(GetPilotInterface()->GetPilot());
-			playerPilot->viewAxis.ProjectVector( damage_from, localDamageVector );
-			playerPilot->playerView.DamageImpulse( localDamageVector, damageDef );
+			playerPilot->viewAxis.ProjectVector(damage_from, localDamageVector);
+			playerPilot->playerView.DamageImpulse(localDamageVector, damageDef);
 
 			// Track last attacker for use in displaying HUD hit indicator
 			if (!gameLocal.isClient) {
@@ -1463,52 +1476,52 @@ void hhVehicle::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &d
 			}
 		}
 	}
-	
+
 	// Tell HUD to show impact direction
-	if( IsVehicle() ) {//AI may want to know who hit them
+	if (IsVehicle()) {//AI may want to know who hit them
 		lastAttacker = attacker;
 		lastAttackTime = gameLocal.time;
 	}
-	idEntity::Damage( inflictor, attacker, dir, damageDefName, 1.0f, location );
+	idEntity::Damage(inflictor, attacker, dir, damageDefName, 1.0f, location);
 }
 
-void hhVehicle::Killed( idEntity *inflictor, idEntity *attacker, int damage, const idVec3 &dir, int location ) {
+void hhVehicle::Killed(idEntity *inflictor, idEntity *attacker, int damage, const idVec3 &dir, int location) {
 	if (gameLocal.isClient) {
 		return;
 	}
-	if( gameLocal.isMultiplayer || health < spawnArgs.GetInt("gibhealth") ) { //rww - always explode in mp
+	if (gameLocal.isMultiplayer || health < spawnArgs.GetInt("gibhealth")) { //rww - always explode in mp
 		CancelEvents(&EV_VehicleExplode);
 		PostEventMS(&EV_VehicleExplode, 0, attacker, dir.x, dir.y, dir.z);
 	}
-	else if( health + damage > 0 ) {	// Only do this the first death
+	else if (health + damage > 0) {	// Only do this the first death
 		ConsumePower(currentPower);
 
-		if( domelight.IsValid() ) {
+		if (domelight.IsValid()) {
 			domelight->SetLightParm(7, 1.0f);
 		}
 
-		StopSound( SND_CHANNEL_DYING, true );
-		StartSound( "snd_dying", SND_CHANNEL_DYING, 0, true );
+		StopSound(SND_CHANNEL_DYING, true);
+		StartSound("snd_dying", SND_CHANNEL_DYING, 0, true);
 
 		// control release during the damage pipe was causing a crash when damaged by splash damage
 		// the clip model is invalidated, then radius damage tries to apply to it.
 		// Should be okay to switch back if "killed" is made into an event
-		CancelEvents( &EV_VehicleExplode );
-		PostEventSec( &EV_VehicleExplode, spawnArgs.GetFloat("explodedelay"), attacker, dir.x, dir.y, dir.z );
+		CancelEvents(&EV_VehicleExplode);
+		PostEventSec(&EV_VehicleExplode, spawnArgs.GetFloat("explodedelay"), attacker, dir.x, dir.y, dir.z);
 	}
 }
 
-bool hhVehicle::Collide( const trace_t &collision, const idVec3 &velocity ) {
+bool hhVehicle::Collide(const trace_t &collision, const idVec3 &velocity) {
 	static const float minCollisionVelocity = 40.0f;
 	static const float maxCollisionVelocity = 650.0f;
 
 	// Velocity in normal direction
 	float len = velocity * -collision.c.normal;
 
-	if ( len > minCollisionVelocity && collision.c.material && !(collision.c.material->GetSurfaceFlags() & SURF_NOIMPACT) ) {
-		if (StartSound( "snd_bounce", SND_CHANNEL_BODY3 )) {
+	if (len > minCollisionVelocity && collision.c.material && !(collision.c.material->GetSurfaceFlags() & SURF_NOIMPACT)) {
+		if (StartSound("snd_bounce", SND_CHANNEL_BODY3)) {
 			// Change volume only after we know the sound played
-			float volume = hhUtils::CalculateSoundVolume( len, minCollisionVelocity, maxCollisionVelocity );
+			float volume = hhUtils::CalculateSoundVolume(len, minCollisionVelocity, maxCollisionVelocity);
 			HH_SetSoundVolume(volume, SND_CHANNEL_BODY3);
 		}
 
@@ -1556,33 +1569,33 @@ bool hhVehicle::InDialogMode() const {
 	return GetPilotInterface() && GetPilotInterface()->GetPilot() && GetPilotInterface()->GetPilot()->IsType(hhPlayer::Type) && static_cast<hhPlayer*>(GetPilotInterface()->GetPilot())->InDialogDamageMode();
 }
 
-void hhVehicle::GiveHealth( int amount ) {
-	health = idMath::ClampInt( 0, spawnHealth, health + amount );
+void hhVehicle::GiveHealth(int amount) {
+	health = idMath::ClampInt(0, spawnHealth, health + amount);
 }
 
-void hhVehicle::GivePower( int amount ) {
-	currentPower = idMath::ClampInt( 0, spawnArgs.GetInt("maxPower"), currentPower + amount );
+void hhVehicle::GivePower(int amount) {
+	currentPower = idMath::ClampInt(0, spawnArgs.GetInt("maxPower"), currentPower + amount);
 }
 
-bool hhVehicle::HandleSingleGuiCommand( idEntity *entityGui, idLexer *src ) {
+bool hhVehicle::HandleSingleGuiCommand(idEntity *entityGui, idLexer *src) {
 	idToken token;
-	if( !src->ReadToken(&token) || token == ";" ) {
+	if (!src->ReadToken(&token) || token == ";") {
 		return false;
 	}
-	if( !token.Icmp("controlvehicle") ) {
+	if (!token.Icmp("controlvehicle")) {
 		if (IsHidden()) { //rww - was possible to get back in a vehicle once it had been hidden for removal
 			return true;
 		}
-		if( entityGui->IsType(idActor::Type) ) {
-			static_cast<idActor*>( entityGui )->EnterVehicle( this );
+		if (entityGui->IsType(idActor::Type)) {
+			static_cast<idActor*>(entityGui)->EnterVehicle(this);
 		}
 		return true;
 	}
 	return false;
 }
 
-void hhVehicle::DrawHUD( idUserInterface* _hud ) {
-	if( _hud ) {
+void hhVehicle::DrawHUD(idUserInterface* _hud) {
+	if (_hud) {
 		//rww - transfer necessary hud variables from the player hud to the vehicle hud
 		if (GetPilotInterface() && GetPilotInterface()->GetPilot() && GetPilotInterface()->GetPilot()->IsType(hhPlayer::Type)) {
 			hhPlayer *plPilot = static_cast<hhPlayer *>(GetPilotInterface()->GetPilot());
@@ -1614,28 +1627,28 @@ void hhVehicle::DrawHUD( idUserInterface* _hud ) {
 				*/
 			}
 		}
-		_hud->SetStateBool( "dying", health <= 0 );
-		_hud->SetStateFloat( "healthfraction", ((float)health)/(float)spawnHealth );
-		_hud->SetStateFloat( "powerfraction", (currentPower)/spawnArgs.GetFloat("maxPower") );
+		_hud->SetStateBool("dying", health <= 0);
+		_hud->SetStateFloat("healthfraction", ((float)health) / (float)spawnHealth);
+		_hud->SetStateFloat("powerfraction", (currentPower) / spawnArgs.GetFloat("maxPower"));
 		idAngles angles = GetAxis().ToAngles();
-		_hud->SetStateFloat( "pitch", angles.pitch );
-		_hud->SetStateFloat( "yaw", angles.yaw );
-		_hud->SetStateFloat( "roll", angles.roll );
-		_hud->Redraw( gameLocal.realClientTime );
+		_hud->SetStateFloat("pitch", angles.pitch);
+		_hud->SetStateFloat("yaw", angles.yaw);
+		_hud->SetStateFloat("roll", angles.roll);
+		_hud->Redraw(gameLocal.realClientTime);
 	}
 }
 
 void hhVehicle::PerformDeathAction(int deathAction, idActor *savedPilot, idEntity *attacker, idVec3 &dir) {
-	switch(deathAction) {
-		case 0:		// Drop pilot
-			break;
-		case 1:		// Kill pilot
-			savedPilot->Damage(this, attacker, dir, spawnArgs.GetString("def_killpilotdamage"), 1.0f, 0);
-			break;
+	switch (deathAction) {
+	case 0:		// Drop pilot
+		break;
+	case 1:		// Kill pilot
+		savedPilot->Damage(this, attacker, dir, spawnArgs.GetString("def_killpilotdamage"), 1.0f, 0);
+		break;
 	}
 }
 
-void hhVehicle::Explode( idEntity *attacker, idVec3 dir ) {
+void hhVehicle::Explode(idEntity *attacker, idVec3 dir) {
 	if (gameLocal.isClient) {
 		return;
 	}
@@ -1665,12 +1678,12 @@ void hhVehicle::Explode( idEntity *attacker, idVec3 dir ) {
 	StartSound("snd_death", SND_CHANNEL_ANY);
 }
 
-bool hhVehicle::HasPower( int amount ) const {
+bool hhVehicle::HasPower(int amount) const {
 	return currentPower >= amount;
 }
 
-bool hhVehicle::ConsumePower( int amount ) {
-	if( InGodMode() ) {
+bool hhVehicle::ConsumePower(int amount) {
+	if (InGodMode()) {
 		return true;
 	}
 
@@ -1690,16 +1703,16 @@ void hhVehicle::RemoveVehicle() {
 	StopSound(SND_CHANNEL_DYING, true);
 
 	Hide();
-	GetPhysics()->SetContents( 0 );
-	GetPhysics()->SetClipMask( 0 );
-	PostEventMS( &EV_Remove, 3000 );			// Give anything targetting it a chance to retarget
+	GetPhysics()->SetContents(0);
+	GetPhysics()->SetClipMask(0);
+	PostEventMS(&EV_Remove, 3000);			// Give anything targetting it a chance to retarget
 }
 
-void hhVehicle::WriteToSnapshot( idBitMsgDelta &msg ) const {
-	physicsObj.WriteToSnapshot( msg );
-	assert(currentPower < (1<<20));
+void hhVehicle::WriteToSnapshot(idBitMsgDelta &msg) const {
+	physicsObj.WriteToSnapshot(msg);
+	assert(currentPower < (1 << 20));
 	msg.WriteBits(currentPower, 20);
-	assert(health < (1<<12));
+	assert(health < (1 << 12));
 	msg.WriteBits(health, 12);
 	msg.WriteBits(bHeadlightOn, 1);
 
@@ -1726,7 +1739,7 @@ void hhVehicle::WriteToSnapshot( idBitMsgDelta &msg ) const {
 
 	msg.WriteBits(dock.GetSpawnId(), 32);
 	msg.WriteBits(domelight.GetSpawnId(), 32);
-	WriteBindToSnapshot( msg );
+	WriteBindToSnapshot(msg);
 
 	if (fireController) { //fire controller can be null at this point.
 		msg.WriteBits(fireController->barrelOffsets.GetCurrentIndex(), 8);
@@ -1736,8 +1749,8 @@ void hhVehicle::WriteToSnapshot( idBitMsgDelta &msg ) const {
 	}
 }
 
-void hhVehicle::ReadFromSnapshot( const idBitMsgDelta &msg ) {
-	physicsObj.ReadFromSnapshot( msg );
+void hhVehicle::ReadFromSnapshot(const idBitMsgDelta &msg) {
+	physicsObj.ReadFromSnapshot(msg);
 	currentPower = msg.ReadBits(20);
 	health = msg.ReadBits(12);
 	bool headlightOn = !!msg.ReadBits(1);
@@ -1778,7 +1791,8 @@ void hhVehicle::ReadFromSnapshot( const idBitMsgDelta &msg ) {
 	if (hidden != IsHidden()) {
 		if (hidden) {
 			Hide();
-		} else {
+		}
+		else {
 			Show();
 		}
 	}
@@ -1798,11 +1812,11 @@ void hhVehicle::ReadFromSnapshot( const idBitMsgDelta &msg ) {
 	}
 	else {
 		if (domelight.SetSpawnId(spawnId)) {
-			domelight->Bind( this, true );
+			domelight->Bind(this, true);
 			domelight->SetLightParm(SHADERPARM_TIMEOFFSET, -MS2SEC(gameLocal.time));
 		}
 	}
-	ReadBindFromSnapshot( msg );
+	ReadBindFromSnapshot(msg);
 
 	int barrelIndex = msg.ReadBits(8);
 	if (fireController) {
@@ -1810,21 +1824,21 @@ void hhVehicle::ReadFromSnapshot( const idBitMsgDelta &msg ) {
 	}
 }
 
-void hhVehicle::ClientPredictionThink( void ) {
+void hhVehicle::ClientPredictionThink(void) {
 	Think();
 }
 
-bool hhVehicle::ClientReceiveEvent( int event, int time, const idBitMsg &msg ) {
-	switch ( event ) {
-		case EVENT_EJECT_PILOT:
-			EjectPilot();
-			return true;
-		default:
-			return hhRenderEntity::ClientReceiveEvent( event, time, msg );
+bool hhVehicle::ClientReceiveEvent(int event, int time, const idBitMsg &msg) {
+	switch (event) {
+	case EVENT_EJECT_PILOT:
+		EjectPilot();
+		return true;
+	default:
+		return hhRenderEntity::ClientReceiveEvent(event, time, msg);
 	}
 }
 
-void hhVehicle::Event_Explode( idEntity *attacker, float dx, float dy, float dz ) {
+void hhVehicle::Event_Explode(idEntity *attacker, float dx, float dy, float dz) {
 	if (InDialogMode()) {
 		// Death not allowed, repost
 		CancelEvents(&EV_VehicleExplode);
@@ -1841,8 +1855,8 @@ void hhVehicle::Event_ResetGravity() {
 }
 
 void hhVehicle::Event_FireCannon() {
-	if( fireController && fireController->LaunchProjectiles(vec3_zero) ) {
-		StartSound( "snd_cannon", SND_CHANNEL_ANY );
+	if (fireController && fireController->LaunchProjectiles(vec3_zero)) {
+		StartSound("snd_cannon", SND_CHANNEL_ANY);
 		fireController->MuzzleFlash();
 		if (GetPilot() && GetPilot()->IsType(hhPlayer::Type)) {
 			// Only players get weapon fire feedback, so monster shuttles aren't pushed back into docks
@@ -1852,66 +1866,66 @@ void hhVehicle::Event_FireCannon() {
 }
 
 // Script control interfaces
-void hhVehicle::Event_GetIn( idEntity *ent ) {
+void hhVehicle::Event_GetIn(idEntity *ent) {
 	if (ent->IsType(idActor::Type)) {
-		static_cast<idActor*>( ent )->EnterVehicle( this );
-		GetPilotInterface()->UnderScriptControl( true );
+		static_cast<idActor*>(ent)->EnterVehicle(this);
+		GetPilotInterface()->UnderScriptControl(true);
 	}
 }
 
 void hhVehicle::Event_GetOut() {
 	if (GetPilotInterface()) {
-		GetPilotInterface()->UnderScriptControl( true );
+		GetPilotInterface()->UnderScriptControl(true);
 		EjectPilot();
 	}
 }
 
-void hhVehicle::Event_Fire( bool start ) {
-	if( GetPilotInterface() ) {
-		GetPilotInterface()->UnderScriptControl( true );
-		GetPilotInterface()->Fire( start );
+void hhVehicle::Event_Fire(bool start) {
+	if (GetPilotInterface()) {
+		GetPilotInterface()->UnderScriptControl(true);
+		GetPilotInterface()->Fire(start);
 	}
 }
 
-void hhVehicle::Event_AltFire( bool start ) {
-	if( GetPilotInterface() ) {
-		GetPilotInterface()->UnderScriptControl( true );
-		GetPilotInterface()->AltFire( start );
+void hhVehicle::Event_AltFire(bool start) {
+	if (GetPilotInterface()) {
+		GetPilotInterface()->UnderScriptControl(true);
+		GetPilotInterface()->AltFire(start);
 	}
 }
 
-void hhVehicle::Event_OrientTowards( idVec3 &point, float speed ) {
-	if( GetPilotInterface() ) {
-		GetPilotInterface()->UnderScriptControl( true );
-		GetPilotInterface()->OrientTowards( point, speed );	// passed as percentage of max
+void hhVehicle::Event_OrientTowards(idVec3 &point, float speed) {
+	if (GetPilotInterface()) {
+		GetPilotInterface()->UnderScriptControl(true);
+		GetPilotInterface()->OrientTowards(point, speed);	// passed as percentage of max
 	}
 }
 
 void hhVehicle::Event_StopOrientingTowards() {
-	if( GetPilotInterface() ) {
-		GetPilotInterface()->UnderScriptControl( true );
-		GetPilotInterface()->OrientTowards( vec3_origin, 0.0f );
+	if (GetPilotInterface()) {
+		GetPilotInterface()->UnderScriptControl(true);
+		GetPilotInterface()->OrientTowards(vec3_origin, 0.0f);
 	}
 }
 
-void hhVehicle::Event_ThrustTowards( idVec3 &point, float speed ) {
+void hhVehicle::Event_ThrustTowards(idVec3 &point, float speed) {
 	idVec3 pt = point;
-	if( GetPilotInterface() ) {
-		GetPilotInterface()->UnderScriptControl( true );
-		GetPilotInterface()->ThrustTowards( pt, speed );	// passed as percentage of max
+	if (GetPilotInterface()) {
+		GetPilotInterface()->UnderScriptControl(true);
+		GetPilotInterface()->ThrustTowards(pt, speed);	// passed as percentage of max
 	}
 }
 
 void hhVehicle::Event_StopThrustingTowards() {
-	if( GetPilotInterface() ) {
-		GetPilotInterface()->UnderScriptControl( true );
-		GetPilotInterface()->ThrustTowards( vec3_origin, 0.0f );
+	if (GetPilotInterface()) {
+		GetPilotInterface()->UnderScriptControl(true);
+		GetPilotInterface()->ThrustTowards(vec3_origin, 0.0f);
 	}
 }
 
 void hhVehicle::Event_ReleaseScriptControl() {
-	if( GetPilotInterface() ) {
-		GetPilotInterface()->UnderScriptControl( false );
+	if (GetPilotInterface()) {
+		GetPilotInterface()->UnderScriptControl(false);
 		GetPilotInterface()->ClearBufferedCmds();
 	}
 }

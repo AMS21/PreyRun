@@ -11,7 +11,7 @@
 
 #define GAME_NAME						"PreyRun"			// appears on window titles and errors
 
-#define	ENGINE_VERSION					"PreyRun 1.0.3"		// printed in console
+#define	ENGINE_VERSION					"PreyRun 1.0.4"		// printed in console
 
 // paths
 #define	CD_BASEDIR						"Prey"
@@ -220,6 +220,6 @@
 
 // PreyRun BEGIN
 #ifdef PR_DEBUG
-#define PR_DEVELOP // Used to mark code which is still being developed
+#define PR_DEVELOP
 #endif // PR_DEBUG
 // PreyRun END

@@ -88,7 +88,7 @@ public:
 	idVec3			GetTouchPos(idEntity *ent, const hhReactionDesc *desc );
 	void			UpdateFromPhysics( bool moveBack );
 	virtual bool	GetTouchPosBound( const hhReactionDesc *desc, idBounds& bounds );
-   	virtual	void	Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &dir, const char *damageDefName, const float damageScale, const int location );
+	virtual	void	Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &dir, const char *damageDefName, const float damageScale, const int location );
 	void			CreateHealthTriggers();
 	void			UpdateHealthTriggers(int oldHealth, int currHealth);
 	int				ReactionTo( const idEntity *ent );
@@ -235,7 +235,7 @@ protected:
 	idEntityPtr<idEntity>	shootTarget;
 	idEntityPtr<hhAIPassageway> currPassageway;					// The passage node this monster is currently in
 	idList<hhMonsterHealthTrigger> healthTriggers;
-    int						lastContactTime;
+	int						lastContactTime;
 	int						hearingRange;
 	int						nextSpeechTime;
 	idAngles				lookOffset;

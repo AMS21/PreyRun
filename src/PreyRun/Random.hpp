@@ -2,8 +2,9 @@
 //
 #pragma once
 
-#include "../game/gamesys/SysCvar.h" // pr_fixedseed,l pr_fixedseed_value
+#include "../game/gamesys/SysCvar.h" // pr_fixedseed,pr_fixedseed_value
 #include <new>
+#include "../sys/sys_public.h"
 
 // My own Version of the Random Number Generator from Random.h
 
@@ -101,7 +102,7 @@ private:
 	idRandomHolder holder;
 };
 
-__forceinline prRandom::prRandom(int seed)
+PR_FINLINE prRandom::prRandom(int seed)
 	: holder{ idRandomHolder::idRandomHolderCreationFlag::dontCreate }
 {
 	this->seed = seed;
@@ -129,7 +130,7 @@ inline prRandom::operator idRandom&()
 	return *p;
 }
 
-__forceinline void prRandom::SetSeed(int seed)
+PR_FINLINE void prRandom::SetSeed(int seed)
 {
 	if (pr_fixedseed.GetBool())
 	{
@@ -141,7 +142,7 @@ __forceinline void prRandom::SetSeed(int seed)
 	}
 }
 
-__forceinline int prRandom::GetSeed(void) const {
+PR_FINLINE int prRandom::GetSeed(void) const {
 	if (pr_fixedseed.GetBool())
 	{
 		return pr_fixedseed_value.GetInteger();
@@ -149,7 +150,7 @@ __forceinline int prRandom::GetSeed(void) const {
 	return seed;
 }
 
-__forceinline int prRandom::RandomInt(void) {
+PR_FINLINE int prRandom::RandomInt(void) {
 	if (pr_fixedseed.GetBool())
 	{
 		return ((69069 * pr_fixedseed_value.GetInteger() + 1) & prRandom::MAX_RAND);
@@ -159,17 +160,17 @@ __forceinline int prRandom::RandomInt(void) {
 	return (seed & prRandom::MAX_RAND);
 }
 
-__forceinline int prRandom::RandomInt(int max) {
+PR_FINLINE int prRandom::RandomInt(int max) {
 	if (max == 0) {
 		return 0;			// avoid divide by zero error
 	}
 	return RandomInt() % max;
 }
 
-__forceinline float prRandom::RandomFloat(void) {
+PR_FINLINE float prRandom::RandomFloat(void) {
 	return (RandomInt() / (float)(prRandom::MAX_RAND + 1));
 }
 
-__forceinline float prRandom::CRandomFloat(void) {
+PR_FINLINE float prRandom::CRandomFloat(void) {
 	return (2.0f * (RandomFloat() - 0.5f));
 }

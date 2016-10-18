@@ -2543,12 +2543,6 @@ idPlayer::EnterCinematic
 ===============
 */
 void idPlayer::EnterCinematic(void) {
-	// PreyRun BEGIN
-#ifdef PR_DEBUG
-	gameLocal.Printf("PreyRunDBG: Entering Cinematic\n");
-#endif // PR_DEBUG
-	// PreyRun END
-
 	Hide();
 	StopSound(SND_CHANNEL_PDA, false);
 
@@ -2590,12 +2584,6 @@ idPlayer::ExitCinematic
 ===============
 */
 void idPlayer::ExitCinematic(void) {
-	// PreyRun BEGIN
-#ifdef PR_DEBUG
-	gameLocal.Printf("PreyRunDBG: Exiting Cinematic\n");
-#endif // PR_DEBUG
-	// PreyRun END
-
 	Show();
 
 	if (weaponEnabled && weapon.GetEntity()) {

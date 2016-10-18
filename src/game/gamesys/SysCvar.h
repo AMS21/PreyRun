@@ -5,7 +5,7 @@
 #define __SYS_CVAR_H__
 
 // PreyRun BEGIN
-#include "../../PreyRun/AutoCmd.hpp"
+#include "../../PreyRun/GameTimer.hpp"
 
 extern idCVar pr_autojump;
 extern idCVar pr_autopause;
@@ -16,8 +16,12 @@ extern bool pr_preysplit_mapchanged;
 #ifdef PR_DEVELOP
 extern idCVar pr_fixedseed;
 extern idCVar pr_fixedseed_value;
-#endif PR_DEVELOP
+#endif // PR_DEVELOP
+extern idStr pr_reload_latestsave;
+extern bool pr_reload_ready;
 extern idCVar pr_freeze;
+// Hud
+extern idCVar pr_hud;
 // Speedometer
 extern idCVar pr_hud_speedometer;
 extern idCVar pr_hud_speedometer_r;
@@ -30,19 +34,16 @@ extern idCVar pr_hud_speedometer_x;
 extern idCVar pr_hud_speedometer_y;
 extern idCVar pr_autocmd_show;
 // Timer
-extern idTimer pr_gametimer;
+extern prTimer pr_gametimer;
 extern bool pr_gametimer_running;
 extern bool pr_timedemo;
 
 extern idCVar pr_timer_autostart;
 extern idCVar pr_timer_autostop;
 extern idCVar pr_timer_methode;
+extern idCVar pr_timer_backup;
+extern idCVar pr_timer_backup_interval;
 extern bool pr_timer_mapchanged;
-const enum PR_TIMER_METHODES
-{
-	METHODE_REALTIMEATTACK,
-	METHODE_INDIVIDUALLEVEL
-};
 
 extern idCVar pr_hud_timer;
 extern idCVar pr_hud_timer_x;
@@ -58,6 +59,7 @@ extern idCVar pr_hud_viewangles;
 extern idCVar pr_hud_velocity;
 // Location
 extern idCVar pr_hud_location;
+extern idCVar pr_hud_location_methode;
 // Entity Info
 extern idCVar pr_hud_entityinfo;
 // Ammo
@@ -76,6 +78,9 @@ extern idCVar pr_hud_custom_y;
 extern idCVar pr_hud_custom_r;
 extern idCVar pr_hud_custom_g;
 extern idCVar pr_hud_custom_b;
+// Keys
+extern idCVar pr_hud_keys;
+extern idCVar pr_hud_keys_methode;
 
 #ifdef PR_DEBUG
 extern idCVar pr_dbg_hud_drawtime;

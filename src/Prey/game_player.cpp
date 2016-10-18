@@ -965,7 +965,8 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 	{
 		pr::ShutdownPreySplitPipe();
 	}
-
+	// Hud
+	_hud->SetStateBool("pr_hud", pr_hud.GetBool());
 	// Speedometer
 	_hud->SetStateBool("pr_hud_speedometer", pr_hud_speedometer.GetBool());
 	_hud->SetStateFloat("pr_hud_speedometer_r", pr_hud_speedometer_r.GetFloat());
@@ -991,6 +992,7 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 	_hud->SetStateBool("pr_hud_velocity", pr_hud_velocity.GetBool());
 	// Location
 	_hud->SetStateBool("pr_hud_location", pr_hud_location.GetBool());
+	_hud->SetStateInt("pr_hud_location_methode", pr_hud_location_methode.GetInteger());
 	// Entity info
 	_hud->SetStateBool("pr_hud_entityinfo", pr_hud_entityinfo.GetBool());
 	// Ammo
@@ -1009,6 +1011,9 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 	_hud->SetStateFloat("pr_hud_custom_r", pr_hud_custom_r.GetFloat());
 	_hud->SetStateFloat("pr_hud_custom_g", pr_hud_custom_g.GetFloat());
 	_hud->SetStateFloat("pr_hud_custom_b", pr_hud_custom_b.GetFloat());
+	// Keys
+	_hud->SetStateBool("pr_hud_keys", pr_hud_keys.GetBool());
+	_hud->SetStateInt("pr_hud_keys_methode", pr_hud_keys_methode.GetInteger());
 	// PreyRun END
 
 	_hud->SetStateBool("invehicle", InVehicle());
@@ -1019,8 +1024,8 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 	_hud->SetStateBool("allowprogress", !disallowProgress);
 	_hud->SetStateBool("showspiritpower", (!disallowHealth && !InVehicle() && (inventory.requirements.bCanSpiritWalk || IsDeathWalking())));
 	_hud->SetStateFloat("lightertemp", lighterTemperature);
-	_hud->SetStateFloat("player_spiritpercent", ((float)spiritPower) / inventory.maxSpirit);
-	_hud->SetStateFloat("player_healthpercent", ((float)health) / inventory.maxHealth);
+	_hud->SetStateFloat("player_spiritpercent", static_cast<float>(spiritPower) / inventory.maxSpirit);
+	_hud->SetStateFloat("player_healthpercent", static_cast<float>(health) / inventory.maxHealth);
 	_hud->SetStateFloat("player_healthR", inventory.maxHealth > 100 ? 0.75f : 0.6f);
 	_hud->SetStateFloat("player_healthG", inventory.maxHealth > 100 ? 0.85f : 0.0f);
 	_hud->SetStateFloat("player_healthB", inventory.maxHealth > 100 ? 1.0f : 0.0f);
@@ -1096,7 +1101,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 #endif // PR_DEBUG
 
 	// Individual Level timer
-	if (!pr_gametimer_running && pr_timer_autostart.GetBool() && pr_timer_mapchanged && pr_timer_methode.GetInteger() == PR_TIMER_METHODES::METHODE_INDIVIDUALLEVEL && (idStr)gameLocal.GetMapName() != idStr("maps/game/roadhouse.map"))
+	if (!pr_gametimer_running && pr_timer_autostart.GetBool() && pr_timer_mapchanged && static_cast<PR_TIMER_METHODE>(pr_timer_methode.GetInteger()) == PR_TIMER_METHODE::INDIVIDUALLEVEL && static_cast<idStr>(gameLocal.GetMapName()) != idStr("maps/game/roadhouse.map"))
 	{
 		gameLocal.Printf("PreyRun: Timer: Individual Level Auto starting\n");
 
@@ -1109,7 +1114,6 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			pr::WriteTimerStart(pr::GetTime());
 		}
 	}
-
 
 	// Might not be the optimal solution because when the game decides to not draw the hud the timer cant resume but it gives better times then hooking InitFromMap()
 	if (pr_gametimer_running && !pr_gametimer.IsRunning() && !pr_freeze.GetBool())
@@ -1138,9 +1142,596 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 	// HUMANHEAD pdm: removed weapon ptr check here since ours is invalid when in a vehicle
 	// Also removed privateCameraView, since we want subtitles when they are on
-	if (gameLocal.GetCamera() || !_hud || !g_showHud.GetBool() || pm_thirdPerson.GetBool()) {
+	if (gameLocal.GetCamera() || !_hud || pm_thirdPerson.GetBool()) {
 		return;
 	}
+
+	// PreyRun BEGIN
+	if (_hud->GetStateBool("pr_hud", "1"))
+	{
+		// Timer
+		if (_hud->GetStateBool("pr_hud_timer", "1"))
+		{
+			auto pr_t_r = _hud->GetStateFloat("pr_hud_timer_r", "255");
+			auto pr_t_g = _hud->GetStateFloat("pr_hud_timer_g", "255");
+			auto pr_t_b = _hud->GetStateFloat("pr_hud_timer_b", "255");
+			auto pr_t_x = _hud->GetStateInt("pr_hud_timer_x", "0");
+			auto pr_t_y = _hud->GetStateInt("pr_hud_timer_y", "235");
+
+			auto times = PR_ms2time(pr_gametimer.Milliseconds());
+
+			idStr strText;
+
+			sprintf(strText, "%02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
+
+			renderSystem->DrawSmallStringExt(pr_t_x, pr_t_y, strText.c_str(), idVec4(PR_toPreyColour(pr_t_r), PR_toPreyColour(pr_t_g), PR_toPreyColour(pr_t_b), 1), false, declManager->FindMaterial("textures/bigchars"));
+		}
+
+		// Speedometer
+		if (_hud->GetStateBool("pr_hud_speedometer", "1"))
+		{
+			auto pr_sm_r = _hud->GetStateFloat("pr_hud_speedometer_r", "255");
+			auto pr_sm_g = _hud->GetStateFloat("pr_hud_speedometer_g", "255");
+			auto pr_sm_b = _hud->GetStateFloat("pr_hud_speedometer_b", "255");
+#ifdef PR_DEVELOP
+			auto pr_sm_prec = _hud->GetStateInt("pr_hud_speedometer_precision", "6");
+#endif // PR_DEVELOP
+			auto pr_sm_x = _hud->GetStateInt("pr_hud_speedometer_x", "320");
+			auto pr_sm_y = _hud->GetStateInt("pr_hud_speedometer_y", "470");
+
+			auto vel = physicsObj.GetLinearVelocity();
+
+			idStr strText;
+
+			if (physicsObj.HasGroundContacts() || InVehicle() || noclip)
+			{
+				// are we standing on the ground or in a Vehicle or nocliping? then add Z speed as well (when wallwalking, being on stairs/slopes or flying in Vehicle or nocliping)
+				sprintf(strText, "%.2f", vel.Length());
+			}
+			else
+			{
+				sprintf(strText, "%.2f", static_cast<float>(idMath::Sqrt(vel.x * vel.x + vel.y * vel.y)));
+
+			}
+			renderSystem->DrawSmallStringExt(pr_sm_x, pr_sm_y, strText.c_str(), idVec4(PR_toPreyColour(pr_sm_r), PR_toPreyColour(pr_sm_g), PR_toPreyColour(pr_sm_b), 1), false, declManager->FindMaterial("textures/bigchars"));
+		}
+
+		// JumpSpeed
+		if (_hud->GetStateBool("pr_hud_jumpspeed", "0"))
+		{
+			idStr strText;
+
+			// If were are standing on the ground or are in a Vehicle get velocity and save it
+			if (physicsObj.HasGroundContacts() || InVehicle() || noclip)
+			{
+				auto vel = physicsObj.GetLinearVelocity().Length();
+				_hud->SetStateFloat("pr_hud_jumpspeed_val", vel);
+				sprintf(strText, "%.2f", vel);
+			}
+			// Were arent standing on the ground so were in mid air, so we display the last speedvalue we had while on the ground
+			else
+			{
+				sprintf(strText, "%.2f", _hud->GetStateFloat("pr_hud_jumpspeed_val", "0"));
+
+			}
+
+			renderSystem->DrawSmallStringExt(310, 445, strText.c_str(), idVec4(PR_toPreyColour(255), PR_toPreyColour(255), PR_toPreyColour(63.75), 1), false, declManager->FindMaterial("textures/bigchars"));
+		}
+
+		// Viewangles
+		if (_hud->GetStateBool("pr_hud_viewangles", "0"))
+		{
+			idStr pitch;
+			idStr yaw;
+			idStr roll;
+
+			idAngles angles;
+
+			if (InVehicle())
+			{
+				angles = GetVehicleInterfaceLocal()->GetVehicle()->GetAxis().ToAngles();
+			}
+			else
+			{
+				angles = GetViewAngles();
+			}
+
+			sprintf(pitch, "Pitch : %f", angles.pitch);
+			sprintf(yaw, "Yaw   : %f", angles.yaw);
+			sprintf(roll, "Roll  : %f", angles.roll);
+
+			renderSystem->DrawSmallStringExt(0, 0, pitch.c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(0, 15, yaw.c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(0, 30, roll.c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+		}
+
+		// Velocity
+		if (_hud->GetStateBool("pr_hud_velocity", "0"))
+		{
+			auto vel = physicsObj.GetLinearVelocity();
+
+			idStr velX;
+			sprintf(velX, "X   : %f", fabs(vel.x));
+			idStr velY;
+			sprintf(velY, "Y   : %f", fabs(vel.y));
+			idStr velZ;
+			sprintf(velZ, "Z   : %f", fabs(vel.z));
+			idStr velXY;
+			sprintf(velXY, "XY  : %f", static_cast<float>(idMath::Sqrt(vel.x * vel.x + vel.y * vel.y)));
+			idStr velXYZ;
+			sprintf(velXYZ, "XYZ : %f", vel.Length());
+
+			renderSystem->DrawSmallStringExt(500, 20, velX, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(500, 35, velY, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(500, 50, velZ, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(500, 65, velXY, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(500, 80, velXYZ, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+		}
+
+		// Location
+		if (_hud->GetStateBool("pr_hud_location", "0"))
+		{
+			auto eyePos = GetEyePosition();
+
+			idStr posX;
+			sprintf(posX, "X: %f", eyePos.x);
+			idStr posY;
+			sprintf(posY, "Y: %f", eyePos.y);
+
+			idStr posZ;
+			auto zpos = eyePos.z;
+			if (static_cast<PR_LOCATION_METHODE>(_hud->GetStateInt("pr_hud_location_methode", "0")) == PR_LOCATION_METHODE::FEETPOS)
+			{
+				zpos -= EyeHeight();
+			}
+			sprintf(posZ, "Z: %f", zpos);
+
+			renderSystem->DrawSmallStringExt(0, 45, posX, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(0, 60, posY, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(0, 75, posZ, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
+		}
+
+		// Entity Info
+		if (_hud->GetStateBool("pr_hud_entityinfo", "0"))
+		{
+			trace_t trace;
+			idVec3 start;
+			idVec3 end;
+
+			// start the traceline at our eyes
+
+			start = GetEyePosition();
+
+			// end the traceline 2048 units ahead in the direction we're viewing
+
+			end = start + viewAngles.ToForward() * 2048.0f;
+
+			// perform the traceline and store the results in trace
+			// stop the trace for monsters and players
+			// and ignore this (the player) since we started the trace inside the player
+
+			gameLocal.clip.TracePoint(trace, start, end, MASK_MONSTERSOLID | MASK_PLAYERSOLID, this);
+
+			// trace.fraction is the fraction of the traceline that was travelled
+			// if trace.fraction is less than one then we hit something
+
+			if ((trace.fraction < 1.0f) && (trace.c.entityNum != ENTITYNUM_NONE))
+			{
+				auto *ent = gameLocal.entities[trace.c.entityNum];
+
+				// you could have also used gameLocal.GetTraceEntity( trace ) here
+				// gameLocal.GetTraceEntity returns the entity's master entity if it exists
+				// search the SDK for more examples
+
+				auto health = ent->GetHealth();
+				auto maxHealth = ent->GetMaxHealth();
+
+				if (health > 0 && maxHealth > 0)
+				{
+					idStr strHealth;
+					sprintf(strHealth, "Health: %03d/%03d", ent->health, ent->GetMaxHealth());
+
+					renderSystem->DrawSmallStringExt(360, 235, strHealth, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
+
+					idStr strName;
+					sprintf(strName, "Name: %s", ent->GetName());
+
+					renderSystem->DrawSmallStringExt(360, 220, strName, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
+				}
+			}
+		}
+
+		// Ammo
+		if (_hud->GetStateBool("pr_hud_ammo", "0"))
+		{
+			if (InVehicle())
+			{
+				// CurrentPower == Ammo
+
+				// Max 600000
+				// 1 Shot is = 3500
+				auto cpower = GetVehicleInterfaceLocal()->GetVehicle()->GetCurrentPower();
+
+				idVec4 colour;
+				idStr strAmmo;
+
+				sprintf(strAmmo, "%03d", cpower / 3500);
+
+				if (cpower > 0)
+				{
+					colour = PR_COLOUR_WHITE;
+				}
+				else
+				{
+					colour = PR_COLOUR_RED;
+				}
+
+				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
+			}
+			else
+			{
+
+				switch (static_cast<PR_WEAPONS>(currentWeapon))
+				{
+				case PR_WEAPONS::RIFLE: // Rifle
+				case PR_WEAPONS::SHOTGUN: // Shotgun
+				{
+					auto clip = weapon->AmmoInClip();
+					auto avail = weapon->AmmoAvailable();
+					idVec4 colour;
+					idStr strAmmo;
+
+					sprintf(strAmmo, "%02d | %02d", clip, avail - clip);
+
+					// PR_FIXME
+					// very ugly there might be a better solution to this than if then else trees
+					if (clip > 0)
+					{
+						colour = PR_COLOUR_WHITE;
+					}
+					else
+					{
+						if (avail > 0)
+						{
+							colour = PR_COLOUR_YELLOW;
+						}
+						else
+						{
+							colour = PR_COLOUR_RED;
+						}
+					}
+
+					renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
+
+					break;
+				}
+				case PR_WEAPONS::CRAWLER: // Grendade
+				case PR_WEAPONS::LEECHER: // Leecher
+				case PR_WEAPONS::ROCKETLAUNCHER: // RocketLauncher
+				{
+					auto avail = weapon->AmmoAvailable();
+					idVec4 colour;
+					idStr strAmmo;
+
+					sprintf(strAmmo, "     %02d", avail);
+
+					if (avail > 0)
+					{
+						colour = PR_COLOUR_WHITE;
+					}
+					else
+					{
+						colour = PR_COLOUR_RED;
+					}
+
+					renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
+					break;
+				}
+				case PR_WEAPONS::MINIGUN: // Minigun
+				{
+					auto avail = weapon->AmmoAvailable();
+					auto altAvail = weapon->AltAmmoAvailable();
+					idVec4 colour;
+					idVec4 colour2;
+					idStr strAmmo;
+					idStr strAmmo2;
+
+					sprintf(strAmmo, "  %03d", avail);
+					sprintf(strAmmo2, "  %02d", altAvail);
+
+					if (avail > 0)
+					{
+						colour = PR_COLOUR_WHITE;
+					}
+					else
+					{
+						colour = PR_COLOUR_RED;
+					}
+
+					if (altAvail > 0)
+					{
+						colour2 = PR_COLOUR_WHITE;
+					}
+					else
+					{
+						colour2 = PR_COLOUR_RED;
+					}
+
+					renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
+					renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS2_Y, strAmmo2, colour2, false, declManager->FindMaterial("textures/bigchars"));
+					break;
+				}
+				default: // Wrench or no weapon
+					break;
+				}
+			}
+		}
+
+		// Health
+		if (_hud->GetStateBool("pr_hud_health", "0"))
+		{
+			// Player is alive, Dead != Deathwalking
+			if (!IsDead())
+			{
+				idStr strHealth;
+				idVec4 colour;
+
+				if (InVehicle())
+				{
+					auto health = GetVehicleInterfaceLocal()->GetVehicle()->health;
+					auto maxHealth = GetVehicleInterfaceLocal()->GetVehicle()->spawnHealth;
+
+					sprintf(strHealth, "%03d | %03d", health, maxHealth);
+
+					if (health == 0)
+					{
+						colour = PR_COLOUR_RED;
+					}
+					else
+					{
+						colour = PR_COLOUR_WHITE;
+					}
+				}
+				else
+				{
+					auto health = GetHealth();
+					auto maxHealth = GetMaxHealth();
+
+					if (godmode) { colour = PR_COLOUR_GREY; }
+					else
+					{
+						// below 25 your hp regenerates back up
+						if (health < 25) { colour = PR_COLOUR_YELLOW; }
+						else { colour = PR_COLOUR_WHITE; }
+					}
+
+					sprintf(strHealth, "%03d | %03d", health, maxHealth);
+				}
+
+				renderSystem->DrawSmallStringExt(70, 448, strHealth, colour, false, declManager->FindMaterial("textures/bigchars"));
+			}
+		}
+
+		// SpiritPower
+		if (_hud->GetStateBool("pr_hud_spiritpower", "0"))
+		{
+			if (!IsDead())
+			{
+				idStr strSpirit;
+				idVec4 colour;
+				int spiritpwr;
+
+				if (inventory.requirements.bCanSpiritWalk)
+				{
+					spiritpwr = GetSpiritPower();
+
+					if (spiritpwr > 0)
+					{
+						colour = PR_COLOUR_WHITE;
+					}
+					else
+					{
+						colour = PR_COLOUR_RED;
+					}
+				}
+				else
+				{
+					spiritpwr = 0;
+					colour = PR_COLOUR_GREY;
+				}
+
+				sprintf(strSpirit, "%03d | 100", spiritpwr);
+
+				renderSystem->DrawSmallStringExt(70, 433, strSpirit, colour, false, declManager->FindMaterial("textures/bigchars"));
+			}
+		}
+
+		// Distance
+		if (_hud->GetStateBool("pr_hud_distance", "0"))
+		{
+			trace_t trace;
+			idVec3 start;
+			idVec3 end;
+
+			// start the traceline at our eyes
+
+			start = GetEyePosition();
+
+			// end the traceline 2048 units ahead in the direction we're viewing
+
+			end = start + viewAngles.ToForward() * 2048.0f;
+
+			// perform the traceline and store the results in trace
+			// and ignore this (the player) since we started the trace inside the player
+			if (IsSpiritWalking())
+			{
+				gameLocal.clip.TracePoint(trace, start, end, CONTENTS_SOLID | CONTENTS_PLAYERCLIP | CONTENTS_BODY | CONTENTS_SPIRITBRIDGE, this);
+			}
+			else
+			{
+				gameLocal.clip.TracePoint(trace, start, end, CONTENTS_SOLID | CONTENTS_PLAYERCLIP | CONTENTS_BODY | CONTENTS_FORCEFIELD, this);
+			}
+
+			// trace.fraction is the fraction of the traceline that was travelled
+			// if trace.fraction is less than one then we hit something
+
+			if ((trace.fraction < 1.0f) && (trace.c.entityNum != ENTITYNUM_NONE))
+			{
+				auto distance = start - trace.endpos;
+
+				idStr strText;
+				sprintf(strText, "Distance %f", fabs(distance.x) + fabs(distance.y) + fabs(distance.z));
+
+				renderSystem->DrawSmallStringExt(360, 205, strText, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
+			}
+		}
+
+		// Custom Hud Element
+		if (_hud->GetStateBool("pr_hud_custom", "0"))
+		{
+			auto pr_cstm_x = _hud->GetStateInt("pr_hud_custom_x", "320");
+			auto pr_cstm_y = _hud->GetStateInt("pr_hud_custom_y", "470");
+			auto pr_cstm_r = _hud->GetStateFloat("pr_hud_custom_r", "255");
+			auto pr_cstm_g = _hud->GetStateFloat("pr_hud_custom_g", "255");
+			auto pr_cstm_b = _hud->GetStateFloat("pr_hud_custom_b", "255");
+
+			auto pr_cstm_text = _hud->GetStateString("pr_hud_custom_text", "");
+
+			renderSystem->DrawSmallStringExt(pr_cstm_x, pr_cstm_y, pr_cstm_text, idVec4(PR_toPreyColour(pr_cstm_r), PR_toPreyColour(pr_cstm_g), PR_toPreyColour(pr_cstm_b), 1), false, declManager->FindMaterial("textures/bigchars"));
+		}
+
+		// Keys
+		if (_hud->GetStateBool("pr_hud_keys", "0"))
+		{
+			auto pr_mthd = static_cast<PR_KEYS_METHODE>(_hud->GetStateInt("pr_hud_keys_methode", "0"));
+
+			auto movef{ false };
+			auto moveb{ false };
+			auto mover{ false };
+			auto movel{ false };
+			auto movej{ false };
+			auto moved{ false };
+
+			if (usercmd.forwardmove != 0)
+			{
+				if (usercmd.forwardmove > 0) { movef = true; }
+				else { moveb = true; }
+			}
+
+			if (usercmd.rightmove != 0)
+			{
+				if (usercmd.rightmove > 0) { mover = true; }
+				else { movel = true; }
+			}
+
+			if (usercmd.upmove != 0)
+			{
+				if (usercmd.upmove > 0) { movej = true; }
+				else { moved = true; }
+			}
+
+			auto colourd{ PR_COLOUR_WHITE };
+			auto colourf{ PR_COLOUR_WHITE };
+			auto colourj{ PR_COLOUR_WHITE };
+
+			auto colourl{ PR_COLOUR_WHITE };
+			auto colourb{ PR_COLOUR_WHITE };
+			auto colourr{ PR_COLOUR_WHITE };
+
+			if (pr_mthd == PR_KEYS_METHODE::NORMAL_GREY || pr_mthd == PR_KEYS_METHODE::REFLEX_GREY || pr_mthd == PR_KEYS_METHODE::MOMENTUM_GREY)
+			{
+				if (!moved) { colourd = PR_COLOUR_GREY; }
+				if (!movef) { colourf = PR_COLOUR_GREY; }
+				if (!movej) { colourj = PR_COLOUR_GREY; }
+
+				if (!movel) { colourl = PR_COLOUR_GREY; }
+				if (!moveb) { colourb = PR_COLOUR_GREY; }
+				if (!mover) { colourr = PR_COLOUR_GREY; }
+			}
+
+			if (pr_mthd == PR_KEYS_METHODE::NORMAL)
+			{
+				idStr strText;
+				idStr strText2;
+
+				sprintf(strText, "%c %c %c", moved ? 'D' : ' ', movef ? 'F' : ' ', movej ? 'J' : ' ');
+				sprintf(strText2, "%c %c %c", movel ? 'L' : ' ', moveb ? 'B' : ' ', mover ? 'R' : ' ');
+
+				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y, strText.c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y2, strText2.c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+			}
+
+			else if (pr_mthd == PR_KEYS_METHODE::NORMAL_GREY)
+			{
+				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y, "D", colourd, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y, "  F", colourf, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y, "    J", colourj, false, declManager->FindMaterial("textures/bigchars"));
+
+				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y2, "L", colourl, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y2, "  B", colourb, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y2, "    R", colourr, false, declManager->FindMaterial("textures/bigchars"));
+			}
+
+			else if (pr_mthd == PR_KEYS_METHODE::REFLEX)
+			{
+				idStr strText;
+				idStr strText2;
+
+				sprintf(strText, "%c  %c", movel ? 'L' : ' ', mover ? 'R' : ' ');
+
+				sprintf(strText2, "%c  %c", moved ? 'D' : ' ', movej ? 'J' : ' ');
+
+				if (movef) { renderSystem->DrawSmallStringExt(300, 220, "  F", PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars")); }
+
+				if (moveb) { renderSystem->DrawSmallStringExt(300, 245, "  B", PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars")); }
+
+				renderSystem->DrawSmallStringExt(305, 230, strText.c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(305, 245, strText2.c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+			}
+
+			else if (pr_mthd == PR_KEYS_METHODE::REFLEX_GREY)
+			{
+				renderSystem->DrawSmallStringExt(305, 230, "L", colourl, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(305, 230, "   R", colourr, false, declManager->FindMaterial("textures/bigchars"));
+
+				renderSystem->DrawSmallStringExt(300, 220, "  F", colourf, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(300, 245, "  B", colourb, false, declManager->FindMaterial("textures/bigchars"));
+
+				renderSystem->DrawSmallStringExt(305, 245, "D", colourd, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(305, 245, "   J", colourj, false, declManager->FindMaterial("textures/bigchars"));
+			}
+
+			else if (pr_mthd == PR_KEYS_METHODE::MOMENTUM)
+			{
+				idStr strText;
+
+				sprintf(strText, "%c  %c", movel ? 'L' : ' ', mover ? 'R' : ' ');
+
+				if (movef) { renderSystem->DrawSmallStringExt(600, 245, "  F", PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars")); }
+
+				if (moveb) { renderSystem->DrawSmallStringExt(600, 275, "  B", PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars")); }
+
+				if (movej) { renderSystem->DrawSmallStringExt(605, 290, "JUMP", PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars")); }
+				if (moved) { renderSystem->DrawSmallStringExt(605, 305, "DUCK", PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars")); }
+
+				renderSystem->DrawSmallStringExt(605, 260, strText.c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+			}
+
+			else if (pr_mthd == PR_KEYS_METHODE::MOMENTUM_GREY)
+			{
+				renderSystem->DrawSmallStringExt(605, 260, "L", colourl, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(605, 260, "   R", colourr, false, declManager->FindMaterial("textures/bigchars"));
+
+				renderSystem->DrawSmallStringExt(600, 245, "  F", colourf, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(600, 275, "  B", colourb, false, declManager->FindMaterial("textures/bigchars"));
+
+				renderSystem->DrawSmallStringExt(605, 290, "JUMP", colourj, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(605, 305, "DUCK", colourd, false, declManager->FindMaterial("textures/bigchars"));
+			}
+		}
+	} // if (pr_hud)
+
+	if (!g_showHud.GetBool()) { return; }
 
 	UpdateHudStats(_hud);
 
@@ -1185,470 +1776,13 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		}
 	}
 
-	// PreyRun BEGIN
-	// Timer
-	if (_hud->GetStateBool("pr_hud_timer", "1"))
-	{
-		float pr_t_r = _hud->GetStateFloat("pr_hud_timer_r", "255");
-		float pr_t_g = _hud->GetStateFloat("pr_hud_timer_g", "255");
-		float pr_t_b = _hud->GetStateFloat("pr_hud_timer_b", "255");
-		int pr_t_x = _hud->GetStateInt("pr_hud_timer_x", "0");
-		int pr_t_y = _hud->GetStateInt("pr_hud_timer_y", "235");
-
-		if (pr_gametimer.IsRunning())
-		{
-			pr_gametimer.Stop();
-			auto times = PR_ms2time(pr_gametimer.Milliseconds());
-			pr_gametimer.Start();
-
-			idStr strText;
-
-			sprintf(strText, "%02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
-
-			renderSystem->DrawSmallStringExt(pr_t_x, pr_t_y, strText.c_str(), idVec4(PR_toPreyColour(pr_t_r), PR_toPreyColour(pr_t_g), PR_toPreyColour(pr_t_b), 1), false, declManager->FindMaterial("textures/bigchars"));
-		}
-		else
-		{
-			auto times = PR_ms2time(pr_gametimer.Milliseconds());
-
-			idStr strText;
-
-			sprintf(strText, "%02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
-
-			renderSystem->DrawSmallStringExt(pr_t_x, pr_t_y, strText.c_str(), idVec4(PR_toPreyColour(pr_t_r), PR_toPreyColour(pr_t_g), PR_toPreyColour(pr_t_b), 1), false, declManager->FindMaterial("textures/bigchars"));
-		}
-	}
-
-	// Speedometer
-	if (_hud->GetStateBool("pr_hud_speedometer", "1"))
-	{
-		float pr_sm_r = _hud->GetStateFloat("pr_hud_speedometer_r", "255");
-		float pr_sm_g = _hud->GetStateFloat("pr_hud_speedometer_g", "255");
-		float pr_sm_b = _hud->GetStateFloat("pr_hud_speedometer_b", "255");
-#ifdef PR_DEVELOP
-		int pr_sm_prec=_hud->GetStateInt("pr_hud_speedometer_precision", "6");
-#endif // PR_DEVELOP
-		int pr_sm_x = _hud->GetStateInt("pr_hud_speedometer_x", "320");
-		int pr_sm_y = _hud->GetStateInt("pr_hud_speedometer_y", "470");
-
-		auto vel = physicsObj.GetLinearVelocity();
-
-		idStr strText;
-
-		// Uses InVehicle now
-		if (physicsObj.HasGroundContacts() || InVehicle())
-		{
-			// are we standing on the ground or in a Vehicle? then add Z speed as well (when wallwalking, being on stairs/slopes or flying in Vehicle)
-			sprintf(strText, "%.2f", vel.Length()); // vel.Lenght() == idMath::Sqrt(vel.x * vel.x + vel.y * vel.y + vel.z * vel.z)
-		}
-		else
-		{
-			sprintf(strText, "%.2f", (float)idMath::Sqrt(vel.x * vel.x + vel.y * vel.y));
-
-		}
-		renderSystem->DrawSmallStringExt(pr_sm_x, pr_sm_y, strText.c_str(), idVec4(PR_toPreyColour(pr_sm_r), PR_toPreyColour(pr_sm_g), PR_toPreyColour(pr_sm_b), 1), false, declManager->FindMaterial("textures/bigchars"));
-	}
-
-	// JumpSpeed
-	if (_hud->GetStateBool("pr_hud_jumpspeed", "0"))
-	{
-		idStr strText;
-
-		// If were are standing on the ground or are in a Vehicle get velocity and save it
-		if (physicsObj.HasGroundContacts() || InVehicle())
-		{
-			auto vel = physicsObj.GetLinearVelocity().Length();
-			_hud->SetStateFloat("pr_hud_jumpspeed_val", vel);
-			sprintf(strText, "%.2f", vel);
-		}
-		// Were arent standing on the ground so were in mid air, so we display the last speedvalue we had while on the ground
-		else
-		{
-			sprintf(strText, "%.2f", _hud->GetStateFloat("pr_hud_jumpspeed_val", 0));
-
-		}
-
-		renderSystem->DrawSmallStringExt(310, 445, strText.c_str(), idVec4(PR_toPreyColour(255), PR_toPreyColour(255), PR_toPreyColour(63.75), 1), false, declManager->FindMaterial("textures/bigchars"));
-	}
-
-	// Viewangles
-	if (_hud->GetStateBool("pr_hud_viewangles", "0"))
-	{
-		idStr pitch;
-		idStr yaw;
-		idStr roll;
-
-		idAngles angles;
-
-		if (InVehicle())
-		{
-			angles = GetVehicleInterfaceLocal()->GetVehicle()->GetAxis().ToAngles();
-		}
-		else
-		{
-			angles = GetViewAngles();
-		}
-
-		sprintf(pitch, "Pitch : %f", angles.pitch);
-		sprintf(yaw, "Yaw   : %f", angles.yaw);
-		sprintf(roll, "Roll  : %f", angles.roll);
-
-		renderSystem->DrawSmallStringExt(0, 0, pitch.c_str(), idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
-		renderSystem->DrawSmallStringExt(0, 15, yaw.c_str(), idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
-		renderSystem->DrawSmallStringExt(0, 30, roll.c_str(), idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
-	}
-
-	// Velocity
-	if (_hud->GetStateBool("pr_hud_velocity", "0"))
-	{
-		auto vel = physicsObj.GetLinearVelocity();
-
-		idStr velX;
-		sprintf(velX, "X   : %f", fabs(vel.x));
-		idStr velY;
-		sprintf(velY, "Y   : %f", fabs(vel.y));
-		idStr velZ;
-		sprintf(velZ, "Z   : %f", fabs(vel.z));
-		idStr velXY;
-		sprintf(velXY, "XY  : %f", (float)idMath::Sqrt(vel.x * vel.x + vel.y * vel.y));
-		idStr velXYZ;
-		sprintf(velXYZ, "XYZ : %f", vel.Length());
-
-		renderSystem->DrawSmallStringExt(500, 20, velX, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
-		renderSystem->DrawSmallStringExt(500, 35, velY, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
-		renderSystem->DrawSmallStringExt(500, 50, velZ, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
-		renderSystem->DrawSmallStringExt(500, 65, velXY, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
-		renderSystem->DrawSmallStringExt(500, 80, velXYZ, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
-	}
-
-	// Location
-	if (_hud->GetStateBool("pr_hud_location", "0"))
-	{
-		auto eyePos = GetEyePosition();
-
-		idStr posX;
-		sprintf(posX, "X: %f", eyePos.x);
-		idStr posY;
-		sprintf(posY, "Y: %f", eyePos.y);
-		idStr posZ;
-		sprintf(posZ, "Z: %f", eyePos.z);
-
-		renderSystem->DrawSmallStringExt(0, 45, posX, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
-		renderSystem->DrawSmallStringExt(0, 60, posY, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
-		renderSystem->DrawSmallStringExt(0, 75, posZ, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
-	}
-
-	// Entity Info
-	if (_hud->GetStateBool("pr_hud_entityinfo", "0"))
-	{
-		trace_t trace;
-		idVec3 start;
-		idVec3 end;
-
-		// start the traceline at our eyes
-
-		start = GetEyePosition();
-
-		// end the traceline 2048 units ahead in the direction we're viewing
-
-		end = start + viewAngles.ToForward() * 2048.0f;
-
-		// perform the traceline and store the results in trace
-		// stop the trace for monsters and players
-		// and ignore this (the player) since we started the trace inside the player
-
-		gameLocal.clip.TracePoint(trace, start, end, MASK_MONSTERSOLID | MASK_PLAYERSOLID, this);
-
-		// trace.fraction is the fraction of the traceline that was travelled
-		// if trace.fraction is less than one then we hit something
-
-		if ((trace.fraction < 1.0f) && (trace.c.entityNum != ENTITYNUM_NONE))
-		{
-			idEntity *ent = gameLocal.entities[trace.c.entityNum];
-
-			// you could have also used gameLocal.GetTraceEntity( trace ) here
-			// gameLocal.GetTraceEntity returns the entity's master entity if it exists
-			// search the SDK for more examples
-
-			int health = ent->GetHealth();
-			int maxHealth = ent->GetMaxHealth();
-
-			if (health > 0 && maxHealth > 0)
-			{
-				idStr strHealth;
-				sprintf(strHealth, "Health: %03d/%03d", ent->health, ent->GetMaxHealth());
-
-				renderSystem->DrawSmallStringExt(360, 235, strHealth, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
-
-				idStr strName;
-				sprintf(strName, "Name: %s", ent->GetName());
-
-				renderSystem->DrawSmallStringExt(360, 220, strName, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
-			}
-		}
-	}
-
-	// Ammo
-	if (_hud->GetStateBool("pr_hud_ammo", "0"))
-	{
-		if (InVehicle())
-		{
-			// CurrentPower == Ammo
-
-			// Max 600000
-			// 1 Shot is = 3500
-			auto cpower = GetVehicleInterfaceLocal()->GetVehicle()->GetCurrentPower();
-
-			idVec4 colour;
-			idStr strAmmo;
-
-			sprintf(strAmmo, "%03d", cpower / 3500);
-
-			if (cpower > 0)
-			{
-				colour = PR_COLOUR_WHITE;
-			}
-			else
-			{
-				colour = PR_COLOUR_RED;
-			}
-
-			renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
-		}
-		else
-		{
-
-			switch (currentWeapon)
-			{
-			case PR_WEAPONS::WPN_RIFLE: // Rifle
-			case PR_WEAPONS::WPN_SHOTGUN: // Shotgun
-			{
-				int clip = weapon->AmmoInClip();
-				int avail = weapon->AmmoAvailable();
-				idVec4 colour;
-				idStr strAmmo;
-
-				sprintf(strAmmo, "%02d | %02d", clip, avail - clip);
-
-				// PR_FIXME
-				// very ugly there might be a better solution to this than if then else trees
-				if (clip > 0)
-				{
-					colour = PR_COLOUR_WHITE;
-				}
-				else
-				{
-					if (avail > 0)
-					{
-						colour = PR_COLOUR_YELLOW;
-					}
-					else
-					{
-						colour = PR_COLOUR_RED;
-					}
-				}
-
-				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
-
-				break;
-			}
-			case PR_WEAPONS::WPN_CRAWLER: // Grendade
-			case PR_WEAPONS::WPN_LEECHER: // Leecher
-			case PR_WEAPONS::WPN_ROCKETLAUNCHER: // RocketLauncher
-			{
-				int avail = weapon->AmmoAvailable();
-				idVec4 colour;
-				idStr strAmmo;
-
-				sprintf(strAmmo, "     %02d", avail);
-
-				if (avail > 0)
-				{
-					colour = PR_COLOUR_WHITE;
-				}
-				else
-				{
-					colour = PR_COLOUR_RED;
-				}
-
-				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
-				break;
-			}
-			case PR_WEAPONS::WPN_MINIGUN: // Minigun
-			{
-				int avail = weapon->AmmoAvailable();
-				int altAvail = weapon->AltAmmoAvailable();
-				idVec4 colour;
-				idVec4 colour2;
-				idStr strAmmo;
-				idStr strAmmo2;
-
-				sprintf(strAmmo, "  %03d", avail);
-				sprintf(strAmmo2, "  %02d", altAvail);
-
-				if (avail > 0)
-				{
-					colour = PR_COLOUR_WHITE;
-				}
-				else
-				{
-					colour = PR_COLOUR_RED;
-				}
-
-				if (altAvail > 0)
-				{
-					colour2 = PR_COLOUR_WHITE;
-				}
-				else
-				{
-					colour2 = PR_COLOUR_RED;
-				}
-
-				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
-				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS2_Y, strAmmo2, colour2, false, declManager->FindMaterial("textures/bigchars"));
-				break;
-			}
-			default: // Wrench or no weapon
-				break;
-			}
-		}
-	}
-
-	// Health
-	if (_hud->GetStateBool("pr_hud_health", "0"))
-	{
-		// Player is alive, Dead != Deathwalking
-		if (!IsDead())
-		{
-			idStr strHealth;
-			idVec4 colour;
-
-			if (InVehicle())
-			{
-				auto health = GetVehicleInterfaceLocal()->GetVehicle()->health;
-				auto maxHealth = GetVehicleInterfaceLocal()->GetVehicle()->spawnHealth;
-
-				sprintf(strHealth, "%03d | %03d", health, maxHealth);
-
-				if (health == 0)
-				{
-					colour = PR_COLOUR_RED;
-				}
-				else
-				{
-					colour = PR_COLOUR_WHITE;
-				}
-			}
-			else
-			{
-				auto health = GetHealth();
-				auto maxHealth = GetMaxHealth();
-
-				// below 25 your hp regenerates back up
-				if (health < 25)
-				{
-					colour = PR_COLOUR_YELLOW;
-				}
-				else
-				{
-					colour = PR_COLOUR_WHITE;
-				}
-
-				sprintf(strHealth, "%03d | %03d", health, maxHealth);
-			}
-
-			renderSystem->DrawSmallStringExt(70, 448, strHealth, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
-		}
-	}
-
-	// SpiritPower
-	if (_hud->GetStateBool("pr_hud_spiritpower", "0"))
-	{
-		if (!IsDead() && inventory.requirements.bCanSpiritWalk)
-		{
-			idStr strSpirit;
-			idVec4 colour;
-
-			auto spiritpwr = GetSpiritPower();
-
-			if (spiritpwr > 0)
-			{
-				colour = PR_COLOUR_WHITE;
-			}
-			else
-			{
-				colour = PR_COLOUR_RED;
-			}
-
-			sprintf(strSpirit, "%03d | 100", GetSpiritPower());
-
-			renderSystem->DrawSmallStringExt(70, 433, strSpirit, colour, false, declManager->FindMaterial("textures/bigchars"));
-		}
-	}
-
-	// Distance
-	if (_hud->GetStateBool("pr_hud_distance", "0"))
-	{
-		trace_t trace;
-		idVec3 start;
-		idVec3 end;
-
-		// start the traceline at our eyes
-
-		start = GetEyePosition();
-
-		// end the traceline 2048 units ahead in the direction we're viewing
-
-		end = start + viewAngles.ToForward() * 2048.0f;
-
-		// perform the traceline and store the results in trace
-		// and ignore this (the player) since we started the trace inside the player
-		if (IsSpiritWalking())
-		{
-			gameLocal.clip.TracePoint(trace, start, end, CONTENTS_SOLID | CONTENTS_PLAYERCLIP | CONTENTS_BODY | CONTENTS_SPIRITBRIDGE, this);
-		}
-		else
-		{
-			gameLocal.clip.TracePoint(trace, start, end, CONTENTS_SOLID | CONTENTS_PLAYERCLIP | CONTENTS_BODY | CONTENTS_FORCEFIELD, this);
-		}
-
-		// trace.fraction is the fraction of the traceline that was travelled
-		// if trace.fraction is less than one then we hit something
-
-		if ((trace.fraction < 1.0f) && (trace.c.entityNum != ENTITYNUM_NONE))
-		{
-			auto distance = start - trace.endpos;
-
-
-
-			idStr strText;
-			sprintf(strText, "Distance %f", fabs(distance.x) + fabs(distance.y) + fabs(distance.z));
-
-			renderSystem->DrawSmallStringExt(360, 205, strText, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
-		}
-	}
-
-	// Custom Hud Element
-	if (_hud->GetStateBool("pr_hud_custom", "0"))
-	{
-		int pr_cstm_x = _hud->GetStateInt("pr_hud_custom_x", "320");
-		int pr_cstm_y = _hud->GetStateInt("pr_hud_custom_y", "470");
-		float pr_cstm_r = _hud->GetStateFloat("pr_hud_custom_r", "255");
-		float pr_cstm_g = _hud->GetStateFloat("pr_hud_custom_g", "255");
-		float pr_cstm_b = _hud->GetStateFloat("pr_hud_custom_b", "255");
-
-		auto pr_cstm_text = _hud->GetStateString("pr_hud_custom_text", "");
-
-		renderSystem->DrawSmallStringExt(pr_cstm_x, pr_cstm_y, pr_cstm_text, idVec4(PR_toPreyColour(pr_cstm_r), PR_toPreyColour(pr_cstm_g), PR_toPreyColour(pr_cstm_b), 1), false, declManager->FindMaterial("textures/bigchars"));
-	}
-
 #ifdef PR_DEBUG
 	if (pr_dbg_hud_drawtime.GetBool())
 	{
 		pr_dbg_timer.Stop();
 
 		idStr str;
-		idVec4 colour{ 1,1,1,1 };
+		auto colour{ PR_COLOUR_WHITE };
 		auto time{ pr_dbg_timer.Milliseconds() };
 
 		if (time >= PR_DBG_HUDDRAWTIME_YELLOW)
@@ -1675,7 +1809,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 }
 
 // PreyRun BEGIN
-__forceinline float PR_toPreyColour(float f)
+ID_INLINE float PR_toPreyColour(float f)
 {
 	return f / 255.F;
 }
@@ -2222,7 +2356,7 @@ void hhPlayer::Weapon_Combat(void) {
 			if (newstate) {
 				SetState(newstate);
 				UpdateScript();
-			}
+		}
 #else
 			assert(idealWeapon >= 0);
 			assert(idealWeapon < MAX_WEAPONS);
@@ -2240,7 +2374,7 @@ void hhPlayer::Weapon_Combat(void) {
 #endif //HUMANHEAD END
 				weaponCatchup = false;
 			}
-		}
+	}
 		else {
 			if (weapon.IsValid() && (weapon->IsReady() || weapon->IsRising())) {
 				InvalidateCurrentWeapon();//Needed incase we change weapons quickly, we can go back to old weapon
@@ -2289,7 +2423,7 @@ void hhPlayer::Weapon_Combat(void) {
 				}
 			}
 		}
-	}
+}
 	else if (!bDeathWalk && !bReallyDead) {
 		weaponGone = false;	// if you drop and re-get weap, you may miss the = false above 
 		if (weapon.IsValid() && weapon.GetEntity()->IsHolstered()) {
@@ -3055,9 +3189,9 @@ void hhPlayer::BobCycle(const idVec3 &pushVelocity) {
 		delta -= LAND_DEFLECT_TIME;
 		f = 1.0 - (delta / LAND_RETURN_TIME);
 		viewBob -= gravity * (landChange * f);
-	}
-#endif	//HUMANHEAD END
 }
+#endif	//HUMANHEAD END
+	}
 
 /*
 ================
@@ -3125,7 +3259,7 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 			return localViewAngles;
 		}
 #endif //HUMANHEAD END
-	}
+}
 
 	//JSHTODO this messes up multiplayer input.  remerge sensitivity code
 	// circularly clamp the angles with deltas
@@ -3557,8 +3691,8 @@ void hhPlayer::PerformImpulse(int impulse) {
 #endif // VENOM END
 		break;
 	}
-	}
 }
+		}
 
 void hhPlayer::Present() {
 	idPlayer::Present();
@@ -5745,9 +5879,9 @@ void hhPlayer::AdjustBodyAngles(void) {
 				//use the multiplied axis
 				animator.SetJointAxis(headJoint, JOINTMOD_LOCAL, rot*axis); //point head in proper direction
 			}
-		}
-#endif
 	}
+#endif
+}
 	else {
 #if 0 //old headlook code
 		//rww - reset head joint override when not on a slab
@@ -5915,7 +6049,7 @@ void hhPlayer::Move(void) {
 								physicsObj.CheckWallWalk(true);*/
 			}
 		}
-	}
+}
 #endif
 	// HUMANHEAD END
 
