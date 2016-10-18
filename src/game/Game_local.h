@@ -854,7 +854,7 @@ protected:	// HUMANHEAD
 
 	void					InitScriptForMap(void);
 
-	void					InitConsoleCommands(void) const;
+	void					InitConsoleCommands(void);
 	void					ShutdownConsoleCommands(void);
 
 	void					InitAsyncNetwork(void);

@@ -3175,7 +3175,7 @@ Let the system know about all of our commands
 so it can perform tab completion
 =================
 */
-void idGameLocal::InitConsoleCommands(void) const
+void idGameLocal::InitConsoleCommands(void)
 {
 	// PreyRun BEGIN
 	// Note all new Commands shoud start with PR_
