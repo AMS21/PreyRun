@@ -68,7 +68,5 @@ storageType prTimer::ClockTicks() const
 
 void prTimer::SetCT(storageType ct)
 {
-	gameLocal.Printf("Setting CT to: %f\n", ct);
 	acuTime = static_cast<std::chrono::duration<storageType,periodType>> (ct);
-	gameLocal.Printf("ms after set: %f\n", Milliseconds());
 }

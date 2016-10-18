@@ -18,6 +18,7 @@ namespace pr
 			return;
 		}
 
+		file->WriteBool(true);
 		file->WriteFloat(GetBackupTime());
 		file->WriteString(mapName);
 
@@ -49,7 +50,6 @@ namespace pr
 	{
 		// Open the file
 		auto file = fileSystem->OpenFileRead(PR_BACKUPTMR_PATH);
-
 		if (file == NULL)
 		{
 #ifdef PR_DEBUG
@@ -58,8 +58,12 @@ namespace pr
 			return;
 		}
 
+		bool isValid{false};
 		float ms;
 		idStr mapName;
+
+		file->ReadBool(isValid);
+		if (!isValid) {	return;}
 
 		file->ReadFloat(ms);
 		file->ReadString(mapName);
@@ -92,6 +96,9 @@ namespace pr
 		auto file = fileSystem->OpenFileWrite(PR_BACKUPTMR_PATH, "fs_savepath");
 
 		if (file == NULL) { return; }
+
+		// Mark the file as invalid
+		file->WriteBool(false);
 
 		fileSystem->CloseFile(file);
 	}
