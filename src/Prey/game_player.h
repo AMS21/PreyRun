@@ -38,33 +38,30 @@ class hhPossessedTommy;
 
 // PreyRun BEGIN
 #include <cstdint>
+#include "../PreyRun/Constants.hpp"
+#include "../PreyRun/Hooking.hpp"
+#include "../PreyRun/GameTimer.hpp"
 
-int const PR_AMMOPOS_X{ 550 };
-int const PR_AMMOPOS_Y{ 448 };
-int const PR_AMMOPOS2_Y{ PR_AMMOPOS_Y + 15 };
+constexpr int PR_AMMOPOS_X{ 550 };
+constexpr int PR_AMMOPOS_Y{ 448 };
+constexpr int PR_AMMOPOS2_Y{ PR_AMMOPOS_Y + 15 };
+
+constexpr int PR_keys_x{300};
+constexpr int PR_keys_y{250};
+constexpr int PR_keys_y2{PR_keys_y + 15};
 
 idVec4 const PR_COLOUR_WHITE{ 1.0F, 1.0F, 1.0F, 1.0F };
 idVec4 const PR_COLOUR_YELLOW{ 1.0F, 1.0F, 0.25F, 1.0F };
 idVec4 const PR_COLOUR_RED{ 1.0F, 0.0F, 0.0F, 1.0F };
-
-const enum PR_WEAPONS {
-	WPN_NONE,
-	WPN_WRENCH,
-	WPN_RIFLE,
-	WPN_CRAWLER,
-	WPN_LEECHER,
-	WPN_MINIGUN,
-	WPN_SHOTGUN,
-	WPN_ROCKETLAUNCHER
-};
+idVec4 const PR_COLOUR_GREY{ 0.65F, 0.65F, 0.65F, 0.65F };
 
 #ifdef PR_DEBUG
-double const PR_DBG_HUDDRAWTIME_YELLOW{ 0.3 };
-double const PR_DBG_HUDDRAWTIME_RED{ 0.4 };
+constexpr double PR_DBG_HUDDRAWTIME_YELLOW{ 0.3 };
+constexpr double PR_DBG_HUDDRAWTIME_RED{ 0.4 };
 #endif // PR_DEBUG
 
 // The draw function from Prey takes floats in the range from 0.0 to 1.0 but usualy colours are represented from 0 to 255
-__forceinline float PR_toPreyColour(float f);
+ID_INLINE float PR_toPreyColour(float f);
 // PreyRun END
 
 #define MAX_HEALTH_NORMAL_MP		100 //rww - a probably temporary hack for trying out the pipe-as-armor concept

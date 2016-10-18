@@ -39,8 +39,10 @@ extern hhProfiler *					profiler;
 #endif
 // HUMANHEAD END
 
+// PreyRun BEGIN
 // the "gameversion" client command will print this plus compile date
-#define	GAME_VERSION		"basePrey-1"
+#define	GAME_VERSION		"PreyRun-1.0.4"
+// PreyRun END
 
 // classes used by idGameLocal
 class idEntity;
@@ -86,24 +88,6 @@ class idLocationEntity;
 //HUMANHEAD END
 
 //============================================================================
-
-// PreyRun BEGIN
-#include "../PreyRun/interprocess.hpp"
-//#include "../PreyRun/Random.hpp"
-#include "../PreyRun/AutoCmd.hpp"
-
-#include <cstdint>
-
-struct PR_time_t
-{
-	uint32_t hours;
-	uint8_t minutes;
-	uint8_t seconds;
-	uint16_t milliseconds;
-};
-
-PR_time_t PR_ms2time(unsigned);
-// PreyRun END
 
 #include "gamesys/Event.h"
 #include "gamesys/Class.h"
@@ -1131,5 +1115,24 @@ const int	CINEMATIC_SKIP_DELAY = SEC2MS(2.0f);
 //HUMANHEAD: aob - must be after Script_Thread.h
 #include "../prey/prey_script_thread.h"
 //HUMANHEAD END
+
+// PreyRun BEGIN
+#include "../PreyRun/interprocess.hpp"
+//#include "../PreyRun/Random.hpp"
+#include "../PreyRun/AutoCmd.hpp"
+#include "../PreyRun/Backup.hpp"
+
+#include <cstdint>
+
+struct PR_time_t
+{
+	uint32_t hours;
+	uint8_t minutes;
+	uint8_t seconds;
+	uint16_t milliseconds;
+};
+
+PR_time_t PR_ms2time(unsigned);
+// PreyRun END
 
 #endif	/* !__GAME_LOCAL_H__ */

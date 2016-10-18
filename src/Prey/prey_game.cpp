@@ -6,6 +6,7 @@
 
 // PreyRun BEGIN
 #include "../PreyRun/Hooking.hpp"
+#include "../PreyRun/Constants.hpp"
 // PreyRun END
 
 extern idCVar com_forceGenericSIMD;
@@ -93,13 +94,13 @@ void hhGameLocal::MapShutdown(void) {
 	// PreyRun BEGIN
 	if (pr_gametimer_running)
 	{
-		Printf("PreyRun: Timer: Paused, Map Shutdown\n");
 		pr_gametimer.Stop();
+		Printf("PreyRun: Timer: Paused, Map Shutdown\n");
 
-		if (pr_preysplit.GetBool() && pr_preysplit_mapchanged && pr_timer_methode.GetInteger() == PR_TIMER_METHODES::METHODE_REALTIMEATTACK)
+		if (pr_preysplit.GetBool() && pr_preysplit_mapchanged && static_cast<PR_TIMER_METHODE>(pr_timer_methode.GetInteger()) == PR_TIMER_METHODE::REALTIMEATTACK)
 		{
 			pr_preysplit_mapchanged = false;
-			pr::WriteMapChange(pr::GetTime(), (idStr)GetMapName());
+			pr::WriteMapChange(pr::GetTime(), static_cast<idStr>(GetMapName()));
 		}
 
 #ifdef PR_DEBUG
@@ -114,12 +115,14 @@ void hhGameLocal::MapShutdown(void) {
 		pr::timeDemoShutdown();
 	}
 
-#ifdef PR_DEBUG
 	if (gamestate != GAMESTATE_NOMAP)
 	{
+		pr::ClearBackupTimer();
+
+#ifdef PR_DEBUG
 		Printf("PreyRunDBG: Leaving map:%s\n", GetMapName());
-	}
 #endif // PR_DEBUG
+	}
 	// PreyRun END
 
 	//HUMANHEAD: mdc - added support for automatically dumping stats on map switch/game exit
@@ -148,6 +151,11 @@ void hhGameLocal::InitFromNewMap(const char *mapName, idRenderWorld *renderWorld
 #ifdef PR_DEBUG
 	Printf("PreyRunDBG: Starting Map: %s\n", mapName);
 #endif // PR_DEBUG
+
+	pr_timer_mapchanged = true;
+
+	// Timer recovery
+	pr::LoadBackupTimer(mapName);
 
 	// Clear all Autocmdzones when chaning level
 	pr::AutocmdzoneHandler::getInstance().Clear();
@@ -762,7 +770,7 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 #ifdef _DEBUG
 	if (isMultiplayer) {
 		assert(!isClient);
-}
+	}
 #endif
 
 	player = GetLocalPlayer();
@@ -805,6 +813,12 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 			pr::WriteTime(pr::GetTime());
 		}
 
+		if (pr_timer_backup.GetBool() && pr_gametimer_running && pr_gametimer.IsRunning())
+		{
+			pr::WriteBackupTime(GetMapName());
+		}
+
+		// Call the function which handles the triggering of autocmdzones
 		pr::AutocmdzoneHandler::getInstance().Trigger();
 		// PreyRun END
 
@@ -979,28 +993,28 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 			// each make up 50% of the time spread over 10 seconds
 			ret.combat = 0;
 			if (player->lastDmgTime > 0 && time < player->lastDmgTime + 10000) {
-				ret.combat += 50.0f * (float)(time - player->lastDmgTime) / 10000;
+				ret.combat += 50.0f * static_cast<float>(time - player->lastDmgTime) / 10000;
 			}
 			if (player->lastHitTime > 0 && time < player->lastHitTime + 10000) {
-				ret.combat += 50.0f * (float)(time - player->lastHitTime) / 10000;
+				ret.combat += 50.0f * static_cast<float>(time - player->lastHitTime) / 10000;
 			}
 		}
 
 		// see if a target_sessionCommand has forced a changelevel
 		if (sessionCommand.Length()) {
 			// PreyRun BEGIN
-			idStr cmd = sessionCommand;
+			auto cmd = sessionCommand;
 
 #ifdef PR_DEBUG
 			Printf("PreyRunDBG: Session command: %s\n", cmd.c_str());
 #endif // PR_DEBUG
 
-			if (cmd.Find("map ", 0, 4))
+			if (cmd.Find("map ", false, 4))
 			{
 				// The command to execute is map
 				pr_preysplit_mapchanged = true;
 
-				if (pr_timer_methode.GetInteger() == PR_TIMER_METHODES::METHODE_INDIVIDUALLEVEL && pr_gametimer_running && pr_gametimer.IsRunning() && pr_timer_autostop.GetBool())
+				if (static_cast<PR_TIMER_METHODE>(pr_timer_methode.GetInteger()) == PR_TIMER_METHODE::INDIVIDUALLEVEL && pr_gametimer_running && pr_gametimer.IsRunning() && pr_timer_autostop.GetBool())
 				{
 					pr_gametimer_running = false;
 					pr_gametimer.Stop();
@@ -1218,7 +1232,7 @@ surfTypes_t hhGameLocal::GetMatterType(const idEntity *ent, const idMaterial *ma
 		Warning(" Material: %s", material ? material->GetName() : "none");
 #endif
 		type = SURFTYPE_METAL;
-}
+	}
 
 	if (g_debugMatter.GetInteger() > 0 && descriptor && descriptor[0]) {
 		Printf("%s: [%s] ent=[%s] mat=[%s]\n",
@@ -1266,7 +1280,7 @@ void hhGameLocal::Save(idSaveGame *savefile) const {
 	savefile->WriteInt(inlinedProcClipModels.Num());
 	for (i = 0; i < inlinedProcClipModels.Num(); i++) {
 		savefile->WriteClipModel(inlinedProcClipModels[i]);
-}
+	}
 #endif
 	//HUMANHEAD END
 	savefile->WriteVec3(gravityNormal);
@@ -1317,7 +1331,7 @@ void hhGameLocal::Restore(idRestoreGame *savefile) {
 	savefile->ReadInt(numInlinedProcClipModels);
 	for (i = 0; i < numInlinedProcClipModels; i++) {
 		savefile->ReadClipModel(inlinedProcClipModels[i]);
-}
+	}
 #endif
 	//HUMANHEAD END
 	savefile->ReadVec3(gravityNormal);
@@ -1408,7 +1422,7 @@ bool hhGameLocal::InhibitEntitySpawn(idDict &spawnArgs) {
 				staticClipModels.Append(model);
 			}
 #if _HH_INLINED_PROC_CLIPMODELS
-			}
+		}
 #endif
 
 		if (inlineEnt == 1) { // This means we must hand the model, too
@@ -1422,7 +1436,7 @@ bool hhGameLocal::InhibitEntitySpawn(idDict &spawnArgs) {
 
 		// Don't spawn an entity for an inlined static
 		return true;
-		}
+	}
 	else {
 		return idGameLocal::InhibitEntitySpawn(spawnArgs);
 	}

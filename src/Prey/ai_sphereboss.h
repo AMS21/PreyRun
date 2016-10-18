@@ -2,6 +2,10 @@
 #ifndef __PREY_AI_SPHEREBOSS_H__
 #define __PREY_AI_SPHEREBOSS_H__
 
+// PreyRun BEGIN
+#include "../PreyRun/GameTimer.hpp"
+// PreyRun END
+
 class hhSphereBoss : public hhMonsterAI {
 
 public:

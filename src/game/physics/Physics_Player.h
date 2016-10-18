@@ -15,6 +15,10 @@
 ===================================================================================
 */
 
+// PreyRun BEGIN
+#include "../../PreyRun/GameTimer.hpp"
+// PreyRun END
+
 //HUMANHEAD START: All these moved here from physics_player.cpp
 // movement parameters
 const float PM_STOPSPEED		= 100.0f;

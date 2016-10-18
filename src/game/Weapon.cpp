@@ -436,7 +436,7 @@ void idWeapon::Restore( idRestoreGame *savefile ) {
 	savefile->ReadRenderLight( guiLight );
 
 	//HUMANHEAD PCF mdl 05/04/06 - Don't save light handles
-    //savefile->ReadInt( muzzleFlashHandle );
+	//savefile->ReadInt( muzzleFlashHandle );
 	savefile->ReadRenderLight( muzzleFlash );
 
 	//HUMANHEAD PCF mdl 05/04/06 - Don't save light handles

@@ -1305,12 +1305,12 @@ void idAFConstraint_UniversalJoint::DebugDraw( void ) {
 	d1 = axis1 * body1->GetWorldAxis();
 
 	if ( master ) {
-        a2 = master->GetWorldOrigin() + anchor2 * master->GetWorldAxis();
+		a2 = master->GetWorldOrigin() + anchor2 * master->GetWorldAxis();
 		s2 = shaft2 * master->GetWorldAxis();
 		d2 = axis2 * master->GetWorldAxis();
 	}
 	else {
-        a2 = anchor2;
+		a2 = anchor2;
 		s2 = shaft2;
 		d2 = axis2;
 	}

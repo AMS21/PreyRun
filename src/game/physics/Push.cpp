@@ -816,21 +816,21 @@ int idPush::TryRotatePushEntity( trace_t &results, idEntity *check, idClipModel 
 	if ( physics->IsType( idPhysics_Actor::Type ) ) {
 		idActor* actor = static_cast<idActor*>( check );
 		if(actor && actor->ShouldRemainAlignedToAxial()) {//HUMANHEAD
-            // rotate the collision model back to axial
-            if ( !RotateEntityToAxial( check, rotationPoint ) ) {
-	            // don't allow rotation if the bbox is no longer axial
-	            return PUSH_BLOCKED;
-            }
+			// rotate the collision model back to axial
+			if ( !RotateEntityToAxial( check, rotationPoint ) ) {
+				// don't allow rotation if the bbox is no longer axial
+				return PUSH_BLOCKED;
+			}
 		}
 	}
 
 	// HUMANHEAD pdm: Also rotate vehicles back to axial
 	if ( physics->IsType( hhPhysics_Vehicle::Type ) ) {
-        // rotate the collision model back to axial
-        if ( !RotateEntityToAxial( check, rotationPoint ) ) {
-	        // don't allow rotation if the bbox is no longer axial
-	        return PUSH_BLOCKED;
-        }
+		// rotate the collision model back to axial
+		if ( !RotateEntityToAxial( check, rotationPoint ) ) {
+			// don't allow rotation if the bbox is no longer axial
+			return PUSH_BLOCKED;
+		}
 	}
 	// HUMANHEAD END
 
@@ -1430,7 +1430,7 @@ float idPush::ClipPush( trace_t &results, idEntity *pusher, const int flags,
 	idRotation rotation;
 	float mass;
 
-    mass = 0.0f;
+	mass = 0.0f;
 
 	results.fraction = 1.0f;
 	results.endpos = newOrigin;

@@ -7,7 +7,6 @@
 
 namespace pr
 {
-
 	static HANDLE pipe_preysplit = INVALID_HANDLE_VALUE;
 	static OVERLAPPED overlapped;
 	static bool writing_to_pipe;
@@ -25,11 +24,12 @@ namespace pr
 				0,
 				0,
 				NULL);
-			if (pipe_preysplit == INVALID_HANDLE_VALUE) {
+			if (pipe_preysplit == INVALID_HANDLE_VALUE)
+			{
 #ifdef PR_DEBUG
 				gameLocal.Printf("Error opening the PreySplit pipe: %d\n", GetLastError());
 #endif // PR_DEBUG
-				gameLocal.Printf("PreyRun: PreySplit integration is not available.\n");
+				gameLocal.Warning("PreyRun: PreySplit integration is not available.\n");
 				return;
 			}
 			gameLocal.Printf("PreyRun: Opened the PreySplit pipe.\n");
@@ -37,11 +37,12 @@ namespace pr
 
 			std::memset(&overlapped, 0, sizeof(overlapped));
 			overlapped.hEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
-			if (overlapped.hEvent == NULL) {
+			if (overlapped.hEvent == NULL)
+			{
 #ifdef PR_DEBUG
 				gameLocal.Printf("Error creating an event for overlapped: %d. Closing the PreySplit pipe.\n", GetLastError());
 #endif // PR_DEBUG
-				gameLocal.Printf("PreyRun: PreySplit integration is not available.\n");
+				gameLocal.Warning("PreyRun: PreySplit integration is not available.\n");
 				CloseHandle(pipe_preysplit);
 				pipe_preysplit = INVALID_HANDLE_VALUE;
 				pr_preysplit_pipeopen = false;
@@ -57,7 +58,8 @@ namespace pr
 
 	void ShutdownPreySplitPipe()
 	{
-		if (pipe_preysplit != INVALID_HANDLE_VALUE) {
+		if (pipe_preysplit != INVALID_HANDLE_VALUE)
+		{
 			CloseHandle(pipe_preysplit);
 			gameLocal.Printf("PreyRun: Closed the PreySplit pipe.\n");
 		}
@@ -73,8 +75,10 @@ namespace pr
 		if (pipe_preysplit == INVALID_HANDLE_VALUE)
 			return;
 
-		if (writing_to_pipe) {
-			if (WaitForSingleObject(overlapped.hEvent, INFINITE) != WAIT_OBJECT_0) {
+		if (writing_to_pipe)
+		{
+			if (WaitForSingleObject(overlapped.hEvent, INFINITE) != WAIT_OBJECT_0)
+			{
 				// Some weird error?
 #ifdef PR_DEBUG
 				gameLocal.Printf("WaitForSingleObject failed with %d.\n", GetLastError());
@@ -85,18 +89,22 @@ namespace pr
 			writing_to_pipe = false;
 		}
 
-		if (!ConnectNamedPipe(pipe_preysplit, &overlapped)) {
+		if (!ConnectNamedPipe(pipe_preysplit, &overlapped))
+		{
 			auto err = GetLastError();
-			if (err == ERROR_NO_DATA) {
+			if (err == ERROR_NO_DATA)
+			{
 				// Client has disconnected.
 				DisconnectNamedPipe(pipe_preysplit);
 				return WritePreySplit(data);
 			}
-			else if (err == ERROR_IO_PENDING) {
+			else if (err == ERROR_IO_PENDING)
+			{
 				// Waiting for someone to connect.
 				return;
 			}
-			else if (err != ERROR_PIPE_CONNECTED) {
+			else if (err != ERROR_PIPE_CONNECTED)
+			{
 				// Some weird error with pipe?
 				// Try remaking it.
 #ifdef PR_DEBUG
@@ -108,14 +116,17 @@ namespace pr
 			}
 		}
 
-		if (!WriteFile(pipe_preysplit, data.data(), data.size(), NULL, &overlapped)) {
+		if (!WriteFile(pipe_preysplit, data.data(), data.size(), NULL, &overlapped))
+		{
 			auto err = GetLastError();
-			if (err == ERROR_IO_PENDING) {
+			if (err == ERROR_IO_PENDING)
+			{
 				// Started writing.
 				writing_to_pipe = true;
 				return;
 			}
-			else {
+			else
+			{
 #ifdef PR_DEBUG
 				gameLocal.Printf("WriteFile failed with %d.\n", err);
 #endif // PR_DEBUG
@@ -159,11 +170,11 @@ namespace pr
 
 		if (pr_preysplit_update.GetFloat() > 0.0f)
 		{
-			static auto last_time = std::chrono::steady_clock::now() - std::chrono::milliseconds(static_cast<long long>(1000 / pr_preysplit_update.GetFloat()) + 1);
+			static auto last_time = std::chrono::steady_clock::now() - std::chrono::milliseconds(static_cast<long long>(pr_preysplit_update.GetFloat()) + 1);
 
 			auto now = std::chrono::steady_clock::now();
 
-			if (now >= last_time + std::chrono::milliseconds(static_cast<long long>(1000 / pr_preysplit_update.GetFloat())))
+			if (now >= last_time + std::chrono::milliseconds(static_cast<long long>(pr_preysplit_update.GetFloat())))
 			{
 				WritePreySplit(buf);
 				last_time = now;
@@ -184,7 +195,7 @@ namespace pr
 		gameLocal.Printf("PreyRunDBG: WriteMapChange: Map exited: %s\nPreyRunDBG: WriteMapChange: Time %02d:%02d:%02d.%03d\n", map.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DEBUG
 
-		int32_t size = static_cast<int32_t>(map.Size());
+		auto size = static_cast<int32_t>(map.Size());
 
 		std::vector<char> buf(15 + size);
 		buf[0] = static_cast<char>(buf.size());
@@ -227,21 +238,45 @@ namespace pr
 		WritePreySplit(buf);
 	}
 
+	void WriteBossKill(const Time& time, const idStr& boss)
+	{
+		auto size = static_cast<int32_t>(boss.Size());
+
+		std::vector<char> buf(15 + size);
+		buf[0] = static_cast<char>(buf.size());
+		buf[1] = static_cast<char>(MessageType::EVENT);
+		buf[2] = static_cast<char>(EventType::BOSS_KILL);
+		auto time_size = AddTimeToBuffer(buf.data() + 3, time);
+
+		std::memcpy(buf.data() + 3 + time_size, &size, sizeof(size));
+		std::memcpy(buf.data() + 3 + time_size + 4, boss.c_str(), size);
+
+#ifdef PR_DEBUG
+		gameLocal.Printf("PreyRunDBG: WriteBossKill: Boss: %s Time: %02d:%02d:%02d.%03d\n", boss.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
+#endif // PR_DEBUG
+
+		WritePreySplit(buf);
+	}
+
+	void WriteCustomSplit(const Time& time)
+	{
+		std::vector<char> buf(11);
+		buf[0] = static_cast<char>(buf.size());
+		buf[1] = static_cast<char>(MessageType::EVENT);
+		buf[2] = static_cast<char>(EventType::CUSTOM_SPLIT);
+		AddTimeToBuffer(buf.data() + 3, time);
+
+#ifdef PR_DEBUG
+		gameLocal.Printf("PreyRunDBG: CustomSplit: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+#endif // PR_DEBUG
+
+		WritePreySplit(buf);
+	}
+
 	Time GetTime()
 	{
-		PR_time_t times;
+		auto times = PR_ms2time(pr_gametimer.Milliseconds());
 
-		if (pr_gametimer.IsRunning())
-		{
-			pr_gametimer.Stop();
-			times = PR_ms2time(pr_gametimer.Milliseconds());
-			pr_gametimer.Start();
-		}
-		else
-		{
-			times = PR_ms2time(pr_gametimer.Milliseconds());
-		}
-
-		return Time{ times.hours, times.minutes, times.seconds, times.milliseconds };
+		return Time{times.hours, times.minutes, times.seconds, times.milliseconds};
 	}
 }

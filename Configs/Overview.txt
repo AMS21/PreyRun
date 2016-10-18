@@ -1,0 +1,24 @@
+Config Name				Chapter Name			Key Codes			Boss
+
+roadhouse.cfg			Last Call
+feedingtowera.cfg		Escape Velocity
+feedingtowerb.cfg 		Downward Spiral
+lotaa.cfg 				Rites of Passage
+feedingtowerc.cfg 		Second Chances
+feedingtowerd.cfg 		All Fall Down
+salvage.cfg 			Crash Landing			1623 / 2724
+salvageboss.cfg 		Sacrifices				634					Centurion
+lotab.cfg 				There are Others
+shuttlea.cfg 			Guiding Fires
+shuttleb.cfg 			The Old Tribes
+biolabsa.cfg 			Hidden Agenda
+biolabsb.cfg 			Jen						2432
+superportal.cfg 		The Dark Harvest
+harverstera.cfg 		Following Her
+harversterb.cfg 		The Complex
+spindlea.cfg 			Ascent
+spindleb.cfg 			Center of Gravity
+girlfriendx.cfg 		Resolutions									CreatureX
+lotad.cfg 				Oath of Vengence
+keeperfortress.cfg 		Facing the Enemy							Keeper
+spherebrain.cfg 		Mothers Embrace

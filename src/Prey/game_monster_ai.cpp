@@ -487,12 +487,32 @@ void hhMonsterAI::Killed(idEntity *inflictor, idEntity *attacker,
 	}
 
 	if ( bBossBar && spawnArgs.GetBool( "remove_bar_on_death" ) ) {
-		idPlayer *player = gameLocal.GetLocalPlayer();
+		auto player = gameLocal.GetLocalPlayer();
 		if ( player && player->hud ) {
 			bBossBar = false;
 			player->hud->HandleNamedEvent("HideProgressBar");
 			player->hud->StateChanged(gameLocal.time);
 		}
+
+		// PreyRun BEGIN
+#ifdef PR_DEBUG
+		gameLocal.Printf("PreyRun DBG: HP Boss died: %s\n", GetName());
+#endif // PR_DEBUG
+		
+		if (pr_gametimer_running && pr_preysplit.GetBool())
+		{
+			// game/salvageboss.map / Sacrifices / Centurion
+			if (static_cast<idStr>(this->GetName()) == idStr("svgBossCenturion"))
+			{
+				pr::WriteBossKill(pr::GetTime(), "centurion");
+			}
+			// game/keeperfortres.map / Facing the Enemie / Keeper
+			else if (static_cast<idStr>(this->GetName()) == idStr("KeeperBoss1Keeper2"))
+			{
+				pr::WriteBossKill(pr::GetTime(), "keeper");
+			}
+		}
+		// PreyRun END
 	}
 
 	HandleNoGore();
@@ -540,7 +560,7 @@ void hhMonsterAI::Killed(idEntity *inflictor, idEntity *attacker,
 			if(jointName.Length()) {
 				jointHandle_t joint = GetAnimator()->GetJointHandle( jointName );
 				if (!GetAnimator()->GetJointTransform( joint, gameLocal.time, origin, axis ) ) {
-					gameLocal.Printf( "%s refers to invalid joint '%s' on entity '%s'\n", (const char*)jointKey.c_str(), (const char*)jointName, (const char*)name );
+					gameLocal.Printf( "%s refers to invalid joint '%s' on entity '%s'\n", static_cast<const char*>(jointKey.c_str()), static_cast<const char*>(jointName), static_cast<const char*>(name) );
 					origin = renderEntity.origin;
 					axis = renderEntity.axis;
 				}

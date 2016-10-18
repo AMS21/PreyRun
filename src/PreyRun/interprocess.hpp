@@ -1,6 +1,7 @@
 #pragma once
 #include "../game/game_local.h"
 #include "StdLib.hpp"
+#include "GameTimer.hpp"
 
 // Credits to Ivan Molodetskikh (Yalter) and Chong Jiang Wei (Matherunner) for their interprocess.cpp from BunnymodXT (https://github.com/YaLTeR/BunnymodXT/blob/master/BunnymodXT/Windows/interprocess.cpp)
 
@@ -8,17 +9,20 @@
 
 namespace pr
 {
-
-	enum class MessageType : unsigned char {
+	enum class MessageType : unsigned char
+	{
 		TIME = 0x00,
 		EVENT = 0x01
 	};
 
-	enum class EventType : unsigned char {
+	enum class EventType : unsigned char
+	{
 		GAMEEND = 0x00,
 		MAPCHANGE = 0x01,
 		TIMER_RESET = 0x02,
-		TIMER_START = 0x03
+		TIMER_START = 0x03,
+		BOSS_KILL = 0x04,
+		CUSTOM_SPLIT = 0x05
 	};
 
 	struct Time
@@ -38,6 +42,8 @@ namespace pr
 	void WriteMapChange(const Time& time, idStr& map);
 	void WriteTimerReset(const Time& time);
 	void WriteTimerStart(const Time& time);
+	void WriteBossKill(const Time& time, const idStr& boss);
+	void WriteCustomSplit(const Time& time);
 
 	Time GetTime();
 }

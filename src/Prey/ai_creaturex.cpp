@@ -996,6 +996,18 @@ bool hhCreatureX::UpdateAnimationControllers( void ) {
 }
 
 void hhCreatureX::Killed(idEntity *inflictor, idEntity *attacker, int damage, const idVec3 &dir, int location ) {
+	// PreyRun BEGIN
+	if (pr_gametimer_running && pr_preysplit.GetBool() && bBossBar)
+	{
+#ifdef PR_DEBUG
+		gameLocal.Printf("PreyRun DBG: CreatureX killed\n");
+#endif // PR_DEBUG
+
+		// game/girlfriendx.map / Resolutions / CreatureX
+		pr::WriteBossKill(pr::GetTime(), "creaturex");
+	}
+	// PreyRun END
+
 	HandleNoGore();
 
 	//stop sparking upon death

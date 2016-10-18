@@ -1,6 +1,10 @@
 #ifndef __PREY_GAME_H
 #define __PREY_GAME_H
 
+// PreyRun BEGIN
+#include "../PreyRun/GameTimer.hpp"
+// PreyRun END
+
 class hhReactionHandler;
 class hhSunCorona; // CJR
 class hhHand;

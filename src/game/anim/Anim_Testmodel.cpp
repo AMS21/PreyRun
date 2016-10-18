@@ -418,7 +418,7 @@ void idTestModel::NextAnim( const idCmdArgs &args ) {
 	headAnim = 0;
 	if ( headAnimator ) {
 		headAnimator->ClearAllAnims( gameLocal.time, 0 );
-        headAnim = headAnimator->GetAnim( animname );
+		headAnim = headAnimator->GetAnim( animname );
 		if ( !headAnim ) {
 			headAnim = headAnimator->GetAnim( "idle" );
 		}
@@ -460,7 +460,7 @@ void idTestModel::PrevAnim( const idCmdArgs &args ) {
 	headAnim = 0;
 	if ( headAnimator ) {
 		headAnimator->ClearAllAnims( gameLocal.time, 0 );
-        headAnim = headAnimator->GetAnim( animname );
+		headAnim = headAnimator->GetAnim( animname );
 		if ( !headAnim ) {
 			headAnim = headAnimator->GetAnim( "idle" );
 		}
@@ -569,7 +569,7 @@ void idTestModel::TestAnim( const idCmdArgs &args ) {
 	headAnim = 0;
 	if ( headAnimator ) {
 		headAnimator->ClearAllAnims( gameLocal.time, 0 );
-        headAnim = headAnimator->GetAnim( animname );
+		headAnim = headAnimator->GetAnim( animname );
 		if ( !headAnim ) {
 			headAnim = headAnimator->GetAnim( "idle" );
 			if ( !headAnim ) {
