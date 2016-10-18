@@ -44,7 +44,7 @@ void Cmd_PR_reload_f(const idCmdArgs &args)
 	{
 		cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("loadgame %s", pr_reload_latestsave.Mid(10,pr_reload_latestsave.Length()).c_str()));
 
-		gameLocal.Printf("Sucessfully loaded savegame %s\n", pr_reload_latestsave.c_str());
+		gameLocal.Printf("Trying to load %s\n", pr_reload_latestsave.c_str());
 	}
 	else
 	{

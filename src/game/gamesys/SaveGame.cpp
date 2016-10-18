@@ -798,7 +798,7 @@ idRestoreGame::idRestoreGame( idFile *savefile ) {
 
 	// PreyRun BEGIN
 #ifdef PR_DEBUG
-	gameLocal.Printf("PreyRun DBG: Loading savefile: %s\n", savefile->GetFullPath());
+	gameLocal.Printf("PreyRun DBG: Loading savefile: %s\n", savefile->GetName());
 #endif // PR_DEBUG
 	pr_reload_latestsave = savefile->GetName();
 	pr_reload_ready = true;

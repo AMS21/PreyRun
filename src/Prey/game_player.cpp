@@ -1118,8 +1118,8 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 	// Might not be the optimal solution because when the game decides to not draw the hud the timer cant resume but it gives better times then hooking InitFromMap()
 	if (pr_gametimer_running && !pr_gametimer.IsRunning() && !pr_freeze.GetBool())
 	{
-		gameLocal.Printf("PreyRun: Timer: Resuming\n");
 		pr_gametimer.Start();
+		gameLocal.Printf("PreyRun: Timer: Resuming\n");
 
 #ifdef PR_DEBUG
 		auto time = PR_ms2time(pr_gametimer.Milliseconds());
@@ -1142,9 +1142,9 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 	// HUMANHEAD pdm: removed weapon ptr check here since ours is invalid when in a vehicle
 	// Also removed privateCameraView, since we want subtitles when they are on
-	if (gameLocal.GetCamera() || !_hud || pm_thirdPerson.GetBool()) {
-		return;
-	}
+	if (gameLocal.GetCamera() || !_hud || pm_thirdPerson.GetBool()) { return; }
+
+	UpdateHudStats(_hud);
 
 	// PreyRun BEGIN
 	if (_hud->GetStateBool("pr_hud", "1"))
@@ -1730,11 +1730,9 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			}
 		}
 	} // if (pr_hud)
+	// PreyRun END
 
 	if (!g_showHud.GetBool()) { return; }
-
-	UpdateHudStats(_hud);
-
 
 	if (weapon.IsValid()) { // HUMANHEAD
 		bool allowGuiUpdate = true;
@@ -2356,7 +2354,7 @@ void hhPlayer::Weapon_Combat(void) {
 			if (newstate) {
 				SetState(newstate);
 				UpdateScript();
-		}
+			}
 #else
 			assert(idealWeapon >= 0);
 			assert(idealWeapon < MAX_WEAPONS);
@@ -2374,7 +2372,7 @@ void hhPlayer::Weapon_Combat(void) {
 #endif //HUMANHEAD END
 				weaponCatchup = false;
 			}
-	}
+		}
 		else {
 			if (weapon.IsValid() && (weapon->IsReady() || weapon->IsRising())) {
 				InvalidateCurrentWeapon();//Needed incase we change weapons quickly, we can go back to old weapon
@@ -2423,7 +2421,7 @@ void hhPlayer::Weapon_Combat(void) {
 				}
 			}
 		}
-}
+	}
 	else if (!bDeathWalk && !bReallyDead) {
 		weaponGone = false;	// if you drop and re-get weap, you may miss the = false above 
 		if (weapon.IsValid() && weapon.GetEntity()->IsHolstered()) {
@@ -3189,9 +3187,9 @@ void hhPlayer::BobCycle(const idVec3 &pushVelocity) {
 		delta -= LAND_DEFLECT_TIME;
 		f = 1.0 - (delta / LAND_RETURN_TIME);
 		viewBob -= gravity * (landChange * f);
-}
-#endif	//HUMANHEAD END
 	}
+#endif	//HUMANHEAD END
+}
 
 /*
 ================
@@ -3210,7 +3208,7 @@ void hhPlayer::UpdateDeltaViewAngles(const idAngles &angles) {
 #endif
 	}
 	SetDeltaViewAngles(delta);
-}
+	}
 
 /*
 ================
@@ -3259,7 +3257,7 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 			return localViewAngles;
 		}
 #endif //HUMANHEAD END
-}
+	}
 
 	//JSHTODO this messes up multiplayer input.  remerge sensitivity code
 	// circularly clamp the angles with deltas
@@ -3275,7 +3273,7 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 			localViewAngles[i] = deltaCmdAngles[i] + deltaViewAngles[i];
 #endif
 		}
-	}
+		}
 	else {
 #if 1 //rww - revert to id's method
 		//localViewAngles.yaw = idMath::AngleNormalize180( SHORT2ANGLE( usercmd.angles[YAW] ) + deltaViewAngles[YAW] - GetUntransformedViewAngles()[YAW] ) * GetViewAnglesSensitivity() + GetUntransformedViewAngles()[YAW];
@@ -3366,7 +3364,7 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 	loggedViewAngles[gameLocal.framenum & (NUM_LOGGED_VIEW_ANGLES - 1)] = localViewAngles;
 
 	return localViewAngles;
-}
+	}
 
 /*
 ================
@@ -3691,8 +3689,8 @@ void hhPlayer::PerformImpulse(int impulse) {
 #endif // VENOM END
 		break;
 	}
+	}
 }
-		}
 
 void hhPlayer::Present() {
 	idPlayer::Present();
@@ -5879,9 +5877,9 @@ void hhPlayer::AdjustBodyAngles(void) {
 				//use the multiplied axis
 				animator.SetJointAxis(headJoint, JOINTMOD_LOCAL, rot*axis); //point head in proper direction
 			}
-	}
+		}
 #endif
-}
+	}
 	else {
 #if 0 //old headlook code
 		//rww - reset head joint override when not on a slab
@@ -5889,7 +5887,7 @@ void hhPlayer::AdjustBodyAngles(void) {
 #endif
 		idPlayer::AdjustBodyAngles();
 	}
-}
+		}
 
 /*
 ==============
@@ -6049,7 +6047,7 @@ void hhPlayer::Move(void) {
 								physicsObj.CheckWallWalk(true);*/
 			}
 		}
-}
+	}
 #endif
 	// HUMANHEAD END
 
@@ -6116,7 +6114,7 @@ void hhPlayer::Move(void) {
 	}
 	physicsObj.WasWallWalking(IsWallWalking()); //rww - moved here
 	//HUMANHEAD END
-}
+	}
 
 /*
 ===============
@@ -6894,7 +6892,7 @@ void hhPlayer::WriteToSnapshot(idBitMsgDelta &msg) const {
 	//note - current weapon's ammo always sent now
 	//ammo_t energyammo = hhWeaponFireController::GetAmmoType("ammo_energy");
 	//msg.WriteBits(inventory.ammo[energyammo], ASYNC_PLAYER_INV_AMMO_BITS);
-}
+	}
 
 /*
 ===============
@@ -7277,7 +7275,7 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 	if (msg.HasChanged()) {
 		UpdateVisuals();
 	}
-}
+	}
 
 /*
 ================

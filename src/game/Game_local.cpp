@@ -1392,7 +1392,7 @@ void idGameLocal::InitFromNewMap(const char *mapName, idRenderWorld *renderWorld
 	gamestate = GAMESTATE_ACTIVE;
 
 	// HUMANHEAD mdl:  Start session
-	if (!isMultiplayer && playTimeStart == (unsigned int)-1) {
+	if (!isMultiplayer && playTimeStart == static_cast<unsigned int>(-1)) {
 		playTimeStart = gameLocal.time;
 	}
 	// HUMANHEAD END
@@ -1425,7 +1425,6 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 
 	// Timer recovery
 	pr::LoadBackupTimer(mapName);
-
 	// PreyRun END
 
 	Printf("------- Game Map Init SaveGame -------\n");
