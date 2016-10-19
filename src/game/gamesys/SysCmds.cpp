@@ -208,7 +208,7 @@ void Cmd_PR_autocmd_add_f(const idCmdArgs &args)
 {
 	if (args.Argc() != 8)
 	{
-		gameLocal.Printf("Usage: Pr_AutoCmd_Add <Point1 X (Float)> <Point1 Y (Float)> <Point 1 Z (Float)> <Point 2 X (Float)> <Point 2 Y (Float)> <Point 2 Z (Float)> <Command (String)>");
+		gameLocal.Printf("Usage: Pr_AutoCmd_Add <Start X (Float)> <Start Y (Float)> <Start 1 Z (Float)> <End 2 X (Float)> <End 2 Y (Float)> <End 2 Z (Float)> <Command (String)>");
 		return;
 	}
 
@@ -244,7 +244,7 @@ void Cmd_PR_autocmd_edit_f(const idCmdArgs &args)
 {
 	if (args.Argc() != 9)
 	{
-		gameLocal.Printf("Usage: PR_AutoCmd_Edit <Index (0-%d)> <Point1 X (Float)> <Point1 Y (Float)> <Point 1 Z (Float)> <Point 2 X (Float)> <Point 2 Y (Float)> <Point 2 Z (Float)> <Command (String)>", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		gameLocal.Printf("Usage: PR_AutoCmd_Edit <Index (0-%d)> <Start X (Float)> <Start Y (Float)> <Start 1 Z (Float)> <End 2 X (Float)> <End 2 Y (Float)> <End 2 Z (Float)> <Command (String)>", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
 		return;
 	}
 
