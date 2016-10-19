@@ -3,6 +3,7 @@
 
 // Credits to Ivan Molodetskikh (Yalter) and Chong Jiang Wei (Matherunner) for their interprocess.cpp from BunnymodXT (https://github.com/YaLTeR/BunnymodXT/blob/master/BunnymodXT/Windows/interprocess.cpp)
 
+#include "PreyRun.hpp"
 #include "interprocess.hpp"
 
 namespace pr
@@ -98,12 +99,12 @@ namespace pr
 				DisconnectNamedPipe(pipe_preysplit);
 				return WritePreySplit(data);
 			}
-			else if (err == ERROR_IO_PENDING)
+			if (err == ERROR_IO_PENDING)
 			{
 				// Waiting for someone to connect.
 				return;
 			}
-			else if (err != ERROR_PIPE_CONNECTED)
+			if (err != ERROR_PIPE_CONNECTED)
 			{
 				// Some weird error with pipe?
 				// Try remaking it.
@@ -123,7 +124,6 @@ namespace pr
 			{
 				// Started writing.
 				writing_to_pipe = true;
-				return;
 			}
 			else
 			{
@@ -131,7 +131,6 @@ namespace pr
 				gameLocal.Printf("WriteFile failed with %d.\n", err);
 #endif // PR_DEBUG
 				DisconnectNamedPipe(pipe_preysplit);
-				return;
 			}
 		}
 	}
@@ -153,9 +152,9 @@ namespace pr
 		buf[2] = static_cast<char>(EventType::GAMEEND);
 		AddTimeToBuffer(buf.data() + 3, time);
 
-#ifdef PR_DEBUG
+#ifdef PR_DBG_INTERPROCESS
 		gameLocal.Printf("PreyRunDBG: WriteGameEnd: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
-#endif // PR_DEBUG
+#endif // PR_DBG_INTERPROCESS
 
 
 		WritePreySplit(buf);
@@ -191,9 +190,9 @@ namespace pr
 		// normal map path   : maps/game/roadhouse.map
 		// gets turneded into: roadhouse.map
 		map.Replace("maps/game/", "");
-#ifdef PR_DEBUG
+#ifdef PR_DBG_INTERPROCESS
 		gameLocal.Printf("PreyRunDBG: WriteMapChange: Map exited: %s\nPreyRunDBG: WriteMapChange: Time %02d:%02d:%02d.%03d\n", map.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
-#endif // PR_DEBUG
+#endif // PR_DBG_INTERPROCESS
 
 		auto size = static_cast<int32_t>(map.Size());
 
@@ -216,9 +215,10 @@ namespace pr
 		buf[1] = static_cast<char>(MessageType::EVENT);
 		buf[2] = static_cast<char>(EventType::TIMER_RESET);
 		AddTimeToBuffer(buf.data() + 3, time);
-#ifdef PR_DEBUG
+
+#ifdef PR_DBG_INTERPROCESS
 		gameLocal.Printf("PreyRunDBG: WriteTimerReset: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
-#endif // PR_DEBUG
+#endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);
 	}
@@ -231,9 +231,9 @@ namespace pr
 		buf[2] = static_cast<char>(EventType::TIMER_START);
 		AddTimeToBuffer(buf.data() + 3, time);
 
-#ifdef PR_DEBUG
+#ifdef PR_DBG_INTERPROCESS
 		gameLocal.Printf("PreyRunDBG: WriteTimerStart: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
-#endif // PR_DEBUG
+#endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);
 	}
@@ -251,9 +251,9 @@ namespace pr
 		std::memcpy(buf.data() + 3 + time_size, &size, sizeof(size));
 		std::memcpy(buf.data() + 3 + time_size + 4, boss.c_str(), size);
 
-#ifdef PR_DEBUG
+#ifdef PR_DBG_INTERPROCESS
 		gameLocal.Printf("PreyRunDBG: WriteBossKill: Boss: %s Time: %02d:%02d:%02d.%03d\n", boss.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
-#endif // PR_DEBUG
+#endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);
 	}
@@ -266,9 +266,9 @@ namespace pr
 		buf[2] = static_cast<char>(EventType::CUSTOM_SPLIT);
 		AddTimeToBuffer(buf.data() + 3, time);
 
-#ifdef PR_DEBUG
+#ifdef PR_DBG_INTERPROCESS
 		gameLocal.Printf("PreyRunDBG: CustomSplit: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
-#endif // PR_DEBUG
+#endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);
 	}

@@ -1,6 +1,7 @@
 #include "../idLib/precompiled.h"
 #pragma hdrstop
 
+#include "PreyRun.hpp"
 #include "Hooking.hpp"
 
 namespace pr

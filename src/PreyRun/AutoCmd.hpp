@@ -44,7 +44,6 @@ namespace pr
 		{
 		public:
 			Autocmdzone();
-
 			Autocmdzone(idVec3 pos1_, idVec3 pos2_, cmdType cmds_)
 				: pos1{ pos1_ }, pos2{ pos2_ }, cmds{ cmds_ }, activated(false) {}
 
@@ -62,7 +61,7 @@ namespace pr
 			void SetPos1(idVec3 val) { this->pos1 = val; };
 			void SetPos2(idVec3 val) { this->pos2 = val; };
 			void SetCmds(cmdType val) { this->cmds = val; };
-			void SetActivated(bool val) { this->activated = val; };
+			void SetActivated(bool val = true) { this->activated = val; };
 
 		private:
 			idVec3 pos1; // Begin point

@@ -220,6 +220,6 @@
 
 // PreyRun BEGIN
 #ifdef PR_DEBUG
-#define PR_DEVELOP
+#define PR_DEVELOP // Used to mark code which is still being worked on
 #endif // PR_DEBUG
 // PreyRun END

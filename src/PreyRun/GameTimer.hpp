@@ -2,13 +2,15 @@
 
 #include "StdLib.hpp"
 
+typedef std::chrono::nanoseconds nanosec;   // 1 second = 1,000,000,000 nanoseconds
+typedef std::chrono::microseconds microsec; // 1 second = 1,000,000		microseconds
+typedef std::chrono::milliseconds millisec; // 1 second = 1,000			milliseconds
+
 typedef double storageType;
-typedef std::chrono::microseconds timeType;
+typedef microsec timeType;
 typedef timeType::period periodType;
 
-typedef std::chrono::milliseconds millisec;
-typedef std::chrono::microseconds microsec;
-typedef std::chrono::nanoseconds nanosec;
+constexpr char * pr_gametimer_clocktick_post{ "us" };
 
 class prTimer
 {
@@ -17,11 +19,15 @@ public:
 	explicit prTimer(storageType ct);
 	~prTimer();
 
-	void Start(void);
-	void Stop(void);
-	void Clear(void);
-	storageType ClockTicks(void) const;
-	storageType Milliseconds(void) const;
+	void Start();
+	void Stop();
+	void Clear();
+
+	storageType Milliseconds() const;
+	storageType Microseconds() const;
+	storageType Nanoseconds() const;
+
+	storageType ClockTicks() const;
 
 	bool IsRunning() const { return isRunning; }
 	void SetCT(storageType ct);

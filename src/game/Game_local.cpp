@@ -5457,7 +5457,7 @@ bool idGameLocal::PlayerIsDeathwalking(void) {
 }
 
 unsigned int idGameLocal::GetTimePlayed(void) {
-	if (playTimeStart == (unsigned int)-1) {
+	if (playTimeStart == static_cast<unsigned int>(-1)) {
 		return playTime;
 	}
 	else {
@@ -5475,10 +5475,11 @@ void idGameLocal::ClearTimePlayed(void) {
 PR_time_t PR_ms2time(unsigned x)
 {
 	PR_time_t ts;
+
 	ts.hours = x / (60 * 60 * 1000);
-	x = x - ts.hours*(60 * 60 * 1000);
+	x = x - ts.hours * (60 * 60 * 1000);
 	ts.minutes = x / (60 * 1000);
-	x = x - ts.minutes*(60 * 1000);
+	x = x - ts.minutes * (60 * 1000);
 	ts.seconds = x / 1000;
 	ts.milliseconds = x - ts.seconds * 1000;
 

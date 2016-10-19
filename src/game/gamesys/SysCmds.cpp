@@ -272,7 +272,7 @@ void Cmd_PR_autocmd_list_f(const idCmdArgs &args)
 	auto& aczHandler = pr::AutocmdzoneHandler::getInstance();
 	auto num{ 0 };
 
-	gameLocal.Printf("Index: X1 Y1 Z1  X2 Y2 Z2  Command to execute\n");
+	gameLocal.Printf("Index: StartX StartY StartZ  EndX EndY EndZ  Command to execute\n");
 
 	for (auto && e : aczHandler)
 	{
@@ -295,7 +295,7 @@ void Cmd_PR_autocmd_remove_f(const idCmdArgs &args)
 {
 	if (args.Argc() != 2)
 	{
-		gameLocal.Printf("Usage: PR_AutoCmd_Remove <Index (0-%d)>", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		gameLocal.Printf("Usage: PR_AutoCmd_Remove <Index (0-%d)>\n", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
 	}
 
 	if (atoi(args.Argv(1)) > pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1)
@@ -325,14 +325,14 @@ void Cmd_PR_crash_f(const idCmdArgs &args)
 void Cmd_PR_dbg_timer_f(const idCmdArgs &args)
 {
 	auto time = PR_ms2time(pr_gametimer.Milliseconds());
-	gameLocal.Printf("Timer is running: %s\nTimer shoud be on: %s\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f us\n", pr_gametimer.IsRunning() ? "True" : "False", pr_gametimer_running ? "True" : "False", time.hours, time.minutes, time.seconds, time.milliseconds,pr_gametimer.Milliseconds(),pr_gametimer.ClockTicks());
+	gameLocal.Printf("Timer is running: %s\nTimer shoud be on: %s\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s\n", pr_gametimer.IsRunning() ? "True" : "False", pr_gametimer_running ? "True" : "False", time.hours, time.minutes, time.seconds, time.milliseconds,pr_gametimer.Milliseconds(),pr_gametimer.ClockTicks(),pr_gametimer_clocktick_post);
 }
 
 void Cmd_PR_dbg_timer_set_f(const idCmdArgs &args)
 {
 	if (args.Argc() != 2)
 	{
-		gameLocal.Printf("Usage: PR_dbg_timer_set <Microseconds (Float)>");
+		gameLocal.Printf("Usage: PR_dbg_timer_set <Microseconds (Float)>\n");
 		return;
 	}
 
@@ -356,7 +356,7 @@ void Cmd_PR_dbg_backup_f(const idCmdArgs &args)
 	// Open the file
 	auto file = fileSystem->OpenFileRead("backuptmr");
 
-	if (file == NULL)
+	if (file == nullptr)
 	{
 		gameLocal.Printf("backuptmr cant be opend\n");
 		return;
