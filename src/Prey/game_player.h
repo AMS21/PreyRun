@@ -46,14 +46,21 @@ constexpr int PR_AMMOPOS_X{ 550 };
 constexpr int PR_AMMOPOS_Y{ 448 };
 constexpr int PR_AMMOPOS2_Y{ PR_AMMOPOS_Y + 15 };
 
-constexpr int PR_keys_x{300};
-constexpr int PR_keys_y{250};
-constexpr int PR_keys_y2{PR_keys_y + 15};
+constexpr int PR_entinfo_offset{ -15 };
+constexpr int PR_entinfo_x{ 360 };
+constexpr int PR_entinfo_y{ 235 };
 
-idVec4 const PR_COLOUR_WHITE{ 1.0F, 1.0F, 1.0F, 1.0F };
-idVec4 const PR_COLOUR_YELLOW{ 1.0F, 1.0F, 0.25F, 1.0F };
-idVec4 const PR_COLOUR_RED{ 1.0F, 0.0F, 0.0F, 1.0F };
-idVec4 const PR_COLOUR_GREY{ 0.65F, 0.65F, 0.65F, 0.65F };
+constexpr int PR_keys_x{ 300 };
+constexpr int PR_keys_y{ 250 };
+constexpr int PR_keys_y2{ PR_keys_y + 15 };
+
+constexpr float PR_entityinfo_distance{ 2048.0f };
+
+const idVec4 PR_COLOUR_WHITE{ 1.00f, 1.00f, 1.00f, 1.00f };
+const idVec4 PR_COLOUR_YELLOW{ 1.00f, 1.00f, 0.25f, 1.00f };
+const idVec4 PR_COLOUR_RED{ 1.00f, 0.00f, 0.00f, 1.00f };
+const idVec4 PR_COLOUR_BLUE{ 0.00f, 0.00f, 1.00f, 1.00f };
+const idVec4 PR_COLOUR_GREY{ 0.65f, 0.65f, 0.65f, 0.65f };
 
 #ifdef PR_DEBUG
 constexpr double PR_DBG_HUDDRAWTIME_YELLOW{ 0.3 };

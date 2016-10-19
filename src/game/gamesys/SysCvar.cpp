@@ -61,7 +61,7 @@ bool pr_gametimer_running{ false };
 
 idCVar pr_timer_autostart("PR_Timer_AutoStart", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly start the hud timer at run begin check PR_Timer_Methode for information when this might be");
 idCVar pr_timer_autostop("PR_Timer_AutoStop", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly stop the hud timer check PR_Timer_Methode for information when this might be");
-idCVar pr_timer_methode("PR_Timer_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Switch the diffrent timing methodes\n0 - RTA - Real Time Attack, the whole game from start (the first frame you can control Tommy) to finish (when the sphere boss is killed) with game time (default)\n1 - Individual Level, Starts when a map or savegame, is loaded and stops when the map has been completed", 0, 1);
+idCVar pr_timer_methode("PR_Timer_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Switch the diffrent timing methodes\n0 - RTA - Real Time Attack, the whole game from start (the first frame you can control Tommy) to finish (when the sphere boss is killed) with game time (default)\n1 - Individual Level, Starts when a map or savegame, is loaded and stops when the map has been completed\n2 - RTA - Experimental, the whole game, start in Escape Velocity the first frame you can control Tommy to fisnih (when the sphere boss is killed), Note that runs with this option are not valid for summiting to speedrun.com!", 0, 2);
 idCVar pr_timer_backup("PR_Timer_Backup", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle support for backing up the game time to resume it after the game crashed. (Requires some harddrive space)");
 idCVar pr_timer_backup_interval("PR_Timer_Backup_Interval", "250", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The interval for updating the backup timer");
 
@@ -88,7 +88,10 @@ idCVar pr_hud_location("PR_hud_Location", "0", CVAR_GAME | CVAR_BOOL, "Toggle di
 idCVar pr_hud_location_methode("PR_hud_Location_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Swtich the different location methodes.\n0 - Display eye (viewpoint) position (default)\n1 - Display feet position", 0, 1);
 
 // Entity Info
-idCVar pr_hud_entityinfo("PR_hud_EntityInfo", "0", CVAR_GAME | CVAR_BOOL, "Shows infos about the entity aimed at (name, health / maximum health)");
+idCVar pr_hud_entityinfo("PR_hud_EntityInfo", "0", CVAR_GAME | CVAR_BOOL, "Shows infos about the entity aimed at which info will be displayed can be selected with pr_hud_entityinfo_*");
+idCVar pr_hud_entityinfo_health("PR_hud_EntityInfo_Health", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entitys health when pr_hud_entityinfo is enabled");
+idCVar pr_hud_entityinfo_name("PR_hud_EntityInfo_Name", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entitys name when pr_hud_entityinfo is enabled");
+idCVar pr_hud_entityinfo_type("PR_hud_EntityInfo_Type", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entitys type when pr_hud_entityinfo is enabled");
 
 // Ammo
 idCVar pr_hud_ammo("PR_hud_Ammo", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current ammo (White = loaded magazine, Yellow = empty magazine, Red = No ammo left)");

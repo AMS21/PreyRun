@@ -62,6 +62,9 @@ extern idCVar pr_hud_location;
 extern idCVar pr_hud_location_methode;
 // Entity Info
 extern idCVar pr_hud_entityinfo;
+extern idCVar pr_hud_entityinfo_health;
+extern idCVar pr_hud_entityinfo_name;
+extern idCVar pr_hud_entityinfo_type;
 // Ammo
 extern idCVar pr_hud_ammo;
 // Health

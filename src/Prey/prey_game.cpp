@@ -157,7 +157,7 @@ void hhGameLocal::InitFromNewMap(const char *mapName, idRenderWorld *renderWorld
 	// Timer recovery
 	pr::LoadBackupTimer(mapName);
 
-	// Clear all Autocmdzones when chaning level
+	// Clear all Autocmdzones when changing level
 	pr::AutocmdzoneHandler::getInstance().Clear();
 
 	// Execute map config file

@@ -995,6 +995,9 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 	_hud->SetStateInt("pr_hud_location_methode", pr_hud_location_methode.GetInteger());
 	// Entity info
 	_hud->SetStateBool("pr_hud_entityinfo", pr_hud_entityinfo.GetBool());
+	_hud->SetStateBool("pr_hud_entityinfo_health", pr_hud_entityinfo_health.GetBool());
+	_hud->SetStateBool("pr_hud_entityinfo_name", pr_hud_entityinfo_name.GetBool());
+	_hud->SetStateBool("pr_hud_entityinfo_type", pr_hud_entityinfo_type.GetBool());
 	// Ammo
 	_hud->SetStateBool("pr_hud_ammo", pr_hud_ammo.GetBool());
 	// Health
@@ -1286,9 +1289,9 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			}
 			sprintf(posZ, "Z: %f", zpos);
 
-			renderSystem->DrawSmallStringExt(0, 45, posX, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(0, 60, posY, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(0, 75, posZ, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(0, 45, posX, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(0, 60, posY, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(0, 75, posZ, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// Entity Info
@@ -1299,12 +1302,17 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			idVec3 end;
 
 			// start the traceline at our eyes
-
 			start = GetEyePosition();
 
 			// end the traceline 2048 units ahead in the direction we're viewing
-
-			end = start + viewAngles.ToForward() * 2048.0f;
+			if (InVehicle())
+			{
+				end = start + GetVehicleInterfaceLocal()->GetVehicle()->GetAxis().ToAngles().ToForward() * PR_entityinfo_distance;
+			}
+			else
+			{
+				end = start + viewAngles.ToForward() * PR_entityinfo_distance;
+			}
 
 			// perform the traceline and store the results in trace
 			// stop the trace for monsters and players
@@ -1315,7 +1323,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			// trace.fraction is the fraction of the traceline that was travelled
 			// if trace.fraction is less than one then we hit something
 
-			if ((trace.fraction < 1.0f) && (trace.c.entityNum != ENTITYNUM_NONE))
+			if (trace.fraction < 1.0f && trace.c.entityNum != ENTITYNUM_NONE)
 			{
 				auto *ent = gameLocal.entities[trace.c.entityNum];
 
@@ -1323,20 +1331,54 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				// gameLocal.GetTraceEntity returns the entity's master entity if it exists
 				// search the SDK for more examples
 
+				auto displayIndex{ 0 };
+
 				auto health = ent->GetHealth();
 				auto maxHealth = ent->GetMaxHealth();
 
 				if (health > 0 && maxHealth > 0)
 				{
-					idStr strHealth;
-					sprintf(strHealth, "Health: %03d/%03d", ent->health, ent->GetMaxHealth());
+					idStr className{ ent->GetClassname() };
 
-					renderSystem->DrawSmallStringExt(360, 235, strHealth, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
+					// Filter unwanted entitys: Doors, Consoles, Vehicle spawner
+					if (className != "hhProxDoor" && className != "hhConsole" && className != "hhShuttle" && className != "hhRailShuttle")
+					{
+						if (_hud->GetStateBool("pr_hud_entityinfo_health", "1"))
+						{
+							idStr strHealth;
+							sprintf(strHealth, "        %03d/%03d", ent->GetHealth(), ent->GetMaxHealth());
 
-					idStr strName;
-					sprintf(strName, "Name: %s", ent->GetName());
+							auto colour{ PR_COLOUR_WHITE };
 
-					renderSystem->DrawSmallStringExt(360, 220, strName, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
+							// takedamge is true when the entity can take damage but not when the entity is shielded
+							if (!ent->fl.takedamage) { colour = PR_COLOUR_GREY; }
+
+							renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, idStr("Health:").c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+							renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, strHealth, colour, false, declManager->FindMaterial("textures/bigchars"));
+
+							++displayIndex;
+						}
+
+						if (_hud->GetStateBool("pr_hud_entityinfo_name", "1"))
+						{
+							idStr strName;
+							sprintf(strName, "Name: %s", ent->GetName());
+
+							renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, strName, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+
+							++displayIndex;
+						}
+
+						if (_hud->GetStateBool("pr_hud_entityinfo_type", "1"))
+						{
+							idStr strType;
+							sprintf(strType, "Type: %s", className.c_str());
+
+							renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, strType, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+
+							//++displayIndex;
+						}
+					}
 				}
 			}
 		}
@@ -1357,14 +1399,8 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 				sprintf(strAmmo, "%03d", cpower / 3500);
 
-				if (cpower > 0)
-				{
-					colour = PR_COLOUR_WHITE;
-				}
-				else
-				{
-					colour = PR_COLOUR_RED;
-				}
+				if (cpower > 0) { colour = PR_COLOUR_WHITE; }
+				else { colour = PR_COLOUR_RED; }
 
 				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
 			}
@@ -1373,8 +1409,8 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 				switch (static_cast<PR_WEAPONS>(currentWeapon))
 				{
-				case PR_WEAPONS::RIFLE: // Rifle
-				case PR_WEAPONS::SHOTGUN: // Shotgun
+				case PR_WEAPONS::RIFLE:
+				case PR_WEAPONS::SHOTGUN:
 				{
 					auto clip = weapon->AmmoInClip();
 					auto avail = weapon->AmmoAvailable();
@@ -1385,29 +1421,20 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 					// PR_FIXME
 					// very ugly there might be a better solution to this than if then else trees
-					if (clip > 0)
-					{
-						colour = PR_COLOUR_WHITE;
-					}
+					if (clip > 0) { colour = PR_COLOUR_WHITE; }
 					else
 					{
-						if (avail > 0)
-						{
-							colour = PR_COLOUR_YELLOW;
-						}
-						else
-						{
-							colour = PR_COLOUR_RED;
-						}
+						if (avail > 0) { colour = PR_COLOUR_YELLOW; }
+						else { colour = PR_COLOUR_RED; }
 					}
 
 					renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
 
 					break;
 				}
-				case PR_WEAPONS::CRAWLER: // Grendade
-				case PR_WEAPONS::LEECHER: // Leecher
-				case PR_WEAPONS::ROCKETLAUNCHER: // RocketLauncher
+				case PR_WEAPONS::CRAWLER:
+				case PR_WEAPONS::LEECHER:
+				case PR_WEAPONS::ROCKETLAUNCHER:
 				{
 					auto avail = weapon->AmmoAvailable();
 					idVec4 colour;
@@ -1415,14 +1442,8 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 					sprintf(strAmmo, "     %02d", avail);
 
-					if (avail > 0)
-					{
-						colour = PR_COLOUR_WHITE;
-					}
-					else
-					{
-						colour = PR_COLOUR_RED;
-					}
+					if (avail > 0) { colour = PR_COLOUR_WHITE; }
+					else { colour = PR_COLOUR_RED; }
 
 					renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
 					break;
@@ -1439,23 +1460,11 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 					sprintf(strAmmo, "  %03d", avail);
 					sprintf(strAmmo2, "  %02d", altAvail);
 
-					if (avail > 0)
-					{
-						colour = PR_COLOUR_WHITE;
-					}
-					else
-					{
-						colour = PR_COLOUR_RED;
-					}
+					if (avail > 0) { colour = PR_COLOUR_WHITE; }
+					else { colour = PR_COLOUR_RED; }
 
-					if (altAvail > 0)
-					{
-						colour2 = PR_COLOUR_WHITE;
-					}
-					else
-					{
-						colour2 = PR_COLOUR_RED;
-					}
+					if (altAvail > 0) { colour2 = PR_COLOUR_WHITE; }
+					else { colour2 = PR_COLOUR_RED; }
 
 					renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
 					renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS2_Y, strAmmo2, colour2, false, declManager->FindMaterial("textures/bigchars"));
@@ -1483,14 +1492,8 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 					sprintf(strHealth, "%03d | %03d", health, maxHealth);
 
-					if (health == 0)
-					{
-						colour = PR_COLOUR_RED;
-					}
-					else
-					{
-						colour = PR_COLOUR_WHITE;
-					}
+					if (health == 0) { colour = PR_COLOUR_RED; }
+					else { colour = PR_COLOUR_WHITE; }
 				}
 				else
 				{
@@ -1525,14 +1528,8 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				{
 					spiritpwr = GetSpiritPower();
 
-					if (spiritpwr > 0)
-					{
-						colour = PR_COLOUR_WHITE;
-					}
-					else
-					{
-						colour = PR_COLOUR_RED;
-					}
+					if (spiritpwr > 0) { colour = PR_COLOUR_WHITE; }
+					else { colour = PR_COLOUR_RED; }
 				}
 				else
 				{
@@ -1554,12 +1551,17 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			idVec3 end;
 
 			// start the traceline at our eyes
-
 			start = GetEyePosition();
 
 			// end the traceline 2048 units ahead in the direction we're viewing
-
-			end = start + viewAngles.ToForward() * 2048.0f;
+			if (InVehicle())
+			{
+				end = start + GetVehicleInterfaceLocal()->GetVehicle()->GetAxis().ToAngles().ToForward() * PR_entityinfo_distance;
+			}
+			else
+			{
+				end = start + viewAngles.ToForward() * PR_entityinfo_distance;
+			}
 
 			// perform the traceline and store the results in trace
 			// and ignore this (the player) since we started the trace inside the player
@@ -1575,14 +1577,14 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			// trace.fraction is the fraction of the traceline that was travelled
 			// if trace.fraction is less than one then we hit something
 
-			if ((trace.fraction < 1.0f) && (trace.c.entityNum != ENTITYNUM_NONE))
+			if (trace.fraction < 1.0f && trace.c.entityNum != ENTITYNUM_NONE)
 			{
 				auto distance = start - trace.endpos;
 
 				idStr strText;
 				sprintf(strText, "Distance %f", fabs(distance.x) + fabs(distance.y) + fabs(distance.z));
 
-				renderSystem->DrawSmallStringExt(360, 205, strText, idVec4(1, 1, 1, 1), false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(360, 205, strText, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
 			}
 		}
 
@@ -3208,7 +3210,7 @@ void hhPlayer::UpdateDeltaViewAngles(const idAngles &angles) {
 #endif
 	}
 	SetDeltaViewAngles(delta);
-	}
+}
 
 /*
 ================
@@ -3257,7 +3259,7 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 			return localViewAngles;
 		}
 #endif //HUMANHEAD END
-	}
+		}
 
 	//JSHTODO this messes up multiplayer input.  remerge sensitivity code
 	// circularly clamp the angles with deltas
@@ -3273,7 +3275,7 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 			localViewAngles[i] = deltaCmdAngles[i] + deltaViewAngles[i];
 #endif
 		}
-		}
+	}
 	else {
 #if 1 //rww - revert to id's method
 		//localViewAngles.yaw = idMath::AngleNormalize180( SHORT2ANGLE( usercmd.angles[YAW] ) + deltaViewAngles[YAW] - GetUntransformedViewAngles()[YAW] ) * GetViewAnglesSensitivity() + GetUntransformedViewAngles()[YAW];
@@ -3690,7 +3692,7 @@ void hhPlayer::PerformImpulse(int impulse) {
 		break;
 	}
 	}
-}
+	}
 
 void hhPlayer::Present() {
 	idPlayer::Present();
@@ -5886,8 +5888,8 @@ void hhPlayer::AdjustBodyAngles(void) {
 		animator.SetJointAxis(headJoint, JOINTMOD_LOCAL, idAngles(0.0f, 0.0f, 0.0f).ToMat3());
 #endif
 		idPlayer::AdjustBodyAngles();
-	}
 		}
+}
 
 /*
 ==============
@@ -6114,7 +6116,7 @@ void hhPlayer::Move(void) {
 	}
 	physicsObj.WasWallWalking(IsWallWalking()); //rww - moved here
 	//HUMANHEAD END
-	}
+}
 
 /*
 ===============
