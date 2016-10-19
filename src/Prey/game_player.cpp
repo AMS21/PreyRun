@@ -1243,9 +1243,9 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			sprintf(yaw, "Yaw   : %f", angles.yaw);
 			sprintf(roll, "Roll  : %f", angles.roll);
 
-			renderSystem->DrawSmallStringExt(0, 0, pitch.c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(0, 15, yaw.c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(0, 30, roll.c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(0, 0, pitch.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(0, 15, yaw.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(0, 30, roll.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// Velocity
@@ -1264,11 +1264,11 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			idStr velXYZ;
 			sprintf(velXYZ, "XYZ : %f", vel.Length());
 
-			renderSystem->DrawSmallStringExt(500, 20, velX, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(500, 35, velY, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(500, 50, velZ, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(500, 65, velXY, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(500, 80, velXYZ, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(500, 20, velX, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(500, 35, velY, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(500, 50, velZ, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(500, 65, velXY, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(500, 80, velXYZ, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// Location
@@ -1289,9 +1289,9 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			}
 			sprintf(posZ, "Z: %f", zpos);
 
-			renderSystem->DrawSmallStringExt(0, 45, posX, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(0, 60, posY, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(0, 75, posZ, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(0, 45, posX, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(0, 60, posY, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(0, 75, posZ, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// Entity Info
@@ -1348,12 +1348,12 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 							idStr strHealth;
 							sprintf(strHealth, "        %03d/%03d", ent->GetHealth(), ent->GetMaxHealth());
 
-							auto colour{ PR_COLOUR_WHITE };
+							auto colour{ PR_colour_white };
 
 							// takedamge is true when the entity can take damage but not when the entity is shielded
-							if (!ent->fl.takedamage) { colour = PR_COLOUR_GREY; }
+							if (!ent->fl.takedamage) { colour = PR_colour_grey; }
 
-							renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, idStr("Health:").c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+							renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, idStr("Health:").c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 							renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, strHealth, colour, false, declManager->FindMaterial("textures/bigchars"));
 
 							++displayIndex;
@@ -1364,7 +1364,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 							idStr strName;
 							sprintf(strName, "Name: %s", ent->GetName());
 
-							renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, strName, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+							renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, strName, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 
 							++displayIndex;
 						}
@@ -1374,7 +1374,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 							idStr strType;
 							sprintf(strType, "Type: %s", className.c_str());
 
-							renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, strType, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+							renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, strType, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 
 							//++displayIndex;
 						}
@@ -1399,10 +1399,10 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 				sprintf(strAmmo, "%03d", cpower / 3500);
 
-				if (cpower > 0) { colour = PR_COLOUR_WHITE; }
-				else { colour = PR_COLOUR_RED; }
+				if (cpower > 0) { colour = PR_colour_white; }
+				else { colour = PR_colour_red; }
 
-				renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_ammopos_x, PR_ammopos_y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
 			}
 			else
 			{
@@ -1421,14 +1421,14 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 					// PR_FIXME
 					// very ugly there might be a better solution to this than if then else trees
-					if (clip > 0) { colour = PR_COLOUR_WHITE; }
+					if (clip > 0) { colour = PR_colour_white; }
 					else
 					{
-						if (avail > 0) { colour = PR_COLOUR_YELLOW; }
-						else { colour = PR_COLOUR_RED; }
+						if (avail > 0) { colour = PR_colour_yellow; }
+						else { colour = PR_colour_red; }
 					}
 
-					renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
+					renderSystem->DrawSmallStringExt(PR_ammopos_x, PR_ammopos_y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
 
 					break;
 				}
@@ -1442,10 +1442,10 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 					sprintf(strAmmo, "     %02d", avail);
 
-					if (avail > 0) { colour = PR_COLOUR_WHITE; }
-					else { colour = PR_COLOUR_RED; }
+					if (avail > 0) { colour = PR_colour_white; }
+					else { colour = PR_colour_red; }
 
-					renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
+					renderSystem->DrawSmallStringExt(PR_ammopos_x, PR_ammopos_y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
 					break;
 				}
 				case PR_WEAPONS::MINIGUN: // Minigun
@@ -1460,14 +1460,14 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 					sprintf(strAmmo, "  %03d", avail);
 					sprintf(strAmmo2, "  %02d", altAvail);
 
-					if (avail > 0) { colour = PR_COLOUR_WHITE; }
-					else { colour = PR_COLOUR_RED; }
+					if (avail > 0) { colour = PR_colour_white; }
+					else { colour = PR_colour_red; }
 
-					if (altAvail > 0) { colour2 = PR_COLOUR_WHITE; }
-					else { colour2 = PR_COLOUR_RED; }
+					if (altAvail > 0) { colour2 = PR_colour_white; }
+					else { colour2 = PR_colour_red; }
 
-					renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS_Y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
-					renderSystem->DrawSmallStringExt(PR_AMMOPOS_X, PR_AMMOPOS2_Y, strAmmo2, colour2, false, declManager->FindMaterial("textures/bigchars"));
+					renderSystem->DrawSmallStringExt(PR_ammopos_x, PR_ammopos_y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
+					renderSystem->DrawSmallStringExt(PR_ammopos_x, PR_ammopos2_y, strAmmo2, colour2, false, declManager->FindMaterial("textures/bigchars"));
 					break;
 				}
 				default: // Wrench or no weapon
@@ -1492,20 +1492,20 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 					sprintf(strHealth, "%03d | %03d", health, maxHealth);
 
-					if (health == 0) { colour = PR_COLOUR_RED; }
-					else { colour = PR_COLOUR_WHITE; }
+					if (health == 0) { colour = PR_colour_red; }
+					else { colour = PR_colour_white; }
 				}
 				else
 				{
 					auto health = GetHealth();
 					auto maxHealth = GetMaxHealth();
 
-					if (godmode) { colour = PR_COLOUR_GREY; }
+					if (godmode) { colour = PR_colour_grey; }
 					else
 					{
 						// below 25 your hp regenerates back up
-						if (health < 25) { colour = PR_COLOUR_YELLOW; }
-						else { colour = PR_COLOUR_WHITE; }
+						if (health < 25) { colour = PR_colour_yellow; }
+						else { colour = PR_colour_white; }
 					}
 
 					sprintf(strHealth, "%03d | %03d", health, maxHealth);
@@ -1528,13 +1528,13 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				{
 					spiritpwr = GetSpiritPower();
 
-					if (spiritpwr > 0) { colour = PR_COLOUR_WHITE; }
-					else { colour = PR_COLOUR_RED; }
+					if (spiritpwr > 0) { colour = PR_colour_white; }
+					else { colour = PR_colour_red; }
 				}
 				else
 				{
 					spiritpwr = 0;
-					colour = PR_COLOUR_GREY;
+					colour = PR_colour_grey;
 				}
 
 				sprintf(strSpirit, "%03d | 100", spiritpwr);
@@ -1584,7 +1584,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				idStr strText;
 				sprintf(strText, "Distance %f", fabs(distance.x) + fabs(distance.y) + fabs(distance.z));
 
-				renderSystem->DrawSmallStringExt(360, 205, strText, PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(360, 205, strText, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 			}
 		}
 
@@ -1632,23 +1632,23 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				else { moved = true; }
 			}
 
-			auto colourd{ PR_COLOUR_WHITE };
-			auto colourf{ PR_COLOUR_WHITE };
-			auto colourj{ PR_COLOUR_WHITE };
+			auto colourd{ PR_colour_white };
+			auto colourf{ PR_colour_white };
+			auto colourj{ PR_colour_white };
 
-			auto colourl{ PR_COLOUR_WHITE };
-			auto colourb{ PR_COLOUR_WHITE };
-			auto colourr{ PR_COLOUR_WHITE };
+			auto colourl{ PR_colour_white };
+			auto colourb{ PR_colour_white };
+			auto colourr{ PR_colour_white };
 
 			if (pr_mthd == PR_KEYS_METHODE::NORMAL_GREY || pr_mthd == PR_KEYS_METHODE::REFLEX_GREY || pr_mthd == PR_KEYS_METHODE::MOMENTUM_GREY)
 			{
-				if (!moved) { colourd = PR_COLOUR_GREY; }
-				if (!movef) { colourf = PR_COLOUR_GREY; }
-				if (!movej) { colourj = PR_COLOUR_GREY; }
+				if (!moved) { colourd = PR_colour_grey; }
+				if (!movef) { colourf = PR_colour_grey; }
+				if (!movej) { colourj = PR_colour_grey; }
 
-				if (!movel) { colourl = PR_COLOUR_GREY; }
-				if (!moveb) { colourb = PR_COLOUR_GREY; }
-				if (!mover) { colourr = PR_COLOUR_GREY; }
+				if (!movel) { colourl = PR_colour_grey; }
+				if (!moveb) { colourb = PR_colour_grey; }
+				if (!mover) { colourr = PR_colour_grey; }
 			}
 
 			if (pr_mthd == PR_KEYS_METHODE::NORMAL)
@@ -1659,8 +1659,8 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				sprintf(strText, "%c %c %c", moved ? 'D' : ' ', movef ? 'F' : ' ', movej ? 'J' : ' ');
 				sprintf(strText2, "%c %c %c", movel ? 'L' : ' ', moveb ? 'B' : ' ', mover ? 'R' : ' ');
 
-				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y, strText.c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
-				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y2, strText2.c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y, strText.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y2, strText2.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 			}
 
 			else if (pr_mthd == PR_KEYS_METHODE::NORMAL_GREY)
@@ -1683,24 +1683,24 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 				sprintf(strText2, "%c  %c", moved ? 'D' : ' ', movej ? 'J' : ' ');
 
-				if (movef) { renderSystem->DrawSmallStringExt(300, 220, "  F", PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars")); }
+				if (movef) { renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_reflex_f_y, "  F", PR_colour_white, false, declManager->FindMaterial("textures/bigchars")); }
 
-				if (moveb) { renderSystem->DrawSmallStringExt(300, 245, "  B", PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars")); }
+				if (moveb) { renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_reflex_bdj_y, "  B", PR_colour_white, false, declManager->FindMaterial("textures/bigchars")); }
 
-				renderSystem->DrawSmallStringExt(305, 230, strText.c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
-				renderSystem->DrawSmallStringExt(305, 245, strText2.c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_reflex_x, PR_keys_reflex_lr_y, strText.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_reflex_x, PR_keys_reflex_bdj_y, strText2.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 			}
 
 			else if (pr_mthd == PR_KEYS_METHODE::REFLEX_GREY)
 			{
-				renderSystem->DrawSmallStringExt(305, 230, "L", colourl, false, declManager->FindMaterial("textures/bigchars"));
-				renderSystem->DrawSmallStringExt(305, 230, "   R", colourr, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_reflex_x, PR_keys_reflex_lr_y, "L", colourl, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_reflex_x, PR_keys_reflex_lr_y, "   R", colourr, false, declManager->FindMaterial("textures/bigchars"));
 
-				renderSystem->DrawSmallStringExt(300, 220, "  F", colourf, false, declManager->FindMaterial("textures/bigchars"));
-				renderSystem->DrawSmallStringExt(300, 245, "  B", colourb, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_reflex_f_y, "  F", colourf, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_reflex_bdj_y, "  B", colourb, false, declManager->FindMaterial("textures/bigchars"));
 
-				renderSystem->DrawSmallStringExt(305, 245, "D", colourd, false, declManager->FindMaterial("textures/bigchars"));
-				renderSystem->DrawSmallStringExt(305, 245, "   J", colourj, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_reflex_x, PR_keys_reflex_bdj_y, "D", colourd, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_reflex_x, PR_keys_reflex_bdj_y, "   J", colourj, false, declManager->FindMaterial("textures/bigchars"));
 			}
 
 			else if (pr_mthd == PR_KEYS_METHODE::MOMENTUM)
@@ -1709,26 +1709,26 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 				sprintf(strText, "%c  %c", movel ? 'L' : ' ', mover ? 'R' : ' ');
 
-				if (movef) { renderSystem->DrawSmallStringExt(600, 245, "  F", PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars")); }
+				if (movef) { renderSystem->DrawSmallStringExt(PR_keys_momentum_fb_x, PR_keys_momentum_f_y, "  F", PR_colour_white, false, declManager->FindMaterial("textures/bigchars")); }
 
-				if (moveb) { renderSystem->DrawSmallStringExt(600, 275, "  B", PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars")); }
+				if (moveb) { renderSystem->DrawSmallStringExt(PR_keys_momentum_fb_x, PR_keys_momentum_b_y, "  B", PR_colour_white, false, declManager->FindMaterial("textures/bigchars")); }
 
-				if (movej) { renderSystem->DrawSmallStringExt(605, 290, "JUMP", PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars")); }
-				if (moved) { renderSystem->DrawSmallStringExt(605, 305, "DUCK", PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars")); }
+				if (movej) { renderSystem->DrawSmallStringExt(PR_keys_momentum_lrjd_x, PR_keys_momentum_j_y, "JUMP", PR_colour_white, false, declManager->FindMaterial("textures/bigchars")); }
+				if (moved) { renderSystem->DrawSmallStringExt(PR_keys_momentum_lrjd_x, PR_keys_momentum_d_y, "DUCK", PR_colour_white, false, declManager->FindMaterial("textures/bigchars")); }
 
-				renderSystem->DrawSmallStringExt(605, 260, strText.c_str(), PR_COLOUR_WHITE, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_momentum_lrjd_x, PR_keys_momentum_lr_y, strText.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 			}
 
 			else if (pr_mthd == PR_KEYS_METHODE::MOMENTUM_GREY)
 			{
-				renderSystem->DrawSmallStringExt(605, 260, "L", colourl, false, declManager->FindMaterial("textures/bigchars"));
-				renderSystem->DrawSmallStringExt(605, 260, "   R", colourr, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_momentum_fb_x, PR_keys_momentum_f_y, "  F", colourf, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_momentum_fb_x, PR_keys_momentum_b_y, "  B", colourb, false, declManager->FindMaterial("textures/bigchars"));
 
-				renderSystem->DrawSmallStringExt(600, 245, "  F", colourf, false, declManager->FindMaterial("textures/bigchars"));
-				renderSystem->DrawSmallStringExt(600, 275, "  B", colourb, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_momentum_lrjd_x, PR_keys_momentum_lr_y, "L", colourl, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_momentum_lrjd_x, PR_keys_momentum_lr_y, "   R", colourr, false, declManager->FindMaterial("textures/bigchars"));
 
-				renderSystem->DrawSmallStringExt(605, 290, "JUMP", colourj, false, declManager->FindMaterial("textures/bigchars"));
-				renderSystem->DrawSmallStringExt(605, 305, "DUCK", colourd, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_momentum_lrjd_x, PR_keys_momentum_j_y, "JUMP", colourj, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_keys_momentum_lrjd_x, PR_keys_momentum_d_y, "DUCK", colourd, false, declManager->FindMaterial("textures/bigchars"));
 			}
 		}
 	} // if (pr_hud)
@@ -1782,18 +1782,18 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		pr_dbg_timer.Stop();
 
 		idStr str;
-		auto colour{ PR_COLOUR_WHITE };
+		auto colour{ PR_colour_white };
 		auto time{ pr_dbg_timer.Milliseconds() };
 
-		if (time >= PR_DBG_HUDDRAWTIME_YELLOW)
+		if (time >= PR_dbg_huddrawtime_yellow)
 		{
-			if (time >= PR_DBG_HUDDRAWTIME_RED)
+			if (time >= PR_dbg_huddrawtime_red)
 			{
-				colour = PR_COLOUR_RED;
+				colour = PR_colour_red;
 			}
 			else
 			{
-				colour = PR_COLOUR_YELLOW;
+				colour = PR_colour_yellow;
 			}
 		}
 

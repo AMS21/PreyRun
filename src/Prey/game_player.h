@@ -42,9 +42,9 @@ class hhPossessedTommy;
 #include "../PreyRun/Hooking.hpp"
 #include "../PreyRun/GameTimer.hpp"
 
-constexpr int PR_AMMOPOS_X{ 550 };
-constexpr int PR_AMMOPOS_Y{ 448 };
-constexpr int PR_AMMOPOS2_Y{ PR_AMMOPOS_Y + 15 };
+constexpr int PR_ammopos_x{ 550 };
+constexpr int PR_ammopos_y{ 448 };
+constexpr int PR_ammopos2_y{ PR_ammopos_y + 15 };
 
 constexpr int PR_entinfo_offset{ -15 };
 constexpr int PR_entinfo_x{ 360 };
@@ -54,20 +54,38 @@ constexpr int PR_keys_x{ 300 };
 constexpr int PR_keys_y{ 250 };
 constexpr int PR_keys_y2{ PR_keys_y + 15 };
 
-constexpr float PR_entityinfo_distance{ 2048.0f };
+// Reflex
+constexpr int PR_keys_reflex_x{ PR_keys_x + 5 };
+constexpr int PR_keys_reflex_f_y{ 220 };
+constexpr int PR_keys_reflex_lr_y{ PR_keys_reflex_f_y + 10 };
+constexpr int PR_keys_reflex_bdj_y{ PR_keys_reflex_f_y + 25 };
 
-const idVec4 PR_COLOUR_WHITE{ 1.00f, 1.00f, 1.00f, 1.00f };
-const idVec4 PR_COLOUR_YELLOW{ 1.00f, 1.00f, 0.25f, 1.00f };
-const idVec4 PR_COLOUR_RED{ 1.00f, 0.00f, 0.00f, 1.00f };
-const idVec4 PR_COLOUR_BLUE{ 0.00f, 0.00f, 1.00f, 1.00f };
-const idVec4 PR_COLOUR_GREY{ 0.65f, 0.65f, 0.65f, 0.65f };
+// Momentum
+constexpr int PR_keys_momentum_fb_x{ 600 };
+constexpr int PR_keys_momentum_lrjd_x{ PR_keys_momentum_fb_x + 5 };
+
+constexpr int PR_keys_momentum_y_offset{ 15 };
+
+constexpr int PR_keys_momentum_f_y{ 245 };
+constexpr int PR_keys_momentum_lr_y{ PR_keys_momentum_f_y + 1 * PR_keys_momentum_y_offset };
+constexpr int PR_keys_momentum_b_y{ PR_keys_momentum_f_y + 2 * PR_keys_momentum_y_offset };
+constexpr int PR_keys_momentum_j_y{ PR_keys_momentum_f_y + 3 * PR_keys_momentum_y_offset };
+constexpr int PR_keys_momentum_d_y{ PR_keys_momentum_f_y + 4 * PR_keys_momentum_y_offset };
+
+constexpr float PR_entityinfo_distance{ 2048.00f };
+
+const idVec4 PR_colour_white{ 1.00f, 1.00f, 1.00f, 1.00f };
+const idVec4 PR_colour_yellow{ 1.00f, 1.00f, 0.25f, 1.00f };
+const idVec4 PR_colour_red{ 1.00f, 0.00f, 0.00f, 1.00f };
+const idVec4 PR_colour_blue{ 0.00f, 0.00f, 1.00f, 1.00f };
+const idVec4 PR_colour_grey{ 0.65f, 0.65f, 0.65f, 0.65f };
 
 #ifdef PR_DEBUG
-constexpr double PR_DBG_HUDDRAWTIME_YELLOW{ 0.3 };
-constexpr double PR_DBG_HUDDRAWTIME_RED{ 0.4 };
+constexpr double PR_dbg_huddrawtime_yellow{ 0.30 };
+constexpr double PR_dbg_huddrawtime_red{ 0.40 };
 #endif // PR_DEBUG
 
-// The draw function from Prey takes floats in the range from 0.0 to 1.0 but usualy colours are represented from 0 to 255
+// The draw function from Prey takes floats in the range from 0.0 to 1.0 but usualy colours are represented from 0 to 255 (hex)
 ID_INLINE float PR_toPreyColour(float f);
 // PreyRun END
 
