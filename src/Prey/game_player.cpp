@@ -1497,8 +1497,8 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 				if (InVehicle())
 				{
-					auto health = GetVehicleInterfaceLocal()->GetVehicle()->health;
-					auto maxHealth = GetVehicleInterfaceLocal()->GetVehicle()->spawnHealth;
+					auto health = GetVehicleInterfaceLocal()->GetVehicle()->GetHealth();
+					auto maxHealth = GetVehicleInterfaceLocal()->GetVehicle()->GetMaxHealth();
 
 					sprintf(strHealth, "%03d | %03d", health, maxHealth);
 

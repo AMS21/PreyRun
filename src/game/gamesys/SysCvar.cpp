@@ -67,7 +67,7 @@ idCVar pr_timer_backup_interval("PR_Timer_Backup_Interval", "250", CVAR_GAME | C
 
 bool pr_timer_mapchanged{ false };
 
-idCVar pr_hud_timer("PR_hud_Timer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of the hud timer, note that the timer will still work even if hidden");
+idCVar pr_hud_timer("PR_hud_Timer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of the hud timer, note that the timer will still works even if hidden");
 idCVar pr_hud_timer_x("PR_hud_Timer_x", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 639);
 idCVar pr_hud_timer_y("PR_hud_Timer_y", "235", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 479);
 idCVar pr_hud_timer_r("PR_hud_Timer_r", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer color", 0, 255);
@@ -88,7 +88,7 @@ idCVar pr_hud_location("PR_hud_Location", "0", CVAR_GAME | CVAR_BOOL, "Toggle di
 idCVar pr_hud_location_methode("PR_hud_Location_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Swtich the different location methodes.\n0 - Display eye (viewpoint) position (default)\n1 - Display feet position", 0, 1);
 
 // Entity Info
-idCVar pr_hud_entityinfo("PR_hud_EntityInfo", "0", CVAR_GAME | CVAR_BOOL, "Shows infos about the entity aimed at which info will be displayed can be selected with pr_hud_entityinfo_*");
+idCVar pr_hud_entityinfo("PR_hud_EntityInfo", "0", CVAR_GAME | CVAR_BOOL, "Shows infos about the entity aimed at. Which info will be displayed can be selected with pr_hud_entityinfo_*");
 idCVar pr_hud_entityinfo_health("PR_hud_EntityInfo_Health", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entitys health when pr_hud_entityinfo is enabled");
 idCVar pr_hud_entityinfo_name("PR_hud_EntityInfo_Name", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entitys name when pr_hud_entityinfo is enabled");
 idCVar pr_hud_entityinfo_type("PR_hud_EntityInfo_Type", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entitys type when pr_hud_entityinfo is enabled");
