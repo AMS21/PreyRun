@@ -81,8 +81,8 @@ const idVec4 PR_colour_blue{ 0.00f, 0.00f, 1.00f, 1.00f };
 const idVec4 PR_colour_grey{ 0.65f, 0.65f, 0.65f, 0.65f };
 
 #ifdef PR_DEBUG
-constexpr double PR_dbg_huddrawtime_yellow{ 0.30 };
-constexpr double PR_dbg_huddrawtime_red{ 0.40 };
+constexpr double PR_dbg_huddrawtime_yellow{ 0.30f };
+constexpr double PR_dbg_huddrawtime_red{ 0.40f };
 #endif // PR_DEBUG
 
 // The draw function from Prey takes floats in the range from 0.0 to 1.0 but usualy colours are represented from 0 to 255 (hex)

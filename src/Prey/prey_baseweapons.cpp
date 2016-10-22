@@ -286,7 +286,7 @@ void hhWeapon::Restore( idRestoreGame *savefile ) {
 	if (!weaponDef) {
 		gameLocal.Error( "Unknown weaponDef:  %s\n", objectname );
 	}
-    dict = &(weaponDef->dict);
+	dict = &(weaponDef->dict);
 
 	savefile->ReadString( icon );
 
