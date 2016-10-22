@@ -1307,11 +1307,11 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			// end the traceline 2048 units ahead in the direction we're viewing
 			if (InVehicle())
 			{
-				end = start + GetVehicleInterfaceLocal()->GetVehicle()->GetAxis().ToAngles().ToForward() * PR_entityinfo_distance;
+				end = start + GetVehicleInterfaceLocal()->GetVehicle()->GetAxis().ToAngles().ToForward() * PR_traceline_distance;
 			}
 			else
 			{
-				end = start + viewAngles.ToForward() * PR_entityinfo_distance;
+				end = start + viewAngles.ToForward() * PR_traceline_distance;
 			}
 
 			// perform the traceline and store the results in trace
@@ -1331,52 +1331,64 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				// gameLocal.GetTraceEntity returns the entity's master entity if it exists
 				// search the SDK for more examples
 
-				auto displayIndex{ 0 };
-
-				auto health = ent->GetHealth();
 				auto maxHealth = ent->GetMaxHealth();
 
-				if (health > 0 && maxHealth > 0)
+				if (maxHealth > 0)
 				{
 					idStr className{ ent->GetClassname() };
 
-					// Filter unwanted entitys: Doors, Consoles, Vehicle spawner
-					if (className != "hhProxDoor" && className != "hhConsole" && className != "hhShuttle" && className != "hhRailShuttle")
+					// Filter unwanted entitys: Doors, Consoles, Vehicle spawner, Pod spawner
+					if (className != "hhProxDoor" && className != "hhConsole" && className != "hhRailShuttle" && className != "hhPodSpawner")
 					{
-						if (_hud->GetStateBool("pr_hud_entityinfo_health", "1"))
+						auto displayIndex{ 0 };
+						auto isValid{ true };
+
+						if (className == "hhShuttle"&&static_cast<hhShuttle*> (ent)->IsConsole())
 						{
-							idStr strHealth;
-							sprintf(strHealth, "        %03d/%03d", ent->GetHealth(), ent->GetMaxHealth());
-
-							auto colour{ PR_colour_white };
-
-							// takedamge is true when the entity can take damage but not when the entity is shielded
-							if (!ent->fl.takedamage) { colour = PR_colour_grey; }
-
-							renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, idStr("Health:").c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
-							renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, strHealth, colour, false, declManager->FindMaterial("textures/bigchars"));
-
-							++displayIndex;
+							isValid = false;
 						}
 
-						if (_hud->GetStateBool("pr_hud_entityinfo_name", "1"))
+						if (isValid)
 						{
-							idStr strName;
-							sprintf(strName, "Name: %s", ent->GetName());
+							if (_hud->GetStateBool("pr_hud_entityinfo_health", "1"))
+							{
+								idStr strHealth;
+								sprintf(strHealth, "        %03d/%03d", ent->GetHealth(), maxHealth);
 
-							renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, strName, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+								auto colour{ PR_colour_white };
 
-							++displayIndex;
-						}
+								if ((className == "hhSphereBoss" && static_cast<hhSphereBoss*> (ent)->IsShielded()) || (className == "hhKeeperSimple" && static_cast<hhKeeperSimple*> (ent)->AI_SHIELD == 1))
+								{
+									colour = PR_colour_blue;
+								}
+								// takedamge is true when the entity can take damage but not when the entity is shielded
+								if (!ent->fl.takedamage) { colour = PR_colour_grey; }
 
-						if (_hud->GetStateBool("pr_hud_entityinfo_type", "1"))
-						{
-							idStr strType;
-							sprintf(strType, "Type: %s", className.c_str());
+								renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, idStr("Health:").c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+								renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, strHealth, colour, false, declManager->FindMaterial("textures/bigchars"));
 
-							renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, strType, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+								++displayIndex;
+							}
 
-							//++displayIndex;
+							if (_hud->GetStateBool("pr_hud_entityinfo_name", "1"))
+							{
+								idStr strName;
+								sprintf(strName, "Name: %s", ent->GetName());
+
+								renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, strName, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+
+								++displayIndex;
+							}
+
+							if (_hud->GetStateBool("pr_hud_entityinfo_type", "1"))
+							{
+								idStr strType;
+								sprintf(strType, "Type: %s", className.c_str());
+
+								renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_entinfo_y - PR_entinfo_offset * displayIndex, strType, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+
+								//++displayIndex;
+							}
 						}
 					}
 				}
@@ -1388,10 +1400,9 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		{
 			if (InVehicle())
 			{
-				// CurrentPower == Ammo
-
+				// CurrentPower == Ammo in vehicle
 				// Max 600000
-				// 1 Shot is = 3500
+				// 1 Shot costs 3500 power
 				auto cpower = GetVehicleInterfaceLocal()->GetVehicle()->GetCurrentPower();
 
 				idVec4 colour;
@@ -1429,7 +1440,6 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 					}
 
 					renderSystem->DrawSmallStringExt(PR_ammopos_x, PR_ammopos_y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
-
 					break;
 				}
 				case PR_WEAPONS::CRAWLER:
@@ -1492,8 +1502,12 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 					sprintf(strHealth, "%03d | %03d", health, maxHealth);
 
-					if (health == 0) { colour = PR_colour_red; }
-					else { colour = PR_colour_white; }
+					if (godmode) { colour = PR_colour_grey; }
+					else
+					{
+						if (health == 0) { colour = PR_colour_red; }
+						else { colour = PR_colour_white; }
+					}
 				}
 				else
 				{
@@ -1556,11 +1570,11 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			// end the traceline 2048 units ahead in the direction we're viewing
 			if (InVehicle())
 			{
-				end = start + GetVehicleInterfaceLocal()->GetVehicle()->GetAxis().ToAngles().ToForward() * PR_entityinfo_distance;
+				end = start + GetVehicleInterfaceLocal()->GetVehicle()->GetAxis().ToAngles().ToForward() * PR_traceline_distance;
 			}
 			else
 			{
-				end = start + viewAngles.ToForward() * PR_entityinfo_distance;
+				end = start + viewAngles.ToForward() * PR_traceline_distance;
 			}
 
 			// perform the traceline and store the results in trace
@@ -3259,7 +3273,7 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 			return localViewAngles;
 		}
 #endif //HUMANHEAD END
-		}
+	}
 
 	//JSHTODO this messes up multiplayer input.  remerge sensitivity code
 	// circularly clamp the angles with deltas
@@ -3366,7 +3380,7 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 	loggedViewAngles[gameLocal.framenum & (NUM_LOGGED_VIEW_ANGLES - 1)] = localViewAngles;
 
 	return localViewAngles;
-	}
+}
 
 /*
 ================
@@ -3692,7 +3706,7 @@ void hhPlayer::PerformImpulse(int impulse) {
 		break;
 	}
 	}
-	}
+}
 
 void hhPlayer::Present() {
 	idPlayer::Present();
@@ -5888,7 +5902,7 @@ void hhPlayer::AdjustBodyAngles(void) {
 		animator.SetJointAxis(headJoint, JOINTMOD_LOCAL, idAngles(0.0f, 0.0f, 0.0f).ToMat3());
 #endif
 		idPlayer::AdjustBodyAngles();
-		}
+	}
 }
 
 /*
@@ -6894,7 +6908,7 @@ void hhPlayer::WriteToSnapshot(idBitMsgDelta &msg) const {
 	//note - current weapon's ammo always sent now
 	//ammo_t energyammo = hhWeaponFireController::GetAmmoType("ammo_energy");
 	//msg.WriteBits(inventory.ammo[energyammo], ASYNC_PLAYER_INV_AMMO_BITS);
-	}
+}
 
 /*
 ===============
@@ -7277,7 +7291,7 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 	if (msg.HasChanged()) {
 		UpdateVisuals();
 	}
-	}
+}
 
 /*
 ================

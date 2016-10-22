@@ -72,7 +72,7 @@ constexpr int PR_keys_momentum_b_y{ PR_keys_momentum_f_y + 2 * PR_keys_momentum_
 constexpr int PR_keys_momentum_j_y{ PR_keys_momentum_f_y + 3 * PR_keys_momentum_y_offset };
 constexpr int PR_keys_momentum_d_y{ PR_keys_momentum_f_y + 4 * PR_keys_momentum_y_offset };
 
-constexpr float PR_entityinfo_distance{ 2048.00f };
+constexpr float PR_traceline_distance{ 2048.00f };
 
 const idVec4 PR_colour_white{ 1.00f, 1.00f, 1.00f, 1.00f };
 const idVec4 PR_colour_yellow{ 1.00f, 1.00f, 0.25f, 1.00f };

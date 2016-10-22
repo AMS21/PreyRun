@@ -37,6 +37,10 @@ public:
 	void Event_DirectMoveToPosition(const idVec3 &pos);
 	void Event_SpinClouds( float shouldSpin );
 	void Event_SetSeekScale( float new_scale );
+
+	// PreyRun BEGIN
+	bool IsShielded() const { return AI_CAN_DAMAGE == 0; };
+	// PreyRun END
 protected:
 	idScriptBool AI_FACE_ENEMY;
 	idScriptBool AI_CAN_DAMAGE;
