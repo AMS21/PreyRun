@@ -97,7 +97,7 @@ namespace pr
 #ifdef PR_DBG_BACKUP
 		else
 		{
-			gameLocal.Printf("pr::LoadBackupTimer wrong map to recover time. CurrentMap=%s mapName=%s\n",cMap,mapName.c_str());
+			gameLocal.Printf("pr::LoadBackupTimer wrong map to recover time. CurrentMap=%s mapName=%s\n", cMap, mapName.c_str());
 		}
 #endif // PR_DBG_BACKUP
 
@@ -131,7 +131,7 @@ namespace pr
 #endif // PR_DBG_BACKUP
 	}
 
-	inline double GetBackupTime()
+	ID_INLINE double GetBackupTime()
 	{
 #ifdef PR_DBG_BACKUP_GETTIME
 		gameLocal.Printf("pr::GetBackupTime = %f\n", pr_gametimer.ClockTicks());
