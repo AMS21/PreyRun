@@ -1341,14 +1341,8 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 					if (className != "hhProxDoor" && className != "hhConsole" && className != "hhRailShuttle" && className != "hhPodSpawner")
 					{
 						auto displayIndex{ 0 };
-						auto isValid{ true };
 
-						if (className == "hhShuttle"&&static_cast<hhShuttle*> (ent)->IsConsole())
-						{
-							isValid = false;
-						}
-
-						if (isValid)
+						if (!(className == "hhShuttle" && static_cast<hhShuttle*> (ent)->IsConsole()))
 						{
 							if (_hud->GetStateBool("pr_hud_entityinfo_health", "1"))
 							{

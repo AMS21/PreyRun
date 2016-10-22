@@ -2,39 +2,42 @@
 
 #include "StdLib.hpp"
 
-typedef std::chrono::nanoseconds nanosec;   // 1 second = 1,000,000,000 nanoseconds
-typedef std::chrono::microseconds microsec; // 1 second = 1,000,000		microseconds
-typedef std::chrono::milliseconds millisec; // 1 second = 1,000			milliseconds
+namespace pr
+{
+	using nanosec = std::chrono::nanoseconds;	// 1 second = 1,000,000,000 nanoseconds
+	using microsec = std::chrono::microseconds;	// 1 second = 1,000,000		microseconds
+	using millisec = std::chrono::milliseconds;	// 1 second = 1,000			milliseconds
 
-typedef double storageType;
-typedef microsec timeType;
-typedef timeType::period periodType;
+	using storageType = double;
+	using timeType = microsec;
+	using periodType = timeType::period;
 
-constexpr char * pr_gametimer_clocktick_post{ "us" };
+	constexpr char pr_gametimer_clocktick_post[]{ "us" };
+}
 
 class prTimer
 {
 public:
 	prTimer();
-	explicit prTimer(storageType ct);
+	explicit prTimer(pr::storageType ct);
 	~prTimer();
 
 	void Start();
 	void Stop();
 	void Clear();
 
-	storageType Milliseconds() const;
-	storageType Microseconds() const;
-	storageType Nanoseconds() const;
+	pr::storageType Milliseconds() const;
+	pr::storageType Microseconds() const;
+	pr::storageType Nanoseconds() const;
 
-	storageType ClockTicks() const;
+	pr::storageType ClockTicks() const;
 
 	bool IsRunning() const { return isRunning; }
-	void SetCT(storageType ct);
+	void SetCT(pr::storageType ct);
 
 private:
 	bool isRunning;
-	std::chrono::duration <storageType, periodType> acuTime;
+	std::chrono::duration <pr::storageType, pr::periodType> acuTime;
 
 	std::chrono::time_point<std::chrono::steady_clock> lastStarted;
 	std::chrono::steady_clock timer;

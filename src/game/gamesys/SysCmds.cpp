@@ -325,7 +325,7 @@ void Cmd_PR_crash_f(const idCmdArgs &args)
 void Cmd_PR_dbg_timer_f(const idCmdArgs &args)
 {
 	auto time = PR_ms2time(pr_gametimer.Milliseconds());
-	gameLocal.Printf("Timer is running: %s\nTimer shoud be on: %s\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s\n", pr_gametimer.IsRunning() ? "True" : "False", pr_gametimer_running ? "True" : "False", time.hours, time.minutes, time.seconds, time.milliseconds, pr_gametimer.Milliseconds(), pr_gametimer.ClockTicks(), pr_gametimer_clocktick_post);
+	gameLocal.Printf("Timer is running: %s\nTimer shoud be on: %s\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s\n", pr_gametimer.IsRunning() ? "True" : "False", pr_gametimer_running ? "True" : "False", time.hours, time.minutes, time.seconds, time.milliseconds, pr_gametimer.Milliseconds(), pr_gametimer.ClockTicks(), pr::pr_gametimer_clocktick_post);
 }
 
 void Cmd_PR_dbg_timer_set_f(const idCmdArgs &args)
