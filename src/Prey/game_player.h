@@ -41,18 +41,34 @@ class hhPossessedTommy;
 #include "../PreyRun/Constants.hpp"
 #include "../PreyRun/Hooking.hpp"
 #include "../PreyRun/GameTimer.hpp"
+#include "../game/Game_local.h"
+
+constexpr int PR_hud_std_y_offset{ 15 };
 
 constexpr int PR_ammopos_x{ 550 };
 constexpr int PR_ammopos_y{ 448 };
-constexpr int PR_ammopos2_y{ PR_ammopos_y + 15 };
+constexpr int PR_ammopos2_y{ PR_ammopos_y + PR_hud_std_y_offset };
+
+constexpr int PR_ammo_vehicle_shot_cost{ 3500 };
+
+constexpr int PR_location_x{ 0 };
+constexpr int PR_location_y{ 45 };
+
+constexpr int PR_velocity_x{ 500 };
+constexpr int PR_velocity_y{ 20 };
+
+constexpr int PR_viewangles_x{ 0 };
+constexpr int PR_viewangles_y{ 0 };
 
 constexpr int PR_entinfo_offset{ -15 };
 constexpr int PR_entinfo_x{ 360 };
 constexpr int PR_entinfo_y{ 235 };
 
+constexpr int PR_distance_y{ 220 };
+
 constexpr int PR_keys_x{ 300 };
 constexpr int PR_keys_y{ 250 };
-constexpr int PR_keys_y2{ PR_keys_y + 15 };
+constexpr int PR_keys_y2{ PR_keys_y + PR_hud_std_y_offset };
 
 // Reflex
 constexpr int PR_keys_reflex_x{ PR_keys_x + 5 };
@@ -81,8 +97,14 @@ const idVec4 PR_colour_blue{ 0.00f, 0.00f, 1.00f, 1.00f };
 const idVec4 PR_colour_grey{ 0.65f, 0.65f, 0.65f, 0.65f };
 
 #ifdef PR_DEBUG
+constexpr int PR_dbg_huddrawtime_x{ 460 };
+constexpr int PR_dbg_huddrawtime_y{ 0 };
+
 constexpr double PR_dbg_huddrawtime_yellow{ 0.30f };
 constexpr double PR_dbg_huddrawtime_red{ 0.40f };
+
+constexpr double PR_dbg_frametime_yellow{ 1.50f };
+constexpr double PR_dbg_frametime_red{ 2.00f };
 #endif // PR_DEBUG
 
 // The draw function from Prey takes floats in the range from 0.0 to 1.0 but usualy colours are represented from 0 to 255 (hex)

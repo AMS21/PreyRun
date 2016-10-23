@@ -5,6 +5,55 @@
 
 #define DAMAGE_INDICATOR_TIME		1100		// Update this in hud_damageindicator.guifragment too
 
+// PreyRun BEGIN
+ID_INLINE float PR_toPreyColour(float f)
+{
+	return f / 255.F;
+}
+
+idStr PR_formatTimeString(PR_time_t time, bool allDigits, int msPrecision)
+{
+	idStr retStr;
+
+	if (allDigits)
+	{
+		sprintf(retStr, "%02d:%02d:%02d", time.hours, time.minutes, time.seconds);
+	}
+	else
+	{
+		if (time.hours != 0)
+		{
+			sprintf(retStr, "%d:%02d:%02d", time.hours, time.minutes, time.seconds);
+		}
+		else
+		{
+			if (time.minutes != 0)
+			{
+				sprintf(retStr, "%d:%02d", time.minutes, time.seconds);
+			}
+			else
+			{
+				sprintf(retStr, "%d", time.seconds);
+			}
+		}
+	}
+
+	// Add milliseconds if needed
+	if (msPrecision != 0)
+	{
+		idStr tempStr;
+
+		// 500 ms = 0.500
+		sprintf(tempStr, "%.*f", msPrecision, static_cast<float>(time.milliseconds) / 1000.00f);
+
+		// Add the string but without the 0 in front
+		retStr.Append(tempStr.Mid(1, tempStr.Length()));
+	}
+
+	return retStr;
+}
+// PreyRun END
+
 const idEventDef EV_PlayWeaponAnim("playWeaponAnim", "sd");
 const idEventDef EV_RechargeHealth("<rechargehealth>", NULL);
 const idEventDef EV_RechargeRifleAmmo("<rechargeRifleAmmo>", NULL);
@@ -972,9 +1021,7 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 	_hud->SetStateFloat("pr_hud_speedometer_r", pr_hud_speedometer_r.GetFloat());
 	_hud->SetStateFloat("pr_hud_speedometer_g", pr_hud_speedometer_g.GetFloat());
 	_hud->SetStateFloat("pr_hud_speedometer_b", pr_hud_speedometer_b.GetFloat());
-#ifdef PR_DEVELOP
 	_hud->SetStateInt("pr_hud_speedometer_precision", pr_hud_speedometer_precision.GetInteger());
-#endif // PR_DEVELOP
 	_hud->SetStateInt("pr_hud_speedometer_x", pr_hud_speedometer_x.GetInteger());
 	_hud->SetStateInt("pr_hud_speedometer_y", pr_hud_speedometer_y.GetInteger());
 	// Timer
@@ -984,8 +1031,17 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 	_hud->SetStateFloat("pr_hud_timer_r", pr_hud_timer_r.GetFloat());
 	_hud->SetStateFloat("pr_hud_timer_g", pr_hud_timer_g.GetFloat());
 	_hud->SetStateFloat("pr_hud_timer_b", pr_hud_timer_b.GetFloat());
+	_hud->SetStateInt("pr_hud_timer_precision", pr_hud_timer_precision.GetInteger());
+	_hud->SetStateBool("pr_hud_timer_alldigits", pr_hud_timer_alldigits.GetBool());
 	// JumpSpeed
 	_hud->SetStateBool("pr_hud_jumpspeed", pr_hud_jumpspeed.GetBool());
+	_hud->SetStateInt("pr_hud_jumpspeed_x", pr_hud_jumpspeed_x.GetInteger());
+	_hud->SetStateInt("pr_hud_jumpspeed_y", pr_hud_jumpspeed_y.GetInteger());
+	_hud->SetStateFloat("pr_hud_jumpspeed_r", pr_hud_jumpspeed_r.GetFloat());
+	_hud->SetStateFloat("pr_hud_jumpspeed_g", pr_hud_jumpspeed_g.GetFloat());
+	_hud->SetStateFloat("pr_hud_jumpspeed_b", pr_hud_jumpspeed_b.GetFloat());
+	_hud->SetStateInt("pr_hud_jumpspeed_precision", pr_hud_jumpspeed_precision.GetInteger());
+	_hud->SetStateInt("pr_hud_jumpspeed_style", pr_hud_jumpspeed_style.GetInteger());
 	// ViewAngles
 	_hud->SetStateBool("pr_hud_viewangles", pr_hud_viewangles.GetBool());
 	// Velocity
@@ -1068,7 +1124,7 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 
 	// Determine slots for our pickup icons
 	int c = inventory.pickupItemNames.Num();
-	for (int i = 0; i < 10; i++) {
+	for (auto i{ 0 }; i < 10; ++i) {
 		if (i < c) {
 			_hud->SetStateString(va("itemicon%i", i), inventory.pickupItemNames[i].icon);
 			_hud->SetStateFloat(va("itemalpha%i", i), inventory.pickupItemNames[i].matcolorAlpha);
@@ -1104,7 +1160,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 #endif // PR_DEBUG
 
 	// Individual Level timer
-	if (!pr_gametimer_running && pr_timer_autostart.GetBool() && pr_timer_mapchanged && static_cast<PR_TIMER_METHODE>(pr_timer_methode.GetInteger()) == PR_TIMER_METHODE::INDIVIDUALLEVEL && static_cast<idStr>(gameLocal.GetMapName()) != idStr("maps/game/roadhouse.map"))
+	if (!pr_gametimer_running && pr_timer_autostart.GetBool() && pr_timer_mapchanged && static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::INDIVIDUALLEVEL && static_cast<idStr>(gameLocal.GetMapName()) != idStr("maps/game/roadhouse.map"))
 	{
 		gameLocal.Printf("PreyRun: Timer: Individual Level Auto starting\n");
 
@@ -1155,70 +1211,103 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		// Timer
 		if (_hud->GetStateBool("pr_hud_timer", "1"))
 		{
-			auto pr_t_r = _hud->GetStateFloat("pr_hud_timer_r", "255");
-			auto pr_t_g = _hud->GetStateFloat("pr_hud_timer_g", "255");
-			auto pr_t_b = _hud->GetStateFloat("pr_hud_timer_b", "255");
 			auto pr_t_x = _hud->GetStateInt("pr_hud_timer_x", "0");
 			auto pr_t_y = _hud->GetStateInt("pr_hud_timer_y", "235");
 
-			auto times = PR_ms2time(pr_gametimer.Milliseconds());
+			auto pr_t_r = _hud->GetStateFloat("pr_hud_timer_r", "255");
+			auto pr_t_g = _hud->GetStateFloat("pr_hud_timer_g", "255");
+			auto pr_t_b = _hud->GetStateFloat("pr_hud_timer_b", "255");
 
-			idStr strText;
+			auto strTime = PR_formatTimeString(PR_ms2time(pr_gametimer.Milliseconds()), _hud->GetStateBool("pr_hud_timer_alldigits","true"), _hud->GetStateInt("pr_hud_timer_precision","3"));
 
-			sprintf(strText, "%02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
-
-			renderSystem->DrawSmallStringExt(pr_t_x, pr_t_y, strText.c_str(), idVec4(PR_toPreyColour(pr_t_r), PR_toPreyColour(pr_t_g), PR_toPreyColour(pr_t_b), 1), false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(pr_t_x, pr_t_y, strTime.c_str(), idVec4(PR_toPreyColour(pr_t_r), PR_toPreyColour(pr_t_g), PR_toPreyColour(pr_t_b), 1), false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// Speedometer
 		if (_hud->GetStateBool("pr_hud_speedometer", "1"))
 		{
+			auto pr_sm_x = _hud->GetStateInt("pr_hud_speedometer_x", "310");
+			auto pr_sm_y = _hud->GetStateInt("pr_hud_speedometer_y", "460");
+
 			auto pr_sm_r = _hud->GetStateFloat("pr_hud_speedometer_r", "255");
 			auto pr_sm_g = _hud->GetStateFloat("pr_hud_speedometer_g", "255");
 			auto pr_sm_b = _hud->GetStateFloat("pr_hud_speedometer_b", "255");
-#ifdef PR_DEVELOP
+
 			auto pr_sm_prec = _hud->GetStateInt("pr_hud_speedometer_precision", "6");
-#endif // PR_DEVELOP
-			auto pr_sm_x = _hud->GetStateInt("pr_hud_speedometer_x", "320");
-			auto pr_sm_y = _hud->GetStateInt("pr_hud_speedometer_y", "470");
 
 			auto vel = physicsObj.GetLinearVelocity();
 
-			idStr strText;
+			idStr strSpeedoMeter;
 
 			if (physicsObj.HasGroundContacts() || InVehicle() || noclip)
 			{
 				// are we standing on the ground or in a Vehicle or nocliping? then add Z speed as well (when wallwalking, being on stairs/slopes or flying in Vehicle or nocliping)
-				sprintf(strText, "%.2f", vel.Length());
+				sprintf(strSpeedoMeter, "%.*f", pr_sm_prec, vel.Length());
 			}
 			else
 			{
-				sprintf(strText, "%.2f", static_cast<float>(idMath::Sqrt(vel.x * vel.x + vel.y * vel.y)));
+				sprintf(strSpeedoMeter, "%.*f", pr_sm_prec, static_cast<float>(idMath::Sqrt(vel.x * vel.x + vel.y * vel.y)));
 
 			}
-			renderSystem->DrawSmallStringExt(pr_sm_x, pr_sm_y, strText.c_str(), idVec4(PR_toPreyColour(pr_sm_r), PR_toPreyColour(pr_sm_g), PR_toPreyColour(pr_sm_b), 1), false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(pr_sm_x, pr_sm_y, strSpeedoMeter.c_str(), idVec4(PR_toPreyColour(pr_sm_r), PR_toPreyColour(pr_sm_g), PR_toPreyColour(pr_sm_b), 1), false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// JumpSpeed
 		if (_hud->GetStateBool("pr_hud_jumpspeed", "0"))
 		{
-			idStr strText;
+			idStr strJumpSpeed;
 
-			// If were are standing on the ground or are in a Vehicle get velocity and save it
+			auto pr_js_x = _hud->GetStateInt("pr_hud_jumpspeed_x", "310");
+			auto pr_js_y = _hud->GetStateInt("pr_hud_jumpspeed_y", "445");
+
+			auto pr_js_r = _hud->GetStateFloat("pr_hud_jumpspeed_r", "255");
+			auto pr_js_g = _hud->GetStateFloat("pr_hud_jumpspeed_g", "255");
+			auto pr_js_b = _hud->GetStateFloat("pr_hud_jumpspeed_b", "63.75");
+
+			auto pr_js_pr = _hud->GetStateInt("pr_hud_jumpspeed_precision", "2");
+			auto pr_js_style = static_cast<PR_jumpspeed_style>(_hud->GetStateInt("pr_hud_jumpspeed_style", "0"));
+
+			auto pr_js_alpha{ 1.00f };
+
+			if (pr_js_style == PR_jumpspeed_style::Fading)
+			{
+				pr_js_alpha = _hud->GetStateFloat("pr_hud_jumpspeed_alpha", "0");
+			}
+
+			// If were are standing on the ground or are in a Vehicle or nocliping get velocity and save it
 			if (physicsObj.HasGroundContacts() || InVehicle() || noclip)
 			{
 				auto vel = physicsObj.GetLinearVelocity().Length();
 				_hud->SetStateFloat("pr_hud_jumpspeed_val", vel);
-				sprintf(strText, "%.2f", vel);
+
+				if (pr_js_style == PR_jumpspeed_style::Normal)
+				{
+					sprintf(strJumpSpeed, "%.*f", pr_js_pr, vel);
+				}
+				else if (pr_js_style == PR_jumpspeed_style::Fading)
+				{
+					pr_js_alpha -= 0.015f;
+					pr_js_alpha = idMath::ClampFloat(0.00f, 1.00f, pr_js_alpha);
+					_hud->SetStateFloat("pr_hud_jumpspeed_alpha", pr_js_alpha);
+
+					sprintf(strJumpSpeed, "%.*f", pr_js_pr, _hud->GetStateFloat("pr_hud_jumpspeed_oldval", "0"));
+				}
 			}
 			// Were arent standing on the ground so were in mid air, so we display the last speedvalue we had while on the ground
 			else
 			{
-				sprintf(strText, "%.2f", _hud->GetStateFloat("pr_hud_jumpspeed_val", "0"));
+				if (pr_js_style == PR_jumpspeed_style::Fading)
+				{
+					pr_js_alpha = 1.00f;
+					_hud->SetStateFloat("pr_hud_jumpspeed_alpha", pr_js_alpha);
+					_hud->SetStateFloat("pr_hud_jumpspeed_oldval", _hud->GetStateFloat("pr_hud_jumpspeed_val", "0"));
+				}
+
+				sprintf(strJumpSpeed, "%.*f", pr_js_pr, _hud->GetStateFloat("pr_hud_jumpspeed_val", "0"));
 
 			}
 
-			renderSystem->DrawSmallStringExt(310, 445, strText.c_str(), idVec4(PR_toPreyColour(255), PR_toPreyColour(255), PR_toPreyColour(63.75), 1), false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(pr_js_x, pr_js_y, strJumpSpeed.c_str(), idVec4(PR_toPreyColour(pr_js_r), PR_toPreyColour(pr_js_g), PR_toPreyColour(pr_js_b), pr_js_alpha), true, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// Viewangles
@@ -1243,9 +1332,9 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			sprintf(yaw, "Yaw   : %f", angles.yaw);
 			sprintf(roll, "Roll  : %f", angles.roll);
 
-			renderSystem->DrawSmallStringExt(0, 0, pitch.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(0, 15, yaw.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(0, 30, roll.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(PR_viewangles_x, PR_viewangles_y, pitch.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(PR_viewangles_x, PR_viewangles_y + PR_hud_std_y_offset, yaw.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(PR_viewangles_x, PR_viewangles_y + 2 * PR_hud_std_y_offset, roll.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// Velocity
@@ -1264,11 +1353,11 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			idStr velXYZ;
 			sprintf(velXYZ, "XYZ : %f", vel.Length());
 
-			renderSystem->DrawSmallStringExt(500, 20, velX, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(500, 35, velY, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(500, 50, velZ, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(500, 65, velXY, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(500, 80, velXYZ, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(PR_velocity_x, PR_velocity_y, velX, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(PR_velocity_x, PR_velocity_y + PR_hud_std_y_offset, velY, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(PR_velocity_x, PR_velocity_y + 2 * PR_hud_std_y_offset, velZ, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(PR_velocity_x, PR_velocity_y + 3 * PR_hud_std_y_offset, velXY, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(PR_velocity_x, PR_velocity_y + 4 * PR_hud_std_y_offset, velXYZ, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// Location
@@ -1283,26 +1372,25 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 			idStr posZ;
 			auto zpos = eyePos.z;
-			if (static_cast<PR_LOCATION_METHODE>(_hud->GetStateInt("pr_hud_location_methode", "0")) == PR_LOCATION_METHODE::FEETPOS)
+			if (static_cast<PR_location_methode>(_hud->GetStateInt("pr_hud_location_methode", "0")) == PR_location_methode::FEETPOS)
 			{
 				zpos -= EyeHeight();
 			}
 			sprintf(posZ, "Z: %f", zpos);
 
-			renderSystem->DrawSmallStringExt(0, 45, posX, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(0, 60, posY, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
-			renderSystem->DrawSmallStringExt(0, 75, posZ, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(PR_location_x, PR_location_y, posX, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(PR_location_x, PR_location_y + PR_hud_std_y_offset, posY, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(PR_location_x, PR_location_y + 2 * PR_hud_std_y_offset, posZ, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// Entity Info
 		if (_hud->GetStateBool("pr_hud_entityinfo", "0"))
 		{
 			trace_t trace;
-			idVec3 start;
 			idVec3 end;
 
 			// start the traceline at our eyes
-			start = GetEyePosition();
+			auto start = GetEyePosition();
 
 			// end the traceline 2048 units ahead in the direction we're viewing
 			if (InVehicle())
@@ -1402,7 +1490,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				idVec4 colour;
 				idStr strAmmo;
 
-				sprintf(strAmmo, "%03d", cpower / 3500);
+				sprintf(strAmmo, "%03d", cpower / PR_ammo_vehicle_shot_cost);
 
 				if (cpower > 0) { colour = PR_colour_white; }
 				else { colour = PR_colour_red; }
@@ -1412,10 +1500,10 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			else
 			{
 
-				switch (static_cast<PR_WEAPONS>(currentWeapon))
+				switch (static_cast<PR_weapons>(currentWeapon))
 				{
-				case PR_WEAPONS::RIFLE:
-				case PR_WEAPONS::SHOTGUN:
+				case PR_weapons::RIFLE:
+				case PR_weapons::SHOTGUN:
 				{
 					auto clip = weapon->AmmoInClip();
 					auto avail = weapon->AmmoAvailable();
@@ -1426,19 +1514,19 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 					// PR_FIXME
 					// very ugly there might be a better solution to this than if then else trees
-					if (clip > 0) { colour = PR_colour_white; }
+					if (clip != 0) { colour = PR_colour_white; }
 					else
 					{
-						if (avail > 0) { colour = PR_colour_yellow; }
+						if (avail != 0) { colour = PR_colour_yellow; }
 						else { colour = PR_colour_red; }
 					}
 
 					renderSystem->DrawSmallStringExt(PR_ammopos_x, PR_ammopos_y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
 					break;
 				}
-				case PR_WEAPONS::CRAWLER:
-				case PR_WEAPONS::LEECHER:
-				case PR_WEAPONS::ROCKETLAUNCHER:
+				case PR_weapons::CRAWLER:
+				case PR_weapons::LEECHER:
+				case PR_weapons::ROCKETLAUNCHER:
 				{
 					auto avail = weapon->AmmoAvailable();
 					idVec4 colour;
@@ -1446,13 +1534,13 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 					sprintf(strAmmo, "     %02d", avail);
 
-					if (avail > 0) { colour = PR_colour_white; }
+					if (avail != 0) { colour = PR_colour_white; }
 					else { colour = PR_colour_red; }
 
 					renderSystem->DrawSmallStringExt(PR_ammopos_x, PR_ammopos_y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
 					break;
 				}
-				case PR_WEAPONS::MINIGUN: // Minigun
+				case PR_weapons::MINIGUN: // Minigun
 				{
 					auto avail = weapon->AmmoAvailable();
 					auto altAvail = weapon->AltAmmoAvailable();
@@ -1464,10 +1552,10 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 					sprintf(strAmmo, "  %03d", avail);
 					sprintf(strAmmo2, "  %02d", altAvail);
 
-					if (avail > 0) { colour = PR_colour_white; }
+					if (avail != 0) { colour = PR_colour_white; }
 					else { colour = PR_colour_red; }
 
-					if (altAvail > 0) { colour2 = PR_colour_white; }
+					if (altAvail != 0) { colour2 = PR_colour_white; }
 					else { colour2 = PR_colour_red; }
 
 					renderSystem->DrawSmallStringExt(PR_ammopos_x, PR_ammopos_y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
@@ -1536,7 +1624,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				{
 					spiritpwr = GetSpiritPower();
 
-					if (spiritpwr > 0) { colour = PR_colour_white; }
+					if (spiritpwr != 0) { colour = PR_colour_white; }
 					else { colour = PR_colour_red; }
 				}
 				else
@@ -1555,11 +1643,10 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		if (_hud->GetStateBool("pr_hud_distance", "0"))
 		{
 			trace_t trace;
-			idVec3 start;
 			idVec3 end;
 
 			// start the traceline at our eyes
-			start = GetEyePosition();
+			auto start = GetEyePosition();
 
 			// end the traceline 2048 units ahead in the direction we're viewing
 			if (InVehicle())
@@ -1589,10 +1676,10 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			{
 				auto distance = start - trace.endpos;
 
-				idStr strText;
-				sprintf(strText, "Distance %f", fabs(distance.x) + fabs(distance.y) + fabs(distance.z));
+				idStr strDistance;
+				sprintf(strDistance, "Distance: %f", distance.Length());
 
-				renderSystem->DrawSmallStringExt(360, 205, strText, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_entinfo_x, PR_distance_y, strDistance, PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 			}
 		}
 
@@ -1613,7 +1700,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		// Keys
 		if (_hud->GetStateBool("pr_hud_keys", "0"))
 		{
-			auto pr_mthd = static_cast<PR_KEYS_METHODE>(_hud->GetStateInt("pr_hud_keys_methode", "0"));
+			auto pr_mthd = static_cast<PR_keys_style>(_hud->GetStateInt("pr_hud_keys_methode", "0"));
 
 			auto movef{ false };
 			auto moveb{ false };
@@ -1648,7 +1735,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			auto colourb{ PR_colour_white };
 			auto colourr{ PR_colour_white };
 
-			if (pr_mthd == PR_KEYS_METHODE::NORMAL_GREY || pr_mthd == PR_KEYS_METHODE::REFLEX_GREY || pr_mthd == PR_KEYS_METHODE::MOMENTUM_GREY)
+			if (pr_mthd == PR_keys_style::NORMAL_GREY || pr_mthd == PR_keys_style::REFLEX_GREY || pr_mthd == PR_keys_style::MOMENTUM_GREY)
 			{
 				if (!moved) { colourd = PR_colour_grey; }
 				if (!movef) { colourf = PR_colour_grey; }
@@ -1659,7 +1746,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				if (!mover) { colourr = PR_colour_grey; }
 			}
 
-			if (pr_mthd == PR_KEYS_METHODE::NORMAL)
+			if (pr_mthd == PR_keys_style::NORMAL)
 			{
 				idStr strText;
 				idStr strText2;
@@ -1671,7 +1758,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y2, strText2.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 			}
 
-			else if (pr_mthd == PR_KEYS_METHODE::NORMAL_GREY)
+			else if (pr_mthd == PR_keys_style::NORMAL_GREY)
 			{
 				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y, "D", colourd, false, declManager->FindMaterial("textures/bigchars"));
 				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y, "  F", colourf, false, declManager->FindMaterial("textures/bigchars"));
@@ -1682,7 +1769,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y2, "    R", colourr, false, declManager->FindMaterial("textures/bigchars"));
 			}
 
-			else if (pr_mthd == PR_KEYS_METHODE::REFLEX)
+			else if (pr_mthd == PR_keys_style::REFLEX)
 			{
 				idStr strText;
 				idStr strText2;
@@ -1699,7 +1786,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				renderSystem->DrawSmallStringExt(PR_keys_reflex_x, PR_keys_reflex_bdj_y, strText2.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 			}
 
-			else if (pr_mthd == PR_KEYS_METHODE::REFLEX_GREY)
+			else if (pr_mthd == PR_keys_style::REFLEX_GREY)
 			{
 				renderSystem->DrawSmallStringExt(PR_keys_reflex_x, PR_keys_reflex_lr_y, "L", colourl, false, declManager->FindMaterial("textures/bigchars"));
 				renderSystem->DrawSmallStringExt(PR_keys_reflex_x, PR_keys_reflex_lr_y, "   R", colourr, false, declManager->FindMaterial("textures/bigchars"));
@@ -1711,7 +1798,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				renderSystem->DrawSmallStringExt(PR_keys_reflex_x, PR_keys_reflex_bdj_y, "   J", colourj, false, declManager->FindMaterial("textures/bigchars"));
 			}
 
-			else if (pr_mthd == PR_KEYS_METHODE::MOMENTUM)
+			else if (pr_mthd == PR_keys_style::MOMENTUM)
 			{
 				idStr strText;
 
@@ -1727,7 +1814,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				renderSystem->DrawSmallStringExt(PR_keys_momentum_lrjd_x, PR_keys_momentum_lr_y, strText.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 			}
 
-			else if (pr_mthd == PR_KEYS_METHODE::MOMENTUM_GREY)
+			else if (pr_mthd == PR_keys_style::MOMENTUM_GREY)
 			{
 				renderSystem->DrawSmallStringExt(PR_keys_momentum_fb_x, PR_keys_momentum_f_y, "  F", colourf, false, declManager->FindMaterial("textures/bigchars"));
 				renderSystem->DrawSmallStringExt(PR_keys_momentum_fb_x, PR_keys_momentum_b_y, "  B", colourb, false, declManager->FindMaterial("textures/bigchars"));
@@ -1789,39 +1876,42 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 	{
 		pr_dbg_timer.Stop();
 
-		idStr str;
+		idStr strDrawTime;
 		auto colour{ PR_colour_white };
 		auto time{ pr_dbg_timer.Milliseconds() };
 
 		if (time >= PR_dbg_huddrawtime_yellow)
 		{
-			if (time >= PR_dbg_huddrawtime_red)
-			{
-				colour = PR_colour_red;
-			}
-			else
-			{
-				colour = PR_colour_yellow;
-			}
+			if (time >= PR_dbg_huddrawtime_red) { colour = PR_colour_red; }
+			else { colour = PR_colour_yellow; }
 		}
 
-		sprintf(str, "%f ms", pr_dbg_timer.Milliseconds());
+		sprintf(strDrawTime, "%f ms", pr_dbg_timer.Milliseconds());
 
-		renderSystem->DrawSmallStringExt(460, 0, str, colour, false, declManager->FindMaterial("textures/bigchars"));
+		renderSystem->DrawSmallStringExt(PR_dbg_huddrawtime_x, PR_dbg_huddrawtime_y, strDrawTime, colour, false, declManager->FindMaterial("textures/bigchars"));
 
 		pr_dbg_timer.Clear();
+	}
+
+	if (pr_dbg_hud_frametime.GetBool())
+	{
+		idStr strDrawTime;
+		auto colour{ PR_colour_white };
+
+		if (pr_dbg_frametimer_value >= PR_dbg_frametime_yellow)
+		{
+			if (pr_dbg_frametimer_value >= PR_dbg_frametime_red) { colour = PR_colour_red; }
+			else { colour = PR_colour_yellow; }
+		}
+
+		sprintf(strDrawTime, "%f ms", pr_dbg_frametimer_value);
+
+		renderSystem->DrawSmallStringExt(PR_dbg_huddrawtime_x, PR_dbg_huddrawtime_y + PR_hud_std_y_offset, strDrawTime, colour, false, declManager->FindMaterial("textures/bigchars"));
 	}
 #endif // PR_DEBUG
 
 	// PreyRun END
 }
-
-// PreyRun BEGIN
-ID_INLINE float PR_toPreyColour(float f)
-{
-	return f / 255.F;
-}
-// PreyRun END
 
 /*
 ===============

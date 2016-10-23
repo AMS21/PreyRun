@@ -97,7 +97,7 @@ void hhGameLocal::MapShutdown(void) {
 		pr_gametimer.Stop();
 		Printf("PreyRun: Timer: Paused, Map Shutdown\n");
 
-		if (pr_preysplit.GetBool() && pr_preysplit_mapchanged && static_cast<PR_TIMER_METHODE>(pr_timer_methode.GetInteger()) == PR_TIMER_METHODE::REALTIMEATTACK)
+		if (pr_preysplit.GetBool() && pr_preysplit_mapchanged && static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::REALTIMEATTACK)
 		{
 			pr_preysplit_mapchanged = false;
 			pr::WriteMapChange(pr::GetTime(), static_cast<idStr>(GetMapName()));
@@ -757,6 +757,10 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 	// HUMANHEAD END
 
 	// PreyRun BEGIN
+#ifdef PR_DEBUG
+	pr_dbg_frametimer.Start();
+#endif // PR_DEBUG
+
 	if (pr_freeze.GetBool())
 	{
 		if (pr_gametimer.IsRunning()) { pr_gametimer.Stop(); }
@@ -1014,7 +1018,7 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 				// The command to execute is map
 				pr_preysplit_mapchanged = true;
 
-				if (static_cast<PR_TIMER_METHODE>(pr_timer_methode.GetInteger()) == PR_TIMER_METHODE::INDIVIDUALLEVEL && pr_gametimer_running && pr_gametimer.IsRunning() && pr_timer_autostop.GetBool())
+				if (static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::INDIVIDUALLEVEL && pr_gametimer_running && pr_gametimer.IsRunning() && pr_timer_autostop.GetBool())
 				{
 					pr_gametimer_running = false;
 					pr_gametimer.Stop();
@@ -1062,6 +1066,14 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 		PROFILE_STOP("LogitechLCDUpdate", PROFMASK_NORMAL);
 	}
 	//HUMANHEAD END
+
+	// PreyRun BEGIN
+#ifdef PR_DEBUG
+	pr_dbg_frametimer.Stop();
+	pr_dbg_frametimer_value = pr_dbg_frametimer.Milliseconds();
+	pr_dbg_frametimer.Clear();
+#endif // PR_DEBUG
+	// PreyRun END
 
 	return ret;
 }

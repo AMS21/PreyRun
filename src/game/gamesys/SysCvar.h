@@ -27,9 +27,7 @@ extern idCVar pr_hud_speedometer;
 extern idCVar pr_hud_speedometer_r;
 extern idCVar pr_hud_speedometer_g;
 extern idCVar pr_hud_speedometer_b;
-#ifdef PR_DEVELOP
 extern idCVar pr_hud_speedometer_precision;
-#endif // PR_DEVELOP
 extern idCVar pr_hud_speedometer_x;
 extern idCVar pr_hud_speedometer_y;
 extern idCVar pr_autocmd_show;
@@ -51,8 +49,17 @@ extern idCVar pr_hud_timer_y;
 extern idCVar pr_hud_timer_r;
 extern idCVar pr_hud_timer_g;
 extern idCVar pr_hud_timer_b;
+extern idCVar pr_hud_timer_precision;
+extern idCVar pr_hud_timer_alldigits;
 // JumpSpeed
 extern idCVar pr_hud_jumpspeed;
+extern idCVar pr_hud_jumpspeed_x;
+extern idCVar pr_hud_jumpspeed_y;
+extern idCVar pr_hud_jumpspeed_r;
+extern idCVar pr_hud_jumpspeed_g;
+extern idCVar pr_hud_jumpspeed_b;
+extern idCVar pr_hud_jumpspeed_precision;
+extern idCVar pr_hud_jumpspeed_style;
 // Viewangles
 extern idCVar pr_hud_viewangles;
 // Velocity
@@ -87,7 +94,10 @@ extern idCVar pr_hud_keys_methode;
 
 #ifdef PR_DEBUG
 extern idCVar pr_dbg_hud_drawtime;
+extern idCVar pr_dbg_hud_frametime;
 extern idTimer pr_dbg_timer;
+extern idTimer pr_dbg_frametimer;
+extern double pr_dbg_frametimer_value;
 #endif // PR_DEBUG
 // PreyRun END
 

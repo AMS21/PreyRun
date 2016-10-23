@@ -47,11 +47,9 @@ idCVar pr_hud_speedometer("PR_hud_Speedometer", "1", CVAR_GAME | CVAR_BOOL | CVA
 idCVar pr_hud_speedometer_r("PR_hud_Speedometer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the red value of the speedometer", 0, 255);
 idCVar pr_hud_speedometer_g("PR_hud_Speedometer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the green value of the speedometer", 0, 255);
 idCVar pr_hud_speedometer_b("PR_hud_Speedometer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the blue value of the speedometer", 0, 255);
-#ifdef PR_DEVELOP
-idCVar pr_hud_speedometer_precision("PR_hud_Speedometer_Precision", "6", CVAR_GAME | CVAR_INTEGER /*| CVAR_ARCHIVE*/, "the amount of numbers shown after the comma", 0, 6);
-#endif // PR_DEVELOP
-idCVar pr_hud_speedometer_x("PR_hud_Speedometer_x", "310", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer x coordinate", 0, 639);
-idCVar pr_hud_speedometer_y("PR_hud_Speedometer_y", "460", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer y coordinate", 0, 479);
+idCVar pr_hud_speedometer_precision("PR_hud_Speedometer_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "the amount of numbers shown after the comma", 0, 6);
+idCVar pr_hud_speedometer_x("PR_hud_Speedometer_X", "310", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer x coordinate", 0, 639);
+idCVar pr_hud_speedometer_y("PR_hud_Speedometer_Y", "460", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer y coordinate", 0, 479);
 
 // Timer
 prTimer pr_gametimer; // The actual timer
@@ -68,14 +66,23 @@ idCVar pr_timer_backup_interval("PR_Timer_Backup_Interval", "250", CVAR_GAME | C
 bool pr_timer_mapchanged{ false };
 
 idCVar pr_hud_timer("PR_hud_Timer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of the hud timer, note that the timer will still works even if hidden");
-idCVar pr_hud_timer_x("PR_hud_Timer_x", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 639);
-idCVar pr_hud_timer_y("PR_hud_Timer_y", "235", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 479);
-idCVar pr_hud_timer_r("PR_hud_Timer_r", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer color", 0, 255);
-idCVar pr_hud_timer_g("PR_hud_Timer_g", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer color", 0, 255);
-idCVar pr_hud_timer_b("PR_hud_Timer_b", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer color", 0, 255);
+idCVar pr_hud_timer_x("PR_hud_Timer_X", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 639);
+idCVar pr_hud_timer_y("PR_hud_Timer_Y", "235", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 479);
+idCVar pr_hud_timer_r("PR_hud_Timer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
+idCVar pr_hud_timer_g("PR_hud_Timer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
+idCVar pr_hud_timer_b("PR_hud_Timer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
+idCVar pr_hud_timer_precision("PR_hud_Timer_Precision", "3", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer precision", 0, 3);
+idCVar pr_hud_timer_alldigits("PR_hud_Timer_AllDigits", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display all digits or only the non zero ones");
 
 // JumpSpeed
 idCVar pr_hud_jumpspeed("PR_hud_JumpSpeed", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your jumpspeed, the speed you had before you jumped");
+idCVar pr_hud_jumpspeed_x("PR_hud_JumpSpeed_X", "310", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed position", 0, 639);
+idCVar pr_hud_jumpspeed_y("PR_hud_JumpSpeed_Y", "445", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed position", 0, 479);
+idCVar pr_hud_jumpspeed_r("PR_hud_JumpSpeed_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0, 255);
+idCVar pr_hud_jumpspeed_g("PR_hud_JumpSpeed_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0, 255);
+idCVar pr_hud_jumpspeed_b("PR_hud_JumpSpeed_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0, 255);
+idCVar pr_hud_jumpspeed_precision("PR_hud_JumpSpeed_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed precision", 0, 6);
+idCVar pr_hud_jumpspeed_style("PR_hud_JumpSpeed_Style", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "PR_FIXME: description");
 
 // Viewangles
 idCVar pr_hud_viewangles("PR_hud_ViewAngles", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of your current viewangles");
@@ -120,6 +127,9 @@ idCVar pr_hud_keys_methode("PR_hud_Keys_Style", "0", CVAR_GAME | CVAR_INTEGER | 
 
 #ifdef PR_DEBUG
 idCVar pr_dbg_hud_drawtime("pr_dbg_hud_drawtime", "0", CVAR_GAME | CVAR_BOOL, "*Debug*: Shows the time in milliseconds it took to draw the hud");
+idCVar pr_dbg_hud_frametime("pr_dbg_hud_frametime", "0", CVAR_GAME | CVAR_BOOL, "*Debug*: Shows the time in milliseconds it took to render this frame");
+double pr_dbg_frametimer_value{ 0 };
+idTimer pr_dbg_frametimer;
 idTimer pr_dbg_timer;
 #endif // PR_DEBUG
 

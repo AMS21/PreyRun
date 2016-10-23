@@ -217,7 +217,7 @@ Several metacharacter may be used in the filter.
 *          match any string of zero or more characters
 ?          match any single character
 [abc...]   match any of the enclosed characters; a hyphen can
-           be used to specify a range (e.g. a-z, A-Z, 0-9)
+		   be used to specify a range (e.g. a-z, A-Z, 0-9)
 
 ============
 */
@@ -1359,7 +1359,7 @@ void idStr::Copynz( char *dest, const char *src, int destsize ) {
 	}
 
 	strncpy( dest, src, destsize-1 );
-    dest[destsize-1] = 0;
+	dest[destsize-1] = 0;
 }
 
 /*
