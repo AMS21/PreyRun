@@ -23,12 +23,9 @@ Cmd_PR_timedemo_f
 */
 void Cmd_PR_timedemo_f(const idCmdArgs &args)
 {
-	const char *demoName;
-	demoName = args.Argv(1);
-
 	pr::timeDemoInit();
 
-	cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("playDemo %s", demoName));
+	cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("playDemo %s", args.Argv(1)));
 
 	pr_timedemo = true;
 }
@@ -44,7 +41,7 @@ void Cmd_PR_reload_f(const idCmdArgs &args)
 	{
 		cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("loadgame %s", pr_reload_latestsave.Mid(10, pr_reload_latestsave.Length()).c_str()));
 
-		gameLocal.Printf("Trying to load %s\n", pr_reload_latestsave.c_str());
+		gameLocal.Printf("Loading save %s\n", pr_reload_latestsave.c_str());
 	}
 	else
 	{
@@ -63,7 +60,7 @@ void Cmd_PR_preysplit_split_f(const idCmdArgs &args)
 	{
 		pr::WriteCustomSplit(pr::GetTime());
 
-		gameLocal.Printf("Custom split\n");
+		gameLocal.Printf("Send custom split to PreySplit\n");
 	}
 }
 
@@ -75,11 +72,11 @@ Cmd_PR_ch_sethealth_f
 void Cmd_PR_ch_sethealth_f(const idCmdArgs &args)
 {
 	auto localPlayer = gameLocal.GetLocalPlayer();
-
 	if (!localPlayer || !gameLocal.CheatsOk(true))
 	{
 		return;
 	}
+
 	localPlayer->SetHealth(atoi(args.Argv(1)));
 }
 
@@ -148,9 +145,10 @@ void Cmd_PR_timer_start_f(const idCmdArgs &args)
 	{
 		pr_gametimer.Start();
 	}
+
 	pr_gametimer_running = true;
 
-	gameLocal.Printf("Starting timer\n");
+	gameLocal.Printf("Starting in-game timer\n");
 }
 
 /*
@@ -165,7 +163,7 @@ void Cmd_PR_timer_stop_f(const idCmdArgs &args)
 		pr_gametimer.Stop();
 		pr_gametimer_running = false;
 
-		gameLocal.Printf("Stopping timer\n");
+		gameLocal.Printf("Stopping in-game timer\n");
 	}
 }
 
@@ -182,7 +180,7 @@ void Cmd_PR_timer_reset_f(const idCmdArgs &args)
 
 	pr::WriteTimerReset(pr::GetTime());
 
-	gameLocal.Printf("Resetting timer\n");
+	gameLocal.Printf("Resetting in-game timer\n");
 }
 
 /*
@@ -194,7 +192,7 @@ void Cmd_PR_timer_now_f(const idCmdArgs &args)
 {
 	auto times = PR_ms2time(pr_gametimer.Milliseconds());
 
-	gameLocal.Printf("%02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
+	gameLocal.Printf("In-game timer: %02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
 }
 
 // Autocmdzones
