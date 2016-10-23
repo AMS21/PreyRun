@@ -1338,7 +1338,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 					idStr className{ ent->GetClassname() };
 
 					// Filter unwanted entitys: Doors, Consoles, Vehicle spawner, Pod spawner
-					if (className != "hhProxDoor" && className != "hhConsole" && className != "hhRailShuttle" && className != "hhPodSpawner")
+					if (className != "hhProxDoor" && className != "hhConsole" && className != "hhRailShuttle" && className != "hhPodSpawner" && className != "hhGibbable")
 					{
 						auto displayIndex{ 0 };
 
