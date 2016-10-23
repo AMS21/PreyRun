@@ -5486,6 +5486,4 @@ PR_time_t PR_ms2time(unsigned x)
 	return ts;
 }
 
-	return ts;
-}
 // PreyRun END
