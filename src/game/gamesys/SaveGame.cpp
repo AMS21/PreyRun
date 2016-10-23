@@ -43,6 +43,7 @@ idSaveGame::idSaveGame()
 */
 idSaveGame::idSaveGame( idFile *savefile )
 {
+	// PreyRun BEGIN
 	if (pr_gametimer_running)
 	{
 		pr_gametimer.Stop();
@@ -53,14 +54,6 @@ idSaveGame::idSaveGame( idFile *savefile )
 		gameLocal.Printf("PreyRunDBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DEBUG
 	}
-
-	file = savefile;
-
-	// Put NULL at the start of the list so we can skip over it.
-	objects.Clear();
-	objects.Append( NULL );
-
-	// PreyRun BEGIN
 #ifdef PR_DEBUG
 	gameLocal.Printf("PreyRun DBG: Saved game: %s\n", savefile->GetName());
 #endif // PR_DEBUG
@@ -68,6 +61,12 @@ idSaveGame::idSaveGame( idFile *savefile )
 	pr_reload_latestsave = savefile->GetName();
 	pr_reload_ready = true;
 	// PreyRun END
+
+	file = savefile;
+
+	// Put NULL at the start of the list so we can skip over it.
+	objects.Clear();
+	objects.Append( NULL );
 }
 
 /*
@@ -750,7 +749,7 @@ idSaveGame::WriteContactInfo
 */
 void idSaveGame::WriteContactInfo( const contactInfo_t &contactInfo )
 {
-	WriteInt( (int)contactInfo.type );
+	WriteInt( static_cast<int>(contactInfo.type) );
 	WriteVec3( contactInfo.point );
 	WriteVec3( contactInfo.normal );
 	WriteFloat( contactInfo.dist );
@@ -861,10 +860,6 @@ idRestoreGame::RestoreGame
 */
 idRestoreGame::idRestoreGame( idFile *savefile )
 {
-	// PreyRun BEGIN
-
-	// PreyRun END
-	
 	file = savefile;
 
 	// PreyRun BEGIN
@@ -882,7 +877,8 @@ idRestoreGame::idRestoreGame( idFile *savefile )
 idRestoreGame::~idRestoreGame()
 ================
 */
-idRestoreGame::~idRestoreGame() {
+idRestoreGame::~idRestoreGame()
+{
 }
 
 /*
