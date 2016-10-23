@@ -1286,7 +1286,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				}
 				else if (pr_js_style == PR_jumpspeed_style::Fading)
 				{
-					pr_js_alpha -= 0.015f;
+					pr_js_alpha -= PR_jumpspeed_fade_factor;
 					pr_js_alpha = idMath::ClampFloat(0.00f, 1.00f, pr_js_alpha);
 					_hud->SetStateFloat("pr_hud_jumpspeed_alpha", pr_js_alpha);
 
