@@ -5,12 +5,12 @@
 #include "PreyRun.hpp"
 #include "GameTimer.hpp"
 
-prTimer::prTimer(): isRunning(false), acuTime(std::chrono::duration<pr::storageType,pr::periodType> (0))
+prTimer::prTimer() : isRunning(false), acuTime(std::chrono::duration<pr::storageType, pr::periodType>(0))
 {
 	lastStarted = timer.now();
 }
 
-prTimer::prTimer(pr::storageType ct) : isRunning(false), acuTime(std::chrono::duration < pr::storageType, pr::periodType > (ct))
+prTimer::prTimer(pr::storageType ct) : isRunning(false), acuTime(std::chrono::duration < pr::storageType, pr::periodType >(ct))
 {
 	lastStarted = timer.now();
 }
@@ -35,9 +35,10 @@ void prTimer::Stop()
 #ifdef PR_DBG_GAMETIMER
 	gameLocal.Printf("prTimer::Stop()\n");
 #endif // PR_DBG_GAMETIMER
+	if (!isRunning) { return; }
 
 	auto diff = timer.now() - lastStarted;
-	acuTime += std::chrono::duration <pr::storageType, pr::periodType> (diff);
+	acuTime += std::chrono::duration <pr::storageType, pr::periodType>(diff);
 
 	isRunning = false;
 }
@@ -48,7 +49,7 @@ void prTimer::Clear()
 	gameLocal.Printf("prTimer::Clear()\n");
 #endif // PR_DBG_GAMETIMER
 
-	acuTime = std::chrono::duration<pr::storageType, pr::periodType> (0);
+	acuTime = std::chrono::duration<pr::storageType, pr::periodType>(0);
 }
 
 pr::storageType prTimer::Milliseconds() const
@@ -60,7 +61,7 @@ pr::storageType prTimer::Milliseconds() const
 		diff += std::chrono::duration_cast<pr::nanosec> (acuTime);
 
 #ifdef PR_DBG_GAMETIMER_GET_TIME
-		gameLocal.Printf("prTimer::Milliseconds diff=%d\n",std::chrono::duration_cast<pr::millisec>(diff).count());
+		gameLocal.Printf("prTimer::Milliseconds diff=%d\n", std::chrono::duration_cast<pr::millisec>(diff).count());
 #endif // PR_DBG_GAMETIMER_GET_TIME
 
 		return std::chrono::duration_cast<pr::millisec>(diff).count();
@@ -102,13 +103,13 @@ pr::storageType prTimer::Nanoseconds() const
 		diff += std::chrono::duration_cast<pr::nanosec> (acuTime);
 
 #ifdef PR_DBG_GAMETIMER_GET_TIME
-		gameLocal.Printf("prTimer::Nanoseconds diff=%d\n", std::chrono::duration_cast<nanosec>(diff).count());
+		gameLocal.Printf("prTimer::Nanoseconds diff=%d\n", std::chrono::duration_cast<pr::nanosec>(diff).count());
 #endif // PR_DBG_GAMETIMER_GET_TIME
 
 		return std::chrono::duration_cast<pr::nanosec>(diff).count();
 	}
 #ifdef PR_DBG_GAMETIMER_GET_TIME
-	gameLocal.Printf("prTimer::Nanoseconds acuTime=%d\n", std::chrono::duration_cast<nanosec>(acuTime).count());
+	gameLocal.Printf("prTimer::Nanoseconds acuTime=%d\n", std::chrono::duration_cast<pr::nanosec>(acuTime).count());
 #endif // PR_DBG_GAMETIMER_GET_TIME
 
 	return std::chrono::duration_cast<pr::nanosec>(acuTime).count();
@@ -123,23 +124,23 @@ pr::storageType prTimer::ClockTicks() const
 		diff += std::chrono::duration_cast<pr::nanosec> (acuTime);
 
 #ifdef PR_DBG_GAMETIMER_GET_CLOCKTICKS
-		gameLocal.Printf("prTimer::ClockTicks diff=%d\n", std::chrono::duration_cast<timeType>(diff).count());
+		gameLocal.Printf("prTimer::ClockTicks diff=%d\n", std::chrono::duration_cast<pr::timeType>(diff).count());
 #endif // PR_DBG_GAMETIMER_GET_CLOCKTICKS
 
-		return std::chrono::duration_cast<timeType>(diff).count();
+		return std::chrono::duration_cast<pr::timeType>(diff).count();
 	}
 #ifdef PR_DBG_GAMETIMER_GET_CLOCKTICKS
-	gameLocal.Printf("prTimer::ClockTicks acuTime=%d\n", std::chrono::duration_cast<timeType>(acuTime).count());
+	gameLocal.Printf("prTimer::ClockTicks acuTime=%d\n", std::chrono::duration_cast<pr::timeType>(acuTime).count());
 #endif // PR_DBG_GAMETIMER_GET_CLOCKTICKS
 
-	return std::chrono::duration_cast<timeType>(acuTime).count();
+	return std::chrono::duration_cast<pr::timeType>(acuTime).count();
 }
 
 void prTimer::SetCT(pr::storageType ct)
 {
 #ifdef PR_DBG_GAMETIMER
-	gameLocal.Printf("prTimer::SetCT ct=%f\n",ct);
+	gameLocal.Printf("prTimer::SetCT ct=%f\n", ct);
 #endif // PR_DBG_GAMETIMER
 
-	acuTime = static_cast<std::chrono::duration<pr::storageType,pr::periodType>> (ct);
+	acuTime = static_cast<std::chrono::duration<pr::storageType, pr::periodType>> (ct);
 }
