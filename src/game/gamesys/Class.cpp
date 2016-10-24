@@ -369,7 +369,7 @@ void idClass::Init( void ) {
 	// is a subclass of another
 	num = 0;
 	for( c = classHierarchy.GetNext(); c != NULL; c = c->node.GetNext(), num++ ) {
-        c->typeNum = num;
+		c->typeNum = num;
 		c->lastChild += num;
 	}
 
@@ -483,7 +483,7 @@ void idClass::operator delete( void *ptr ) {
 		p = ( ( int * )ptr ) - 1;
 		memused -= *p;
 		numobjects--;
-        Mem_Free( p );
+		Mem_Free( p );
 	}
 }
 
@@ -494,7 +494,7 @@ void idClass::operator delete( void *ptr, int, int, char *, int ) {
 		p = ( ( int * )ptr ) - 1;
 		memused -= *p;
 		numobjects--;
-        Mem_Free( p );
+		Mem_Free( p );
 	}
 }
 

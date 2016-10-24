@@ -44,9 +44,10 @@ idStr PR_formatTimeString(PR_time_t time, bool allDigits, int msPrecision)
 		idStr tempStr;
 
 		// 500 ms = 0.500
-		sprintf(tempStr, "%.*f", msPrecision, static_cast<float>(time.milliseconds) / 1000.00f);
+		sprintf(tempStr, "%.*f", msPrecision, static_cast<float>(time.milliseconds) / 1'000.00f);
 
 		// Add the string but without the 0 in front
+		// 500 ms = .500
 		retStr.Append(tempStr.Mid(1, tempStr.Length()));
 	}
 
@@ -192,7 +193,7 @@ hhPlayer::hhPlayer(void) :
 	bPlayingLowHealthSound = false;
 	bLotaTunnelMode = false;
 
-	for (int ix = 0; ix < MAX_TRACKED_ATTACKERS; ix++) {
+	for (auto ix{ 0 }; ix < MAX_TRACKED_ATTACKERS; ++ix) {
 		lastAttackers[ix].attacker = NULL;
 		lastAttackers[ix].time = 0;
 		lastAttackers[ix].displayed = false;
@@ -323,7 +324,7 @@ hhPlayer::SpawnTalon()
 void hhPlayer::TrySpawnTalon() {
 	// TODO:  Deal with co-op issues.  Have multiple Talons in co-op, or just one?
 	if (inventory.requirements.bCanSummonTalon && !talon.IsValid()) {
-		talon = (hhTalon *)gameLocal.SpawnObject(spawnArgs.GetString("def_hawkpower"), NULL);
+		talon = static_cast<hhTalon *>(gameLocal.SpawnObject(spawnArgs.GetString("def_hawkpower"), NULL));
 		if (talon.IsValid()) {
 			talon->SetOwner(this);
 			talon->SummonTalon();
@@ -4156,7 +4157,7 @@ void hhPlayer::Damage(idEntity *inflictor, idEntity *attacker, const idVec3 &dir
 		}
 
 		int oldHealth = health;
-		idPlayer::Damage(inflictor, attacker, dir, damageDefName, (const float)newDamageScale, location); // CJR DDA TEST
+		idPlayer::Damage(inflictor, attacker, dir, damageDefName, static_cast<const float>(newDamageScale), location); // CJR DDA TEST
 
 		if (attacker && attacker->IsType(hhMonsterAI::Type)) { // CJR DDA: Damaged by a monster, add the damage to the monster count
 			float delta = oldHealth - health;
