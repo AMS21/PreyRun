@@ -63,8 +63,6 @@ idCVar pr_timer_methode("PR_Timer_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR
 idCVar pr_timer_backup("PR_Timer_Backup", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle support for backing up the game time to resume it after the game crashed");
 idCVar pr_timer_backup_interval("PR_Timer_Backup_Interval", "250", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The interval for updating the backup timer");
 
-bool pr_timer_mapchanged{ false };
-
 idCVar pr_hud_timer("PR_hud_Timer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of the hud timer, note that the timer will still works even if hidden");
 idCVar pr_hud_timer_x("PR_hud_Timer_X", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 639);
 idCVar pr_hud_timer_y("PR_hud_Timer_Y", "235", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 479);

@@ -1628,7 +1628,7 @@ void hhVehicle::DrawHUD(idUserInterface* _hud) {
 			}
 		}
 		_hud->SetStateBool("dying", health <= 0);
-		_hud->SetStateFloat("healthfraction", ((float)health) / (float)spawnHealth);
+		_hud->SetStateFloat("healthfraction", static_cast<float>(health) / static_cast<float>(spawnHealth));
 		_hud->SetStateFloat("powerfraction", (currentPower) / spawnArgs.GetFloat("maxPower"));
 		idAngles angles = GetAxis().ToAngles();
 		_hud->SetStateFloat("pitch", angles.pitch);

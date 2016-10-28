@@ -1752,9 +1752,10 @@ void idPhysics_Player::SetMovementType(const pmtype_t type) {
 	// Casting GetMapName() to idStr might not be the optimal solution but you cant compare cstrings (you can but its a real pain in the ass)
 	if (!pr_gametimer_running && pr_timer_autostart.GetBool() && static_cast<idStr>(gameLocal.GetMapName()) == idStr("maps/game/roadhouse.map") && type == PM_NORMAL && current.movementType == PM_FREEZE)
 	{
-		gameLocal.Printf("PreyRun: Timer: Auto starting\n");
-		pr_gametimer_running = true;
 		pr_gametimer.Start();
+		pr_gametimer_running = true;
+
+		gameLocal.Printf("PreyRun: Timer: Auto starting\n");
 
 		if (pr_preysplit.GetBool())
 		{

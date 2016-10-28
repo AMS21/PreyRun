@@ -1161,13 +1161,13 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 #endif // PR_DEBUG
 
 	// Individual Level timer
-	if (!pr_gametimer_running && pr_timer_autostart.GetBool() && pr_timer_mapchanged && static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::INDIVIDUALLEVEL && static_cast<idStr>(gameLocal.GetMapName()) != idStr("maps/game/roadhouse.map"))
+	if (pr_gametimer_running && !pr_gametimer.IsRunning() && pr_timer_autostart.GetBool() && static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::INDIVIDUALLEVEL)
 	{
-		gameLocal.Printf("PreyRun: Timer: Individual Level Auto starting\n");
+		pr_gametimer.Clear();
 
-		pr_timer_mapchanged = false;
-		pr_gametimer_running = true;
 		pr_gametimer.Start();
+
+		gameLocal.Printf("PreyRun: Timer: Individual Level Auto starting\n");
 
 		if (pr_preysplit.GetBool())
 		{
@@ -4272,7 +4272,7 @@ void hhPlayer::DoDeathDrop() {
 			if (jointName.Length()) {
 				jointHandle_t joint = GetAnimator()->GetJointHandle(jointName);
 				if (!GetAnimator()->GetJointTransform(joint, gameLocal.time, origin, axis)) {
-					gameLocal.Printf("%s refers to invalid joint '%s' on entity '%s'\n", (const char*)jointKey.c_str(), (const char*)jointName, (const char*)name);
+					gameLocal.Printf("%s refers to invalid joint '%s' on entity '%s'\n", static_cast<const char*>(jointKey.c_str()), static_cast<const char*>(jointName), static_cast<const char*>(name));
 					origin = renderEntity.origin;
 					axis = renderEntity.axis;
 				}
@@ -4415,11 +4415,11 @@ void hhPlayer::Killed(idEntity *inflictor, idEntity *attacker, int damage, const
 
 				GetPhysics()->SetContents(0); //make non-solid
 
-				hhMPDeathProxy *prox = (hhMPDeathProxy *)hhSpiritProxy::CreateProxy(spawnArgs.GetString("def_deathProxy_mp"), this, GetOrigin(), GetPhysics()->GetAxis(), viewAxis, viewAngles, GetEyeAxis());
+				hhMPDeathProxy *prox = static_cast<hhMPDeathProxy *>(hhSpiritProxy::CreateProxy(spawnArgs.GetString("def_deathProxy_mp"), this, GetOrigin(), GetPhysics()->GetAxis(), viewAxis, viewAngles, GetEyeAxis()));
 				assert(((hhSpiritProxy *)prox)->IsType(hhMPDeathProxy::Type));
 				if (prox) {
 					idVec3 flingForce;
-					float capDmg = (float)damage;
+					float capDmg = static_cast<float>(damage);
 					if (capDmg > 200.0f) {
 						capDmg = 200.0f;
 					}

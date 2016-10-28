@@ -152,7 +152,10 @@ void hhGameLocal::InitFromNewMap(const char *mapName, idRenderWorld *renderWorld
 	Printf("PreyRunDBG: Starting Map: %s\n", mapName);
 #endif // PR_DEBUG
 
-	pr_timer_mapchanged = true;
+	if (static_cast<PR_timer_methode> (pr_timer_methode.GetInteger()) == PR_timer_methode::INDIVIDUALLEVEL && static_cast<idStr>(gameLocal.GetMapName()) != idStr("maps/game/roadhouse.map"))
+	{
+		pr_gametimer_running = true;
+	}
 
 	// Timer recovery
 	pr::LoadBackupTimer(mapName);

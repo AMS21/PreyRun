@@ -41,7 +41,6 @@ extern idCVar pr_timer_autostop;
 extern idCVar pr_timer_methode;
 extern idCVar pr_timer_backup;
 extern idCVar pr_timer_backup_interval;
-extern bool pr_timer_mapchanged;
 
 extern idCVar pr_hud_timer;
 extern idCVar pr_hud_timer_x;
