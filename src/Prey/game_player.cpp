@@ -1219,7 +1219,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			auto pr_t_g = _hud->GetStateFloat("pr_hud_timer_g", "255");
 			auto pr_t_b = _hud->GetStateFloat("pr_hud_timer_b", "255");
 
-			auto strTime = PR_formatTimeString(PR_ms2time(pr_gametimer.Milliseconds()), _hud->GetStateBool("pr_hud_timer_alldigits","true"), _hud->GetStateInt("pr_hud_timer_precision","3"));
+			auto strTime = PR_formatTimeString(PR_ms2time(pr_gametimer.Milliseconds()), _hud->GetStateBool("pr_hud_timer_alldigits", "true"), _hud->GetStateInt("pr_hud_timer_precision", "3"));
 
 			renderSystem->DrawSmallStringExt(pr_t_x, pr_t_y, strTime.c_str(), idVec4(PR_toPreyColour(pr_t_r), PR_toPreyColour(pr_t_g), PR_toPreyColour(pr_t_b), 1), false, declManager->FindMaterial("textures/bigchars"));
 		}
@@ -1608,7 +1608,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 					sprintf(strHealth, "%03d | %03d", health, maxHealth);
 				}
 
-				renderSystem->DrawSmallStringExt(70, 448, strHealth, colour, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_health_x, PR_health_y, strHealth, colour, false, declManager->FindMaterial("textures/bigchars"));
 			}
 		}
 
@@ -1636,7 +1636,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 				sprintf(strSpirit, "%03d | 100", spiritpwr);
 
-				renderSystem->DrawSmallStringExt(70, 433, strSpirit, colour, false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(PR_spiritpower_x, PR_spiritpower_y, strSpirit, colour, false, declManager->FindMaterial("textures/bigchars"));
 			}
 		}
 
@@ -1832,41 +1832,39 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 	if (!g_showHud.GetBool()) { return; }
 
-	if (weapon.IsValid()) { // HUMANHEAD
+	if (weapon.IsValid())
+	{ // HUMANHEAD
 		bool allowGuiUpdate = true;
 		//rww - update the weapon gui only if the owner is being spectated by this client, or is this client
-		if (gameLocal.localClientNum != entityNumber) {
+		if (gameLocal.localClientNum != entityNumber)
+		{
 			// if updating the hud for a followed client
-			if (gameLocal.localClientNum >= 0 && gameLocal.entities[gameLocal.localClientNum] && gameLocal.entities[gameLocal.localClientNum]->IsType(idPlayer::Type)) {
+			if (gameLocal.localClientNum >= 0 && gameLocal.entities[gameLocal.localClientNum] && gameLocal.entities[gameLocal.localClientNum]->IsType(idPlayer::Type))
+			{
 				idPlayer *p = static_cast<idPlayer *>(gameLocal.entities[gameLocal.localClientNum]);
-				if (!p->spectating || p->spectator != entityNumber) {
+				if (!p->spectating || p->spectator != entityNumber)
+				{
 					allowGuiUpdate = false;
 				}
 			}
-			else {
-				allowGuiUpdate = false;
-			}
+			else { allowGuiUpdate = false; }
 		}
 
-		if (allowGuiUpdate) {
-			weapon->UpdateGUI();
-		}
+		if (allowGuiUpdate) { weapon->UpdateGUI(); }
 	}
 
 	_hud->SetStateInt("s_debug", cvarSystem->GetCVarInteger("s_showLevelMeter"));
 
 	//HUMANHEAD aob: vehicle logic
-	if (InVehicle()) {
-		DrawHUDVehicle(_hud);
-	}
-	else {
-		_hud->Redraw(gameLocal.realClientTime);
-	}
+	if (InVehicle()) { DrawHUDVehicle(_hud); }
+	else { _hud->Redraw(gameLocal.realClientTime); }
 	//HUMANHEAD END
 
 	// weapon targeting crosshair
-	if (!GuiActive()) {
-		if (cursor) {
+	if (!GuiActive())
+	{
+		if (cursor)
+		{
 			UpdateCrosshairs();
 			cursor->Redraw(gameLocal.realClientTime);
 		}
@@ -3309,7 +3307,7 @@ void hhPlayer::UpdateDeltaViewAngles(const idAngles &angles) {
 #endif
 	}
 	SetDeltaViewAngles(delta);
-}
+	}
 
 /*
 ================
@@ -3390,8 +3388,8 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 
 		if (!centerView.IsDone(gameLocal.time)) {
 			localViewAngles.pitch = centerView.GetCurrentValue(gameLocal.time);
-		}
 	}
+		}
 
 #if GAMEPAD_SUPPORT	// VENOM BEGIN
 	float fpitch = idMath::Fabs(localViewAngles.pitch);
@@ -3465,7 +3463,7 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 	loggedViewAngles[gameLocal.framenum & (NUM_LOGGED_VIEW_ANGLES - 1)] = localViewAngles;
 
 	return localViewAngles;
-}
+	}
 
 /*
 ================
@@ -5988,7 +5986,7 @@ void hhPlayer::AdjustBodyAngles(void) {
 #endif
 		idPlayer::AdjustBodyAngles();
 	}
-}
+		}
 
 /*
 ==============
@@ -6215,7 +6213,7 @@ void hhPlayer::Move(void) {
 	}
 	physicsObj.WasWallWalking(IsWallWalking()); //rww - moved here
 	//HUMANHEAD END
-}
+	}
 
 /*
 ===============
@@ -6993,7 +6991,7 @@ void hhPlayer::WriteToSnapshot(idBitMsgDelta &msg) const {
 	//note - current weapon's ammo always sent now
 	//ammo_t energyammo = hhWeaponFireController::GetAmmoType("ammo_energy");
 	//msg.WriteBits(inventory.ammo[energyammo], ASYNC_PLAYER_INV_AMMO_BITS);
-}
+	}
 
 /*
 ===============
@@ -7376,7 +7374,7 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 	if (msg.HasChanged()) {
 		UpdateVisuals();
 	}
-}
+	}
 
 /*
 ================

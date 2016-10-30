@@ -68,6 +68,12 @@ constexpr int PR_entinfo_y{ 235 };
 
 constexpr int PR_distance_y{ 220 };
 
+constexpr int PR_health_x{ 70 };
+constexpr int PR_health_y{ 448 };
+
+constexpr int PR_spiritpower_x{ 70 };
+constexpr int PR_spiritpower_y{ PR_health_y - PR_hud_std_y_offset };
+
 constexpr int PR_keys_x{ 300 };
 constexpr int PR_keys_y{ 250 };
 constexpr int PR_keys_y2{ PR_keys_y + PR_hud_std_y_offset };
