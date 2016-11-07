@@ -3,7 +3,6 @@
 #include "../game/Game_local.h"
 
 #include "StdLib.hpp"
-#include "Constants.hpp"
 #include "GameTimer.hpp"
 
 namespace pr
@@ -12,5 +11,5 @@ namespace pr
 	void LoadBackupTimer(const char* cMap);
 	void ClearBackupTimer();
 
-	inline double GetBackupTime();
+	ID_INLINE double GetBackupTime();
 }

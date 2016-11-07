@@ -1421,7 +1421,10 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 	gameLocal.Printf("PreyRunDBG: Loading savegame %s from map %s\n", saveGameFile->GetName(), mapName);
 #endif // PR_DEBUG
 
-	pr_timer_mapchanged = true;
+	if (static_cast<PR_timer_methode> (pr_timer_methode.GetInteger()) == PR_timer_methode::INDIVIDUALLEVEL)
+	{
+		pr_gametimer_running = true;
+	}
 
 	// Timer recovery
 	pr::LoadBackupTimer(mapName);
@@ -1490,7 +1493,7 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 	FindEntityDef(GAME_PLAYERDEFNAME, false);	// HUMANHEAD pdm: removed hardcoded name
 
 	// precache any media specified in the map
-	for (i = 0; i < mapFile->GetNumEntities(); i++) {
+	for (i= 0; i < mapFile->GetNumEntities(); ++i) {
 		idMapEntity *mapEnt = mapFile->GetEntity(i);
 
 		if (!idGameLocal::InhibitEntitySpawn(mapEnt->epairs)) { // HUMANHEAD mdl:  Need this to call the original function
@@ -1506,13 +1509,13 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 	SetServerInfo(si);
 
 	savegame.ReadInt(numClients);
-	for (i = 0; i < numClients; i++) {
+	for (i = 0; i < numClients; ++i) {
 		savegame.ReadDict(&userInfo[i]);
 		savegame.ReadUsercmd(usercmds[i]);
 		savegame.ReadDict(&persistentPlayerInfo[i]);
 	}
 
-	for (i = 0; i < MAX_GENTITIES; i++) {
+	for (i = 0; i < MAX_GENTITIES; ++i) {
 		savegame.ReadObject(reinterpret_cast<idClass *&>(entities[i]));
 		savegame.ReadInt(spawnIds[i]);
 
@@ -1556,7 +1559,7 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 	//HUMANHEAD END
 	savegame.ReadDict(&persistentLevelInfo);
 
-	for (i = 0; i < MAX_GLOBAL_SHADER_PARMS; i++) {
+	for (i = 0; i < MAX_GLOBAL_SHADER_PARMS; ++i) {
 		savegame.ReadFloat(globalShaderParms[i]);
 	}
 
@@ -1613,7 +1616,7 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 		}
 
 		locationEntities = new idLocationEntity *[num];
-		for (i = 0; i < num; i++) {
+		for (i = 0; i < num; ++i) {
 			savegame.ReadObject(reinterpret_cast<idClass *&>(locationEntities[i]));
 		}
 	}
@@ -5457,7 +5460,7 @@ bool idGameLocal::PlayerIsDeathwalking(void) {
 }
 
 unsigned int idGameLocal::GetTimePlayed(void) {
-	if (playTimeStart == (unsigned int)-1) {
+	if (playTimeStart == static_cast<unsigned int>(-1)) {
 		return playTime;
 	}
 	else {
@@ -5475,13 +5478,15 @@ void idGameLocal::ClearTimePlayed(void) {
 PR_time_t PR_ms2time(unsigned x)
 {
 	PR_time_t ts;
-	ts.hours = x / (60 * 60 * 1000);
-	x = x - ts.hours*(60 * 60 * 1000);
-	ts.minutes = x / (60 * 1000);
-	x = x - ts.minutes*(60 * 1000);
-	ts.seconds = x / 1000;
-	ts.milliseconds = x - ts.seconds * 1000;
+
+	ts.hours = x / (60 * 60 * 1'000);
+	x = x - ts.hours * (60 * 60 * 1'000);
+	ts.minutes = x / (60 * 1'000);
+	x = x - ts.minutes * (60 * 1'000);
+	ts.seconds = x / 1'000;
+	ts.milliseconds = x - ts.seconds * 1'000;
 
 	return ts;
 }
+
 // PreyRun END

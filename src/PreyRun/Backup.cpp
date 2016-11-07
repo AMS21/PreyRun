@@ -1,20 +1,23 @@
 #include "../idLib/precompiled.h"
 #pragma hdrstop
 
+#include "PreyRun.hpp"
 #include "Backup.hpp"
 
 namespace pr
 {
-	constexpr char* PR_BACKUPTMR_PATH{"backuptmr"};
+	constexpr char* pr_backuptmr_path{ "backuptmr" };
 
 	static void WriteToFile(const char* mapName)
 	{
 		// Open the file
-		auto file = fileSystem->OpenFileWrite(PR_BACKUPTMR_PATH, "fs_savepath");
+		auto file = fileSystem->OpenFileWrite(pr_backuptmr_path, "fs_savepath");
 
-		if (file == NULL)
+		if (file == nullptr)
 		{
-			gameLocal.Printf("Couldn't open %s\n", PR_BACKUPTMR_PATH);
+#ifdef PR_DEBUG
+			gameLocal.Printf("Couldn't open %s\n", pr_backuptmr_path);
+#endif // PR_DEBUG
 			return;
 		}
 
@@ -49,28 +52,34 @@ namespace pr
 	void LoadBackupTimer(const char* cMap)
 	{
 		// Open the file
-		auto file = fileSystem->OpenFileRead(PR_BACKUPTMR_PATH);
-		if (file == NULL)
+		auto file = fileSystem->OpenFileRead(pr_backuptmr_path);
+		if (file == nullptr)
 		{
 #ifdef PR_DEBUG
-			gameLocal.Printf("Couldn't open %s\n", PR_BACKUPTMR_PATH);
+			gameLocal.Printf("Couldn't open %s\n", pr_backuptmr_path);
 #endif // PR_DEBUG
 			return;
 		}
 
-		bool isValid{false};
+		bool isValid{ false };
 		float ms;
 		idStr mapName;
 
 		file->ReadBool(isValid);
-		if (!isValid) {	return;}
+		if (!isValid)
+		{
+#ifdef PR_DBG_BACKUP
+			gameLocal.Printf("pr::LoadBackupTimer backuptimer is invalid\n");
+#endif // PR_DBG_BACKUP
+			return;
+		}
 
 		file->ReadFloat(ms);
 		file->ReadString(mapName);
 
-#ifdef PR_DEBUG
-		gameLocal.Printf("Read time: %f\n", ms);
-#endif // PR_DEBUG
+#ifdef PR_DBG_BACKUP
+		gameLocal.Printf("pr::LoadBackupTimer ms=%f mapName=%s\n", ms, mapName.c_str());
+#endif // PR_DBG_BACKUP
 
 		// Are we on the correct map to recover our time?
 		if (static_cast<idStr>(cMap) == mapName)
@@ -85,6 +94,12 @@ namespace pr
 			gameLocal.Printf("Successfully recoverd backup time: %f\n", ms);
 #endif // PR_DEBUG
 		}
+#ifdef PR_DBG_BACKUP
+		else
+		{
+			gameLocal.Printf("pr::LoadBackupTimer wrong map to recover time. CurrentMap=%s mapName=%s\n", cMap, mapName.c_str());
+		}
+#endif // PR_DBG_BACKUP
 
 		// Close the opened file
 		fileSystem->CloseFile(file);
@@ -92,19 +107,35 @@ namespace pr
 
 	void ClearBackupTimer()
 	{
+#ifdef PR_DBG_BACKUP
+		gameLocal.Printf("pr::ClearBackupTimer result: ");
+#endif // PR_DBG_BACKUP
 		// Open the file
-		auto file = fileSystem->OpenFileWrite(PR_BACKUPTMR_PATH, "fs_savepath");
+		auto file = fileSystem->OpenFileWrite(pr_backuptmr_path, "fs_savepath");
 
-		if (file == NULL) { return; }
+		if (file == nullptr)
+		{
+#ifdef PR_DBG_BACKUP
+			gameLocal.Printf("coud'nt open file\n");
+#endif // PR_DBG_BACKUP
+			return;
+		}
 
 		// Mark the file as invalid
 		file->WriteBool(false);
 
 		fileSystem->CloseFile(file);
+
+#ifdef PR_DBG_BACKUP
+		gameLocal.Printf("successfully cleared backup timer\n");
+#endif // PR_DBG_BACKUP
 	}
 
-	inline double GetBackupTime()
+	ID_INLINE double GetBackupTime()
 	{
+#ifdef PR_DBG_BACKUP_GETTIME
+		gameLocal.Printf("pr::GetBackupTime = %f\n", pr_gametimer.ClockTicks());
+#endif // PR_DBG_BACKUP_GETTIME
 		return pr_gametimer.ClockTicks();
 	}
 }

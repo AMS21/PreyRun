@@ -1,6 +1,7 @@
 #include "../idLib/precompiled.h"
 #pragma hdrstop
 
+#include "PreyRun.hpp"
 #include "AutoCmd.hpp"
 
 namespace pr
@@ -56,14 +57,21 @@ namespace pr
 		{
 			static std::string const delims{ ";" };
 
-			auto f = [](auto &&e) {
+			auto f = [](auto &&e)
+			{
 				return split(std::forward<decltype(e)>(e), delims);
 			};
 
 			std::vector<std::vector<std::string>> v{};
 			v.push_back(f(std::string(cmds.c_str())));
-			for (auto const &vec : v) {
-				for (auto const &str : vec) {
+
+			for (auto const &vec : v)
+			{
+				for (auto const &str : vec)
+				{
+#ifdef PR_DBG_AUTOCMD
+					gameLocal.Printf("Autocmdzone::Run(): executing '%s'\n",str.c_str());
+#endif // PR_DBG_AUTOCMD
 					cmdSystem->BufferCommandText(CMD_EXEC_NOW, str.c_str());
 				}
 			}
@@ -79,17 +87,10 @@ namespace pr
 			auto axis{ gameLocal.GetLocalPlayer()->viewAngles.ToMat3() };
 
 			idBounds bounds(pos1, pos2);
-
-			if (activated)
-			{
-				gameRenderWorld->DebugBounds(colorRed, bounds);
-			}
-			else
-			{
-				gameRenderWorld->DebugBounds(colorBlue, bounds);
-			}
-
 			idStr string;
+
+			if (activated) { gameRenderWorld->DebugBounds(colorRed, bounds); }
+			else { gameRenderWorld->DebugBounds(colorBlue, bounds); }
 
 			sprintf(string, "Autocmdzone:\n%s", cmds.c_str());
 
@@ -113,12 +114,14 @@ namespace pr
 	{
 		if (gameLocal.GetLocalPlayer())
 		{
+			auto playerbounds = gameLocal.GetLocalPlayer()->GetPhysics()->GetAbsBounds();
+
 			for (auto it = acz.begin(); it != acz.end(); ++it)
 			{
 				idBounds bounds{ it->GetPos1(),it->GetPos2() };
 
 				// Do we intersect with the Player?
-				if (bounds.IntersectsBounds(gameLocal.GetLocalPlayer()->GetPhysics()->GetAbsBounds()))
+				if (bounds.IntersectsBounds(playerbounds))
 				{
 					it->Run();
 				}
@@ -140,14 +143,17 @@ namespace pr
 
 	void AutocmdzoneHandler::Add(idVec3 pos1_, idVec3 pos2_, cmdType cmds_)
 	{
-#ifdef PR_DEBUG
-		gameLocal.Printf("AutocmdzoneHandler.Add() Adding autocmdzone: %f %f %f %f %f %f %s\n", pos1_.x, pos1_.y, pos1_.z, pos2_.x, pos2_.y, pos2_.z, cmds_.c_str());
-#endif // PR_DEBUG
-		this->acz.push_back(AutocmdzoneHandler::Autocmdzone(pos1_, pos2_, cmds_));
+#ifdef PR_DBG_AUTOCMD
+		gameLocal.Printf("AutocmdzoneHandler::Add() Adding autocmdzone: %f %f %f %f %f %f %s\n", pos1_.x, pos1_.y, pos1_.z, pos2_.x, pos2_.y, pos2_.z, cmds_.c_str());
+#endif // PR_DBG_AUTOCMD
+		this->acz.push_back(Autocmdzone(pos1_, pos2_, cmds_));
 	}
 
 	void AutocmdzoneHandler::Edit(int num, idVec3 pos1_, idVec3 pos2_, cmdType cmds_)
 	{
+#ifdef PR_DBG_AUTOCMD
+		gameLocal.Printf("AutocmdzoneHandler::Edit() editing number: %d\n",num);
+#endif // PR_DBG_AUTOCMD
 		acz.at(num).SetPos1(pos1_);
 		acz.at(num).SetPos2(pos2_);
 		acz.at(num).SetCmds(cmds_);

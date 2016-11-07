@@ -10,7 +10,7 @@ Save game related helper classes.
 
 */
 
-const int INITIAL_RELEASE_BUILD_NUMBER = 1262;
+constexpr int Initial_Release_Build_Number = 1262;
 
 class idSaveGame {
 public:

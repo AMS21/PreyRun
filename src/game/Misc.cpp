@@ -31,7 +31,8 @@ END_CLASS
 idSpawnableEntity::Spawn
 ======================
 */
-void idSpawnableEntity::Spawn() {
+void idSpawnableEntity::Spawn()
+{
 	// this just holds dict information
 	fl.neverDormant = true;
 }
@@ -53,7 +54,8 @@ END_CLASS
 idPlayerStart::idPlayerStart
 ================
 */
-idPlayerStart::idPlayerStart( void ) {
+idPlayerStart::idPlayerStart( void )
+{
 	teleportStage = 0;
 }
 
@@ -62,7 +64,8 @@ idPlayerStart::idPlayerStart( void ) {
 idPlayerStart::Spawn
 ================
 */
-void idPlayerStart::Spawn( void ) {
+void idPlayerStart::Spawn( void )
+{
 	teleportStage = 0;
 }
 
@@ -71,7 +74,8 @@ void idPlayerStart::Spawn( void ) {
 idPlayerStart::Save
 ================
 */
-void idPlayerStart::Save( idSaveGame *savefile ) const {
+void idPlayerStart::Save( idSaveGame *savefile ) const
+{
 	savefile->WriteInt( teleportStage );
 }
 
@@ -80,7 +84,8 @@ void idPlayerStart::Save( idSaveGame *savefile ) const {
 idPlayerStart::Restore
 ================
 */
-void idPlayerStart::Restore( idRestoreGame *savefile ) {
+void idPlayerStart::Restore( idRestoreGame *savefile )
+{
 	savefile->ReadInt( teleportStage );
 }
 
@@ -89,7 +94,8 @@ void idPlayerStart::Restore( idRestoreGame *savefile ) {
 idPlayerStart::ClientReceiveEvent
 ================
 */
-bool idPlayerStart::ClientReceiveEvent( int event, int time, const idBitMsg &msg ) {
+bool idPlayerStart::ClientReceiveEvent( int event, int time, const idBitMsg &msg )
+{
 	int entityNumber;
 
 	switch( event ) {
@@ -113,7 +119,8 @@ bool idPlayerStart::ClientReceiveEvent( int event, int time, const idBitMsg &msg
 idPlayerStart::TeleportPlayer
 ================
 */
-void idPlayerStart::TeleportPlayer( idPlayer *player ) {
+void idPlayerStart::TeleportPlayer( idPlayer *player )
+{
 	float pushVel = spawnArgs.GetFloat( "push", "300" );
 	float f = spawnArgs.GetFloat( "visualEffect", "0" );
 	const char *viewName = spawnArgs.GetString( "visualView", "" );
@@ -145,7 +152,8 @@ void idPlayerStart::TeleportPlayer( idPlayer *player ) {
 idPlayerStart::Event_TeleportPlayer
 ================
 */
-void idPlayerStart::Event_TeleportPlayer( idEntity *activator ) {
+void idPlayerStart::Event_TeleportPlayer( idEntity *activator )
+{
 	idPlayer *player;
 
 	if ( activator->IsType( idPlayer::Type ) ) {
@@ -185,7 +193,8 @@ END_CLASS
 idActivator::Save
 ================
 */
-void idActivator::Save( idSaveGame *savefile ) const {
+void idActivator::Save( idSaveGame *savefile ) const
+{
 	savefile->WriteBool( stay_on );
 }
 
@@ -194,7 +203,8 @@ void idActivator::Save( idSaveGame *savefile ) const {
 idActivator::Restore
 ================
 */
-void idActivator::Restore( idRestoreGame *savefile ) {
+void idActivator::Restore( idRestoreGame *savefile )
+{
 	savefile->ReadBool( stay_on );
 
 	if ( stay_on ) {
@@ -207,7 +217,8 @@ void idActivator::Restore( idRestoreGame *savefile ) {
 idActivator::Spawn
 ================
 */
-void idActivator::Spawn( void ) {
+void idActivator::Spawn( void )
+{
 	bool start_off;
 
 	spawnArgs.GetBool( "stay_on", "0", stay_on );
@@ -226,7 +237,8 @@ void idActivator::Spawn( void ) {
 idActivator::Think
 ================
 */
-void idActivator::Think( void ) {
+void idActivator::Think( void )
+{
 	RunPhysics();
 	if ( thinkFlags & TH_THINK ) {
 		if ( TouchTriggers() ) {
@@ -243,7 +255,8 @@ void idActivator::Think( void ) {
 idActivator::Activate
 ================
 */
-void idActivator::Event_Activate( idEntity *activator ) {
+void idActivator::Event_Activate( idEntity *activator )
+{
 	if ( thinkFlags & TH_THINK ) {
 		BecomeInactive( TH_THINK );
 	} else {
@@ -269,7 +282,8 @@ END_CLASS
 idPathCorner::Spawn
 =====================
 */
-void idPathCorner::Spawn( void ) {
+void idPathCorner::Spawn( void )
+{
 }
 
 /*
@@ -277,7 +291,8 @@ void idPathCorner::Spawn( void ) {
 idPathCorner::DrawDebugInfo
 =====================
 */
-void idPathCorner::DrawDebugInfo( void ) {
+void idPathCorner::DrawDebugInfo( void )
+{
 	idEntity *ent;
 	idBounds bnds( idVec3( -4.0, -4.0f, -8.0f ), idVec3( 4.0, 4.0f, 64.0f ) );
 
@@ -296,7 +311,8 @@ void idPathCorner::DrawDebugInfo( void ) {
 idPathCorner::RandomPath
 ============
 */
-idPathCorner *idPathCorner::RandomPath( const idEntity *source, const idEntity *ignore ) {
+idPathCorner *idPathCorner::RandomPath( const idEntity *source, const idEntity *ignore )
+{
 	int	i;
 	int	num;
 	int which;
@@ -327,7 +343,8 @@ idPathCorner *idPathCorner::RandomPath( const idEntity *source, const idEntity *
 idPathCorner::Event_RandomPath
 =====================
 */
-void idPathCorner::Event_RandomPath( void ) {
+void idPathCorner::Event_RandomPath( void )
+{
 	idPathCorner *path;
 
 	path = RandomPath( this, NULL );
@@ -354,7 +371,8 @@ END_CLASS
 idDamagable::idDamagable
 ================
 */
-idDamagable::idDamagable( void ) {
+idDamagable::idDamagable( void )
+{
 	count = 0;
 	nextTriggerTime = 0;
 }
@@ -364,7 +382,8 @@ idDamagable::idDamagable( void ) {
 idDamagable::Save
 ================
 */
-void idDamagable::Save( idSaveGame *savefile ) const {
+void idDamagable::Save( idSaveGame *savefile ) const
+{
 	savefile->WriteInt( count );
 	savefile->WriteInt( nextTriggerTime );
 }
@@ -3019,7 +3038,7 @@ void idPhantomObjects::Restore( idRestoreGame *savefile ) {
 		savefile->ReadInt( targetTime[ i ] );
 	}
 
-	if ( savefile->GetBuildNumber() == INITIAL_RELEASE_BUILD_NUMBER ) {
+	if ( savefile->GetBuildNumber() == Initial_Release_Build_Number ) {
 		// these weren't saved out in the first release
 		for( i = 0; i < num; i++ ) {
 			lastTargetPos[ i ].Zero();
@@ -3086,7 +3105,7 @@ void idPhantomObjects::Event_Activate( idEntity *activator ) {
 
 	const idVec3 &toPos = target.GetEntity()->GetEyePosition();
 
-    // calculate the relative times of all the objects
+	// calculate the relative times of all the objects
 	time = 0.0f;
 	for( i = 0; i < targetTime.Num(); i++ ) {
 		targetTime[ i ] = SEC2MS( time );
