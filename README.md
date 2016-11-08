@@ -1,7 +1,7 @@
 #How to install
 
 ##Installing as a mod
-- Download [PreyRun.rar](https://github.com/CppAndre/PreyRun/releases/download/V1.0.4/PreyRun.rar) or [PreyRun - without configs.rar](https://github.com/CppAndre/PreyRun/releases/download/V1.0.4/PreyRun.-.Without.config.files.rar)
+- Download [PreyRun.rar](https://github.com/CppAndre/PreyRun/releases/download/V1.0.4.1/PreyRun.rar) or [PreyRun - without configs.rar](https://github.com/CppAndre/PreyRun/releases/download/V1.0.4.1/PreyRun.-.Without.Configs.rar)
 - Extract the file from the archive somewhere (game00.pk4, description.txt, ...)
 - In your Prey root folder (where Prey.exe and PreyDed.exe are located) create a new folder called 'PreyRun'
 - Copy the files you have extracted previously to the newly created sub folder 'PreyRun'
