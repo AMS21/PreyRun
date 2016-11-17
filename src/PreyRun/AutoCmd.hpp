@@ -23,18 +23,18 @@ namespace pr
 		auto end() const -> decltype(auto) { return acz.end(); }
 		auto cend() const -> decltype(auto) { return acz.cend(); }
 
-		// Sigleton
+		// Singleton
 		static AutocmdzoneHandler& getInstance();
 
-		void Draw();
+		void Draw() const;
 
 		// Function to handle the triggering of the autocmdzones
-		void Trigger();
+		void CheckForTriggering();
 
-		void Add(idVec3 pos1_, idVec3 pos2_, cmdType cmds_);
-		void Remove(int index) { acz.erase(acz.begin() + index); };
+		void Add(const idVec3 &pos1_, const idVec3 &pos2_, const cmdType &cmds_);
+		void Remove(const int &index) { acz.erase(acz.begin() + index); };
 		void Clear() { this->acz.clear(); };
-		void Edit(int num, idVec3 pos1_, idVec3 pos2_, cmdType cmds_);
+		void Edit(const int &num, const idVec3 &pos1_, const idVec3 &pos2_, const cmdType &cmds_);
 
 		int NumOfZones() const { return acz.size(); };
 	private:
@@ -43,7 +43,7 @@ namespace pr
 		class Autocmdzone
 		{
 		public:
-			Autocmdzone();
+			Autocmdzone() : pos1(idVec3(0, 0, 0)), pos2(idVec3(0, 0, 0)), cmds(""), activated(false) {};
 			Autocmdzone(idVec3 pos1_, idVec3 pos2_, cmdType cmds_)
 				: pos1{ pos1_ }, pos2{ pos2_ }, cmds{ cmds_ }, activated(false) {}
 

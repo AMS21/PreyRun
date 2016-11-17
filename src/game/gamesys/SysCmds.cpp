@@ -72,10 +72,7 @@ Cmd_PR_ch_sethealth_f
 void Cmd_PR_ch_sethealth_f(const idCmdArgs &args)
 {
 	auto localPlayer = gameLocal.GetLocalPlayer();
-	if (!localPlayer || !gameLocal.CheatsOk(true))
-	{
-		return;
-	}
+	if (!localPlayer || !gameLocal.CheatsOk(true)) { return; }
 
 	localPlayer->SetHealth(atoi(args.Argv(1)));
 }
@@ -206,14 +203,14 @@ void Cmd_PR_autocmd_add_f(const idCmdArgs &args)
 {
 	if (args.Argc() != 8)
 	{
-		gameLocal.Printf("Usage: Pr_AutoCmd_Add <Start X (Float)> <Start Y (Float)> <Start 1 Z (Float)> <End 2 X (Float)> <End 2 Y (Float)> <End 2 Z (Float)> <Command (String)>");
+		gameLocal.Printf("Usage: Pr_AutoCmd_Add <Start X (Float)> <Start Y (Float)> <Start 1 Z (Float)> <End 2 X (Float)> <End 2 Y (Float)> <End 2 Z (Float)> <Command (String)>\n");
 		return;
 	}
 
 	pr::AutocmdzoneHandler::getInstance().Add(
-		idVec3(atof(args.Argv(1)), atof(args.Argv(2)), atof(args.Argv(3)))
-		, idVec3(atof(args.Argv(4)), atof(args.Argv(5)), atof(args.Argv(6)))
-		, static_cast<idStr>(args.Argv(7))
+		idVec3(atof(args.Argv(1)), atof(args.Argv(2)), atof(args.Argv(3))) // Starting Point
+		, idVec3(atof(args.Argv(4)), atof(args.Argv(5)), atof(args.Argv(6))) // End Points
+		, static_cast<idStr>(args.Argv(7)) // commands
 	);
 
 	gameLocal.Printf("Succesfully added autocmdzone number %d\n", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
@@ -226,11 +223,9 @@ Cmd_PR_autocmd_clear_f
 */
 void Cmd_PR_autocmd_clear_f(const idCmdArgs &args)
 {
-	auto temp = pr::AutocmdzoneHandler::getInstance().NumOfZones();
+	gameLocal.Printf("Cleared %d autocmdzones\n", pr::AutocmdzoneHandler::getInstance().NumOfZones());
 
 	pr::AutocmdzoneHandler::getInstance().Clear();
-
-	gameLocal.Printf("Cleared %d autocmdzones\n", temp);
 }
 
 /*
@@ -242,21 +237,37 @@ void Cmd_PR_autocmd_edit_f(const idCmdArgs &args)
 {
 	if (args.Argc() != 9)
 	{
-		gameLocal.Printf("Usage: PR_AutoCmd_Edit <Index (0-%d)> <Start X (Float)> <Start Y (Float)> <Start 1 Z (Float)> <End 2 X (Float)> <End 2 Y (Float)> <End 2 Z (Float)> <Command (String)>", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		if (pr::AutocmdzoneHandler::getInstance().NumOfZones() > 1)
+		{
+			gameLocal.Printf("Usage: PR_AutoCmd_Edit <Index (0-%d)> <Start X (Float)> <Start Y (Float)> <Start 1 Z (Float)> <End 2 X (Float)> <End 2 Y (Float)> <End 2 Z (Float)> <Command (String)>\n", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		}
+		else
+		{
+			// If there are actually 0 autocmdzones this here will still be printed but i guess thats okay
+			gameLocal.Printf("Usage: Pr_AutoCmd_Edit <Index (0)> <Start X (Float)> <Start Y (Float)> <Start 1 Z (Float)> <End 2 X (Float)> <End 2 Y (Float)> <End 2 Z (Float)> <Command (String)>\n");
+		}
 		return;
 	}
 
-	if (atoi(args.Argv(1)) > pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1)
+	// The index must be between 0 < Index > and NumOfZones
+	if (atoi(args.Argv(1)) > pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1 || atoi(args.Argv(1)) < 0)
 	{
-		gameLocal.Printf("Out of bounds: %d max: %d", atoi(args.Argv(1)), pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		if (pr::AutocmdzoneHandler::getInstance().NumOfZones() == 0)
+		{
+			gameLocal.Printf("There are no autocmds you need to create one first using PR_AutoCmd_Add\n");
+		}
+		else
+		{
+			gameLocal.Printf("Out of bounds: %d max: %d\n", atoi(args.Argv(1)), pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		}
 		return;
 	}
 
 	pr::AutocmdzoneHandler::getInstance().Edit(
-		atoi(args.Argv(1))
-		, idVec3(atof(args.Argv(2)), atof(args.Argv(3)), atof(args.Argv(4)))
-		, idVec3(atof(args.Argv(5)), atof(args.Argv(6)), atof(args.Argv(7)))
-		, static_cast<idStr>(args.Argv(8))
+		atoi(args.Argv(1)) // Index
+		, idVec3(atof(args.Argv(2)), atof(args.Argv(3)), atof(args.Argv(4))) // Start Position
+		, idVec3(atof(args.Argv(5)), atof(args.Argv(6)), atof(args.Argv(7))) // End Position
+		, static_cast<idStr>(args.Argv(8)) // Commands
 	);
 }
 
@@ -293,12 +304,31 @@ void Cmd_PR_autocmd_remove_f(const idCmdArgs &args)
 {
 	if (args.Argc() != 2)
 	{
-		gameLocal.Printf("Usage: PR_AutoCmd_Remove <Index (0-%d)>\n", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		if (pr::AutocmdzoneHandler::getInstance().NumOfZones() > 1)
+		{
+			gameLocal.Printf("Usage: PR_AutoCmd_Remove <Index (0-%d)>\n", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		}
+		else
+		{
+			// If there are actually 0 autocmdzones this here will still be printed but i guess thats okay
+			gameLocal.Printf("Usage: PR_AutoCmd_Remove <Index (0)>\n");
+		}
+
+		return;
 	}
 
-	if (atoi(args.Argv(1)) > pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1)
+	// The index must be between 0 < Index > and NumOfZones
+	if (atoi(args.Argv(1)) > pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1 || atoi(args.Argv(1)) < 0)
 	{
-		gameLocal.Printf("Out of bounds: %d max: %d\n", atoi(args.Argv(1)), pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		if (pr::AutocmdzoneHandler::getInstance().NumOfZones() == 0)
+		{
+			gameLocal.Printf("There are no autocmds you need to create one first using PR_AutoCmd_Add\n");
+		}
+		else
+		{
+			gameLocal.Printf("Out of bounds: %d max: %d\n", atoi(args.Argv(1)), pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		}
+
 		return;
 	}
 
@@ -310,6 +340,7 @@ void Cmd_PR_autocmd_remove_f(const idCmdArgs &args)
 #ifdef PR_DEBUG
 void Cmd_PR_test_f(const idCmdArgs &args)
 {
+
 }
 
 void Cmd_PR_crash_f(const idCmdArgs &args)
@@ -323,7 +354,8 @@ void Cmd_PR_crash_f(const idCmdArgs &args)
 void Cmd_PR_dbg_timer_f(const idCmdArgs &args)
 {
 	auto time = PR_ms2time(pr_gametimer.Milliseconds());
-	gameLocal.Printf("Timer is running: %s\nTimer shoud be on: %s\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s\n", pr_gametimer.IsRunning() ? "True" : "False", pr_gametimer_running ? "True" : "False", time.hours, time.minutes, time.seconds, time.milliseconds, pr_gametimer.Milliseconds(), pr_gametimer.ClockTicks(), pr::pr_gametimer_clocktick_post);
+
+	gameLocal.Printf("Timer is running: %s\nTimer shoud be on: %s\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s\n", pr_gametimer.IsRunning() ? "True" : "False", pr_gametimer_running ? "True" : "False", time.hours, time.minutes, time.seconds, time.milliseconds, pr_gametimer.Milliseconds(), pr_gametimer.ClockTicks(), pr::timer::pr_gametimer_clocktick_postfix);
 }
 
 void Cmd_PR_dbg_timer_set_f(const idCmdArgs &args)
@@ -360,6 +392,14 @@ void Cmd_PR_dbg_backup_f(const idCmdArgs &args)
 		return;
 	}
 
+	bool isValid;
+	file->ReadBool(isValid);
+	if (!isValid)
+	{
+		gameLocal.Printf("backuptmr is not valid!\n");
+		return;
+	}
+
 	float ms;
 	idStr mapName;
 
@@ -386,7 +426,7 @@ void Cmd_PR_dbg_rng(const idCmdArgs &args)
 {
 	auto rng = gameLocal.random;
 
-	gameLocal.Printf("Seed: %d, Int: %d, Int: %d, Float: %f, Float: %f", rng.GetSeed(), rng.RandomInt(), rng.RandomInt(), rng.RandomFloat(), rng.RandomFloat());
+	gameLocal.Printf("Seed: %d, Int: %d, Int: %d, Float: %f, Float: %f\n", rng.GetSeed(), rng.RandomInt(), rng.RandomInt(), rng.RandomFloat(), rng.RandomFloat());
 }
 
 void Cmd_PR_dbg_randseed_f(const idCmdArgs &args)
@@ -408,10 +448,11 @@ void Cmd_PR_dbg_autocmd_f(const idCmdArgs &args)
 {
 	if (args.Argc() != 2)
 	{
-		gameLocal.Printf("Usage: PR_dbg_autocmd <Index (0-%d)>", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		gameLocal.Printf("Usage: PR_dbg_autocmd <Index (0-%d)>\n", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		return;
 	}
 
-	if (atoi(args.Argv(1)) > pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1)
+	if (atoi(args.Argv(1)) > pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1 || atoi(args.Argv(1)) < 0)
 	{
 		gameLocal.Printf("Out of bounds: %d max: %d\n", atoi(args.Argv(1)), pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
 		return;
@@ -426,7 +467,7 @@ void Cmd_PR_dbg_autocmd_trigger_f(const idCmdArgs &args)
 {
 	if (args.Argc() != 2)
 	{
-		gameLocal.Printf("Usage: PR_dbg_autocmd_trigger <Index (0-%d)>", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		gameLocal.Printf("Usage: PR_dbg_autocmd_trigger <Index (0-%d)>\n", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
 	}
 
 	if (atoi(args.Argv(1)) > pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1)
@@ -874,7 +915,7 @@ void Cmd_Give_f(const idCmdArgs &args) {
 	//HUMANHEAD PCF rww 05/16/06
 	declManager->SetInsideLevelLoad(wasInside);
 	//HUMANHEAD END
-}
+		}
 
 /*
 ==================
@@ -1108,7 +1149,7 @@ static void Cmd_Say(bool team, const idCmdArgs &args) {
 	{
 		gameLocal.mpGame.ProcessChatMessage(gameLocal.localClientNum, team, name, text, NULL);
 	}
-}
+	}
 
 /*
 ==================
@@ -1389,7 +1430,7 @@ void Cmd_PlayerShadowToggle_f(const idCmdArgs &args) {
 		if (gameLocal.entities[i]->IsType(hhPlayer::Type))
 		{
 			gameLocal.entities[i]->GetRenderEntity()->noShadow = setShadows;
-		}
+}
 	}
 }
 #endif
@@ -3050,7 +3091,7 @@ void Cmd_PrintTypeName_f(const idCmdArgs &args)
 	}
 	else {
 		common->Printf("Invalid typenum.\n");
-	}
+}
 }
 #endif
 /*
@@ -3081,24 +3122,24 @@ so it can perform tab completion
 void idGameLocal::InitConsoleCommands(void)
 {
 	// PreyRun BEGIN
-	// Note all new Commands shoud start with PR_
+	// Note all new PreyRun commands shoud start with PR_
 	cmdSystem->AddCommand("PR_TimeDemo", Cmd_PR_timedemo_f, CMD_FL_GAME, "*Unfinished* PreyRun cmd: Displays plays a demo and tells you how long it took");
 	cmdSystem->AddCommand("PR_Reload", Cmd_PR_reload_f, CMD_FL_GAME, "PreyRun cmd: Load the latest savegame");
 
 	cmdSystem->AddCommand("PR_PreySplit_Split", Cmd_PR_preysplit_split_f, CMD_FL_GAME, "PreyRun cmd: Tells PreySplit to do an custom split");
 
-	// Cheats
+	// Cheat Commands
 	cmdSystem->AddCommand("PR_CH_SetHealth", Cmd_PR_ch_sethealth_f, CMD_FL_GAME | CMD_FL_CHEAT, "*Cheat* PreyRun cmd: Set your health to the specified value");
 	cmdSystem->AddCommand("PR_CH_SetPos", Cmd_PR_ch_setpos_f, CMD_FL_GAME | CMD_FL_CHEAT, "*Cheat* PreyRun cmd: Set your X, Y and Z coordinate");
 	cmdSystem->AddCommand("PR_CH_SetPos_Offset", Cmd_PR_ch_setpos_offset_f, CMD_FL_GAME | CMD_FL_CHEAT, "*Cheat* PreyRun cmd: Offset your X, Y and Z coordiante by the given values");
 
-	// Timer
+	// Hud-Timer Commands
 	cmdSystem->AddCommand("PR_Timer_Start", Cmd_PR_timer_start_f, CMD_FL_GAME, "PreyRun cmd: Starts the in-game timer. pr_hud_timer must be enabled for the time display to appear on the screen");
 	cmdSystem->AddCommand("PR_Timer_Stop", Cmd_PR_timer_stop_f, CMD_FL_GAME, "PreyRun cmd: Stops the in-game timer");
 	cmdSystem->AddCommand("PR_Timer_Reset", Cmd_PR_timer_reset_f, CMD_FL_GAME, "PreyRun cmd: Stops and resets the in-game timer");
 	cmdSystem->AddCommand("PR_Timer_Now", Cmd_PR_timer_now_f, CMD_FL_GAME, "PreyRun cmd: Displays the current time of the in-game timer");
 
-	// AutoCmd
+	// Autocmdzone Commands
 	cmdSystem->AddCommand("PR_AutoCmd_Add", Cmd_PR_autocmd_add_f, CMD_FL_GAME, "PreyRun cmd: Add a autocmdzone");
 	cmdSystem->AddCommand("PR_AutoCmd_Clear", Cmd_PR_autocmd_clear_f, CMD_FL_GAME, "PreyRun cmd: Remove all autocmdzones");
 	cmdSystem->AddCommand("PR_AutoCmd_Edit", Cmd_PR_autocmd_edit_f, CMD_FL_GAME, "PreyRun cmd: Edit a autocmdzone by index retrieved from PR_AutoCmd_List");
@@ -3254,6 +3295,7 @@ void idGameLocal::InitConsoleCommands(void)
 idGameLocal::ShutdownConsoleCommands
 =================
 */
-void idGameLocal::ShutdownConsoleCommands(void) {
+void idGameLocal::ShutdownConsoleCommands(void)
+{
 	cmdSystem->RemoveFlaggedCommands(CMD_FL_GAME);
 }

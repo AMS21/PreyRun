@@ -16,14 +16,14 @@ namespace pr
 		if (file == nullptr)
 		{
 #ifdef PR_DEBUG
-			gameLocal.Printf("Couldn't open %s\n", pr_backuptmr_path);
+			gameLocal.Printf("pr::WriteToFile Couldn't open %s\n", pr_backuptmr_path);
 #endif // PR_DEBUG
 			return;
 		}
 
-		file->WriteBool(true);
-		file->WriteFloat(GetBackupTime());
-		file->WriteString(mapName);
+		file->WriteBool(true); // Is this a valid backuptmr file? : Yes so we actually can recover the time from this file! 
+		file->WriteFloat(GetBackupTime()); // The actual time returned by pr_gametimer.ClockTicks()
+		file->WriteString(mapName); // The map you were on when the timer was last saved
 
 		// Close the opened file
 		fileSystem->CloseFile(file);
@@ -53,10 +53,11 @@ namespace pr
 	{
 		// Open the file
 		auto file = fileSystem->OpenFileRead(pr_backuptmr_path);
+
 		if (file == nullptr)
 		{
 #ifdef PR_DEBUG
-			gameLocal.Printf("Couldn't open %s\n", pr_backuptmr_path);
+			gameLocal.Printf("pr::LoadBackupTimer Couldn't open %s\n", pr_backuptmr_path);
 #endif // PR_DEBUG
 			return;
 		}
@@ -87,11 +88,10 @@ namespace pr
 			// Set the timer
 			pr_gametimer.SetCT(ms);
 			// Let the timer continue
-			//pr_gametimer.Start();
 			pr_gametimer_running = true;
 
 #ifdef PR_DEBUG
-			gameLocal.Printf("Successfully recoverd backup time: %f\n", ms);
+			gameLocal.Printf("pr::LoadBackupTimer Successfully recoverd backup time: %f\n", ms);
 #endif // PR_DEBUG
 		}
 #ifdef PR_DBG_BACKUP
@@ -107,16 +107,13 @@ namespace pr
 
 	void ClearBackupTimer()
 	{
-#ifdef PR_DBG_BACKUP
-		gameLocal.Printf("pr::ClearBackupTimer result: ");
-#endif // PR_DBG_BACKUP
 		// Open the file
 		auto file = fileSystem->OpenFileWrite(pr_backuptmr_path, "fs_savepath");
 
 		if (file == nullptr)
 		{
 #ifdef PR_DBG_BACKUP
-			gameLocal.Printf("coud'nt open file\n");
+			gameLocal.Printf("pr::ClearBackupTimer Coud'nt open file\n");
 #endif // PR_DBG_BACKUP
 			return;
 		}
@@ -127,7 +124,7 @@ namespace pr
 		fileSystem->CloseFile(file);
 
 #ifdef PR_DBG_BACKUP
-		gameLocal.Printf("successfully cleared backup timer\n");
+		gameLocal.Printf("pr::ClearBackupTimer successfully cleared backup timer\n");
 #endif // PR_DBG_BACKUP
 	}
 

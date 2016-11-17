@@ -826,7 +826,7 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 		}
 
 		// Call the function which handles the triggering of autocmdzones
-		pr::AutocmdzoneHandler::getInstance().Trigger();
+		pr::AutocmdzoneHandler::getInstance().CheckForTriggering();
 		// PreyRun END
 
 #ifdef GAME_DLL

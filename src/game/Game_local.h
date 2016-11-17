@@ -41,7 +41,7 @@ extern hhProfiler *					profiler;
 
 // PreyRun BEGIN
 // the "gameversion" client command will print this plus compile date
-#define	GAME_VERSION		"PreyRun-1.0.5"
+#define	GAME_VERSION		"PreyRun-1.0.4.1"
 // PreyRun END
 
 // classes used by idGameLocal

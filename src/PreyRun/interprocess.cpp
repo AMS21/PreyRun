@@ -33,16 +33,19 @@ namespace pr
 				gameLocal.Warning("PreyRun: PreySplit integration is not available.\n");
 				return;
 			}
+
 			gameLocal.Printf("PreyRun: Opened the PreySplit pipe.\n");
 			pr_preysplit_pipeopen = true;
 
 			std::memset(&overlapped, 0, sizeof(overlapped));
 			overlapped.hEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
+
 			if (overlapped.hEvent == NULL)
 			{
 #ifdef PR_DEBUG
 				gameLocal.Printf("Error creating an event for overlapped: %d. Closing the PreySplit pipe.\n", GetLastError());
 #endif // PR_DEBUG
+
 				gameLocal.Warning("PreyRun: PreySplit integration is not available.\n");
 				CloseHandle(pipe_preysplit);
 				pipe_preysplit = INVALID_HANDLE_VALUE;
@@ -64,6 +67,7 @@ namespace pr
 			CloseHandle(pipe_preysplit);
 			gameLocal.Printf("PreyRun: Closed the PreySplit pipe.\n");
 		}
+
 		pipe_preysplit = INVALID_HANDLE_VALUE;
 		pr_preysplit_pipeopen = false;
 
@@ -73,8 +77,7 @@ namespace pr
 
 	static void WritePreySplit(const std::vector<char>& data)
 	{
-		if (pipe_preysplit == INVALID_HANDLE_VALUE)
-			return;
+		if (pipe_preysplit == INVALID_HANDLE_VALUE) { return; }
 
 		if (writing_to_pipe)
 		{
@@ -84,9 +87,11 @@ namespace pr
 #ifdef PR_DEBUG
 				gameLocal.Printf("WaitForSingleObject failed with %d.\n", GetLastError());
 #endif // PR_DEBUG
+
 				DisconnectNamedPipe(pipe_preysplit);
 				return WritePreySplit(data);
 			}
+
 			writing_to_pipe = false;
 		}
 
@@ -99,11 +104,13 @@ namespace pr
 				DisconnectNamedPipe(pipe_preysplit);
 				return WritePreySplit(data);
 			}
+
 			if (err == ERROR_IO_PENDING)
 			{
 				// Waiting for someone to connect.
 				return;
 			}
+
 			if (err != ERROR_PIPE_CONNECTED)
 			{
 				// Some weird error with pipe?
@@ -111,6 +118,7 @@ namespace pr
 #ifdef PR_DEBUG
 				gameLocal.Printf("ConnectNamedPipe failed with %d.\n", err);
 #endif // PR_DEBUG
+
 				ShutdownPreySplitPipe();
 				InitPreySplitPipe();
 				return WritePreySplit(data);
@@ -141,6 +149,7 @@ namespace pr
 		std::memcpy(buf + sizeof(time.hours), &time.minutes, sizeof(time.minutes));
 		std::memcpy(buf + sizeof(time.hours) + sizeof(time.minutes), &time.seconds, sizeof(time.seconds));
 		std::memcpy(buf + sizeof(time.hours) + sizeof(time.minutes) + sizeof(time.seconds), &time.milliseconds, sizeof(time.milliseconds));
+
 		return sizeof(time.hours) + sizeof(time.minutes) + sizeof(time.seconds) + sizeof(time.milliseconds);
 	}
 
@@ -155,7 +164,6 @@ namespace pr
 #ifdef PR_DBG_INTERPROCESS
 		gameLocal.Printf("PreyRunDBG: WriteGameEnd: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DBG_INTERPROCESS
-
 
 		WritePreySplit(buf);
 	}
@@ -189,7 +197,9 @@ namespace pr
 	{
 		// normal map path   : maps/game/roadhouse.map
 		// gets turneded into: roadhouse.map
+
 		map.Replace("maps/game/", "");
+
 #ifdef PR_DBG_INTERPROCESS
 		gameLocal.Printf("PreyRunDBG: WriteMapChange: Map exited: %s\nPreyRunDBG: WriteMapChange: Time %02d:%02d:%02d.%03d\n", map.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DBG_INTERPROCESS
@@ -277,6 +287,6 @@ namespace pr
 	{
 		auto times = PR_ms2time(pr_gametimer.Milliseconds());
 
-		return Time{times.hours, times.minutes, times.seconds, times.milliseconds};
+		return Time{ times.hours, times.minutes, times.seconds, times.milliseconds };
 	}
 }

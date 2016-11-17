@@ -9,14 +9,17 @@ namespace pr
 	template <class CharType>
 	auto split(std::basic_string<CharType> const &str,
 		std::basic_string<CharType> const &delims)
-		-> std::vector<std::basic_string<CharType>> {
+		/*-> std::vector<std::basic_string<CharType>> */ {
 		using StringType = std::basic_string<CharType>;
 		using container_type = std::vector<StringType>;
 		container_type result{};
 		result.reserve(7U);
-		auto lambda{
-			[&](auto c) {
-			return std::any_of(std::begin(delims), std::end(delims), [c](auto ch) {
+		auto lambda
+		{
+			[&](auto c)
+		{
+			return std::any_of(std::begin(delims), std::end(delims), [c](auto ch)
+			{
 				return ch == c;
 			});
 		}
@@ -26,14 +29,16 @@ namespace pr
 		auto const end = std::end(str);
 		auto the_next_one = begin;
 
-		for (auto pos = begin; pos != end; pos = the_next_one + 1) {
+		for (auto pos = begin; pos != end; pos = the_next_one + 1)
+		{
 			the_next_one = std::find_if(pos, end, lambda);
 			result.emplace_back(pos, the_next_one);
 			if (the_next_one == end) break;
 		}
 
 		result.erase(std::remove_if(std::begin(result), std::end(result),
-			[](auto &&e) {
+			[](auto &&e)
+		{
 			return e.empty();
 		}), std::end(result));
 
@@ -42,15 +47,6 @@ namespace pr
 	}
 
 	// Autocmdzone
-	AutocmdzoneHandler::Autocmdzone::Autocmdzone()
-	{
-		this->pos1 = idVec3(0, 0, 0);
-		this->pos2 = idVec3(0, 0, 0);
-
-		this->cmds = "";
-		this->activated = false;
-	}
-
 	void AutocmdzoneHandler::Autocmdzone::Run()
 	{
 		if (!activated)
@@ -70,15 +66,15 @@ namespace pr
 				for (auto const &str : vec)
 				{
 #ifdef PR_DBG_AUTOCMD
-					gameLocal.Printf("Autocmdzone::Run(): executing '%s'\n",str.c_str());
+					gameLocal.Printf("Autocmdzone::Run(): executing '%s'\n", str.c_str());
 #endif // PR_DBG_AUTOCMD
 					cmdSystem->BufferCommandText(CMD_EXEC_NOW, str.c_str());
 				}
 			}
 
 			activated = true;
-		}
-	}
+				}
+			}
 
 	void AutocmdzoneHandler::Autocmdzone::Draw() const
 	{
@@ -94,7 +90,7 @@ namespace pr
 
 			sprintf(string, "Autocmdzone:\n%s", cmds.c_str());
 
-			gameRenderWorld->DrawText(string.c_str(), bounds.GetCenter(), 0.1f, colorWhite, axis, 1);
+			gameRenderWorld->DrawText(string.c_str(), bounds.GetCenter(), 0.1f, colorWhite, axis);
 		}
 	}
 
@@ -106,56 +102,50 @@ namespace pr
 		return instance;
 	}
 
-	AutocmdzoneHandler::AutocmdzoneHandler()
-	{
-	}
+	AutocmdzoneHandler::AutocmdzoneHandler() { }
 
-	void AutocmdzoneHandler::Trigger()
+	// Checks if any of the autocommandzones shoud be triggerd and triggers them
+	void AutocmdzoneHandler::CheckForTriggering()
 	{
 		if (gameLocal.GetLocalPlayer())
 		{
 			auto playerbounds = gameLocal.GetLocalPlayer()->GetPhysics()->GetAbsBounds();
 
-			for (auto it = acz.begin(); it != acz.end(); ++it)
+			for (auto& e : this->acz)
 			{
-				idBounds bounds{ it->GetPos1(),it->GetPos2() };
+				idBounds bounds{ e.GetPos1(),e.GetPos2() };
 
 				// Do we intersect with the Player?
-				if (bounds.IntersectsBounds(playerbounds))
-				{
-					it->Run();
-				}
-				else
-				{
-					it->SetActivated(false);
-				}
+				if (bounds.IntersectsBounds(playerbounds)) { e.Run(); }
+				else { e.SetActivated(false); }
 			}
 		}
 	}
 
-	void AutocmdzoneHandler::Draw()
+	void AutocmdzoneHandler::Draw() const
 	{
-		for (auto it = acz.begin(); it != acz.end(); ++it)
+		for (auto const &e : acz)
 		{
-			it->Draw();
+			e.Draw();
 		}
 	}
 
-	void AutocmdzoneHandler::Add(idVec3 pos1_, idVec3 pos2_, cmdType cmds_)
+	void AutocmdzoneHandler::Add(const idVec3 &pos1_, const idVec3 &pos2_, const cmdType &cmds_)
 	{
 #ifdef PR_DBG_AUTOCMD
 		gameLocal.Printf("AutocmdzoneHandler::Add() Adding autocmdzone: %f %f %f %f %f %f %s\n", pos1_.x, pos1_.y, pos1_.z, pos2_.x, pos2_.y, pos2_.z, cmds_.c_str());
 #endif // PR_DBG_AUTOCMD
-		this->acz.push_back(Autocmdzone(pos1_, pos2_, cmds_));
+		this->acz.emplace_back(pos1_, pos2_, cmds_);
 	}
 
-	void AutocmdzoneHandler::Edit(int num, idVec3 pos1_, idVec3 pos2_, cmdType cmds_)
+	// !Under the premise that const int ´num´ will always be > 0 and < acz.size()!
+	void AutocmdzoneHandler::Edit(const int &num, const idVec3 &pos1_, const idVec3 &pos2_, const cmdType &cmds_)
 	{
 #ifdef PR_DBG_AUTOCMD
-		gameLocal.Printf("AutocmdzoneHandler::Edit() editing number: %d\n",num);
+		gameLocal.Printf("AutocmdzoneHandler::Edit() editing number: %d\n", num);
 #endif // PR_DBG_AUTOCMD
-		acz.at(num).SetPos1(pos1_);
-		acz.at(num).SetPos2(pos2_);
-		acz.at(num).SetCmds(cmds_);
+		acz[num].SetPos1(pos1_);
+		acz[num].SetPos2(pos2_);
+		acz[num].SetCmds(cmds_);
 	}
-}
+	}
