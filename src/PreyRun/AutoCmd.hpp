@@ -45,7 +45,7 @@ namespace pr
 		public:
 			Autocmdzone() : pos1(idVec3(0, 0, 0)), pos2(idVec3(0, 0, 0)), cmds(""), activated(false) {};
 			Autocmdzone(idVec3 pos1_, idVec3 pos2_, cmdType cmds_)
-				: pos1{ pos1_ }, pos2{ pos2_ }, cmds{ cmds_ }, activated(false) {}
+				: pos1 { pos1_ }, pos2 { pos2_ }, cmds { cmds_ }, activated(false) {}
 
 			// Actually run the cmd
 			void Run();

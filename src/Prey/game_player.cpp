@@ -160,7 +160,8 @@ hhPlayer::hhPlayer
 =================
 */
 hhPlayer::hhPlayer(void) :
-	thirdPersonCameraClipBounds(idTraceModel(idBounds(idVec3(-4, -8, -8), idVec3(8, 8, 8)))) {
+	thirdPersonCameraClipBounds(idTraceModel(idBounds(idVec3(-4, -8, -8), idVec3(8, 8, 8))))
+{
 
 	hand = NULL;	// nla
 	spiritProxy = NULL;
@@ -193,7 +194,8 @@ hhPlayer::hhPlayer(void) :
 	bPlayingLowHealthSound = false;
 	bLotaTunnelMode = false;
 
-	for (auto ix{ 0 }; ix < MAX_TRACKED_ATTACKERS; ++ix) {
+	for (auto ix { 0 }; ix < MAX_TRACKED_ATTACKERS; ++ix)
+	{
 		lastAttackers[ix].attacker = NULL;
 		lastAttackers[ix].time = 0;
 		lastAttackers[ix].displayed = false;
@@ -207,7 +209,8 @@ hhPlayer::hhPlayer(void) :
 	bob = 0.0f;
 }
 
-void hhPlayer::LinkScriptVariables(void) {
+void hhPlayer::LinkScriptVariables(void)
+{
 	idPlayer::LinkScriptVariables();
 
 	AI_ASIDE.LinkTo(scriptObject, "AI_ASIDE");
@@ -220,7 +223,8 @@ hhPlayer::Spawn
 Prepare any resources used by the player.
 ==============
 */
-void hhPlayer::Spawn(void) {
+void hhPlayer::Spawn(void)
+{
 
 	SetupWeaponInfo();
 
@@ -231,7 +235,8 @@ void hhPlayer::Spawn(void) {
 	ddaProbabilityAccum = 1.0f;
 
 	// Start DDA heartbeat events, only in single player
-	if (!gameLocal.isMultiplayer) {
+	if (!gameLocal.isMultiplayer)
+	{
 		PostEventMS(&EV_DDAHeartbeat, ddaHeartbeatMS);
 	}
 
@@ -271,18 +276,22 @@ void hhPlayer::Spawn(void) {
 	memset(&lighter, 0, sizeof(lighter));
 
 	SetupWeaponFlags();
-	if (idealWeapon < 1 || idealWeapon > 8) {
+	if (idealWeapon < 1 || idealWeapon > 8)
+	{
 		// Go to the highest weapon available if no weapon is current selected (NOTE:  This will be ignored if all weapons are locked)
 		NextBestWeapon();	//HUMANHEAD bjk
 	}
 
 	//HUMANHEAD PCF mdl 04/26/06 - Made this a separate if block from above so we can disallow locked weapons
-	if (!(weaponFlags & (1 << (idealWeapon - 1)))) {
+	if (!(weaponFlags & (1 << (idealWeapon - 1))))
+	{
 		// If the current weapon is invalid now, try the next weapon
 		NextWeapon();
-		if (!(weaponFlags & (1 << (idealWeapon - 1)))) {
+		if (!(weaponFlags & (1 << (idealWeapon - 1))))
+		{
 			// No weapons available
-			if (weapon.GetEntity()) {
+			if (weapon.GetEntity())
+			{
 				weapon.GetEntity()->PutAway();
 				weapon.GetEntity()->HideWeapon();
 			}
@@ -301,7 +310,8 @@ void hhPlayer::Spawn(void) {
 	physicsObj.SetInwardGravity(-1); //rww
 }
 
-void hhPlayer::RestorePersistantInfo(void) {
+void hhPlayer::RestorePersistantInfo(void)
+{
 	int num;
 
 	idPlayer::RestorePersistantInfo();
@@ -321,11 +331,14 @@ void hhPlayer::RestorePersistantInfo(void) {
 hhPlayer::SpawnTalon()
 ==============
 */
-void hhPlayer::TrySpawnTalon() {
+void hhPlayer::TrySpawnTalon()
+{
 	// TODO:  Deal with co-op issues.  Have multiple Talons in co-op, or just one?
-	if (inventory.requirements.bCanSummonTalon && !talon.IsValid()) {
+	if (inventory.requirements.bCanSummonTalon && !talon.IsValid())
+	{
 		talon = static_cast<hhTalon *>(gameLocal.SpawnObject(spawnArgs.GetString("def_hawkpower"), NULL));
-		if (talon.IsValid()) {
+		if (talon.IsValid())
+		{
 			talon->SetOwner(this);
 			talon->SummonTalon();
 			bTalonAttackComment = true;
@@ -341,13 +354,16 @@ hhPlayer::TalonAttackComment
 Talon is attacking an enemy, so have Tommy make a comment
 ==============
 */
-void hhPlayer::TalonAttackComment() {
-	if (IsDeathWalking()) {
+void hhPlayer::TalonAttackComment()
+{
+	if (IsDeathWalking())
+	{
 		return;
 	}
 
 	// Play a sound on the player to encourage Talon to attack
-	if (bTalonAttackComment && gameLocal.GetTime() > nextTalonAttackCommentTime) { // Player can make an attack comment
+	if (bTalonAttackComment && gameLocal.GetTime() > nextTalonAttackCommentTime)
+	{ // Player can make an attack comment
 		int num = spawnArgs.GetInt("numAttackComments", "6");
 
 		StartSound(va("snd_talonattack%d", gameLocal.random.RandomInt(num)), SND_CHANNEL_VOICE, 0, false, NULL);
@@ -362,9 +378,11 @@ hhPlayer::~hhPlayer()
 Release any resources used by the player.
 ==============
 */
-hhPlayer::~hhPlayer() {
+hhPlayer::~hhPlayer()
+{
 	//rww - remove me if i'm a pilot
-	if (InVehicle() && GetVehicleInterface() && GetVehicleInterface()->GetVehicle()) {
+	if (InVehicle() && GetVehicleInterface() && GetVehicleInterface()->GetVehicle())
+	{
 		GetVehicleInterface()->GetVehicle()->EjectPilot();
 	}
 
@@ -374,7 +392,8 @@ hhPlayer::~hhPlayer() {
 }
 
 
-void hhPlayer::RemoveResources() {
+void hhPlayer::RemoveResources()
+{
 	LighterOff();
 	SAFE_REMOVE(hand);		//FIXME: Should this be something other than a safe remove?  (ie, remove hand?)
 	SAFE_REMOVE(talon);
@@ -393,7 +412,8 @@ Initializes all non-persistant parts of playerState
 Called during SpawnToPoint
 ==============
 */
-void hhPlayer::Init() {
+void hhPlayer::Init()
+{
 	oldCmdAngles.Zero();
 
 	idPlayer::Init();
@@ -437,11 +457,13 @@ void hhPlayer::Init() {
 	bPlayingLowHealthSound = false;
 
 	// Set shuttle view off
-	if (entityNumber == gameLocal.localClientNum) { //rww
+	if (entityNumber == gameLocal.localClientNum)
+	{ //rww
 		renderSystem->SetShuttleView(false);
 	}
 
-	if (gameLocal.isMultiplayer) { //rww - reset my really-deadness when i respawn in MP
+	if (gameLocal.isMultiplayer)
+	{ //rww - reset my really-deadness when i respawn in MP
 		bReallyDead = false;
 		SetSkinByName(NULL); //make sure we are not using spiritwalk skin.
 	}
@@ -449,7 +471,8 @@ void hhPlayer::Init() {
 	SetViewAnglesSensitivity(1.0f);
 	cameraInterpolator.SetSelf(this);
 
-	for (int ix = 0; ix < MAX_TRACKED_ATTACKERS; ix++) {
+	for (int ix = 0; ix < MAX_TRACKED_ATTACKERS; ix++)
+	{
 		lastAttackers[ix].attacker = NULL;
 		lastAttackers[ix].time = 0;
 		lastAttackers[ix].displayed = false;
@@ -471,7 +494,8 @@ Most of it probably belongs in ::Init() for clarity.
 	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge (big chunk taken from idPlayer::SpawnToPoint)
 ============
 */
-void hhPlayer::SpawnToPoint(const idVec3 &spawn_origin, const idAngles &spawn_angles) {
+void hhPlayer::SpawnToPoint(const idVec3 &spawn_origin, const idAngles &spawn_angles)
+{
 
 	RemoveResources();
 
@@ -506,17 +530,20 @@ void hhPlayer::SpawnToPoint(const idVec3 &spawn_origin, const idAngles &spawn_an
 	physicsObj.SetClipModelAxis();
 	physicsObj.EnableClip();
 
-	if (!spectating) {
+	if (!spectating)
+	{
 		SetCombatContents(true);
 	}
 
 	physicsObj.SetLinearVelocity(vec3_origin);
 
 	// setup our initial view
-	if (!spectating) {
+	if (!spectating)
+	{
 		SetOrigin(spawn_origin);
 	}
-	else {
+	else
+	{
 		spec_origin = spawn_origin;
 		spec_origin[2] += pm_normalheight.GetFloat();
 		spec_origin[2] += SPECTATE_RAISE;
@@ -536,18 +563,23 @@ void hhPlayer::SpawnToPoint(const idVec3 &spawn_origin, const idAngles &spawn_an
 	idealLegsYaw = 0.0f;
 	oldViewYaw = viewAngles.yaw;
 
-	if (spectating) {
+	if (spectating)
+	{
 		Hide();
 	}
-	else {
+	else
+	{
 		Show();
 	}
 
-	if (gameLocal.isMultiplayer) {
+	if (gameLocal.isMultiplayer)
+	{
 #ifndef HUMANHEAD //jsh We don't have a teleport effect
-		if (!spectating) {
+		if (!spectating)
+		{
 			// we may be called twice in a row in some situations. avoid a double fx and 'fly to the roof'
-			if (lastTeleFX < gameLocal.time - 1000) {
+			if (lastTeleFX < gameLocal.time - 1000)
+			{
 				idEntityFx::StartFx(spawnArgs.GetString("fx_spawn"), &spawn_origin, NULL, this, true);
 				lastTeleFX = gameLocal.time;
 			}
@@ -555,12 +587,14 @@ void hhPlayer::SpawnToPoint(const idVec3 &spawn_origin, const idAngles &spawn_an
 #endif
 		AI_TELEPORT = false;//true; //HUMANHEAD rww - we don't have a teleport anim either, ha ha ha (well we do, but it's not done)
 	}
-	else {
+	else
+	{
 		AI_TELEPORT = false;
 	}
 
 	// kill anything at the new position
-	if (!spectating) {
+	if (!spectating)
+	{
 		physicsObj.SetClipMask(MASK_PLAYERSOLID); // the clip mask is usually maintained in Move(), but KillBox requires it
 		gameLocal.KillBox(this);
 	}
@@ -571,7 +605,8 @@ void hhPlayer::SpawnToPoint(const idVec3 &spawn_origin, const idAngles &spawn_an
 	// set our respawn time and buttons so that if we're killed we don't respawn immediately
 	minRespawnTime = gameLocal.time;
 	maxRespawnTime = gameLocal.time;
-	if (!spectating) {
+	if (!spectating)
+	{
 		forceRespawn = false;
 	}
 
@@ -606,7 +641,8 @@ void hhPlayer::SpawnToPoint(const idVec3 &spawn_origin, const idAngles &spawn_an
 	prevStepUpOrigin = cameraInterpolator.GetCurrentPosition();
 	//HUMANHEAD END
 
-	if (!gameLocal.isMultiplayer) { // Only recharge health and rifle ammo in single player
+	if (!gameLocal.isMultiplayer)
+	{ // Only recharge health and rifle ammo in single player
 		lastDamagedTime = gameLocal.time; // CJR PCF 04/27/06:  Ensure that lastDamagedTime is set probably at level load
 		PostEventSec(&EV_RechargeHealth, spawnArgs.GetFloat("healthRechargeRate", "0.5"));
 		PostEventSec(&EV_RechargeRifleAmmo, spawnArgs.GetFloat("rifleAmmoRechargeRate", "2"));
@@ -627,7 +663,8 @@ hhPlayer::SetupWeaponEntity
 	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
 ==============
 */
-void hhPlayer::SetupWeaponEntity(void) {
+void hhPlayer::SetupWeaponEntity(void)
+{
 	weapon.Clear();
 	InvalidateCurrentWeapon();
 }
@@ -637,8 +674,10 @@ void hhPlayer::SetupWeaponEntity(void) {
 hhPlayer::ApplyImpulse
 ================
 */
-void hhPlayer::ApplyImpulse(idEntity *ent, int id, const idVec3 &point, const idVec3 &impulse) {
-	if (ent && (ent->IsType(hhForceField::Type) || ent->IsType(hhDeathWraith::Type))) {
+void hhPlayer::ApplyImpulse(idEntity *ent, int id, const idVec3 &point, const idVec3 &impulse)
+{
+	if (ent && (ent->IsType(hhForceField::Type) || ent->IsType(hhDeathWraith::Type)))
+	{
 		idPlayer::ApplyImpulse(ent, id, point, impulse);
 	}
 }
@@ -650,27 +689,34 @@ hhPlayer::CL_UpdateProgress
 	called after getting a snapshot, or directly if a local client
 ================
 */
-void hhPlayer::CL_UpdateProgress(bool bBar, float value, int state) {
+void hhPlayer::CL_UpdateProgress(bool bBar, float value, int state)
+{
 	idUserInterface *_hud = NULL;
 
-	if (InVehicle() && GetVehicleInterfaceLocal() && GetVehicleInterfaceLocal()->GetHUD()) {
+	if (InVehicle() && GetVehicleInterfaceLocal() && GetVehicleInterfaceLocal()->GetHUD())
+	{
 		_hud = GetVehicleInterfaceLocal()->GetHUD();
 	}
-	else {
+	else
+	{
 		_hud = hud;
 	}
 
 	// Update progress bar
-	if (bBar && !bShowProgressBar) {
+	if (bBar && !bShowProgressBar)
+	{
 		_hud->HandleNamedEvent("ShowProgressBar");
 	}
-	else if (!bBar && bShowProgressBar) {
+	else if (!bBar && bShowProgressBar)
+	{
 		_hud->HandleNamedEvent("HideProgressBar");
 	}
 
 	// See if we just entered a victory state
-	if (state != progressBarState) {
-		switch (state) {
+	if (state != progressBarState)
+	{
+		switch (state)
+		{
 		case 0:
 			_hud->HandleNamedEvent("ProgressNone");
 			break;
@@ -695,14 +741,17 @@ void hhPlayer::CL_UpdateProgress(bool bBar, float value, int state) {
 
 // This called once per tick, put things in here that should be updated regardless of frame rate
 //	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
-void hhPlayer::UpdateHud(idUserInterface *_hud) {
+void hhPlayer::UpdateHud(idUserInterface *_hud)
+{
 	idPlayer *aimed;
 
-	if (!_hud) {
+	if (!_hud)
+	{
 		return;
 	}
 
-	if (entityNumber != gameLocal.localClientNum) {
+	if (entityNumber != gameLocal.localClientNum)
+	{
 		return;
 	}
 
@@ -722,18 +771,23 @@ void hhPlayer::UpdateHud(idUserInterface *_hud) {
 	pickupTimeFadeOutStop = PICKUPTIME_FADEOUT_END * scale;
 
 	// Determine fade in colour for icons
-	if (c > 0) {
-		for (i = 0; i < c; i++) {
+	if (c > 0)
+	{
+		for (i = 0; i < c; i++)
+		{
 			inventory.pickupItemNames[i].time += gameLocal.msec;
 			time = inventory.pickupItemNames[i].time;
 
-			if (time < pickupTimeFadeInStart) {
+			if (time < pickupTimeFadeInStart)
+			{
 				inventory.pickupItemNames[i].matcolorAlpha = 0.0f;
 			}
-			else if (time < pickupTimeFadeInStop) {
-				inventory.pickupItemNames[i].matcolorAlpha = ((float)(time - pickupTimeFadeInStart)) / (pickupTimeFadeInStop - pickupTimeFadeInStart);
+			else if (time < pickupTimeFadeInStop)
+			{
+				inventory.pickupItemNames[i].matcolorAlpha = ((float) (time - pickupTimeFadeInStart)) / (pickupTimeFadeInStop - pickupTimeFadeInStart);
 			}
-			else {
+			else
+			{
 				inventory.pickupItemNames[i].matcolorAlpha = 1.0f;
 			}
 		}
@@ -741,19 +795,23 @@ void hhPlayer::UpdateHud(idUserInterface *_hud) {
 		// Determine fadeout of slot zero icon
 		inventory.pickupItemNames[0].slotZeroTime += gameLocal.msec;
 		time = inventory.pickupItemNames[0].slotZeroTime;
-		if (time < pickupTimeFadeOutStart) {
+		if (time < pickupTimeFadeOutStart)
+		{
 			inventory.pickupItemNames[0].matcolorAlpha = 1.0f;
 		}
-		else if (time < pickupTimeFadeOutStop) {
-			inventory.pickupItemNames[0].matcolorAlpha = 1.0f - ((float)(time - pickupTimeFadeOutStart)) / (pickupTimeFadeOutStop - pickupTimeFadeOutStart);
+		else if (time < pickupTimeFadeOutStop)
+		{
+			inventory.pickupItemNames[0].matcolorAlpha = 1.0f - ((float) (time - pickupTimeFadeOutStart)) / (pickupTimeFadeOutStop - pickupTimeFadeOutStart);
 		}
-		else {
+		else
+		{
 			inventory.pickupItemNames[0].matcolorAlpha = 0.0f;
 		}
 
 		// Remove any expired icons
 		time = inventory.pickupItemNames[0].slotZeroTime;
-		if (time > pickupTimeFadeOutStop) {
+		if (time > pickupTimeFadeOutStop)
+		{
 			// icon has faded out, remove from list and slide them down
 			inventory.pickupItemNames.RemoveIndex(0);
 		}
@@ -761,7 +819,8 @@ void hhPlayer::UpdateHud(idUserInterface *_hud) {
 
 	// HUMANHEAD pdm: Changed aim logic to always show colour-coded aimee
 	if (MPAim != -1 && gameLocal.entities[MPAim]
-		&& gameLocal.entities[MPAim]->IsType(idPlayer::Type)) {
+		&& gameLocal.entities[MPAim]->IsType(idPlayer::Type))
+	{
 
 		aimed = static_cast<idPlayer *>(gameLocal.entities[MPAim]);
 		_hud->SetStateString("aim_text", gameLocal.userInfo[MPAim].GetString("ui_name"));
@@ -771,12 +830,14 @@ void hhPlayer::UpdateHud(idUserInterface *_hud) {
 		_hud->SetStateFloat("aim_B", teamColor.z);
 
 		//HUMANHEAD rww - health display on hud for gameplay testing
-		if (g_showAimHealth.GetBool()) {
+		if (g_showAimHealth.GetBool())
+		{
 			_hud->SetStateInt("aim_health", gameLocal.entities[MPAim]->health);
 		}
 		//HUMANHEAD END
 	}
-	else {
+	else
+	{
 		_hud->SetStateString("aim_text", "");
 
 		//HUMANHEAD rww
@@ -786,24 +847,31 @@ void hhPlayer::UpdateHud(idUserInterface *_hud) {
 
 #if !GOLD
 	_hud->SetStateInt("g_showProjectilePct", g_showProjectilePct.GetInteger());
-	if (numProjectilesFired) {
-		_hud->SetStateString("projectilepct", va("Hit %% %.1f", ((float)numProjectileHits / numProjectilesFired) * 100));
+	if (numProjectilesFired)
+	{
+		_hud->SetStateString("projectilepct", va("Hit %% %.1f", ((float) numProjectileHits / numProjectilesFired) * 100));
 	}
-	else {
+	else
+	{
 		_hud->SetStateString("projectilepct", "Hit % 0.0");
 	}
 #endif
 
-	if (gameLocal.isNewFrame) { //HUMANHEAD rww - only on newframe
-		// Update low health sound
-		if (health > 0 && health < 25 && !IsSpiritOrDeathwalking()) {
-			if (!bPlayingLowHealthSound) {
+	if (gameLocal.isNewFrame)
+	{ //HUMANHEAD rww - only on newframe
+// Update low health sound
+		if (health > 0 && health < 25 && !IsSpiritOrDeathwalking())
+		{
+			if (!bPlayingLowHealthSound)
+			{
 				StartSound("snd_lowhealth", SND_CHANNEL_HEART, 0, false, NULL);
 				bPlayingLowHealthSound = true;
 			}
 		}
-		else {
-			if (bPlayingLowHealthSound) {
+		else
+		{
+			if (bPlayingLowHealthSound)
+			{
 				StopSound(SND_CHANNEL_HEART, false);
 				bPlayingLowHealthSound = false;
 			}
@@ -813,10 +881,13 @@ void hhPlayer::UpdateHud(idUserInterface *_hud) {
 	// Handle damage indictors
 	idVec3 localDamageVector;
 	idVec3 toEnemy;
-	for (int ix = 0; ix < MAX_TRACKED_ATTACKERS; ix++) {
-		if (lastAttackers[ix].attacker.IsValid()) {
+	for (int ix = 0; ix < MAX_TRACKED_ATTACKERS; ix++)
+	{
+		if (lastAttackers[ix].attacker.IsValid())
+		{
 
-			if (!lastAttackers[ix].displayed) {
+			if (!lastAttackers[ix].displayed)
+			{
 				_hud->HandleNamedEvent(va("Attacked%i", ix));//Notify hud we were attacked
 				_hud->SetStateBool("displayDamageIndicators", true);
 				lastAttackers[ix].displayed = true;
@@ -827,60 +898,72 @@ void hhPlayer::UpdateHud(idUserInterface *_hud) {
 			GetAxis().ProjectVector(toEnemy, localDamageVector);
 			float yawToEnemy = idMath::AngleNormalize180(localDamageVector.ToYaw());
 			_hud->SetStateFloat(va("yawToEnemy%i", ix), yawToEnemy);
-			if (gameLocal.time > lastAttackers[ix].time + DAMAGE_INDICATOR_TIME) {
+			if (gameLocal.time > lastAttackers[ix].time + DAMAGE_INDICATOR_TIME)
+			{
 				lastAttackers[ix].attacker = NULL;
 
 				bool allExpired = true;
-				for (int jx = 0; jx < MAX_TRACKED_ATTACKERS; jx++) {
-					if (lastAttackers[jx].attacker.IsValid()) {
+				for (int jx = 0; jx < MAX_TRACKED_ATTACKERS; jx++)
+				{
+					if (lastAttackers[jx].attacker.IsValid())
+					{
 						allExpired = false;
 						break;
 					}
 				}
-				if (allExpired) {
+				if (allExpired)
+				{
 					_hud->SetStateBool("displayDamageIndicators", false);
 				}
 			}
 		}
 	}
 
-	if (gameLocal.isMultiplayer) {
+	if (gameLocal.isMultiplayer)
+	{
 		bool bLagged = isLagged && gameLocal.isMultiplayer && (gameLocal.localClientNum == entityNumber);
 		_hud->SetStateBool("hudLag", bLagged);
 	}
 	// HUMANHEAD PCF pdm 06-26-06: Fix for multiplayer shuttle hud elements appearing in SP after a MP session
-	else {
+	else
+	{
 		_hud->SetStateBool("ismultiplayer", false);
 	}
 	// HUMANHEAD END
 }
 
 //	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
-void hhPlayer::UpdateHudWeapon(bool flashWeapon) {
+void hhPlayer::UpdateHudWeapon(bool flashWeapon)
+{
 	idUserInterface *_hud = hhPlayer::hud;
 
 	// if updating the hud of a followed client
-	if (gameLocal.localClientNum >= 0 && gameLocal.entities[gameLocal.localClientNum] && gameLocal.entities[gameLocal.localClientNum]->IsType(idPlayer::Type)) {
+	if (gameLocal.localClientNum >= 0 && gameLocal.entities[gameLocal.localClientNum] && gameLocal.entities[gameLocal.localClientNum]->IsType(idPlayer::Type))
+	{
 		idPlayer *p = static_cast<idPlayer *>(gameLocal.entities[gameLocal.localClientNum]);
-		if (p->spectating && p->spectator == entityNumber) {
+		if (p->spectating && p->spectator == entityNumber)
+		{
 			assert(p->hud);
 			_hud = p->hud;
 		}
 	}
 
-	if (_hud) {
+	if (_hud)
+	{
 		// HUMANHEAD pdm: changed to suit our needs
 		_hud->SetStateInt("currentweapon", GetCurrentWeapon());
 		_hud->SetStateInt("idealweapon", GetIdealWeapon());
 		//HUMANHEAD PCF mdl 05/05/06 - Added !IsLocked( GetIdealWeapon() )
-		if (flashWeapon && !IsLocked(GetIdealWeapon())) {
+		if (flashWeapon && !IsLocked(GetIdealWeapon()))
+		{
 			_hud->HandleNamedEvent("weaponChange");
 		}
 	}
 }
 
 //	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
-void hhPlayer::UpdateHudAmmo(idUserInterface *_hud) {
+void hhPlayer::UpdateHudAmmo(idUserInterface *_hud)
+{
 	assert(_hud);
 	float ammoPct, altPct;
 	int ammoType, altAmmoType;
@@ -889,11 +972,13 @@ void hhPlayer::UpdateHudAmmo(idUserInterface *_hud) {
 
 	// HUMANHEAD pdm: Weapon switch overlay, using rover to spread the expense over frames
 	static int rover = 0;
-	if (++rover > 9) {
+	if (++rover > 9)
+	{
 		rover = 0;
 	}
 
-	if (rover) {
+	if (rover)
+	{
 		bool bHeld = false;
 		ammoPct = 0.0f;
 		altPct = 0.0f;
@@ -904,7 +989,8 @@ void hhPlayer::UpdateHudAmmo(idUserInterface *_hud) {
 		ammoLow = false;
 		altAmmoLow = false;
 
-		if (inventory.weapons & (1 << rover)) {
+		if (inventory.weapons & (1 << rover))
+		{
 			// have this weapon
 			bHeld = true;
 			ammoPct = ammo / weaponInfo[rover].ammoMax;
@@ -914,13 +1000,15 @@ void hhPlayer::UpdateHudAmmo(idUserInterface *_hud) {
 		}
 
 		// Spirit ammo doesn't display in a bar
-		if (ammoType == 1) {
+		if (ammoType == 1)
+		{
 			ammoType = 0;
 			altAmmoType = 0;
 		}
 
 		// Zero out alt-ammo bar if appropriate
-		if (altAmmoType == 0 || altAmmoType == ammoType) {
+		if (altAmmoType == 0 || altAmmoType == ammoType)
+		{
 			altPct = 0.0f;
 		}
 
@@ -943,12 +1031,15 @@ void hhPlayer::UpdateHudAmmo(idUserInterface *_hud) {
 	ammo = 0;
 	altAmmo = 0;
 
-	if (bLotaTunnelMode || privateCameraView || IsLocked(idealWeapon) || !weapon.IsValid() || !weapon->IsLinked() || currentWeapon == -1) {
+	if (bLotaTunnelMode || privateCameraView || IsLocked(idealWeapon) || !weapon.IsValid() || !weapon->IsLinked() || currentWeapon == -1)
+	{
 		// Don't display ammo bar for invalid weapons, or when weapons are locked
 		bDisallowAmmoBars = true;
 	}
-	else {
-		if (currentWeapon >= 0 && currentWeapon < 15) {
+	else
+	{
+		if (currentWeapon >= 0 && currentWeapon < 15)
+		{
 			ammoType = weaponInfo[currentWeapon].ammoType;
 			altAmmoType = altWeaponInfo[currentWeapon].ammoType;
 			ammo = inventory.ammo[ammoType];
@@ -959,16 +1050,19 @@ void hhPlayer::UpdateHudAmmo(idUserInterface *_hud) {
 			altAmmoLow = altAmmo > 0 && altAmmo <= altWeaponInfo[currentWeapon].ammoLow;
 		}
 
-		if (ammoType == 1) {
+		if (ammoType == 1)
+		{
 			bDisallowAmmoBars = true;
 		}
 	}
 
-	if (bDisallowAmmoBars) {
+	if (bDisallowAmmoBars)
+	{
 		_hud->SetStateBool("player_ammobar", false);
 		_hud->SetStateBool("player_altammobar", false);
 	}
-	else {
+	else
+	{
 		_hud->SetStateBool("player_ammobar", ammoType != 0);
 		_hud->SetStateBool("player_altammobar", altAmmoType != 0 && altAmmoType != ammoType);
 
@@ -988,7 +1082,8 @@ hhPlayer::UpdateHudStats
 	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
 ================
 */
-void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
+void hhPlayer::UpdateHudStats(idUserInterface *_hud)
+{
 
 	assert(_hud);
 
@@ -998,10 +1093,12 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 	bool disallowHealth = bLotaTunnelMode || (IsLocked(1) && !gameLocal.IsLOTA()) || privateCameraView != NULL;
 	bool disallowProgress = bLotaTunnelMode || privateCameraView != NULL || IsDeathWalking();
 
-	if (disallowHealth) {
+	if (disallowHealth)
+	{
 		int blah = 0;
 	}
-	else {
+	else
+	{
 		int blah2 = 0;
 	}
 	// PreyRun BEGIN
@@ -1097,22 +1194,26 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 	_hud->SetStateString("player_spirit", spiritPower < 0 ? "0" : va("%d", spiritPower));
 	_hud->SetStateFloat("progress", progressBarGuiValue.GetCurrentValue(gameLocal.time));
 
-	if (healthPulse) {
+	if (healthPulse)
+	{
 		_hud->HandleNamedEvent("healthPulse");
 		StartSound("snd_healthpulse", SND_CHANNEL_ITEM, 0, false, NULL);
 		healthPulse = false;
 	}
-	if (spiritPulse) {
+	if (spiritPulse)
+	{
 		_hud->HandleNamedEvent("spiritPulse");
 		StartSound("snd_spiritpulse", SND_CHANNEL_ITEM, 0, false, NULL);
 		spiritPulse = false;
 	}
 
-	if (inventory.ammoPulse) {
+	if (inventory.ammoPulse)
+	{
 		_hud->HandleNamedEvent("ammoPulse");
 		inventory.ammoPulse = false;
 	}
-	if (inventory.weaponPulse) {
+	if (inventory.weaponPulse)
+	{
 		// We need to update the weapon hud manually, but not
 		// the armor/ammo/health because they are updated every
 		// frame no matter what
@@ -1125,13 +1226,16 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud) {
 
 	// Determine slots for our pickup icons
 	int c = inventory.pickupItemNames.Num();
-	for (auto i{ 0 }; i < 10; ++i) {
-		if (i < c) {
+	for (auto i { 0 }; i < 10; ++i)
+	{
+		if (i < c)
+		{
 			_hud->SetStateString(va("itemicon%i", i), inventory.pickupItemNames[i].icon);
 			_hud->SetStateFloat(va("itemalpha%i", i), inventory.pickupItemNames[i].matcolorAlpha);
 			_hud->SetStateBool(va("itemwide%i", i), inventory.pickupItemNames[i].bDoubleWide);
 		}
-		else {
+		else
+		{
 			_hud->SetStateString(va("itemicon%i", i), "");
 			_hud->SetStateFloat(va("itemalpha%i", i), 0.0f);
 			_hud->SetStateBool(va("itemwide%i", i), false);
@@ -1146,7 +1250,8 @@ hhPlayer::DrawHUD
 	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
 ===============
 */
-void hhPlayer::DrawHUD(idUserInterface *_hud) {
+void hhPlayer::DrawHUD(idUserInterface *_hud)
+{
 	// PreyRun BEGIN
 	if (pr_freeze.GetBool() && pr_gametimer.IsRunning())
 	{
@@ -1190,7 +1295,8 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 	}
 	// PreyRun END
 
-	if (guiOverlay) {
+	if (guiOverlay)
+	{
 		guiOverlay->Redraw(gameLocal.realClientTime);
 		sysEvent_t ev;
 		const char *command;
@@ -1268,7 +1374,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 			auto pr_js_pr = _hud->GetStateInt("pr_hud_jumpspeed_precision", "2");
 			auto pr_js_style = static_cast<PR_jumpspeed_style>(_hud->GetStateInt("pr_hud_jumpspeed_style", "0"));
 
-			auto pr_js_alpha{ 1.00f };
+			auto pr_js_alpha { 1.00f };
 
 			if (pr_js_style == PR_jumpspeed_style::Fading)
 			{
@@ -1305,7 +1411,6 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				}
 
 				sprintf(strJumpSpeed, "%.*f", pr_js_pr, _hud->GetStateFloat("pr_hud_jumpspeed_val", "0"));
-
 			}
 
 			renderSystem->DrawSmallStringExt(pr_js_x, pr_js_y, strJumpSpeed.c_str(), idVec4(PR_toPreyColour(pr_js_r), PR_toPreyColour(pr_js_g), PR_toPreyColour(pr_js_b), pr_js_alpha), true, declManager->FindMaterial("textures/bigchars"));
@@ -1424,12 +1529,12 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 
 				if (maxHealth > 0)
 				{
-					idStr className{ ent->GetClassname() };
+					idStr className { ent->GetClassname() };
 
 					// Filter unwanted entitys: Doors, Consoles, Vehicle spawner, Pod spawner
 					if (className != "hhProxDoor" && className != "hhConsole" && className != "hhRailShuttle" && className != "hhPodSpawner" && className != "hhGibbable")
 					{
-						auto displayIndex{ 0 };
+						auto displayIndex { 0 };
 
 						if (!(className == "hhShuttle" && static_cast<hhShuttle*> (ent)->IsConsole()))
 						{
@@ -1438,7 +1543,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 								idStr strHealth;
 								sprintf(strHealth, "        %03d/%03d", ent->GetHealth(), maxHealth);
 
-								auto colour{ PR_colour_white };
+								auto colour { PR_colour_white };
 
 								if ((className == "hhSphereBoss" && static_cast<hhSphereBoss*> (ent)->IsShielded()) || (className == "hhKeeperSimple" && static_cast<hhKeeperSimple*> (ent)->AI_SHIELD == 1))
 								{
@@ -1703,12 +1808,12 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		{
 			auto pr_mthd = static_cast<PR_keys_style>(_hud->GetStateInt("pr_hud_keys_methode", "0"));
 
-			auto movef{ false };
-			auto moveb{ false };
-			auto mover{ false };
-			auto movel{ false };
-			auto movej{ false };
-			auto moved{ false };
+			auto movef { false };
+			auto moveb { false };
+			auto mover { false };
+			auto movel { false };
+			auto movej { false };
+			auto moved { false };
 
 			if (usercmd.forwardmove != 0)
 			{
@@ -1728,13 +1833,13 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 				else { moved = true; }
 			}
 
-			auto colourd{ PR_colour_white };
-			auto colourf{ PR_colour_white };
-			auto colourj{ PR_colour_white };
+			auto colourd { PR_colour_white };
+			auto colourf { PR_colour_white };
+			auto colourj { PR_colour_white };
 
-			auto colourl{ PR_colour_white };
-			auto colourb{ PR_colour_white };
-			auto colourr{ PR_colour_white };
+			auto colourl { PR_colour_white };
+			auto colourb { PR_colour_white };
+			auto colourr { PR_colour_white };
 
 			if (pr_mthd == PR_keys_style::NORMAL_GREY || pr_mthd == PR_keys_style::REFLEX_GREY || pr_mthd == PR_keys_style::MOMENTUM_GREY)
 			{
@@ -1876,8 +1981,8 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 		pr_dbg_timer.Stop();
 
 		idStr strDrawTime;
-		auto colour{ PR_colour_white };
-		auto time{ pr_dbg_timer.Milliseconds() };
+		auto colour { PR_colour_white };
+		auto time { pr_dbg_timer.Milliseconds() };
 
 		if (time >= PR_dbg_huddrawtime_yellow)
 		{
@@ -1895,7 +2000,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud) {
 	if (pr_dbg_hud_frametime.GetBool())
 	{
 		idStr strDrawTime;
-		auto colour{ PR_colour_white };
+		auto colour { PR_colour_white };
 
 		if (pr_dbg_frametimer_value >= PR_dbg_frametime_yellow)
 		{
@@ -1918,8 +2023,10 @@ hhPlayer::DrawHUDVehicle
 	HUMANHEAD: This run only for local players
 ===============
 */
-void hhPlayer::DrawHUDVehicle(idUserInterface* _hud) {
-	if (GetVehicleInterfaceLocal()) {
+void hhPlayer::DrawHUDVehicle(idUserInterface* _hud)
+{
+	if (GetVehicleInterfaceLocal())
+	{
 		GetVehicleInterfaceLocal()->DrawHUD(_hud);
 	}
 }
@@ -1929,23 +2036,28 @@ void hhPlayer::DrawHUDVehicle(idUserInterface* _hud) {
 hhPlayer::FireWeapon
 ===============
 */
-void hhPlayer::FireWeapon(void) {
+void hhPlayer::FireWeapon(void)
+{
 	idMat3 axis;
 	idVec3 muzzle;
 
-	if (privateCameraView) {
+	if (privateCameraView)
+	{
 		return;
 	}
 
-	if (g_editEntityMode.GetInteger()) {
+	if (g_editEntityMode.GetInteger())
+	{
 		GetViewPos(muzzle, axis);
-		if (gameLocal.editEntities->SelectEntity(muzzle, axis[0], this)) {
+		if (gameLocal.editEntities->SelectEntity(muzzle, axis[0], this))
+		{
 			return;
 		}
 	}
 
 	//HUMANHEAD: aob - removed ammo check because we allow weapons to change modes
-	if (weapon.IsValid()) {
+	if (weapon.IsValid())
+	{
 		AI_ATTACK_HELD = true;
 		weapon->BeginAttack();
 	}
@@ -1958,27 +2070,34 @@ void hhPlayer::FireWeapon(void) {
 //
 //=========================================================================
 
-void hhPlayer::FireWeaponAlt(void) {
+void hhPlayer::FireWeaponAlt(void)
+{
 	idMat3 axis;
 	idVec3 muzzle;
 
-	if (privateCameraView) {
+	if (privateCameraView)
+	{
 		return;
 	}
 
-	if (g_editEntityMode.GetBool()) {
+	if (g_editEntityMode.GetBool())
+	{
 		GetViewPos(muzzle, axis);
-		if (gameLocal.editEntities->SelectEntity(muzzle, axis[0], NULL)) {
+		if (gameLocal.editEntities->SelectEntity(muzzle, axis[0], NULL))
+		{
 			return;
 		}
 	}
 
-	if (gameLocal.isMultiplayer && spectating) {
+	if (gameLocal.isMultiplayer && spectating)
+	{
 		static int lastSpectatorSwitch = 0;
-		if (gameLocal.time > lastSpectatorSwitch + 500) {
+		if (gameLocal.time > lastSpectatorSwitch + 500)
+		{
 			spectator = gameLocal.GetNextClientNum(spectator);
 			idPlayer *player = gameLocal.GetClientByNum(spectator);
-			while (player->spectating && player != this) {
+			while (player->spectating && player != this)
+			{
 				player = gameLocal.GetClientByNum(spectator);
 			}
 			lastSpectatorSwitch = gameLocal.time;
@@ -1987,20 +2106,24 @@ void hhPlayer::FireWeaponAlt(void) {
 	}
 
 	//HUMANHEAD: aob - removed ammo check because we allow weapons to change modes
-	if (weapon.IsValid()) {
+	if (weapon.IsValid())
+	{
 		AI_ATTACK_HELD = true;
 		weapon->BeginAltAttack();
 	}
 	//HUMANEHAD END
 
-	if (hud) {
+	if (hud)
+	{
 		hud->HandleNamedEvent("closeObjective");
 	}
 }
 
-void hhPlayer::StopFiring(void) {
+void hhPlayer::StopFiring(void)
+{
 	idPlayer::StopFiring();
-	if (weapon.GetEntity() && weapon->IsType(hhWeaponRifle::Type)) {
+	if (weapon.GetEntity() && weapon->IsType(hhWeaponRifle::Type))
+	{
 		static_cast<hhWeaponRifle*>(weapon.GetEntity())->ZoomOut();
 	}
 }
@@ -2010,7 +2133,8 @@ void hhPlayer::StopFiring(void) {
 hhPlayer::HasAmmo
 ===============
 */
-int hhPlayer::HasAmmo(ammo_t type, int amount) {
+int hhPlayer::HasAmmo(ammo_t type, int amount)
+{
 	return inventory.HasAmmo(type, amount);
 }
 
@@ -2019,7 +2143,8 @@ int hhPlayer::HasAmmo(ammo_t type, int amount) {
 hhPlayer::UseAmmo
 ===============
 */
-bool hhPlayer::UseAmmo(ammo_t type, int amount) {
+bool hhPlayer::UseAmmo(ammo_t type, int amount)
+{
 	return inventory.UseAmmo(type, amount);
 }
 
@@ -2028,8 +2153,10 @@ bool hhPlayer::UseAmmo(ammo_t type, int amount) {
 hhPlayer::NextBestWeapon
 ===============
 */
-void hhPlayer::NextBestWeapon(void) {
-	if (ActiveGui() || IsSpiritOrDeathwalking()) {
+void hhPlayer::NextBestWeapon(void)
+{
+	if (ActiveGui() || IsSpiritOrDeathwalking())
+	{
 		return;
 	}
 	idPlayer::NextBestWeapon();
@@ -2040,11 +2167,14 @@ void hhPlayer::NextBestWeapon(void) {
 hhPlayer::SelectWeapon
 ===============
 */
-void hhPlayer::SelectWeapon(int num, bool force) {
-	if (!(weaponFlags & (1 << (num - 1)))) {
+void hhPlayer::SelectWeapon(int num, bool force)
+{
+	if (!(weaponFlags & (1 << (num - 1))))
+	{
 		return;
 	}
-	if (bFrozen || ActiveGui() || (SkipWeapon(num) || IsSpiritOrDeathwalking())) {
+	if (bFrozen || ActiveGui() || (SkipWeapon(num) || IsSpiritOrDeathwalking()))
+	{
 		return;
 	}
 	idPlayer::SelectWeapon(num, force);
@@ -2055,22 +2185,27 @@ void hhPlayer::SelectWeapon(int num, bool force) {
 hhPlayer::NextWeapon
 ===============
 */
-void hhPlayer::NextWeapon(void) {
-	if (ActiveGui() || IsSpiritOrDeathwalking() || bFrozen) {
+void hhPlayer::NextWeapon(void)
+{
+	if (ActiveGui() || IsSpiritOrDeathwalking() || bFrozen)
+	{
 		// NOTE: Spirit weapon is disallowed from being cycled to using the weapon*_cycle key
 		return;
 	}
 	//idPlayer::NextWeapon();
-	if (!weaponEnabled || spectating || hiddenWeapon || gameLocal.inCinematic || privateCameraView || gameLocal.world->spawnArgs.GetBool("no_Weapons") || health < 0) {
+	if (!weaponEnabled || spectating || hiddenWeapon || gameLocal.inCinematic || privateCameraView || gameLocal.world->spawnArgs.GetBool("no_Weapons") || health < 0)
+	{
 		return;
 	}
 
-	if (gameLocal.isClient) {
+	if (gameLocal.isClient)
+	{
 		return;
 	}
 
 	// check if we have any weapons
-	if (!inventory.weapons) {
+	if (!inventory.weapons)
+	{
 		return;
 	}
 
@@ -2079,11 +2214,14 @@ void hhPlayer::NextWeapon(void) {
 
 	w = idealWeapon;
 	start = w;
-	while (1) {
+	while (1)
+	{
 		w++;
-		if (w >= MAX_WEAPONS) {
+		if (w >= MAX_WEAPONS)
+		{
 			// No weapon selected and nothing to select
-			if (start == -1) {
+			if (start == -1)
+			{
 				idealWeapon = 0;
 				currentWeapon = 0;
 				return;
@@ -2091,33 +2229,41 @@ void hhPlayer::NextWeapon(void) {
 			w = 0;
 		}
 		// Keep us from an infinite loop if no weapons are valid
-		if (w == start) {
-			if (!(weaponFlags & (1 << (w - 1)))) {
+		if (w == start)
+		{
+			if (!(weaponFlags & (1 << (w - 1))))
+			{
 				idealWeapon = 0;
 				currentWeapon = 0;
 			}
 			return;
 		}
 		weap = spawnArgs.GetString(va("def_weapon%d", w));
-		if (!spawnArgs.GetBool(va("weapon%d_cycle", w))) {
+		if (!spawnArgs.GetBool(va("weapon%d_cycle", w)))
+		{
 			continue;
 		}
-		if (!weap[0]) {
+		if (!weap[0])
+		{
 			continue;
 		}
-		if ((inventory.weapons & (1 << w)) == 0) {
+		if ((inventory.weapons & (1 << w)) == 0)
+		{
 			continue;
 		}
 		// Make sure the weapon is valid for this level
-		if (!(weaponFlags & (1 << (w - 1)))) {
+		if (!(weaponFlags & (1 << (w - 1))))
+		{
 			continue;
 		}
-		if (inventory.HasAmmo(weap) || inventory.HasAltAmmo(weap) || spawnArgs.GetBool(va("weapon%d_allowempty", w))) {
+		if (inventory.HasAmmo(weap) || inventory.HasAltAmmo(weap) || spawnArgs.GetBool(va("weapon%d_allowempty", w)))
+		{
 			break;
 		}
 	}
 
-	if ((w != currentWeapon) && (w != idealWeapon)) {
+	if ((w != currentWeapon) && (w != idealWeapon))
+	{
 		idealWeapon = w;
 		weaponSwitchTime = gameLocal.time + WEAPON_SWITCH_DELAY;
 		UpdateHudWeapon();
@@ -2129,35 +2275,44 @@ void hhPlayer::NextWeapon(void) {
 hhPlayer::PrevWeapon
 ===============
 */
-void hhPlayer::PrevWeapon(void) {
-	if (ActiveGui() || IsSpiritOrDeathwalking() || bFrozen) {
+void hhPlayer::PrevWeapon(void)
+{
+	if (ActiveGui() || IsSpiritOrDeathwalking() || bFrozen)
+	{
 		// NOTE: Spirit weapon is disallowed from being cycled to using the weapon*_cycle key
 		return;
 	}
 	//idPlayer::PrevWeapon();
-	if (!weaponEnabled || spectating || hiddenWeapon || gameLocal.inCinematic || privateCameraView || gameLocal.world->spawnArgs.GetBool("no_Weapons") || health < 0) {
+	if (!weaponEnabled || spectating || hiddenWeapon || gameLocal.inCinematic || privateCameraView || gameLocal.world->spawnArgs.GetBool("no_Weapons") || health < 0)
+	{
 		return;
 	}
 
-	if (gameLocal.isClient) {
+	if (gameLocal.isClient)
+	{
 		return;
 	}
 
 	// check if we have any weapons
-	if (!inventory.weapons) {
+	if (!inventory.weapons)
+	{
 		return;
 	}
 
 	const char *weap;
 	int w = idealWeapon, start = w;
-	if (w == -1) {
+	if (w == -1)
+	{
 		w = MAX_WEAPONS - 1;
 	}
-	while (1) {
+	while (1)
+	{
 		w--;
-		if (w < 0) {
+		if (w < 0)
+		{
 			// No weapon selected and nothing to select
-			if (start == -1) {
+			if (start == -1)
+			{
 				idealWeapon = 0;
 				currentWeapon = 0;
 				return;
@@ -2166,33 +2321,41 @@ void hhPlayer::PrevWeapon(void) {
 			w = MAX_WEAPONS - 1;
 		}
 		// Keep us from an infinite loop if no weapons are valid
-		if (w == start) {
-			if (!(weaponFlags & (1 << (w - 1)))) {
+		if (w == start)
+		{
+			if (!(weaponFlags & (1 << (w - 1))))
+			{
 				idealWeapon = 0;
 				currentWeapon = 0;
 			}
 			return;
 		}
 		weap = spawnArgs.GetString(va("def_weapon%d", w));
-		if (!spawnArgs.GetBool(va("weapon%d_cycle", w))) {
+		if (!spawnArgs.GetBool(va("weapon%d_cycle", w)))
+		{
 			continue;
 		}
-		if (!weap[0]) {
+		if (!weap[0])
+		{
 			continue;
 		}
-		if ((inventory.weapons & (1 << w)) == 0) {
+		if ((inventory.weapons & (1 << w)) == 0)
+		{
 			continue;
 		}
 		// Make sure the weapon is valid for this level
-		if (!(weaponFlags & (1 << (w - 1)))) {
+		if (!(weaponFlags & (1 << (w - 1))))
+		{
 			continue;
 		}
-		if (inventory.HasAmmo(weap) || inventory.HasAltAmmo(weap) || spawnArgs.GetBool(va("weapon%d_allowempty", w))) {
+		if (inventory.HasAmmo(weap) || inventory.HasAltAmmo(weap) || spawnArgs.GetBool(va("weapon%d_allowempty", w)))
+		{
 			break;
 		}
 	}
 
-	if ((w != currentWeapon) && (w != idealWeapon)) {
+	if ((w != currentWeapon) && (w != idealWeapon))
+	{
 		idealWeapon = w;
 		weaponSwitchTime = gameLocal.time + WEAPON_SWITCH_DELAY;
 		UpdateHudWeapon();
@@ -2204,7 +2367,8 @@ void hhPlayer::PrevWeapon(void) {
 hhPlayer::SkipWeapon
 ===============
 */
-bool hhPlayer::SkipWeapon(int weaponNum) const {
+bool hhPlayer::SkipWeapon(int weaponNum) const
+{
 	//No bow if not in spirit mode
 	return !IsSpiritOrDeathwalking() && weaponNum == spawnArgs.GetInt("spirit_weapon");
 }
@@ -2216,8 +2380,10 @@ hhPlayer::SnapDownCurrentWeapon
 HUMANHEAD: aob
 ===============
 */
-void hhPlayer::SnapDownCurrentWeapon() {
-	if (weapon.IsValid()) {
+void hhPlayer::SnapDownCurrentWeapon()
+{
+	if (weapon.IsValid())
+	{
 		weapon->SnapDown();
 	}
 }
@@ -2229,8 +2395,10 @@ hhPlayer::SnapUpCurrentWeapon
 HUMANHEAD: aob
 ===============
 */
-void hhPlayer::SnapUpCurrentWeapon() {
-	if (weapon.IsValid()) {
+void hhPlayer::SnapUpCurrentWeapon()
+{
+	if (weapon.IsValid())
+	{
 		weapon->SnapUp();
 	}
 }
@@ -2242,22 +2410,27 @@ hhPlayer::SelectEtherealWeapon
 HUMANHEAD: aob
 ===============
 */
-void hhPlayer::SelectEtherealWeapon() {
-	if (GetCurrentWeapon() != 0) {
+void hhPlayer::SelectEtherealWeapon()
+{
+	if (GetCurrentWeapon() != 0)
+	{
 		lastWeaponSpirit = GetCurrentWeapon();
 	}
 
 	weaponHandState.SetPlayer(this);
-	if (!gameLocal.isClient) {
+	if (!gameLocal.isClient)
+	{
 		int spiritWeaponIndex = spawnArgs.GetInt("spirit_weapon");
 		const char *spiritWeaponName = NULL;
-		if (bDeathWalk || (inventory.weapons & (1 << spiritWeaponIndex))) {
+		if (bDeathWalk || (inventory.weapons & (1 << spiritWeaponIndex)))
+		{
 			spiritWeaponName = GetWeaponName(spiritWeaponIndex);
 		}
 		weaponHandState.Archive(spiritWeaponName, 0, (InGUIMode()) ? "guihand_normal" : NULL);
 	}
 
-	if (weapon.IsValid()) {
+	if (weapon.IsValid())
+	{
 		weapon->SetShaderParm(SHADERPARM_MODE, MS2SEC(gameLocal.time)); // Glow in the bow
 		weapon->SetShaderParm(SHADERPARM_MISC, 1.0f); // Turn on the arrow
 		weapon->SetShaderParm(SHADERPARM_DIVERSITY, MS2SEC(gameLocal.time)); // Glow in the arrow
@@ -2271,12 +2444,15 @@ hhPlayer::PutawayEtherealWeapon
 HUMANHEAD: aob
 ===============
 */
-void hhPlayer::PutawayEtherealWeapon() {
+void hhPlayer::PutawayEtherealWeapon()
+{
 	//If we haven't actually changed weapons yet, put current weapon up
-	if (GetCurrentWeapon() != lastWeaponSpirit) {
+	if (GetCurrentWeapon() != lastWeaponSpirit)
+	{
 		SnapDownCurrentWeapon();
 	}
-	else {
+	else
+	{
 		SnapUpCurrentWeapon();
 	}
 
@@ -2289,85 +2465,105 @@ hhPlayer::UpdateWeapon
 	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
 ===============
 */
-void hhPlayer::UpdateWeapon(void) {
+void hhPlayer::UpdateWeapon(void)
+{
 
-	if (IsDead()) { // HUMANHEAD cjr:  Replaced health <= 0 with IsDead() call for deathwalk override
+	if (IsDead())
+	{ // HUMANHEAD cjr:  Replaced health <= 0 with IsDead() call for deathwalk override
 		return;
 	}
 
 	assert(!spectating);
 
-	if (gameLocal.isClient) {
+	if (gameLocal.isClient)
+	{
 		// clients need to wait till the weapon and it's world model entity
 		// are present and synchronized ( weapon.worldModel idEntityPtr to idAnimatedEntity )
-		if (!weapon.GetEntity()->IsWorldModelReady()) {
+		if (!weapon.GetEntity()->IsWorldModelReady())
+		{
 			return;
 		}
 	}
-	else if (gameLocal.isMultiplayer) { //rww - projectile deferring
-		if (weapon.IsValid()) {
+	else if (gameLocal.isMultiplayer)
+	{ //rww - projectile deferring
+		if (weapon.IsValid())
+		{
 			weapon->CheckDeferredProjectiles();
 		}
 	}
 
 	// always make sure the weapon is correctly setup before accessing it
-	if (weapon.GetEntity() && !weapon.GetEntity()->IsLinked()) {
-		if (idealWeapon != -1) {
+	if (weapon.GetEntity() && !weapon.GetEntity()->IsLinked())
+	{
+		if (idealWeapon != -1)
+		{
 			animPrefix = spawnArgs.GetString(va("def_weapon%d", idealWeapon));
 			weapon.GetEntity()->GetWeaponDef(animPrefix, inventory.clip[idealWeapon]);
 			animPrefix.Strip("weaponobj_"); //HUMANHEAD rww
 			assert(weapon.GetEntity()->IsLinked());
 		}
-		else {
+		else
+		{
 			return;
 		}
 	}
 
 	//HUMANEHAD rww
-	if (weapon.IsValid() && weapon->IsType(hhWeaponSoulStripper::Type)) {
+	if (weapon.IsValid() && weapon->IsType(hhWeaponSoulStripper::Type))
+	{
 		hhWeaponSoulStripper *leechGun = static_cast<hhWeaponSoulStripper *>(weapon.GetEntity());
 		leechGun->CheckCans();
 	}
 	//HUMANHEAD END
 
-	if (!InVehicle()) {
-		if (g_dragEntity.GetBool()) {
+	if (!InVehicle())
+	{
+		if (g_dragEntity.GetBool())
+		{
 			StopFiring();
 			dragEntity.Update(this);
-			if (weapon.IsValid()) {
+			if (weapon.IsValid())
+			{
 				weapon.GetEntity()->FreeModelDef();
 			}
 			return;
 		}
-		else if (ActiveGui()) {
+		else if (ActiveGui())
+		{
 			// gui handling overrides weapon use
 			Weapon_GUI();
 		}
-		else {
+		else
+		{
 			Weapon_Combat();
 		}
 
 		// Determine whether we are in aside state
-		if (weapon.IsValid() && weapon->IsAside()) {
-			if (!AI_ASIDE) {
+		if (weapon.IsValid() && weapon->IsAside())
+		{
+			if (!AI_ASIDE)
+			{
 				AI_ASIDE = true;
 				SetState("AsideWeapon");
 				UpdateScript();
 			}
 		}
-		else {
+		else
+		{
 			AI_ASIDE = false;
 		}
 	}
 
 	//HUMANHEAD: aob - added weapon validity check
-	if (weapon.IsValid()) {
+	if (weapon.IsValid())
+	{
 		// update weapon state, particles, dlights, etc
 		weapon->PresentWeapon(showWeaponViewModel);
 	}
 
 	// nla
-	if (hand.IsValid()) {
+	if (hand.IsValid())
+	{
 		hand->Present();
 	}
 }
@@ -2378,10 +2574,12 @@ hhPlayer::InGUIMode
 nla - Used for the GUI hand to check if it should be up.  (Coming back from spiritwalk)
 ===============
 */
-bool hhPlayer::InGUIMode() {
+bool hhPlayer::InGUIMode()
+{
 
 	// Logic adapted from UpdateWeapon
-	if (ActiveGui() && !InVehicle()) {
+	if (ActiveGui() && !InVehicle())
+	{
 		return(true);
 	}
 
@@ -2395,47 +2593,58 @@ hhPlayer::Weapon_Combat
 	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
 ===============
 */
-void hhPlayer::Weapon_Combat(void) {
+void hhPlayer::Weapon_Combat(void)
+{
 	idMat3		axis;
 	idVec3		muzzle;
 	idDict		args;
 
-	if (!weaponEnabled || gameLocal.inCinematic || privateCameraView) {
+	if (!weaponEnabled || gameLocal.inCinematic || privateCameraView)
+	{
 		return;
 	}
 
 	// HUMANHEAD nla
-	if (hand.IsValid() && hand->IsType(hhGuiHand::Type) && hand->IsAttached() && !hand->IsLowering()) {
+	if (hand.IsValid() && hand->IsType(hhGuiHand::Type) && hand->IsAttached() && !hand->IsLowering())
+	{
 		hand->RemoveHand();
 	}
 	// HUMANHEAD END
 
-	if (idealWeapon != 0 && IsLocked(idealWeapon)) {		//HUMANHEAD bjk PCF (4-30-06) - fix wrench up in roadhouse
+	if (idealWeapon != 0 && IsLocked(idealWeapon))
+	{		//HUMANHEAD bjk PCF (4-30-06) - fix wrench up in roadhouse
 		NextWeapon();
 	}
 
-	if (idealWeapon == 0) {
+	if (idealWeapon == 0)
+	{
 		return;
 	}
 
 	RaiseWeapon();
-	if (weapon.IsValid()) {
+	if (weapon.IsValid())
+	{
 		weapon.GetEntity()->PutUpright();
 	}
 
-	if (weapon.IsValid() && weapon->IsReloading()) {
-		if (!AI_RELOAD) {
+	if (weapon.IsValid() && weapon->IsReloading())
+	{
+		if (!AI_RELOAD)
+		{
 			AI_RELOAD = true;
 			SetState("ReloadWeapon");
 			UpdateScript();
 		}
 	}
-	else {
+	else
+	{
 		AI_RELOAD = false;
 	}
 
-	if (idealWeapon != currentWeapon && (!gameLocal.isMultiplayer || inventory.lastShot[idealWeapon] < gameLocal.time)) {	//HUMANHEAD bjk PATCH 7-27-06
-		if (weaponCatchup) {
+	if (idealWeapon != currentWeapon && (!gameLocal.isMultiplayer || inventory.lastShot[idealWeapon] < gameLocal.time))
+	{	//HUMANHEAD bjk PATCH 7-27-06
+		if (weaponCatchup)
+		{
 			assert(gameLocal.isClient);
 #ifndef HUMANHEAD //HUMANHEAD rww FIXME!!!! this also produces horrible memory leaks because of the dirty fire controller stuff
 			//HUMANHEAD rww - our crazy weapon system does not work ok with this. did we change the weapon dictionary parsing?
@@ -2450,7 +2659,8 @@ void hhPlayer::Weapon_Combat(void) {
 
 			weapon.GetEntity()->NetCatchup();
 			const function_t *newstate = GetScriptFunction("NetCatchup");
-			if (newstate) {
+			if (newstate)
+			{
 				SetState(newstate);
 				UpdateScript();
 			}
@@ -2461,7 +2671,8 @@ void hhPlayer::Weapon_Combat(void) {
 			animPrefix = spawnArgs.GetString(va("def_weapon%d", idealWeapon));
 			const char *currentWeaponName = weapon->spawnArgs.GetString("classname", "");
 			//make sure the weapon i have from my snapshot, and the weapon i have selected are the same.
-			if (currentWeaponName && !idStr::Cmp(animPrefix, currentWeaponName)) {
+			if (currentWeaponName && !idStr::Cmp(animPrefix, currentWeaponName))
+			{
 				weaponGone = false;
 				currentWeapon = idealWeapon;
 
@@ -2472,25 +2683,31 @@ void hhPlayer::Weapon_Combat(void) {
 				weaponCatchup = false;
 			}
 		}
-		else {
-			if (weapon.IsValid() && (weapon->IsReady() || weapon->IsRising())) {
+		else
+		{
+			if (weapon.IsValid() && (weapon->IsReady() || weapon->IsRising()))
+			{
 				InvalidateCurrentWeapon();//Needed incase we change weapons quickly, we can go back to old weapon
 				weapon->PutAway();
 			}
 
-			if ((!weapon.IsValid() || weapon->IsHolstered()) && !bDeathWalk && !bReallyDead) {
+			if ((!weapon.IsValid() || weapon->IsHolstered()) && !bDeathWalk && !bReallyDead)
+			{
 				assert(idealWeapon >= 0);
 				assert(idealWeapon < MAX_WEAPONS);
 
-				if (currentWeapon > 0 && !spawnArgs.GetBool(va("weapon%d_toggle", currentWeapon))) {	//HUMANHEAD bjk
+				if (currentWeapon > 0 && !spawnArgs.GetBool(va("weapon%d_toggle", currentWeapon)))
+				{	//HUMANHEAD bjk
 					previousWeapon = currentWeapon;
 				}
 				//HUMANHEAD PCF rww 05/03/06 - the local client might get skippiness between switching weapons if we
 				//attempt to raise the weapon again before validating that the weapon ent is of the type that we
 				//already desire to switch to. this bug is introduced by the concept of switching out entities when
 				//changing weapons (not client-friendly).
-				if (gameLocal.isClient && entityNumber == gameLocal.localClientNum) {
-					if (weapon.IsValid() && weapon->GetDict() && idStr::Icmp(weapon->GetDict()->GetString("classname"), GetWeaponName(idealWeapon)) == 0) {
+				if (gameLocal.isClient && entityNumber == gameLocal.localClientNum)
+				{
+					if (weapon.IsValid() && weapon->GetDict() && idStr::Icmp(weapon->GetDict()->GetString("classname"), GetWeaponName(idealWeapon)) == 0)
+					{
 						currentWeapon = idealWeapon;
 						weaponGone = false;
 						animPrefix = GetWeaponName(currentWeapon);
@@ -2499,13 +2716,15 @@ void hhPlayer::Weapon_Combat(void) {
 					}
 				}
 				//HUMANHEAD END
-				else {
+				else
+				{
 					currentWeapon = idealWeapon;
 					weaponGone = false;
 
 					//HUMANHEAD: aob
 					animPrefix = GetWeaponName(currentWeapon);
-					if (!gameLocal.isClient) {
+					if (!gameLocal.isClient)
+					{
 						SAFE_REMOVE(weapon);
 						weapon = SpawnWeapon(animPrefix.c_str());
 					}
@@ -2514,60 +2733,74 @@ void hhPlayer::Weapon_Combat(void) {
 					animPrefix.Strip("weaponobj_");	//HUMANHEAD pdm: changed from weapon_ to weaponobj_ per our naming convention
 
 					//HUMANHEAD PCF rww 05/03/06 - safety check, make sure weapon is valid particularly for the client
-					if (weapon.IsValid()) {
+					if (weapon.IsValid())
+					{
 						weapon.GetEntity()->Raise();
 					}
 				}
 			}
 		}
 	}
-	else if (!bDeathWalk && !bReallyDead) {
-		weaponGone = false;	// if you drop and re-get weap, you may miss the = false above 
-		if (weapon.IsValid() && weapon.GetEntity()->IsHolstered()) {
-			if (!weapon.GetEntity()->AmmoAvailable()) {
+	else if (!bDeathWalk && !bReallyDead)
+	{
+		weaponGone = false;	// if you drop and re-get weap, you may miss the = false above
+		if (weapon.IsValid() && weapon.GetEntity()->IsHolstered())
+		{
+			if (!weapon.GetEntity()->AmmoAvailable())
+			{
 				// weapons can switch automatically if they have no more ammo
 				NextBestWeapon();
 			}
-			else if (!gameLocal.isMultiplayer || inventory.lastShot[idealWeapon] < gameLocal.time) {		//HUMANHEAD bjk PATCH 9-11-06
+			else if (!gameLocal.isMultiplayer || inventory.lastShot[idealWeapon] < gameLocal.time)
+			{		//HUMANHEAD bjk PATCH 9-11-06
 				weapon.GetEntity()->Raise();
 				state = GetScriptFunction("RaiseWeapon");
-				if (state) {
+				if (state)
+				{
 					SetState(state);
 				}
 			}
 		}
 	}
 
-	if (weapon.IsValid()) {
+	if (weapon.IsValid())
+	{
 		weapon->PrecomputeTraceInfo();
 	}
 
 	// check for attack
 	AI_WEAPON_FIRED = false;
-	if ((usercmd.buttons & BUTTON_ATTACK) && !weaponGone) {
+	if ((usercmd.buttons & BUTTON_ATTACK) && !weaponGone)
+	{
 		FireWeapon();
 	}
-	else if (oldButtons & BUTTON_ATTACK) {
+	else if (oldButtons & BUTTON_ATTACK)
+	{
 		AI_ATTACK_HELD = false;
-		if (weapon.IsValid()) {
+		if (weapon.IsValid())
+		{
 			weapon.GetEntity()->EndAttack();
 		}
 	}
 
 	// HUMANHEAD
-	if ((usercmd.buttons & BUTTON_ATTACK_ALT) && !weaponGone) {
+	if ((usercmd.buttons & BUTTON_ATTACK_ALT) && !weaponGone)
+	{
 		FireWeaponAlt();
 	}
-	else if (oldButtons & BUTTON_ATTACK_ALT) {
+	else if (oldButtons & BUTTON_ATTACK_ALT)
+	{
 		AI_ATTACK_HELD = false;
-		if (weapon.IsValid()) {
+		if (weapon.IsValid())
+		{
 			weapon.GetEntity()->EndAltAttack();
 		}
 	}
 	// HUMANHEAD END
 
 	// update our ammo clip in our inventory
-	if (weapon.IsValid() && (currentWeapon >= 0) && (currentWeapon < MAX_WEAPONS)) {
+	if (weapon.IsValid() && (currentWeapon >= 0) && (currentWeapon < MAX_WEAPONS))
+	{
 		inventory.clip[currentWeapon] = weapon->AmmoInClip();
 		inventory.altMode[currentWeapon] = weapon->GetAltMode();
 	}
@@ -2578,7 +2811,8 @@ void hhPlayer::Weapon_Combat(void) {
 hhPlayer::SpawnWeapon
 ===============
 */
-hhWeapon* hhPlayer::SpawnWeapon(const char* name) {
+hhWeapon* hhPlayer::SpawnWeapon(const char* name)
+{
 	hhWeapon*	weaponPtr = NULL;
 	idDict		args;
 
@@ -2600,9 +2834,12 @@ hhPlayer::GetWeaponNum
 	HUMANHEAD
 =====================
 */
-int hhPlayer::GetWeaponNum(const char* weaponName) const {
-	for (int i = 1; i < MAX_WEAPONS; ++i) {
-		if (!idStr::Icmp(GetWeaponName(i), weaponName)) {
+int hhPlayer::GetWeaponNum(const char* weaponName) const
+{
+	for (int i = 1; i < MAX_WEAPONS; ++i)
+	{
+		if (!idStr::Icmp(GetWeaponName(i), weaponName))
+		{
 			return i;
 		}
 	}
@@ -2616,8 +2853,10 @@ hhPlayer::GetWeaponName
 	HUMANHEAD
 =====================
 */
-const char* hhPlayer::GetWeaponName(int num) const {
-	if (num < 1 || num >= MAX_WEAPONS) {
+const char* hhPlayer::GetWeaponName(int num) const
+{
+	if (num < 1 || num >= MAX_WEAPONS)
+	{
 		return NULL;
 	}
 
@@ -2630,72 +2869,89 @@ hhPlayer::Weapon_GUI
 	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
 ===============
 */
-void hhPlayer::Weapon_GUI(void) {
+void hhPlayer::Weapon_GUI(void)
+{
 
 	StopFiring();
 	weapon.GetEntity()->LowerWeapon();
 
 	// NLANOTE - Same here
 	// disable click prediction for the GUIs. handy to check the state sync does the right thing
-	if (gameLocal.isClient && !net_clientPredictGUI.GetBool()) {
+	if (gameLocal.isClient && !net_clientPredictGUI.GetBool())
+	{
 		return;
 	}
 
-	if (health <= 0 || bDeathWalk) {		//HUMANHEAD bjk PCF (5-5-06) - no hand stuff when dead
+	if (health <= 0 || bDeathWalk)
+	{		//HUMANHEAD bjk PCF (5-5-06) - no hand stuff when dead
 		return;
 	}
 
-	// HUMANHEAD nla 
-	if (!bDeathWalk) { // mdl - Don't do hand stuff while deathwalking
-		if (hand.IsValid() && hand->IsType(hhGuiHand::Type)) {
+	// HUMANHEAD nla
+	if (!bDeathWalk)
+	{ // mdl - Don't do hand stuff while deathwalking
+		if (hand.IsValid() && hand->IsType(hhGuiHand::Type))
+		{
 			//if ( !hand->IsReady() && !hand->IsRaising() ) {
-			if (!hand->IsReady() && !hand->IsRaising() && !hand->IsLowering()) {
+			if (!hand->IsReady() && !hand->IsRaising() && !hand->IsLowering())
+			{
 				hand->Reraise();
 			}
 		}
 		else if ((!hand.IsValid() && weapon.IsValid() && !weapon->IsAside()) ||
 			(hand.IsValid() && !hand->IsType(hhGuiHand::Type) && !hand->IsLowering()) ||
-			(!hand.IsValid() && idealWeapon == 0)) {
-			if (!gameLocal.isClient) { //rww
+			(!hand.IsValid() && idealWeapon == 0))
+		{
+			if (!gameLocal.isClient)
+			{ //rww
 				hhHand::AddHand(this, GetGuiHandInfo());
 			}
 		}
 	}
 	// HUMANHEAD END
 
-	if (hand.IsValid() && (oldButtons ^ usercmd.buttons) & BUTTON_ATTACK) {	//HUMANHEAD bjk: no waiting for ready
+	if (hand.IsValid() && (oldButtons ^ usercmd.buttons) & BUTTON_ATTACK)
+	{	//HUMANHEAD bjk: no waiting for ready
 		sysEvent_t ev;
 		const char *command = NULL;
 		bool updateVisuals = false;
 
 		idUserInterface *ui = ActiveGui();
-		if (ui) {
+		if (ui)
+		{
 			ev = sys->GenerateMouseButtonEvent(1, (usercmd.buttons & BUTTON_ATTACK) != 0);
 			command = ui->HandleEvent(&ev, gameLocal.time, &updateVisuals);
-			if (updateVisuals && focusGUIent && ui == focusUI) {
+			if (updateVisuals && focusGUIent && ui == focusUI)
+			{
 				focusGUIent->UpdateVisuals();
 			}
 		}
-		if (gameLocal.isClient) {
+		if (gameLocal.isClient)
+		{
 			// we predict enough, but don't want to execute commands
-			if (focusGUIent) {
-				if (hand.IsValid() && hand->IsType(hhGuiHand::Type) && ev.evValue2) { //rww - still predict hand
+			if (focusGUIent)
+			{
+				if (hand.IsValid() && hand->IsType(hhGuiHand::Type) && ev.evValue2)
+				{ //rww - still predict hand
 					hand->SetAction(focusGUIent->spawnArgs.GetString("pressAnim", "press"));	//HUMANHEAD bjk
 					hand->Action();
 				}
 			}
 			return;
 		}
-		if (focusGUIent) {
+		if (focusGUIent)
+		{
 			HandleGuiCommands(focusGUIent, command);
 			// HUMANHEAD nla - Added to handle the hand stuff.  = )
-			if (hand.IsValid() && hand->IsType(hhGuiHand::Type) && ev.evValue2) {
+			if (hand.IsValid() && hand->IsType(hhGuiHand::Type) && ev.evValue2)
+			{
 				hand->SetAction(focusGUIent->spawnArgs.GetString("pressAnim", "press"));	//HUMANHEAD bjk
 				hand->Action();
 			}
 			// HUMANHEAD END
 		}
-		else {
+		else
+		{
 			HandleGuiCommands(this, command);
 		}
 	}
@@ -2707,12 +2963,14 @@ hhPlayer::UpdateCrosshairs
 HUMANHEAD PDM
 ================
 */
-void hhPlayer::UpdateCrosshairs() {
+void hhPlayer::UpdateCrosshairs()
+{
 	bool combatCrosshair = false;
 	bool targeting = false;
 	int crosshair = 0;
 
-	if (!privateCameraView && !IsLocked(idealWeapon) && (!hand.IsValid() || hand->IsLowered()) && !InCinematic() && weapon.IsValid() && g_crosshair.GetInteger()) {
+	if (!privateCameraView && !IsLocked(idealWeapon) && (!hand.IsValid() || hand->IsLowered()) && !InCinematic() && weapon.IsValid() && g_crosshair.GetInteger())
+	{
 		weapon->UpdateCrosshairs(combatCrosshair, targeting);
 		crosshair = g_crosshair.GetInteger();
 	}
@@ -2732,7 +2990,8 @@ the focus and sending it a mouse move event
 	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
 ================
 */
-void hhPlayer::UpdateFocus(void) {
+void hhPlayer::UpdateFocus(void)
+{
 	idClipModel *clipModelList[MAX_GENTITIES];
 	idClipModel *clip;
 	int			listedClipModels;
@@ -2748,19 +3007,22 @@ void hhPlayer::UpdateFocus(void) {
 	sysEvent_t	ev;
 	idUserInterface *ui;
 
-	if (gameLocal.inCinematic) {
+	if (gameLocal.inCinematic)
+	{
 		return;
 	}
 
 	oldFocus = focusGUIent;
 	oldUI = focusUI;
 
-	if (focusTime <= gameLocal.time) {
+	if (focusTime <= gameLocal.time)
+	{
 		ClearFocus();
 	}
 
 	// don't let spectators interact with GUIs
-	if (spectating) {
+	if (spectating)
+	{
 		return;
 	}
 
@@ -2774,21 +3036,27 @@ void hhPlayer::UpdateFocus(void) {
 
 	// HUMANHEAD pdm: Changed aim logic a bit
 	// player identification -> names to the hud
-	if (gameLocal.isMultiplayer && entityNumber == gameLocal.localClientNum) {
+	if (gameLocal.isMultiplayer && entityNumber == gameLocal.localClientNum)
+	{
 		idVec3 end = start + viewDir * 768.0f;
 		gameLocal.clip.TracePoint(trace, start, end, MASK_SHOT_BOUNDINGBOX, this);
-		if ((trace.fraction < 1.0f) && (trace.c.entityNum < MAX_CLIENTS)) {
+		if ((trace.fraction < 1.0f) && (trace.c.entityNum < MAX_CLIENTS))
+		{
 			MPAim = trace.c.entityNum;
 		}
-		else {
+		else
+		{
 			MPAim = -1;
 
 			//HUMANHEAD rww - if we're hitting a shuttle with a pilot, set the pilot to the MPAim ent
-			if (trace.c.entityNum >= MAX_CLIENTS && trace.c.entityNum < MAX_GENTITIES) {
+			if (trace.c.entityNum >= MAX_CLIENTS && trace.c.entityNum < MAX_GENTITIES)
+			{
 				idEntity *traceEnt = gameLocal.entities[trace.c.entityNum];
-				if (traceEnt && traceEnt->IsType(hhVehicle::Type)) { //is it a vehicle?
+				if (traceEnt && traceEnt->IsType(hhVehicle::Type))
+				{ //is it a vehicle?
 					hhVehicle *traceVeh = static_cast<hhVehicle *>(traceEnt);
-					if (traceVeh->GetPilot() && traceVeh->GetPilot()->IsType(hhPlayer::Type)) { //if it's a vehicle, does it have a player pilot?
+					if (traceVeh->GetPilot() && traceVeh->GetPilot()->IsType(hhPlayer::Type))
+					{ //if it's a vehicle, does it have a player pilot?
 						MPAim = traceVeh->GetPilot()->entityNumber;
 					}
 				}
@@ -2804,56 +3072,70 @@ void hhPlayer::UpdateFocus(void) {
 
 	// no pretense at sorting here, just assume that there will only be one active
 	// gui within range along the trace
-	for (i = 0; i < listedClipModels; i++) {
+	for (i = 0; i < listedClipModels; i++)
+	{
 		clip = clipModelList[i];
 		ent = clip->GetEntity();
 
-		if (ent->IsHidden()) {
+		if (ent->IsHidden())
+		{
 			continue;
 		}
 
 		// HUMANHEAD pdm: added support here for all guis, not just gui1
 		int interactiveMask = 0;
 		renderEntity_t *renderEnt = ent->GetRenderEntity();
-		if (renderEnt) {
-			for (int ix = 0; ix < MAX_RENDERENTITY_GUI; ix++) {
-				if (renderEnt->gui[ix] && renderEnt->gui[ix]->IsInteractive()) {
+		if (renderEnt)
+		{
+			for (int ix = 0; ix < MAX_RENDERENTITY_GUI; ix++)
+			{
+				if (renderEnt->gui[ix] && renderEnt->gui[ix]->IsInteractive())
+				{
 					interactiveMask |= (1 << ix);
 				}
 			}
 		}
-		if (!interactiveMask) {
+		if (!interactiveMask)
+		{
 			continue;
 		}
 
 		pt = gameRenderWorld->GuiTrace(ent->GetModelDefHandle(), start, end, interactiveMask);
 
-		if (ent->fl.accurateGuiTrace) {
+		if (ent->fl.accurateGuiTrace)
+		{
 			trace_t tr;
 			gameLocal.clip.TracePoint(tr, start, end, CONTENTS_SOLID, this);
-			if (tr.fraction < pt.frac) {
+			if (tr.fraction < pt.frac)
+			{
 				continue;
 			}
 		}
 
-		if (pt.x != -1) {
+		if (pt.x != -1)
+		{
 			// we have a hit
 			renderEntity_t *focusGUIrenderEntity = ent->GetRenderEntity();
-			if (!focusGUIrenderEntity) {
+			if (!focusGUIrenderEntity)
+			{
 				continue;
 			}
 
-			if (pt.guiId == 1) {
+			if (pt.guiId == 1)
+			{
 				ui = focusGUIrenderEntity->gui[0];
 			}
-			else if (pt.guiId == 2) {
+			else if (pt.guiId == 2)
+			{
 				ui = focusGUIrenderEntity->gui[1];
 			}
-			else {
+			else
+			{
 				ui = focusGUIrenderEntity->gui[2];
 			}
 
-			if (ui == NULL) {
+			if (ui == NULL)
+			{
 				continue;
 			}
 
@@ -2861,12 +3143,14 @@ void hhPlayer::UpdateFocus(void) {
 			focusGUIent = ent;
 			focusUI = ui;
 
-			if (oldFocus != ent) {
+			if (oldFocus != ent)
+			{
 				// new activation
 				// going to see if we have anything in inventory a gui might be interested in
 				// need to enumerate inventory items
 				focusUI->SetStateInt("inv_count", inventory.items.Num());
-				for (j = 0; j < inventory.items.Num(); j++) {
+				for (j = 0; j < inventory.items.Num(); j++)
+				{
 					idDict *item = inventory.items[j];
 					const char *iname = item->GetString("inv_name");
 					const char *iicon = item->GetString("inv_icon");
@@ -2876,12 +3160,14 @@ void hhPlayer::UpdateFocus(void) {
 					focusUI->SetStateString(va("inv_icon_%i", j), iicon);
 					focusUI->SetStateString(va("inv_text_%i", j), itext);
 					kv = item->MatchPrefix("inv_id", NULL);
-					if (kv) {
+					if (kv)
+					{
 						focusUI->SetStateString(va("inv_id_%i", j), kv->GetValue());
 					}
 					// HUMANHEAD nla - Changed to pass all "passtogui_" keys to the gui
 					kv = item->MatchPrefix("passtogui_", NULL);
-					if (kv) {
+					if (kv)
+					{
 						focusUI->SetStateString(kv->GetKey(), kv->GetValue());
 						kv = item->MatchPrefix("passtogui_", kv);
 					}
@@ -2893,7 +3179,8 @@ void hhPlayer::UpdateFocus(void) {
 				focusUI->SetStateBool("player_spiritwalking", IsSpiritWalking());	// for hunterhand gui
 
 				kv = focusGUIent->spawnArgs.MatchPrefix("gui_parm", NULL);
-				while (kv) {
+				while (kv)
+				{
 					focusUI->SetStateString(kv->GetKey(), kv->GetValue());
 					kv = focusGUIent->spawnArgs.MatchPrefix("gui_parm", kv);
 				}
@@ -2913,14 +3200,17 @@ void hhPlayer::UpdateFocus(void) {
 		}
 	}
 
-	if (focusGUIent && focusUI) {
-		if (!oldFocus || oldFocus != focusGUIent) {
+	if (focusGUIent && focusUI)
+	{
+		if (!oldFocus || oldFocus != focusGUIent)
+		{
 			command = focusUI->Activate(true, gameLocal.time);
 			HandleGuiCommands(focusGUIent, command);
 			//StartSound( "snd_guienter", SND_CHANNEL_ANY, 0, false, NULL );
 		}
 	}
-	else if (oldFocus && oldUI) {
+	else if (oldFocus && oldUI)
+	{
 		command = oldUI->Activate(false, gameLocal.time);
 		HandleGuiCommands(oldFocus, command);
 		//StartSound( "snd_guiexit", SND_CHANNEL_ANY, 0, false, NULL );
@@ -2935,22 +3225,25 @@ hhPlayer::ApplyLandDeflect
 HUMANHEAD: aob
 ===============
 */
-idVec3 hhPlayer::ApplyLandDeflect(const idVec3& pos, float scale) {
+idVec3 hhPlayer::ApplyLandDeflect(const idVec3& pos, float scale)
+{
 	idVec3	localPos(pos);
 	int		delta = 0;
 	float	fraction = 0.0f;
 
 	// add fall height
 	delta = gameLocal.time - landTime;
-	if (delta < LAND_DEFLECT_TIME) {
-		fraction = (float)delta / LAND_DEFLECT_TIME;
+	if (delta < LAND_DEFLECT_TIME)
+	{
+		fraction = (float) delta / LAND_DEFLECT_TIME;
 		//HUMANHEAD: aob
 		fraction *= scale;
 		//HUMANHEAD END
 		localPos += cameraInterpolator.GetCurrentUpVector() * landChange * fraction;
 	}
-	else if (delta < LAND_DEFLECT_TIME + LAND_RETURN_TIME) {
-		fraction = (float)(LAND_DEFLECT_TIME + LAND_RETURN_TIME - delta) / LAND_RETURN_TIME;
+	else if (delta < LAND_DEFLECT_TIME + LAND_RETURN_TIME)
+	{
+		fraction = (float) (LAND_DEFLECT_TIME + LAND_RETURN_TIME - delta) / LAND_RETURN_TIME;
 		//HUMANHEAD: aob
 		fraction *= scale;
 		//HUMANHEAD END
@@ -2968,7 +3261,8 @@ Check for hard landings that generate sound events
 	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
 =================
 */
-void hhPlayer::CrashLand(const idVec3 &oldOrigin, const idVec3 &oldVelocity) {
+void hhPlayer::CrashLand(const idVec3 &oldOrigin, const idVec3 &oldVelocity)
+{
 	//HUMANHEAD: aob - removed unused vars
 	idVec3		origin;
 	idVec3		gravityNormal;
@@ -2986,13 +3280,15 @@ void hhPlayer::CrashLand(const idVec3 &oldOrigin, const idVec3 &oldVelocity) {
 
 	//HUMANHEAD: aob - added IsBound and trace check
 	// if the player is not on the ground
-	if ((!physicsObj.HasGroundContacts() || trace.fraction == 1.0f) && !IsBound()) {
+	if ((!physicsObj.HasGroundContacts() || trace.fraction == 1.0f) && !IsBound())
+	{
 		return;
 	}
 
 	//HUMANHEAD: aob - only check when we land on the ground
 	//If we get here we can assume we currently have ground contacts
-	if (physicsObj.HadGroundContacts()) {
+	if (physicsObj.HadGroundContacts())
+	{
 		return;
 	}
 	//HUMANHEAD END
@@ -3000,22 +3296,26 @@ void hhPlayer::CrashLand(const idVec3 &oldOrigin, const idVec3 &oldVelocity) {
 	gravityNormal = physicsObj.GetGravityNormal();
 
 	// if the player wasn't going down
-	if ((oldVelocity * -gravityNormal) >= 0.0f) {
+	if ((oldVelocity * -gravityNormal) >= 0.0f)
+	{
 		return;
 	}
 
 	waterLevel = physicsObj.GetWaterLevel();
 
 	// never take falling damage if completely underwater
-	if (waterLevel == WATERLEVEL_HEAD) {
+	if (waterLevel == WATERLEVEL_HEAD)
+	{
 		return;
 	}
 
 	// no falling damage if touching a nodamage surface
 	noDamage = false;
-	for (int i = 0; i < physicsObj.GetNumContacts(); i++) {
+	for (int i = 0; i < physicsObj.GetNumContacts(); i++)
+	{
 		const contactInfo_t &contact = physicsObj.GetContact(i);
-		if (contact.material->GetSurfaceFlags() & SURF_NODAMAGE) {
+		if (contact.material->GetSurfaceFlags() & SURF_NODAMAGE)
+		{
 			noDamage = true;
 			break;
 		}
@@ -3029,14 +3329,17 @@ void hhPlayer::CrashLand(const idVec3 &oldOrigin, const idVec3 &oldVelocity) {
 	//HUMANHEAD END
 
 	// reduce falling damage if there is standing water
-	if (waterLevel == WATERLEVEL_WAIST) {
+	if (waterLevel == WATERLEVEL_WAIST)
+	{
 		delta *= 0.25f;
 	}
-	if (waterLevel == WATERLEVEL_FEET) {
+	if (waterLevel == WATERLEVEL_FEET)
+	{
 		delta *= 0.5f;
 	}
 
-	if (delta < crashlandSpeed_jump || IsSpiritOrDeathwalking()) {
+	if (delta < crashlandSpeed_jump || IsSpiritOrDeathwalking())
+	{
 		return;	// Early out
 	}
 
@@ -3055,42 +3358,50 @@ void hhPlayer::CrashLand(const idVec3 &oldOrigin, const idVec3 &oldVelocity) {
 
 	fallDir.Normalize();
 
-	if (trace.fraction == 1.0f) {
+	if (trace.fraction == 1.0f)
+	{
 		return;
 	}
 
-	if (!IsBound()) {
+	if (!IsBound())
+	{
 		PlayCrashLandSound(trace, soundScale);
 		gameLocal.AlertAI(this, spawnArgs.GetFloat("land_alert_radius", "400"));
 	}
 
 	// Determine damage to what you're landing on
 	entity = gameLocal.GetTraceEntity(trace);
-	if (entity && trace.c.entityNum != ENTITYNUM_WORLD) {
+	if (entity && trace.c.entityNum != ENTITYNUM_WORLD)
+	{
 		entity->ApplyImpulse(this, 0, trace.c.point, (oldVelocity * reverseContactNormal) * reverseContactNormal);//Not sure if this impulse is large enough
 
 		const char* entityDamageName = spawnArgs.GetString("def_damageFellOnto");
-		if (*entityDamageName && damageScale > 0.0f) {
+		if (*entityDamageName && damageScale > 0.0f)
+		{
 			entity->Damage(this, this, fallDir, entityDamageName, damageScale, INVALID_JOINT);
 		}
 	}
 
 	// Calculate damage to self
 	const char* selfDamageName = NULL;
-	if (delta < crashlandSpeed_soft) {			// Soft Fall
+	if (delta < crashlandSpeed_soft)
+	{			// Soft Fall
 		AI_SOFTLANDING = true;
 		selfDamageName = spawnArgs.GetString("def_damageSoftFall");
 	}
-	else if (delta < crashlandSpeed_fatal) {		// Hard Fall
+	else if (delta < crashlandSpeed_fatal)
+	{		// Hard Fall
 		AI_HARDLANDING = true;
 		selfDamageName = spawnArgs.GetString("def_damageHardFall");
 	}
-	else {											// Fatal Fall
+	else
+	{											// Fatal Fall
 		AI_HARDLANDING = true;
 		selfDamageName = spawnArgs.GetString("def_damageFatalFall");
 	}
 
-	if (*selfDamageName && damageScale > 0.0f && !noDamage) {
+	if (*selfDamageName && damageScale > 0.0f && !noDamage)
+	{
 		pain_debounce_time = gameLocal.time + pain_delay + 1;  // ignore pain since we'll play our landing anim
 		Damage(NULL, NULL, fallDir, selfDamageName, damageScale, INVALID_JOINT);
 	}
@@ -3104,23 +3415,28 @@ HUMANHEAD: aob
 ===============
 */
 #define BOB_TO_NOBOB_RETURN_TIME 3000.0f
-idVec3 hhPlayer::ApplyBobCycle(const idVec3& pos, const idVec3& velocity) {
+idVec3 hhPlayer::ApplyBobCycle(const idVec3& pos, const idVec3& velocity)
+{
 	float			delta = 0.0f;
 	idVec3			localViewBob(pos);
 	const float		maxBob = 6.0f;
 
-	if (bob > 0.0f && !usercmd.forwardmove && !usercmd.rightmove) {//smoothly goto bob of zero if not already there
+	if (bob > 0.0f && !usercmd.forwardmove && !usercmd.rightmove)
+	{//smoothly goto bob of zero if not already there
 		delta = gameLocal.time - lastAppliedBobCycle;
 		bob *= (1.0f - (delta / BOB_TO_NOBOB_RETURN_TIME));
-		if (bob < 0.0f) {
+		if (bob < 0.0f)
+		{
 			bob = 0.0f;
 		}
 	}
-	else {
+	else
+	{
 		// add bob height after any movement smoothing
 		lastAppliedBobCycle = gameLocal.time;
 		bob = bobfracsin * xyspeed * pm_bobup.GetFloat();
-		if (bob > maxBob) {
+		if (bob > maxBob)
+		{
 			bob = maxBob;
 		}
 	}
@@ -3137,7 +3453,8 @@ hhPlayer::BobCycle
 	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
 ===============
 */
-void hhPlayer::BobCycle(const idVec3 &pushVelocity) {
+void hhPlayer::BobCycle(const idVec3 &pushVelocity)
+{
 	float		bobmove;
 	int			old; //, deltaTime;
 	idVec3		vel, gravityDir, velocity;
@@ -3161,17 +3478,21 @@ void hhPlayer::BobCycle(const idVec3 &pushVelocity) {
 
 	// do not evaluate the bob for other clients
 	// when doing a spectate follow, don't do any weapon bobbing
-	if (gameLocal.isClient && entityNumber != gameLocal.localClientNum) {
+	if (gameLocal.isClient && entityNumber != gameLocal.localClientNum)
+	{
 		//HUMANHEAD rww - allow bob when following players in spectator mode
 		bool canBob = false;
-		if (gameLocal.localClientNum != -1 && gameLocal.entities[gameLocal.localClientNum] && gameLocal.entities[gameLocal.localClientNum]->IsType(hhPlayer::Type)) {
+		if (gameLocal.localClientNum != -1 && gameLocal.entities[gameLocal.localClientNum] && gameLocal.entities[gameLocal.localClientNum]->IsType(hhPlayer::Type))
+		{
 			hhPlayer *pl = static_cast<hhPlayer *>(gameLocal.entities[gameLocal.localClientNum]);
-			if (pl->spectating && pl->spectator == entityNumber) {
+			if (pl->spectating && pl->spectator == entityNumber)
+			{
 				canBob = true;
 			}
 		}
 
-		if (!canBob) {
+		if (!canBob)
+		{
 			//HUMANHEAD END
 			viewBobAngles.Zero();
 			viewBob.Zero();
@@ -3179,31 +3500,36 @@ void hhPlayer::BobCycle(const idVec3 &pushVelocity) {
 		}
 	}
 
-	if (!physicsObj.HasGroundContacts() || influenceActive == INFLUENCE_LEVEL2 || (gameLocal.isMultiplayer && spectating)) {
+	if (!physicsObj.HasGroundContacts() || influenceActive == INFLUENCE_LEVEL2 || (gameLocal.isMultiplayer && spectating))
+	{
 		// airborne
 		bobCycle = 0;
 		bobFoot = 0;
 		bobfracsin = 0;
 	}
-	else if ((!usercmd.forwardmove && !usercmd.rightmove) || (xyspeed <= MIN_BOB_SPEED)) {
+	else if ((!usercmd.forwardmove && !usercmd.rightmove) || (xyspeed <= MIN_BOB_SPEED))
+	{
 		// start at beginning of cycle again
 		bobCycle = 0;
 		bobFoot = 0;
 		bobfracsin = 0;
 	}
-	else {
-		if (physicsObj.IsCrouching()) {
+	else
+	{
+		if (physicsObj.IsCrouching())
+		{
 			bobmove = pm_crouchbob.GetFloat();
 			// ducked characters never play footsteps
 		}
-		else {
+		else
+		{
 			// vary the bobbing based on the speed of the player
 			bobmove = pm_walkbob.GetFloat() * (1.0f - bobFrac) + pm_runbob.GetFloat() * bobFrac;
 		}
 
 		// check for footstep / splash sounds
 		old = bobCycle;
-		bobCycle = (int)(old + bobmove * gameLocal.msec) & 255;
+		bobCycle = (int) (old + bobmove * gameLocal.msec) & 255;
 		bobFoot = (bobCycle & 128) >> 7;
 		bobfracsin = idMath::Fabs(sin((bobCycle & 127) / 127.0 * idMath::PI));
 	}
@@ -3225,15 +3551,18 @@ void hhPlayer::BobCycle(const idVec3 &pushVelocity) {
 	speed = xyspeed > 200 ? xyspeed : 200;
 
 	delta = bobfracsin * pm_bobpitch.GetFloat() * speed;
-	if (physicsObj.IsCrouching()) {
+	if (physicsObj.IsCrouching())
+	{
 		delta *= 3;		// crouching
 	}
 	viewBobAngles.pitch += delta;
 	delta = bobfracsin * pm_bobroll.GetFloat() * speed;
-	if (physicsObj.IsCrouching()) {
+	if (physicsObj.IsCrouching())
+	{
 		delta *= 3;		// crouching accentuates roll
 	}
-	if (bobFoot & 1) {
+	if (bobFoot & 1)
+	{
 		delta = -delta;
 	}
 	viewBobAngles.roll += delta;
@@ -3245,17 +3574,21 @@ void hhPlayer::BobCycle(const idVec3 &pushVelocity) {
 	// calculate position for view bobbing
 	viewBob.Zero();
 
-	if (physicsObj.HasSteppedUp()) {
+	if (physicsObj.HasSteppedUp())
+	{
 
 		// check for stepping up before a previous step is completed
 		deltaTime = gameLocal.time - stepUpTime;
-		if (deltaTime < STEPUP_TIME) {
+		if (deltaTime < STEPUP_TIME)
+		{
 			stepUpDelta = stepUpDelta * (STEPUP_TIME - deltaTime) / STEPUP_TIME + physicsObj.GetStepUp();
 		}
-		else {
+		else
+		{
 			stepUpDelta = physicsObj.GetStepUp();
 		}
-		if (stepUpDelta > 2.0f * pm_stepsize.GetFloat()) {
+		if (stepUpDelta > 2.0f * pm_stepsize.GetFloat())
+		{
 			stepUpDelta = 2.0f * pm_stepsize.GetFloat();
 		}
 		stepUpTime = gameLocal.time;
@@ -3265,24 +3598,28 @@ void hhPlayer::BobCycle(const idVec3 &pushVelocity) {
 
 	// if the player stepped up recently
 	deltaTime = gameLocal.time - stepUpTime;
-	if (deltaTime < STEPUP_TIME) {
+	if (deltaTime < STEPUP_TIME)
+	{
 		viewBob += gravity * (stepUpDelta * (STEPUP_TIME - deltaTime) / STEPUP_TIME);
 	}
 
 	// add bob height after any movement smoothing
 	bob = bobfracsin * xyspeed * pm_bobup.GetFloat();
-	if (bob > 6) {
+	if (bob > 6)
+	{
 		bob = 6;
 	}
 	viewBob[2] += bob;
 
 	// add fall height
 	delta = gameLocal.time - landTime;
-	if (delta < LAND_DEFLECT_TIME) {
+	if (delta < LAND_DEFLECT_TIME)
+	{
 		f = delta / LAND_DEFLECT_TIME;
 		viewBob -= gravity * (landChange * f);
 	}
-	else if (delta < LAND_DEFLECT_TIME + LAND_RETURN_TIME) {
+	else if (delta < LAND_DEFLECT_TIME + LAND_RETURN_TIME)
+	{
 		delta -= LAND_DEFLECT_TIME;
 		f = 1.0 - (delta / LAND_RETURN_TIME);
 		viewBob -= gravity * (landChange * f);
@@ -3295,10 +3632,12 @@ void hhPlayer::BobCycle(const idVec3 &pushVelocity) {
 hhPlayer::UpdateDeltaViewAngles
 ================
 */
-void hhPlayer::UpdateDeltaViewAngles(const idAngles &angles) {
+void hhPlayer::UpdateDeltaViewAngles(const idAngles &angles)
+{
 	// set the delta angle
 	idAngles delta;
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 3; i++)
+	{
 #if 1 //rww - revert to id's method
 		//delta[i] = ((angles[i] - GetUntransformedViewAngles()[i]) / GetViewAnglesSensitivity()) + GetUntransformedViewAngles()[i] - SHORT2ANGLE(usercmd.angles[i]);
 		delta[i] = angles[i] - SHORT2ANGLE(usercmd.angles[i]);
@@ -3307,19 +3646,21 @@ void hhPlayer::UpdateDeltaViewAngles(const idAngles &angles) {
 #endif
 	}
 	SetDeltaViewAngles(delta);
-	}
+}
 
 /*
 ================
 hhPlayer::DetermineViewAngles
 ================
 */
-idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles) {
+idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles)
+{
 	int i;
 	idAngles localViewAngles(GetUntransformedViewAngles());
 	idAngles deltaCmdAngles;
 
-	if (!noclip && (gameLocal.inCinematic || privateCameraView || gameLocal.GetCamera() || influenceActive == INFLUENCE_LEVEL2)) {
+	if (!noclip && (gameLocal.inCinematic || privateCameraView || gameLocal.GetCamera() || influenceActive == INFLUENCE_LEVEL2))
+	{
 		// no view changes at all, but we still want to update the deltas or else when
 		// we get out of this mode, our view will snap to a kind of random angle
 		return GetUntransformedViewAngles();
@@ -3338,19 +3679,23 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 	//HUMANHEAD END
 
 	// if dead
-	if (IsDead()) {
+	if (IsDead())
+	{
 #if 0
-		if (DoThirdPersonDeath()) {
+		if (DoThirdPersonDeath())
+		{
 			localViewAngles.roll = 0.0f;
 			localViewAngles.pitch = 30.0f;
 		}
-		else {
+		else
+		{
 			localViewAngles.roll = 40.0f;
 			localViewAngles.pitch = -15.0f;
 		}
 		return localViewAngles;
 #else //HUMANHEAD PCF rww 04/26/06 - look freely while dead in MP
-		if (!DoThirdPersonDeath()) {
+		if (!DoThirdPersonDeath())
+		{
 			localViewAngles.roll = 40.0f;
 			localViewAngles.pitch = -15.0f;
 			return localViewAngles;
@@ -3360,8 +3705,10 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 
 	//JSHTODO this messes up multiplayer input.  remerge sensitivity code
 	// circularly clamp the angles with deltas
-	if (usercmd.buttons & BUTTON_MLOOK) {
-		for (i = 0; i < 3; i++) {
+	if (usercmd.buttons & BUTTON_MLOOK)
+	{
+		for (i = 0; i < 3; i++)
+		{
 			cmdAngles[i] = SHORT2ANGLE(usercmd.angles[i]);
 #if 1 //rww - revert to id's method
 			//localViewAngles[i] = idMath::AngleNormalize180( cmdAngles[i] + deltaViewAngles[i] - GetUntransformedViewAngles()[i] ) * GetViewAnglesSensitivity() + GetUntransformedViewAngles()[i];
@@ -3373,7 +3720,8 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 #endif
 		}
 	}
-	else {
+	else
+	{
 #if 1 //rww - revert to id's method
 		//localViewAngles.yaw = idMath::AngleNormalize180( SHORT2ANGLE( usercmd.angles[YAW] ) + deltaViewAngles[YAW] - GetUntransformedViewAngles()[YAW] ) * GetViewAnglesSensitivity() + GetUntransformedViewAngles()[YAW];
 		localViewAngles.yaw = idMath::AngleNormalize180(SHORT2ANGLE(usercmd.angles[YAW]) + deltaViewAngles[YAW]);
@@ -3386,10 +3734,11 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 		localViewAngles.yaw = deltaCmdAngles[YAW] + deltaViewAngles[YAW];
 #endif
 
-		if (!centerView.IsDone(gameLocal.time)) {
+		if (!centerView.IsDone(gameLocal.time))
+		{
 			localViewAngles.pitch = centerView.GetCurrentValue(gameLocal.time);
-	}
 		}
+	}
 
 #if GAMEPAD_SUPPORT	// VENOM BEGIN
 	float fpitch = idMath::Fabs(localViewAngles.pitch);
@@ -3401,22 +3750,27 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 		)
 	{
 		// dont start the leveling until we have .5 sec of valid movement
-		if ((gameLocal.time - lastAutoLevelTime) > 500) {
+		if ((gameLocal.time - lastAutoLevelTime) > 500)
+		{
 			float fadd = 0.6f;
-			if (fpitch < 10.f) {
+			if (fpitch < 10.f)
+			{
 				fadd *= (fpitch / 10.f);
 				fadd += 0.05f;
 			}
 
-			if (localViewAngles.pitch < 0) {
+			if (localViewAngles.pitch < 0)
+			{
 				localViewAngles.pitch += fadd;
 			}
-			else {
+			else
+			{
 				localViewAngles.pitch -= fadd;
 			}
 		}
 	}
-	else {
+	else
+	{
 		lastAutoLevelTime = gameLocal.time;
 	}
 
@@ -3425,27 +3779,33 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 #endif // VENOM END
 
 	// clamp the pitch
-	if (noclip) {
+	if (noclip)
+	{
 		localViewAngles.pitch = hhMath::ClampFloat(-89.0f, 89.0f, localViewAngles.pitch);
 	}
-	else {
+	else
+	{
 		//HUMANHEAD PCF rww 04/26/06 - look freely while dead in MP
-		if (IsDead() && DoThirdPersonDeath()) {
+		if (IsDead() && DoThirdPersonDeath())
+		{
 			localViewAngles.pitch = hhMath::ClampFloat(-45.0f, 45.0f, localViewAngles.pitch);
 		}
-		else {
+		else
+		{
 			//HUMANHEAD END
 			localViewAngles.pitch = hhMath::ClampFloat(pm_minviewpitch.GetFloat(), pm_maxviewpitch.GetFloat(), localViewAngles.pitch);
 		}
 	}
 
 	// HUMANHEAD pdm: clamp the yaw (only used for bindControllers)
-	if (!noclip && bClampYaw) {
+	if (!noclip && bClampYaw)
+	{
 		float idealYaw = 0.0f;
 		idVec3 masterOrigin;
 		idMat3 masterAxis;
 
-		if (GetMasterPosition(masterOrigin, masterAxis)) {
+		if (GetMasterPosition(masterOrigin, masterAxis))
+		{
 			idealYaw = masterAxis[0].ToYaw();
 			idealYaw = idMath::AngleNormalize180(idealYaw);
 		}
@@ -3463,16 +3823,18 @@ idAngles hhPlayer::DetermineViewAngles(const usercmd_t& cmd, idAngles& cmdAngles
 	loggedViewAngles[gameLocal.framenum & (NUM_LOGGED_VIEW_ANGLES - 1)] = localViewAngles;
 
 	return localViewAngles;
-	}
+}
 
 /*
 ================
 hhPlayer::SetViewAnglesSensitivity
 ================
 */
-void hhPlayer::SetViewAnglesSensitivity(float factor) {
+void hhPlayer::SetViewAnglesSensitivity(float factor)
+{
 	viewAnglesSensitivity = factor;
-	if (gameLocal.localClientNum == entityNumber) {
+	if (gameLocal.localClientNum == entityNumber)
+	{
 		common->SetGameSensitivityFactor(factor);
 	}
 }
@@ -3482,7 +3844,8 @@ void hhPlayer::SetViewAnglesSensitivity(float factor) {
 hhPlayer::GetViewAnglesSensitivity
 ================
 */
-float hhPlayer::GetViewAnglesSensitivity() const {
+float hhPlayer::GetViewAnglesSensitivity() const
+{
 	return viewAnglesSensitivity;
 }
 
@@ -3491,12 +3854,15 @@ float hhPlayer::GetViewAnglesSensitivity() const {
 hhPlayer::UpdateViewAngles
 ================
 */
-void hhPlayer::UpdateViewAngles(void) {
-	if (InVehicle()) {
+void hhPlayer::UpdateViewAngles(void)
+{
+	if (InVehicle())
+	{
 		return;
 	}
 
-	if (!noclip && (InCinematic() && lockView)) {
+	if (!noclip && (InCinematic() && lockView))
+	{
 		// no view changes at all, but we still want to update the deltas or else when
 		// we get out of this mode, our view will snap to a kind of random angle
 		UpdateDeltaViewAngles(viewAngles);
@@ -3508,11 +3874,14 @@ void hhPlayer::UpdateViewAngles(void) {
 
 	//HUMANHEAD rww - moved angle smoothing code here
 	// update the smoothed view angles
-	if (gameLocal.isClient) {
-		if (gameLocal.framenum >= smoothedFrame && entityNumber != gameLocal.localClientNum) {
+	if (gameLocal.isClient)
+	{
+		if (gameLocal.framenum >= smoothedFrame && entityNumber != gameLocal.localClientNum)
+		{
 			idAngles anglesDiff = viewAngles - smoothedAngles;
 			anglesDiff.Normalize180();
-			if (idMath::Fabs(anglesDiff.yaw) < 90.0f && idMath::Fabs(anglesDiff.pitch) < 90.0f) {
+			if (idMath::Fabs(anglesDiff.yaw) < 90.0f && idMath::Fabs(anglesDiff.pitch) < 90.0f)
+			{
 				// smoothen by pushing back to the previous angles
 				viewAngles -= gameLocal.clientSmoothing * anglesDiff;
 				viewAngles.Normalize180();
@@ -3534,7 +3903,8 @@ hhPlayer::UpdateOrientation
 HUMANHEAD: aob
 =====================
 */
-void hhPlayer::UpdateOrientation(const idAngles& newUntransformedViewAngles) {
+void hhPlayer::UpdateOrientation(const idAngles& newUntransformedViewAngles)
+{
 	idAngles angles;
 	//This is where the camera interpolator transforms the viewAngles to work with wallwalk.
 	//We also store the original untransformed view angles for use in some other code.
@@ -3544,7 +3914,8 @@ void hhPlayer::UpdateOrientation(const idAngles& newUntransformedViewAngles) {
 	SetUntransformedViewAngles(newUntransformedViewAngles);
 
 	angles = GetUntransformedViewAngles();
-	if (IsWallWalking()) {
+	if (IsWallWalking())
+	{
 		angles.pitch = 0.0f;
 	}
 	SetUntransformedViewAxis(idAngles(0.0f, angles.yaw, 0.0f).ToMat3());
@@ -3562,8 +3933,10 @@ void hhPlayer::UpdateOrientation(const idAngles& newUntransformedViewAngles) {
 // CJR
 //=============================================================================
 
-bool hhPlayer::CheckFOV(const idVec3 &pos) {
-	if (fovDot == 1.0f) {
+bool hhPlayer::CheckFOV(const idVec3 &pos)
+{
+	if (fovDot == 1.0f)
+	{
 		return true;
 	}
 
@@ -3582,8 +3955,10 @@ bool hhPlayer::CheckFOV(const idVec3 &pos) {
 // hhPlayer::CheckFOV
 // jsh - Similar to CheckFOV, but only checks yaw
 //=============================================================================
-bool hhPlayer::CheckYawFOV(const idVec3 &pos) {
-	if (fovDot == 1.0f) {
+bool hhPlayer::CheckYawFOV(const idVec3 &pos)
+{
+	if (fovDot == 1.0f)
+	{
 		return true;
 	}
 
@@ -3609,7 +3984,8 @@ hhPlayer::SetOrientation
 HUMANHEAD: aob
 =====================
 */
-void hhPlayer::SetOrientation(const idVec3& origin, const idMat3& bboxAxis, const idVec3& lookDir, const idAngles& newUntransformedViewAngles) {
+void hhPlayer::SetOrientation(const idVec3& origin, const idMat3& bboxAxis, const idVec3& lookDir, const idAngles& newUntransformedViewAngles)
+{
 	//never let the untransformed view angles have a roll value
 	idAngles modifiedUntransViewAngles = newUntransformedViewAngles;
 	modifiedUntransViewAngles.roll = 0.0f;
@@ -3638,7 +4014,8 @@ HUMANHEAD: mdl
 Same as SetOrientation, except doesn't check wallwalk, since the materials may not be set before the first frame.
 =====================
 */
-void hhPlayer::RestoreOrientation(const idVec3& origin, const idMat3& bboxAxis, const idVec3& lookDir, const idAngles& newUntransformedViewAngles) {
+void hhPlayer::RestoreOrientation(const idVec3& origin, const idMat3& bboxAxis, const idVec3& lookDir, const idAngles& newUntransformedViewAngles)
+{
 	physicsObj.SetOrigin(GetLocalCoordinates(origin));
 	physicsObj.SetAxis(bboxAxis);
 
@@ -3661,10 +4038,12 @@ hhPlayer::BufferLoggedViewAngles
 HUMANHEAD: aob - used when teleporting and using portals
 =====================
 */
-void hhPlayer::BufferLoggedViewAngles(const idAngles& newUntransformedViewAngles) {
+void hhPlayer::BufferLoggedViewAngles(const idAngles& newUntransformedViewAngles)
+{
 	idAngles deltaAngles = newUntransformedViewAngles - GetUntransformedViewAngles();
 
-	for (int ix = 0; ix < NUM_LOGGED_VIEW_ANGLES; ++ix) {
+	for (int ix = 0; ix < NUM_LOGGED_VIEW_ANGLES; ++ix)
+	{
 		loggedViewAngles[ix] += deltaAngles;
 	}
 }
@@ -3676,28 +4055,34 @@ hhPlayer::UpdateFromPhysics
 AOBMERGE - PERSISTANT MERGE
 ================
 */
-void hhPlayer::UpdateFromPhysics(bool moveBack) {
+void hhPlayer::UpdateFromPhysics(bool moveBack)
+{
 
 	// set master delta angles for actors
-	if (GetBindMaster()) {
-		if (!InVehicle()) {
+	if (GetBindMaster())
+	{
+		if (!InVehicle())
+		{
 			idAngles delta = GetDeltaViewAngles();
-			if (moveBack) {
+			if (moveBack)
+			{
 				delta.yaw -= physicsObj.GetMasterDeltaYaw();
 			}
-			else {
+			else
+			{
 				delta.yaw += physicsObj.GetMasterDeltaYaw();
 			}
 
 			SetDeltaViewAngles(delta);
 		}
-		else {
+		else
+		{
 			SetUntransformedViewAxis(mat3_identity);
 			SetUntransformedViewAngles(GetUntransformedViewAxis().ToAngles());
 			viewAngles = GetUntransformedViewAngles();
 			SetAxis(GetBindMaster()->GetAxis());
 
-			//AOB - now that we have an updated viewAxis we need to update the 
+			//AOB - now that we have an updated viewAxis we need to update the
 			//camera.  Feels like a hack!
 			cameraInterpolator.SetTargetAxis(GetAxis(), INTERPOLATE_NONE);
 		}
@@ -3712,74 +4097,95 @@ hhPlayer::PerformImpulse
 ==============
 */
 
-void hhPlayer::PerformImpulse(int impulse) {
-	if (InVehicle() && GetVehicleInterface()->InvalidVehicleImpulse(impulse)) {
+void hhPlayer::PerformImpulse(int impulse)
+{
+	if (InVehicle() && GetVehicleInterface()->InvalidVehicleImpulse(impulse))
+	{
 		return;
 	}
 
 	idPlayer::PerformImpulse(impulse);
 
-	switch (impulse) {
-	case IMPULSE_14: {
-		if (weapon.IsValid() && weapon->IsType(hhWeaponZoomable::Type)) {
+	switch (impulse)
+	{
+	case IMPULSE_14:
+	{
+		if (weapon.IsValid() && weapon->IsType(hhWeaponZoomable::Type))
+		{
 			hhWeaponZoomable *weap = static_cast<hhWeaponZoomable*>(weapon.GetEntity());
-			if (weap && weap->GetAltMode()) {
+			if (weap && weap->GetAltMode())
+			{
 				weap->ZoomInStep();
 			}
-			else {
+			else
+			{
 				NextWeapon();
 			}
 		}
-		else {
+		else
+		{
 			NextWeapon();
 		}
 		break;
 	}
-	case IMPULSE_15: {
-		if (weapon.IsValid() && weapon->IsType(hhWeaponZoomable::Type)) {
+	case IMPULSE_15:
+	{
+		if (weapon.IsValid() && weapon->IsType(hhWeaponZoomable::Type))
+		{
 			hhWeaponZoomable *weap = static_cast<hhWeaponZoomable*>(weapon.GetEntity());
-			if (weap && weap->GetAltMode()) {
+			if (weap && weap->GetAltMode())
+			{
 				weap->ZoomOutStep();
 			}
-			else {
+			else
+			{
 				PrevWeapon();
 			}
 		}
-		else {
+		else
+		{
 			PrevWeapon();
 		}
 		break;
 	}
 	case IMPULSE_16:
 		// Toggle Lighter
-		if (inventory.requirements.bCanUseLighter && weaponFlags != 0) { // mdl:  Disable lighter if all weapons are disabled
-			if (!gameLocal.isClient) {
+		if (inventory.requirements.bCanUseLighter && weaponFlags != 0)
+		{ // mdl:  Disable lighter if all weapons are disabled
+			if (!gameLocal.isClient)
+			{
 				ToggleLighter();
 			}
 		}
 		break;
 	case IMPULSE_25:
 		// Throw grenade
-		if (weaponFlags != 0 && !ActiveGui()) { // mdl:  Disable if all weapons are disabled
-			if (!gameLocal.isClient) {
+		if (weaponFlags != 0 && !ActiveGui())
+		{ // mdl:  Disable if all weapons are disabled
+			if (!gameLocal.isClient)
+			{
 				ThrowGrenade();
 			}
 		}
 		break;
 	case IMPULSE_54:
 		// Spirit Power key
-		if (IsDeathWalking()) { // CJR:  Developer-only ability to quickly return from DeathWalk by hitting the spirit key
-			if (developer.GetBool() && (gameLocal.time - deathWalkTime > spawnArgs.GetInt("deathWalkMinTime", "4000"))) { // Force the player to stay in deathwalk for a short period of time
+		if (IsDeathWalking())
+		{ // CJR:  Developer-only ability to quickly return from DeathWalk by hitting the spirit key
+			if (developer.GetBool() && (gameLocal.time - deathWalkTime > spawnArgs.GetInt("deathWalkMinTime", "4000")))
+			{ // Force the player to stay in deathwalk for a short period of time
 				deathWalkFlash = 0.0f;
 				PostEventMS(&EV_PrepareToResurrect, 0);
 			}
 		}
-		else if (inventory.requirements.bCanSpiritWalk) {
+		else if (inventory.requirements.bCanSpiritWalk)
+		{
 			ToggleSpiritWalk();
 		}
 		break;
 
-	case IMPULSE_18: {
+	case IMPULSE_18:
+	{
 #if GAMEPAD_SUPPORT	// VENOM BEGIN
 		idAngles localViewAngles(GetUntransformedViewAngles());
 		centerView.Init(gameLocal.time, 360, localViewAngles.pitch, 0);
@@ -3791,10 +4197,12 @@ void hhPlayer::PerformImpulse(int impulse) {
 	}
 }
 
-void hhPlayer::Present() {
+void hhPlayer::Present()
+{
 	idPlayer::Present();
 
-	if (lighterHandle != -1) {
+	if (lighterHandle != -1)
+	{
 		// Update oscillation position
 		idVec3 oscillation;
 		oscillation.x = 0.0f;
@@ -3813,12 +4221,15 @@ void hhPlayer::Present() {
 	}
 }
 
-void hhPlayer::LighterOn() {
-	if (IsSpiritOrDeathwalking() || InVehicle() || spectating || bReallyDead) { // No lighter in spirit mode, deathwalk, or when in vehicles (or when spectating or really dead -rww)
+void hhPlayer::LighterOn()
+{
+	if (IsSpiritOrDeathwalking() || InVehicle() || spectating || bReallyDead)
+	{ // No lighter in spirit mode, deathwalk, or when in vehicles (or when spectating or really dead -rww)
 		return;
 	}
 
-	if (lighterHandle == -1) {
+	if (lighterHandle == -1)
+	{
 		// Add the dynamic light
 		memset(&lighter, 0, sizeof(lighter));
 		lighter.lightId = LIGHTID_VIEW_MUZZLE_FLASH + entityNumber;
@@ -3840,46 +4251,59 @@ void hhPlayer::LighterOn() {
 	}
 }
 
-void hhPlayer::LighterOff() {
-	if (lighterHandle != -1) {
+void hhPlayer::LighterOff()
+{
+	if (lighterHandle != -1)
+	{
 		gameRenderWorld->FreeLightDef(lighterHandle);
 		lighterHandle = -1;
 		StartSound("snd_lighter_off", SND_CHANNEL_ITEM);
 	}
 }
 
-bool hhPlayer::IsLighterOn() const { 	//HUMANHEAD PCF mdl 05/04/06 - Made const
+bool hhPlayer::IsLighterOn() const
+{ 	//HUMANHEAD PCF mdl 05/04/06 - Made const
 	return (lighterHandle != -1);
 }
 
-void hhPlayer::ToggleLighter() {
-	if (IsLighterOn()) {
+void hhPlayer::ToggleLighter()
+{
+	if (IsLighterOn())
+	{
 		LighterOff();
 	}
-	else {
+	else
+	{
 		LighterOn();
 	}
 }
 
-void hhPlayer::UpdateLighter() {
-	if (IsLighterOn()) {
+void hhPlayer::UpdateLighter()
+{
+	if (IsLighterOn())
+	{
 		// Increase the lighter's temperature until it overheats
-		if (!gameLocal.isMultiplayer) { //rww - don't bother overheating the lighter in mp
+		if (!gameLocal.isMultiplayer)
+		{ //rww - don't bother overheating the lighter in mp
 			lighterTemperature += spawnArgs.GetFloat("lighterHeatRate", "0.025") * MS2SEC(USERCMD_MSEC);
-			if (lighterTemperature >= 1.0f) {
+			if (lighterTemperature >= 1.0f)
+			{
 				// Too hot, turn the lighter off
 				StartSound("snd_lighter_toohot", SND_CHANNEL_ANY);
 				lighterTemperature = 1.0f;
 
-				if (!(godmode || noclip)) {
+				if (!(godmode || noclip))
+				{
 					LighterOff();
 				}
 			}
 		}
 	}
-	else {
+	else
+	{
 		// Lighter is off, so decrease the lighter's temperature
-		if (lighterTemperature > 0) {
+		if (lighterTemperature > 0)
+		{
 			lighterTemperature -= spawnArgs.GetFloat("lighterCoolRate", "0.05")  * MS2SEC(USERCMD_MSEC);
 		}
 	}
@@ -3890,12 +4314,15 @@ void hhPlayer::UpdateLighter() {
 hhPlayer::PlayFootstepSound
 ==================
 */
-void hhPlayer::PlayFootstepSound() {
-	if (IsSpiritOrDeathwalking()) {
+void hhPlayer::PlayFootstepSound()
+{
+	if (IsSpiritOrDeathwalking())
+	{
 		return; // No footstep sounds in spiritwalk mode
 	}
 
-	if (IsWallWalking()) {
+	if (IsWallWalking())
+	{
 		// Special case wallwalk since contacts includes some non-wallwalk types
 		const char* soundKey = gameLocal.MatterTypeToMatterKey("snd_footstep", SURFTYPE_WALLWALK);
 		StartSound(soundKey, SND_CHANNEL_BODY3, 0, false, NULL);
@@ -3912,13 +4339,16 @@ hhPlayer::PlayPainSound
 HUMANHEAD: aob
 =====================
 */
-void hhPlayer::PlayPainSound() {
-	if (IsSpiritOrDeathwalking()) {
+void hhPlayer::PlayPainSound()
+{
+	if (IsSpiritOrDeathwalking())
+	{
 		return;
 	}
 
 	//HUMANHEAD PCF rww 09/15/06 - female mp sounds
-	if (IsFemale()) {
+	if (IsFemale())
+	{
 		StartSound("snd_pain_small_female", SND_CHANNEL_VOICE);
 		return;
 	}
@@ -3931,8 +4361,10 @@ void hhPlayer::PlayPainSound() {
 hhPlayer::Give
 ===============
 */
-bool hhPlayer::Give(const char *statname, const char *value) {
-	if (IsDead()) {
+bool hhPlayer::Give(const char *statname, const char *value)
+{
+	if (IsDead())
+	{
 		return false;
 	}
 
@@ -3944,8 +4376,10 @@ bool hhPlayer::Give(const char *statname, const char *value) {
 hhPlayer::ReportAttack
 ===============
 */
-void hhPlayer::ReportAttack(idEntity *attacker) {
-	if (gameLocal.isServer && attacker) { //rww - broadcast event for this on the server
+void hhPlayer::ReportAttack(idEntity *attacker)
+{
+	if (gameLocal.isServer && attacker)
+	{ //rww - broadcast event for this on the server
 		idBitMsg	msg;
 		byte		msgBuf[MAX_EVENT_PARAM_SIZE];
 
@@ -3957,24 +4391,29 @@ void hhPlayer::ReportAttack(idEntity *attacker) {
 
 	int ix;
 
-	for (ix = 0; ix < MAX_TRACKED_ATTACKERS; ix++) {
+	for (ix = 0; ix < MAX_TRACKED_ATTACKERS; ix++)
+	{
 
 		// If the attacker already exists, stomp it
-		if (lastAttackers[ix].attacker == attacker) {
+		if (lastAttackers[ix].attacker == attacker)
+		{
 			lastAttackers[ix].time = gameLocal.time;
 			lastAttackers[ix].displayed = false;
 			return;
 		}
 
 		// If any are expired, free their slot
-		if (gameLocal.time > lastAttackers[ix].time + DAMAGE_INDICATOR_TIME) {
+		if (gameLocal.time > lastAttackers[ix].time + DAMAGE_INDICATOR_TIME)
+		{
 			lastAttackers[ix].attacker = NULL;
 		}
 	}
 
 	// Add this attacker to first free slot, if any
-	for (ix = 0; ix < MAX_TRACKED_ATTACKERS; ix++) {
-		if (!lastAttackers[ix].attacker.IsValid()) {
+	for (ix = 0; ix < MAX_TRACKED_ATTACKERS; ix++)
+	{
+		if (!lastAttackers[ix].attacker.IsValid())
+		{
 			lastAttackers[ix].attacker = attacker;
 			lastAttackers[ix].time = gameLocal.time;
 			lastAttackers[ix].displayed = false;
@@ -3985,13 +4424,16 @@ void hhPlayer::ReportAttack(idEntity *attacker) {
 	// All slots full, overwrite the oldest slot
 	int oldSlot = -1;
 	int oldTime = gameLocal.time;
-	for (ix = 0; ix < MAX_TRACKED_ATTACKERS; ix++) {
-		if (lastAttackers[ix].time < oldTime) {
+	for (ix = 0; ix < MAX_TRACKED_ATTACKERS; ix++)
+	{
+		if (lastAttackers[ix].time < oldTime)
+		{
 			oldTime = lastAttackers[ix].time;
 			oldSlot = ix;
 		}
 	}
-	if (oldSlot > 0) {
+	if (oldSlot > 0)
+	{
 		lastAttackers[oldSlot].attacker = attacker;
 		lastAttackers[oldSlot].time = gameLocal.time;
 		lastAttackers[oldSlot].displayed = false;
@@ -4004,12 +4446,16 @@ hhPlayer::Damage
 ==================
 */
 void hhPlayer::Damage(idEntity *inflictor, idEntity *attacker, const idVec3 &dir,
-	const char *damageDefName, const float damageScale, const int location) {
+	const char *damageDefName, const float damageScale, const int location)
+{
 
-	if (IsSpiritOrDeathwalking()) { //Player is spirit-walking, so check for special immunities
+	if (IsSpiritOrDeathwalking())
+	{ //Player is spirit-walking, so check for special immunities
 		const idKeyValue *kv = spawnArgs.MatchPrefix("immunityspirit");
-		while (kv && kv->GetValue().Length()) {
-			if (!kv->GetValue().Icmp(damageDefName)) {
+		while (kv && kv->GetValue().Length())
+		{
+			if (!kv->GetValue().Icmp(damageDefName))
+			{
 				return;
 			}
 			kv = spawnArgs.MatchPrefix("immunityspirit", kv);
@@ -4017,26 +4463,31 @@ void hhPlayer::Damage(idEntity *inflictor, idEntity *attacker, const idVec3 &dir
 
 		// If the player is spiritwalking, then any damage takes away spirit power instead of health
 		ammo_t ammo_spiritpower = idWeapon::GetAmmoNumForName("ammo_spiritpower");
-		if (IsSpiritWalking()) {
+		if (IsSpiritWalking())
+		{
 			const idDict *damageDef = gameLocal.FindEntityDefDict(damageDefName);
-			if (damageDef) {
+			if (damageDef)
+			{
 				idPlayer *player = (attacker && attacker->IsType(idPlayer::Type)) ? static_cast<idPlayer*>(attacker) : NULL;
 				if (!(gameLocal.gameType == GAME_TDM
 					&& !gameLocal.serverInfo.GetBool("si_teamDamage")
 					&& !damageDef->GetBool("noTeam")
 					&& player
 					&& player != this		// you get self damage no matter what
-					&& player->team == team)) {
+					&& player->team == team))
+				{
 					//rww - don't damage teammates' spirit when ff off
 					int damageWhenSpirit = damageDef->GetInt("damageWhenSpirit", "0"); //rww - special damage for knocking players back to body in mp when shot by other things (namely spirit arrows)
 					int oldSpirit = inventory.ammo[ammo_spiritpower];
 
 					int spiritDamage = (damageDef->GetInt("damage", "1") * spawnArgs.GetFloat("damageScaleInSpirit") * damageScale) + damageWhenSpirit;
-					if (spiritDamage <= 0 && damageScale > 0) {
+					if (spiritDamage <= 0 && damageScale > 0)
+					{
 						spiritDamage = 1;
 					}
 
-					if (!UseAmmo(ammo_spiritpower, spiritDamage)) {
+					if (!UseAmmo(ammo_spiritpower, spiritDamage))
+					{
 						inventory.ammo[ammo_spiritpower] = 0; // Clear spiritpower amount when returning from excessive damage
 					}
 				}
@@ -4045,51 +4496,65 @@ void hhPlayer::Damage(idEntity *inflictor, idEntity *attacker, const idVec3 &dir
 			lastDamagedTime = gameLocal.time; // Save the damage time for the health recharge code
 
 			// Track last attacker for use in displaying HUD hit indicator
-			if (!gameLocal.isClient) {
+			if (!gameLocal.isClient)
+			{
 				ReportAttack(attacker);
 			}
 
 			//HUMANHEAD rww - damage feedback for hitting spirit players in mp
-			if (gameLocal.isMultiplayer && attacker && !gameLocal.isClient) {
+			if (gameLocal.isMultiplayer && attacker && !gameLocal.isClient)
+			{
 				hhPlayer *killer = NULL;
-				if (attacker->IsType(idPlayer::Type)) {
+				if (attacker->IsType(idPlayer::Type))
+				{
 					killer = static_cast<hhPlayer*>(attacker);
 				}
-				else if (attacker->IsType(hhVehicle::Type)) {
+				else if (attacker->IsType(hhVehicle::Type))
+				{
 					hhVehicle *veh = static_cast<hhVehicle*>(attacker);
-					if (veh->GetPilot() && veh->GetPilot()->IsType(idPlayer::Type)) {
+					if (veh->GetPilot() && veh->GetPilot()->IsType(idPlayer::Type))
+					{
 						killer = static_cast<hhPlayer*>(veh->GetPilot());
 					}
 				}
 
-				if (killer && killer->entityNumber != entityNumber && killer->mpHitFeedbackTime <= gameLocal.time) {
-					if (killer == gameLocal.GetLocalPlayer()) {
+				if (killer && killer->entityNumber != entityNumber && killer->mpHitFeedbackTime <= gameLocal.time)
+				{
+					if (killer == gameLocal.GetLocalPlayer())
+					{
 						assert(IsSpiritOrDeathwalking());
-						if (gameLocal.gameType == GAME_TDM && team == killer->team) {
+						if (gameLocal.gameType == GAME_TDM && team == killer->team)
+						{
 							killer->StartSound("snd_hitTeamFeedback", SND_CHANNEL_ITEM, 0, false, NULL);
 						}
-						else {
+						else
+						{
 							killer->StartSound("snd_hitSpiritFeedback", SND_CHANNEL_ITEM, 0, false, NULL);
 
 							//hardcoded health ranges for the various flash colors
 							float h;
-							if (health > 100) {
+							if (health > 100)
+							{
 								h = 0.0f;
 							}
-							else if (health > 75) {
+							else if (health > 75)
+							{
 								h = 0.25f;
 							}
-							else if (health > 25) {
+							else if (health > 25)
+							{
 								h = 0.50f;
 							}
-							else {
+							else
+							{
 								h = 0.75f;
 							}
 							SetShaderParm(3, h);
 							SetShaderParm(5, -MS2SEC(gameLocal.time) * 2);
 						}
 					}
-					else {
+					else
+					{
 						idBitMsg	msg;
 						byte		msgBuf[MAX_EVENT_PARAM_SIZE];
 
@@ -4108,19 +4573,24 @@ void hhPlayer::Damage(idEntity *inflictor, idEntity *attacker, const idVec3 &dir
 	lastDamagedTime = gameLocal.time; // Save the damage time for the health recharge code
 
 	// Track last attacker for use in displaying HUD hit indicator
-	if (!gameLocal.isClient) {
+	if (!gameLocal.isClient)
+	{
 		ReportAttack(attacker);
 	}
 
 	// Check if the damage should "really kill" the player (when in deathwalk mode)
-	if (IsDeathWalking()) {
+	if (IsDeathWalking())
+	{
 		const idDict *damageDef = gameLocal.FindEntityDefDict(damageDefName);
-		if (damageDef) {
-			if (damageDef->GetBool("reallyKill", "0")) { // Truly kill the player
+		if (damageDef)
+		{
+			if (damageDef->GetBool("reallyKill", "0"))
+			{ // Truly kill the player
 				ReallyKilled(inflictor, attacker, damageDef->GetInt("damage", "9999"), dir, location);
 				return;
 			}
-			else if (damageDef->GetBool("spiritDamage", "0")) { // Drain spirit power
+			else if (damageDef->GetBool("spiritDamage", "0"))
+			{ // Drain spirit power
 				ammo_t ammo_spiritpower = idWeapon::GetAmmoNumForName("ammo_spiritpower");
 				UseAmmo(ammo_spiritpower, damageDef->GetInt("damage", "1") * damageScale);
 				return;
@@ -4129,26 +4599,32 @@ void hhPlayer::Damage(idEntity *inflictor, idEntity *attacker, const idVec3 &dir
 	}
 
 	//HUMANHEAD rww - keep track of last person to attack me, debounce time will vary based on ground contact
-	if (attacker && attacker->IsType(idPlayer::Type)) {
+	if (attacker && attacker->IsType(idPlayer::Type))
+	{
 		airAttacker = attacker;
-		if (!AI_ONGROUND) {
+		if (!AI_ONGROUND)
+		{
 			airAttackerTime = gameLocal.time + 300;
 		}
-		else { //if they are on the ground do a 100ms debounce in case they fall off a ledge or something as a result of leftover attack velocity
+		else
+		{ //if they are on the ground do a 100ms debounce in case they fall off a ledge or something as a result of leftover attack velocity
 			airAttackerTime = gameLocal.time + 100;
 		}
 	}
 	//HUMANHEAD END
 
 	// CJR: DDA:  Only in single player
-	if (!gameLocal.isMultiplayer) {
+	if (!gameLocal.isMultiplayer)
+	{
 		float newDamageScale = gameLocal.GetDDAValue() * 2.0f; // Scale damage from easy to hard
 		newDamageScale *= damageScale;
 
 		const idDict *damageDef = gameLocal.FindEntityDefDict(damageDefName);
-		if (damageDef) {
+		if (damageDef)
+		{
 			bool noGod = damageDef->GetBool("noGod", "0");
-			if (noGod) {
+			if (noGod)
+			{
 				// Make sure fatal damage bypasses post-deathwalk invulnerability
 				fl.takedamage = true;
 			}
@@ -4157,66 +4633,84 @@ void hhPlayer::Damage(idEntity *inflictor, idEntity *attacker, const idVec3 &dir
 		int oldHealth = health;
 		idPlayer::Damage(inflictor, attacker, dir, damageDefName, static_cast<const float>(newDamageScale), location); // CJR DDA TEST
 
-		if (attacker && attacker->IsType(hhMonsterAI::Type)) { // CJR DDA: Damaged by a monster, add the damage to the monster count
+		if (attacker && attacker->IsType(hhMonsterAI::Type))
+		{ // CJR DDA: Damaged by a monster, add the damage to the monster count
 			float delta = oldHealth - health;
 
 			hhMonsterAI *monster = static_cast<hhMonsterAI *>(attacker);
 
-			if (monster) {
+			if (monster)
+			{
 				monster->DamagedPlayer(delta);
 			}
 		}
 	}
-	else {
+	else
+	{
 		idPlayer::Damage(inflictor, attacker, dir, damageDefName, damageScale, location);
 	}
 
 	//HUMANHEAD rww - hit feedback
-	if (gameLocal.isMultiplayer && attacker && !gameLocal.isClient) { //let's broadcast from the server only, so hit feedback is always reliable
+	if (gameLocal.isMultiplayer && attacker && !gameLocal.isClient)
+	{ //let's broadcast from the server only, so hit feedback is always reliable
 		hhPlayer *killer = NULL;
-		if (attacker->IsType(idPlayer::Type)) {
+		if (attacker->IsType(idPlayer::Type))
+		{
 			killer = static_cast<hhPlayer*>(attacker);
 		}
-		else if (attacker->IsType(hhVehicle::Type)) {
+		else if (attacker->IsType(hhVehicle::Type))
+		{
 			hhVehicle *veh = static_cast<hhVehicle*>(attacker);
-			if (veh->GetPilot() && veh->GetPilot()->IsType(idPlayer::Type)) {
+			if (veh->GetPilot() && veh->GetPilot()->IsType(idPlayer::Type))
+			{
 				killer = static_cast<hhPlayer*>(veh->GetPilot());
 			}
 		}
 
-		if (killer && killer->entityNumber != entityNumber && killer->mpHitFeedbackTime <= gameLocal.time) {
-			if (killer == gameLocal.GetLocalPlayer()) {
+		if (killer && killer->entityNumber != entityNumber && killer->mpHitFeedbackTime <= gameLocal.time)
+		{
+			if (killer == gameLocal.GetLocalPlayer())
+			{
 				//don't provide visual indicator when shooting a teammate
-				if (gameLocal.gameType == GAME_TDM && team == killer->team) {
+				if (gameLocal.gameType == GAME_TDM && team == killer->team)
+				{
 					killer->StartSound("snd_hitTeamFeedback", SND_CHANNEL_ITEM, 0, false, NULL);
 				}
-				else {
-					if (IsSpiritOrDeathwalking()) {
+				else
+				{
+					if (IsSpiritOrDeathwalking())
+					{
 						killer->StartSound("snd_hitSpiritFeedback", SND_CHANNEL_ITEM, 0, false, NULL);
 					}
-					else {
+					else
+					{
 						killer->StartSound("snd_hitFeedback", SND_CHANNEL_ITEM, 0, false, NULL);
 					}
 
 					//hardcoded health ranges for the various flash colors
 					float h;
-					if (health > 100) {
+					if (health > 100)
+					{
 						h = 0.0f;
 					}
-					else if (health > 75) {
+					else if (health > 75)
+					{
 						h = 0.25f;
 					}
-					else if (health > 25) {
+					else if (health > 25)
+					{
 						h = 0.50f;
 					}
-					else {
+					else
+					{
 						h = 0.75f;
 					}
 					SetShaderParm(3, h);
 					SetShaderParm(5, -MS2SEC(gameLocal.time) * 2);
 				}
 			}
-			else {
+			else
+			{
 				idBitMsg	msg;
 				byte		msgBuf[MAX_EVENT_PARAM_SIZE];
 
@@ -4231,25 +4725,30 @@ void hhPlayer::Damage(idEntity *inflictor, idEntity *attacker, const idVec3 &dir
 	}
 	//HUMANHEAD END
 
-	if (bFrozen) {
+	if (bFrozen)
+	{
 		const idDict *damageDef = gameLocal.FindEntityDefDict(damageDefName);
-		if (damageDef && damageDef->GetInt("free_cocoon", "0")) {
+		if (damageDef && damageDef->GetInt("free_cocoon", "0"))
+		{
 			Event_Unfreeze();
 		}
 	}
 }
 
-void hhPlayer::DoDeathDrop() {
+void hhPlayer::DoDeathDrop()
+{
 	// General dropping (for monsters, souls, etc.)
 	const idKeyValue *kv = NULL;
 	kv = spawnArgs.MatchPrefix("def_drops", NULL);
-	while (kv) {
+	while (kv)
+	{
 
 		idStr drops = kv->GetValue();
 		idDict args;
 
 		idStr last5 = kv->GetKey().Right(5);
-		if (drops.Length() && idStr::Icmp(last5, "Joint") != 0) {
+		if (drops.Length() && idStr::Icmp(last5, "Joint") != 0)
+		{
 
 			args.Set("classname", drops);
 
@@ -4267,9 +4766,11 @@ void hhPlayer::DoDeathDrop() {
 			gameLocal.SpawnEntityDef(args, &newEnt);
 			HH_ASSERT(newEnt != NULL);
 
-			if (jointName.Length()) {
+			if (jointName.Length())
+			{
 				jointHandle_t joint = GetAnimator()->GetJointHandle(jointName);
-				if (!GetAnimator()->GetJointTransform(joint, gameLocal.time, origin, axis)) {
+				if (!GetAnimator()->GetJointTransform(joint, gameLocal.time, origin, axis))
+				{
 					gameLocal.Printf("%s refers to invalid joint '%s' on entity '%s'\n", static_cast<const char*>(jointKey.c_str()), static_cast<const char*>(jointName), static_cast<const char*>(name));
 					origin = renderEntity.origin;
 					axis = renderEntity.axis;
@@ -4279,7 +4780,8 @@ void hhPlayer::DoDeathDrop() {
 				newEnt->SetAxis(axis);
 				newEnt->SetOrigin(origin);
 			}
-			else {
+			else
+			{
 				newEnt->SetAxis(viewAxis);
 				newEnt->SetOrigin(GetOrigin());
 			}
@@ -4298,18 +4800,23 @@ only cosmetic things should be placed here, this function will not be called
 for sure on death, at least for the client.
 ==================
 */
-void hhPlayer::Event_RespawnCleanup(void) {
+void hhPlayer::Event_RespawnCleanup(void)
+{
 	//remove any fx entities which are bound to the player
 	idEntity *ent;
 	idEntity *next;
 
-	for (ent = teamChain; ent != NULL; ent = next) {
+	for (ent = teamChain; ent != NULL; ent = next)
+	{
 		next = ent->GetTeamChain();
-		if (ent->GetBindMaster() == this && ent->IsType(hhEntityFx::Type)) {
+		if (ent->GetBindMaster() == this && ent->IsType(hhEntityFx::Type))
+		{
 			ent->Unbind();
-			if (!ent->fl.noRemoveWhenUnbound) {
+			if (!ent->fl.noRemoveWhenUnbound)
+			{
 				ent->PostEventMS(&EV_Remove, 0);
-				if (gameLocal.isClient) {
+				if (gameLocal.isClient)
+				{
 					ent->Hide();
 				}
 			}
@@ -4324,79 +4831,94 @@ void hhPlayer::Event_RespawnCleanup(void) {
 hhPlayer::Killed
 ==================
 */
-void hhPlayer::Killed(idEntity *inflictor, idEntity *attacker, int damage, const idVec3 &dir, int location) {
+void hhPlayer::Killed(idEntity *inflictor, idEntity *attacker, int damage, const idVec3 &dir, int location)
+{
 	//you only die once
-	if (AI_DEAD) {
+	if (AI_DEAD)
+	{
 		return;
 	}
 
 	CancelEvents(&EV_DamagePlayer); //rww - don't do any more posted damage events once dead
 
-	if (gameLocal.isMultiplayer) { //rww - this was not handled at all, i guess because there are different circumstances for "death" in sp
+	if (gameLocal.isMultiplayer)
+	{ //rww - this was not handled at all, i guess because there are different circumstances for "death" in sp
 		wallwalkSoundController.StopSound(SND_CHANNEL_WALLWALK, SND_CHANNEL_WALLWALK2, false);
 		spiritwalkSoundController.StopSound(SND_CHANNEL_BODY, SND_CHANNEL_BODY2);
 
 		LighterOff();
 
-		if (!gameLocal.isClient && weapon.IsValid() && weapon->IsType(hhWeapon::Type) && weapon->CanDrop()) { //when dying in mp, toss my weapon out.
+		if (!gameLocal.isClient && weapon.IsValid() && weapon->IsType(hhWeapon::Type) && weapon->CanDrop())
+		{ //when dying in mp, toss my weapon out.
 			idVec3 forward, up;
 
 			viewAngles.ToVectors(&forward, NULL, &up);
 			//rww - hackishness to keep the type of ammo in the leechgun that it was dropped with
 			idEntity *dropped = weapon->DropItem(50.0f * forward + 50.0f * up, 0, 60000, true);
-			if (dropped && weapon->IsType(hhWeaponSoulStripper::Type)) {
+			if (dropped && weapon->IsType(hhWeaponSoulStripper::Type))
+			{
 				dropped->spawnArgs.Set("def_droppedEnergyType", inventory.energyType);
 			}
 		}
 	}
 
-	if (!gameLocal.isClient) {
+	if (!gameLocal.isClient)
+	{
 		DoDeathDrop();
 	}
 
-	if (gameLocal.isMultiplayer && !gameLocal.IsCooperative()) {
+	if (gameLocal.isMultiplayer && !gameLocal.IsCooperative())
+	{
 		bDeathWalk = false;
 		bSpiritWalk = false;
 		bReallyDead = true;
 	}
-	else if (!inventory.requirements.bCanDeathWalk || !gameLocal.DeathwalkMapLoaded()) {
+	else if (!inventory.requirements.bCanDeathWalk || !gameLocal.DeathwalkMapLoaded())
+	{
 		bDeathWalk = false;
 		bSpiritWalk = false;
 		bReallyDead = true;
 	}
 
 	//First thing we do is get out of vehicle
-	if (InVehicle()) {
+	if (InVehicle())
+	{
 		GetVehicleInterface()->GetVehicle()->EjectPilot();
 	}
 
 	// HUMANHEAD cjr:  Update DDA
-	if (!AI_DEAD && !gameLocal.isMultiplayer) {
+	if (!AI_DEAD && !gameLocal.isMultiplayer)
+	{
 		gameLocal.GetDDA()->DDA_AddDeath(this, attacker);
 	}
 	// HUMANHEAD END
 
-	if (attacker && attacker->spawnArgs.GetBool("death_look_at", "0")) {
+	if (attacker && attacker->spawnArgs.GetBool("death_look_at", "0"))
+	{
 		attacker->spawnArgs.GetString("death_look_at_bone", "", deathLookAtBone);
 		attacker->spawnArgs.GetString("death_camera_bone", "", deathCameraBone);
 		deathLookAtEntity = attacker;
 	}
 
-	if (weapon.IsValid()) {
+	if (weapon.IsValid())
+	{
 		//HUMANHEAD bjk 04/26/06 - no sniper scope when dead
-		if (weapon->IsType(hhWeaponRifle::Type)) {
+		if (weapon->IsType(hhWeaponRifle::Type))
+		{
 			static_cast<hhWeaponRifle*>(weapon.GetEntity())->ZoomOut();
 		}
 		weapon->PutAway();
 	}
 
 	// HUMANHEAD nla
-	if (hand.IsValid()) {
+	if (hand.IsValid())
+	{
 		hand->PutAway();
 	}
 	// HUMANHEAD END
 
-	if (!bReallyDead) { // Only go into deathwalk mode if the player is in the transitional death state
+	if (!bReallyDead)
+	{ // Only go into deathwalk mode if the player is in the transitional death state
 		idVec3 origin;
 		idMat3 axis;
 		idVec3 viewDir;
@@ -4405,20 +4927,25 @@ void hhPlayer::Killed(idEntity *inflictor, idEntity *attacker, int damage, const
 		GetResurrectionPoint(origin, axis, viewDir, angles, eyeAxis, GetPhysics()->GetAbsBounds(), GetOrigin(), GetPhysics()->GetAxis(), GetAxis()[0], viewAngles);
 		DeathWalk(origin, axis, viewDir.ToMat3(), angles, eyeAxis);
 	}
-	else {
-		if (gameLocal.isMultiplayer) { //HUMANHEAD rww
+	else
+	{
+		if (gameLocal.isMultiplayer)
+		{ //HUMANHEAD rww
 			PostEventMS(&EV_RespawnCleanup, 32);
-			if (!gameLocal.isClient) {
+			if (!gameLocal.isClient)
+			{
 				StartRagdoll(); //start to rag on the player so that the proxy copies off proper af status
 
 				GetPhysics()->SetContents(0); //make non-solid
 
 				hhMPDeathProxy *prox = static_cast<hhMPDeathProxy *>(hhSpiritProxy::CreateProxy(spawnArgs.GetString("def_deathProxy_mp"), this, GetOrigin(), GetPhysics()->GetAxis(), viewAxis, viewAngles, GetEyeAxis()));
-				assert(((hhSpiritProxy *)prox)->IsType(hhMPDeathProxy::Type));
-				if (prox) {
+				assert(((hhSpiritProxy *) prox)->IsType(hhMPDeathProxy::Type));
+				if (prox)
+				{
 					idVec3 flingForce;
 					float capDmg = static_cast<float>(damage);
-					if (capDmg > 200.0f) {
+					if (capDmg > 200.0f)
+					{
 						capDmg = 200.0f;
 					}
 
@@ -4438,7 +4965,8 @@ void hhPlayer::Killed(idEntity *inflictor, idEntity *attacker, int damage, const
 			minRespawnTime = gameLocal.time + RAGDOLL_DEATH_TIME;
 			maxRespawnTime = minRespawnTime + 10000;
 		}
-		else {
+		else
+		{
 			GetPhysics()->SetContents(0);
 			Hide();
 
@@ -4453,7 +4981,8 @@ void hhPlayer::Killed(idEntity *inflictor, idEntity *attacker, int damage, const
 	AI_DEAD = true;
 
 	//HUMANHEAD rww
-	if (gameLocal.isMultiplayer) {
+	if (gameLocal.isMultiplayer)
+	{
 		SetAnimState(ANIMCHANNEL_LEGS, "Legs_Death", 4);
 		SetAnimState(ANIMCHANNEL_TORSO, "Torso_Death", 4);
 		SetWaitState("");
@@ -4461,31 +4990,40 @@ void hhPlayer::Killed(idEntity *inflictor, idEntity *attacker, int damage, const
 	//HUMANHEAD END
 
 	//HUMANHEAD PCF rww 09/15/06 - female mp sounds
-	if (IsFemale()) {
+	if (IsFemale())
+	{
 		StartSound("snd_death_female", SND_CHANNEL_VOICE);
 	}
-	else {
+	else
+	{
 		//HUMANHEAD END
 		StartSound("snd_death", SND_CHANNEL_VOICE);
 	}
 
-	if (gameLocal.isMultiplayer && !gameLocal.isCoop) {
+	if (gameLocal.isMultiplayer && !gameLocal.isCoop)
+	{
 		idPlayer *killer = NULL;
 
-		if (attacker->IsType(idPlayer::Type)) {
+		if (attacker->IsType(idPlayer::Type))
+		{
 			killer = static_cast<idPlayer*>(attacker);
 		}
-		else { //rww - otherwise try to credit airAttacker
+		else
+		{ //rww - otherwise try to credit airAttacker
 			if (airAttacker.IsValid() &&
 				airAttacker.GetEntity() &&
-				airAttackerTime > gameLocal.time) {
+				airAttackerTime > gameLocal.time)
+			{
 
-				if (airAttacker->IsType(idPlayer::Type)) {
+				if (airAttacker->IsType(idPlayer::Type))
+				{
 					killer = static_cast<idPlayer*>(airAttacker.GetEntity());
 				}
-				else if (airAttacker->IsType(hhVehicle::Type)) {
+				else if (airAttacker->IsType(hhVehicle::Type))
+				{
 					hhVehicle *veh = static_cast<hhVehicle*>(airAttacker.GetEntity());
-					if (veh->GetPilot() && veh->GetPilot()->IsType(idPlayer::Type)) {
+					if (veh->GetPilot() && veh->GetPilot()->IsType(idPlayer::Type))
+					{
 						killer = static_cast<idPlayer*>(veh->GetPilot());
 					}
 				}
@@ -4504,15 +5042,20 @@ void hhPlayer::Killed(idEntity *inflictor, idEntity *attacker, int damage, const
 hhPlayer::Kill
 ==============
 */
-void hhPlayer::Kill(bool delayRespawn, bool nodamage) {
-	if (noclip) {	// HUMANHEAD pdm: Because of deathwalk, this shouldn't be allowed
+void hhPlayer::Kill(bool delayRespawn, bool nodamage)
+{
+	if (noclip)
+	{	// HUMANHEAD pdm: Because of deathwalk, this shouldn't be allowed
 		return;
 	}
 
-	if (health > 0) {
+	if (health > 0)
+	{
 		//HUMANHEAD rww
-		if (IsSpiritOrDeathwalking()) {
-			if (!IsSpiritWalking()) { //don't "kill" when dead.
+		if (IsSpiritOrDeathwalking())
+		{
+			if (!IsSpiritWalking())
+			{ //don't "kill" when dead.
 				return;
 			}
 			StopSpiritWalk(true);
@@ -4522,8 +5065,10 @@ void hhPlayer::Kill(bool delayRespawn, bool nodamage) {
 		godmode = false;
 		health = 0;
 		//HUMANHEAD rww - if in a vehicle, eject now
-		if (InVehicle()) {
-			if (vehicleInterfaceLocal.GetVehicle()) {
+		if (InVehicle())
+		{
+			if (vehicleInterfaceLocal.GetVehicle())
+			{
 				vehicleInterfaceLocal.GetVehicle()->EjectPilot();
 			}
 		}
@@ -4539,7 +5084,8 @@ hhPlayer::DetermineOwnerPosition
 HUMANHEAD: aob
 ===============
 */
-void hhPlayer::DetermineOwnerPosition(idVec3 &ownerOrigin, idMat3 &ownerAxis) {
+void hhPlayer::DetermineOwnerPosition(idVec3 &ownerOrigin, idMat3 &ownerAxis)
+{
 	ownerAxis = TransformToPlayerSpace(GetUntransformedViewAxis());
 	ownerOrigin = cameraInterpolator.GetCurrentPosition() + idVec3(g_gun_x.GetFloat(), g_gun_y.GetFloat(), g_gun_z.GetFloat()) * GetAxis();
 }
@@ -4550,20 +5096,23 @@ hhPlayer::GetViewPos
 ===============
 */
 //HUMANHEAD bjk
-void hhPlayer::GetViewPos(idVec3 &origin, idMat3 &axis) {
+void hhPlayer::GetViewPos(idVec3 &origin, idMat3 &axis)
+{
 	idAngles angles;
 
 	// if dead, fix the angle and don't add any kick
 	// HUMANHEAD cjr:  Replaced health <= 0 with IsDead() call for deathwalk override
-	if (IsDead() && !gameLocal.isMultiplayer) { //rww - don't want this in mp.
-	// HUMANHEAD END
+	if (IsDead() && !gameLocal.isMultiplayer)
+	{ //rww - don't want this in mp.
+// HUMANHEAD END
 		angles.yaw = viewAngles.yaw;
 		angles.roll = 40;
 		angles.pitch = -15;
 		axis = angles.ToMat3();
 		origin = GetEyePosition();
 	}
-	else {
+	else
+	{
 		assert(kickSpring < 500.0f && kickSpring > 0.0f);
 		assert(kickDamping < 500.0f && kickDamping > 0.0f);
 		origin = viewBob + TransformToPlayerSpace(idVec3(g_viewNodalX.GetFloat(), g_viewNodalZ.GetFloat(), g_viewNodalZ.GetFloat() + EyeHeight()));
@@ -4576,11 +5125,13 @@ void hhPlayer::GetViewPos(idVec3 &origin, idMat3 &axis) {
 hhPlayer::CalculateRenderView
 ===============
 */
-void hhPlayer::CalculateRenderView(void) {
+void hhPlayer::CalculateRenderView(void)
+{
 	idPlayer::CalculateRenderView();
 
 	// HUMANHEAD cjr
-	if (IsSpiritOrDeathwalking()) { // If spiritwalking, then allow the player to see special objects
+	if (IsSpiritOrDeathwalking())
+	{ // If spiritwalking, then allow the player to see special objects
 		renderView->viewSpiritEntities = true;
 	}
 }
@@ -4592,36 +5143,43 @@ hhPlayer::OffsetThirdPersonView
 	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
 ===============
 */
-void hhPlayer::OffsetThirdPersonView(float angle, float range, float height, bool clip) {
+void hhPlayer::OffsetThirdPersonView(float angle, float range, float height, bool clip)
+{
 	idVec3			view;
 	trace_t			trace;
 	idMat3			lookAxis;
 	idVec3			origin;
 	idAngles		angles(GetUntransformedViewAngles());
 
-	if (angle) {
+	if (angle)
+	{
 		angles.pitch = 0.0f;
 	}
 
-	if (angles.pitch > 45.0f && !InVehicle()) {
+	if (angles.pitch > 45.0f && !InVehicle())
+	{
 		angles.pitch = 45.0f;		// don't go too far overhead
 	}
 
 	//HUMANHEAD: aob
 	lookAxis = TransformToPlayerSpace(angles.ToMat3() * idAngles(0.0f, angle, 0.0f).ToMat3());
-	if (InVehicle()) {
+	if (InVehicle())
+	{
 		origin = GetOrigin() + lookAxis[2] * (height + EyeHeight());
 	}
-	else {
+	else
+	{
 		origin = GetEyePosition() + GetEyeAxis()[2] * height;
 	}
 	view = origin + lookAxis[0] * -range;
 	// trace a ray from the origin to the viewpoint to make sure the view isn't
 	// in a solid block.  Use an 16 by 16 block to prevent the view from near clipping anything
-	if (!noclip) {
+	if (!noclip)
+	{
 		int mask = MASK_SHOT_BOUNDINGBOX;
 
-		if (gameLocal.isMultiplayer) { //rww - don't want this hitting corpses. also, shouldn't we pay attention to "clip"?
+		if (gameLocal.isMultiplayer)
+		{ //rww - don't want this hitting corpses. also, shouldn't we pay attention to "clip"?
 			mask = MASK_PLAYERSOLID;
 		}
 
@@ -4644,7 +5202,8 @@ hhPlayer::GetGuiHandInfo
   Retrns the proper gui hand info for a given gui
 ==============================
 */
-const char *hhPlayer::GetGuiHandInfo() {
+const char *hhPlayer::GetGuiHandInfo()
+{
 	const char *attrib;
 	idDict	*item = NULL;
 	const char *handString;
@@ -4652,17 +5211,21 @@ const char *hhPlayer::GetGuiHandInfo() {
 	// Set the gui to:
 	//	"required_attribute"	"Hunter Hand"
 	// If item exists in player inventory, player uses guihand specified by item
-	if (!IsSpiritWalking() && focusGUIent && focusGUIent->spawnArgs.GetString("required_attribute", NULL, &attrib)) {
+	if (!IsSpiritWalking() && focusGUIent && focusGUIent->spawnArgs.GetString("required_attribute", NULL, &attrib))
+	{
 		item = FindInventoryItem(attrib);
-		if (item) {
-			if (item->GetString("def_guihand", NULL, &handString)) {
+		if (item)
+		{
+			if (item->GetString("def_guihand", NULL, &handString))
+			{
 				return handString;
 			}
 		}
 	}
 
 	// If no required attribute/player doesn't have the item, check for a def_guihand string
-	if (focusGUIent && focusGUIent->spawnArgs.GetString("def_guihand", NULL, &handString)) {
+	if (focusGUIent && focusGUIent->spawnArgs.GetString("def_guihand", NULL, &handString))
+	{
 		return(handString);
 	}
 
@@ -4678,52 +5241,64 @@ const char *hhPlayer::GetGuiHandInfo() {
 //
 //=============================================================================
 
-void hhPlayer::StartSpiritWalk(const bool bThrust, bool force) {
+void hhPlayer::StartSpiritWalk(const bool bThrust, bool force)
+{
 	hhFxInfo	fxInfo;
 	idVec3		origin;
 	idMat3		axis;
 
 	//rww - don't do anything on the client
-	if (gameLocal.isClient) {
+	if (gameLocal.isClient)
+	{
 		return;
 	}
 
-	if (bReallyDead) { // Don't allow spiritwalking if truly dead
-		if (force) {
+	if (bReallyDead)
+	{ // Don't allow spiritwalking if truly dead
+		if (force)
+		{
 			gameLocal.Error("Attempted to force spirit walk when dead.\n");
 		}
 		return;
 	}
 
 	// Make sure spirit walk isn't disabled
-	if (!bAllowSpirit) {
+	if (!bAllowSpirit)
+	{
 		StartSound("snd_spiritWalkDenied", SND_CHANNEL_ANY);
 		return;
 	}
 
 	spiritWalkToggleTime = gameLocal.time;
 
-	if (gameLocal.isMultiplayer) { // CJR:  Don't allow spiritwalking in MP unless the player has spirit power
-		if (GetSpiritPower() <= 0) {
+	if (gameLocal.isMultiplayer)
+	{ // CJR:  Don't allow spiritwalking in MP unless the player has spirit power
+		if (GetSpiritPower() <= 0)
+		{
 			StartSound("snd_spiritWalkDenied", SND_CHANNEL_ANY, 0, true);
 			return;
 		}
 	}
 
-	if (!force && nextSpiritTime > gameLocal.time) { // mdl: Make sure they didn't just get knocked back into their body by a wraith
+	if (!force && nextSpiritTime > gameLocal.time)
+	{ // mdl: Make sure they didn't just get knocked back into their body by a wraith
 		StartSound("snd_spiritWalkDenied", SND_CHANNEL_ANY);
 		return;
 	}
 
-	if (!IsSpiritOrDeathwalking()) {
-		if (!gameLocal.IsLOTA()) { // In LOTA, spirit power never drains
+	if (!IsSpiritOrDeathwalking())
+	{
+		if (!gameLocal.IsLOTA())
+		{ // In LOTA, spirit power never drains
 			PostEventMS(&EV_DrainSpiritPower, spiritDrainHeartbeatMS);
 		}
 
-		if (!bThrust) { // Normal spiritwalking
+		if (!bThrust)
+		{ // Normal spiritwalking
 			EnableEthereal(spawnArgs.GetString("def_spiritProxy"), GetOrigin(), GetPhysics()->GetAxis(), viewAxis, viewAngles, GetEyeAxis());
 		}
-		else { // Knocked out by a wraith
+		else
+		{ // Knocked out by a wraith
 			EnableEthereal(spawnArgs.GetString("def_possessedProxy"), GetOrigin(), GetPhysics()->GetAxis(), viewAxis, viewAngles, GetEyeAxis());
 		}
 
@@ -4732,7 +5307,8 @@ void hhPlayer::StartSpiritWalk(const bool bThrust, bool force) {
 		spiritwalkSoundController.StartSound(SND_CHANNEL_BODY, SND_CHANNEL_BODY2);
 
 		// Update HUD
-		if (hud) {
+		if (hud)
+		{
 			hud->HandleNamedEvent("SwitchToEthereal");
 		}
 
@@ -4748,7 +5324,8 @@ void hhPlayer::StartSpiritWalk(const bool bThrust, bool force) {
 		BroadcastFxInfoPrefixed("fx_spiritWalkFlash", origin, axis, &fxInfo);
 
 		// Thrust the player backwards out of the body
-		if (bThrust) {
+		if (bThrust)
+		{
 			idVec3 vec = GetPhysics()->GetAxis()[0] * -200.0f + GetPhysics()->GetAxis()[2] * 50.0f;
 
 			physicsObj.SetLinearVelocity(physicsObj.GetLinearVelocity() + vec);
@@ -4758,40 +5335,48 @@ void hhPlayer::StartSpiritWalk(const bool bThrust, bool force) {
 
 		// bg - trigger map entity, provides a simple hook for map/scripts
 		idEntity *swTrig = gameLocal.FindEntity("sw_spiritWalkEntered");
-		if (swTrig) {
+		if (swTrig)
+		{
 			swTrig->PostEventMS(&EV_Activate, 0, this);
 		}
 	}
 }
 
-void hhPlayer::StopSpiritWalk(bool forceAllowance) {
+void hhPlayer::StopSpiritWalk(bool forceAllowance)
+{
 	hhFxInfo	fxInfo;
 	idVec3		origin;
 	idMat3		axis;
 
 	//rww - don't do anything on the client
-	if (gameLocal.isClient) {
+	if (gameLocal.isClient)
+	{
 		return;
 	}
 
-	if (IsPossessed()) { // If possessed and the player stops spiritwalking, they die
+	if (IsPossessed())
+	{ // If possessed and the player stops spiritwalking, they die
 		PossessKilled();
 		return;
 	}
 
 	spiritWalkToggleTime = gameLocal.time;
 
-	if (bReallyDead) { // Don't allow spiritwalking if truly dead
+	if (bReallyDead)
+	{ // Don't allow spiritwalking if truly dead
 		return;
 	}
 
 	CancelEvents(&EV_SetOverlayMaterial); //HUMANHEAD rww - if being forced back out of spirit mode quickly enough, don't set overlay afterward
 
-	if (IsSpiritOrDeathwalking()) {
+	if (IsSpiritOrDeathwalking())
+	{
 		CancelEvents(&EV_DrainSpiritPower);
-		if (weapon.IsValid() && weapon->IsType(hhWeaponSpiritBow::Type)) {
+		if (weapon.IsValid() && weapon->IsType(hhWeaponSpiritBow::Type))
+		{
 			hhWeaponSpiritBow *bow = static_cast<hhWeaponSpiritBow *>(weapon.GetEntity());
-			if (bow->BowVisionIsEnabled()) {
+			if (bow->BowVisionIsEnabled())
+			{
 				bow->StopBowVision();
 			}
 		}
@@ -4801,12 +5386,14 @@ void hhPlayer::StopSpiritWalk(bool forceAllowance) {
 
 		// bg - trigger map entity, provides a simple hook for map/scripts
 		idEntity *swTrig = gameLocal.FindEntity("sw_spiritWalkExited");
-		if (swTrig) {
+		if (swTrig)
+		{
 			swTrig->PostEventMS(&EV_Activate, 0, this);
 		}
 
 		// Update HUD
-		if (hud) {
+		if (hud)
+		{
 			hud->HandleNamedEvent("SwitchFromEthereal");
 		}
 		buttonMask |= BUTTON_ATTACK;	//HUMANHEAD bjk
@@ -4820,37 +5407,45 @@ void hhPlayer::StopSpiritWalk(bool forceAllowance) {
 	}
 }
 
-void hhPlayer::ToggleSpiritWalk(void) {
-	if (spectating) { //rww - do not allow spectators to spirit walk.
+void hhPlayer::ToggleSpiritWalk(void)
+{
+	if (spectating)
+	{ //rww - do not allow spectators to spirit walk.
 		return;
 	}
 
-	if (bPossessed) { // Cannot toggle away from spiritwalk when possessed
+	if (bPossessed)
+	{ // Cannot toggle away from spiritwalk when possessed
 		StartSound("snd_spiritWalkDenied", SND_CHANNEL_ANY);
 		return;
 	}
 
 	// spiritwalk time check -- force a delay between spiritwalking and not
-	if (gameLocal.time < spiritWalkToggleTime + 250) {
+	if (gameLocal.time < spiritWalkToggleTime + 250)
+	{
 		return;
 	}
 
-	if (IsSpiritOrDeathwalking()) {
+	if (IsSpiritOrDeathwalking())
+	{
 		StopSpiritWalk();
 	}
-	else {
+	else
+	{
 		StartSpiritWalk(false);
 	}
 }
 
 //HUMANHEAD rww
-void hhPlayer::RestorePlayerLocationFromDeathwalk(const idVec3& origin, const idMat3& bboxAxis, const idVec3& viewDir, const idAngles& angles) {
+void hhPlayer::RestorePlayerLocationFromDeathwalk(const idVec3& origin, const idMat3& bboxAxis, const idVec3& viewDir, const idAngles& angles)
+{
 	idVec3		newOrigin;
 	idMat3		newAxis;
 	idVec3		newViewDir;
 	idAngles	newAngles;
 
-	if (deathwalkLastCrouching) {
+	if (deathwalkLastCrouching)
+	{
 		ForceCrouching();
 	}
 
@@ -4876,14 +5471,17 @@ void hhPlayer::RestorePlayerLocationFromDeathwalk(const idVec3& origin, const id
 //	- Updates bindings
 //=============================================================================
 
-void hhPlayer::EnableEthereal(const char *proxyName, const idVec3& origin, const idMat3& bboxAxis, const idMat3& newViewAxis, const idAngles& newViewAngles, const idMat3& newEyeAxis) {
+void hhPlayer::EnableEthereal(const char *proxyName, const idVec3& origin, const idMat3& bboxAxis, const idMat3& newViewAxis, const idAngles& newViewAngles, const idMat3& newEyeAxis)
+{
 	//rww - don't do anything on the client - DO NOT PUT ANYTHING ABOVE HERE
-	if (gameLocal.isClient) {
+	if (gameLocal.isClient)
+	{
 		return;
 	}
 
 	// Turn on low-pass effect
-	if (gameLocal.localClientNum == entityNumber) { //rww - don't do this for anyone but the local client on listen servers
+	if (gameLocal.localClientNum == entityNumber)
+	{ //rww - don't do this for anyone but the local client on listen servers
 		gameLocal.SpiritWalkSoundMode(true);
 	}
 
@@ -4896,21 +5494,26 @@ void hhPlayer::EnableEthereal(const char *proxyName, const idVec3& origin, const
 	spawnArgs.Set("produces_splats", "0");
 
 	// HUMANHEAD mdl:  Let our enemies know about the spirit proxy
-	for (int i = 0; i < hhMonsterAI::allSimpleMonsters.Num(); i++) {
-		if (hhMonsterAI::allSimpleMonsters[i]->GetEnemy() == this) {
+	for (int i = 0; i < hhMonsterAI::allSimpleMonsters.Num(); i++)
+	{
+		if (hhMonsterAI::allSimpleMonsters[i]->GetEnemy() == this)
+		{
 			hhMonsterAI::allSimpleMonsters[i]->ProcessEvent(&MA_EnemyIsSpirit, this, spiritProxy.GetEntity());
 		}
 	}
 
 	// If bound to another object (like on a rail ride), swap bindings with the proxy
-	if (GetBindMaster() != NULL) {
-		if (GetBindMaster()->IsType(hhBindController::Type)) {
+	if (GetBindMaster() != NULL)
+	{
+		if (GetBindMaster()->IsType(hhBindController::Type))
+		{
 			hhBindController *binder = static_cast<hhBindController *>(GetBindMaster());
 			bool loose = binder->IsLoose();
 			binder->Detach();
 			binder->Attach(spiritProxy.GetEntity(), loose);
 		}
-		else {
+		else
+		{
 			gameLocal.Warning("Handle this: spiritwalking while bound to non-rail");
 			SwapBindInfo(spiritProxy.GetEntity());	// untested
 		}
@@ -4938,13 +5541,15 @@ void hhPlayer::EnableEthereal(const char *proxyName, const idVec3& origin, const
 //	- Fade volume back up on all class 0 sounds
 //=============================================================================
 
-void hhPlayer::DisableEthereal(void) {
+void hhPlayer::DisableEthereal(void)
+{
 	hhFxInfo	fxInfo;
 	idVec3		boneOffset;
 	idMat3		boneAxis;
 
 	//rww - don't do anything on the client - DO NOT PUT ANYTHING ABOVE HERE
-	if (gameLocal.isClient) {
+	if (gameLocal.isClient)
+	{
 		return;
 	}
 
@@ -4956,31 +5561,38 @@ void hhPlayer::DisableEthereal(void) {
 	fxInfo.SetNormal(boneAxis[1]);
 	BroadcastFxInfo(spawnArgs.GetString("fx_spiritReturn"), boneOffset, GetAxis(), &fxInfo);
 
-	if (spiritProxy.IsValid()) {
+	if (spiritProxy.IsValid())
+	{
 		// Handle case of returning to a body on a rail ride
 		idEntity *spiritMaster = spiritProxy->GetBindMaster();
-		if (spiritMaster != NULL) {
-			if (spiritMaster->IsType(hhBindController::Type)) {
+		if (spiritMaster != NULL)
+		{
+			if (spiritMaster->IsType(hhBindController::Type))
+			{
 				hhBindController *binder = static_cast<hhBindController *>(spiritMaster);
 				bool loose = binder->IsLoose();
 				binder->Detach();
 				spiritProxy->DeactivateProxy();
 				binder->Attach(this, loose);
 			}
-			else if (spiritMaster->IsType(hhMonsterAI::Type)) {
-				if (reinterpret_cast<hhMonsterAI *> (spiritMaster)->GetEnemy() != static_cast<idActor *> (spiritProxy.GetEntity())) {
+			else if (spiritMaster->IsType(hhMonsterAI::Type))
+			{
+				if (reinterpret_cast<hhMonsterAI *> (spiritMaster)->GetEnemy() != static_cast<idActor *> (spiritProxy.GetEntity()))
+				{
 					gameLocal.Warning("Monster has spirit proxy bound to it but spirit proxy is not it's enemy!\n");
 				}
 				spiritProxy->DeactivateProxy();
 			}
-			else {
+			else
+			{
 				gameLocal.Warning("Handle this: spiritwalking while bound to non-rail");
 				idEntity *temp = spiritProxy.GetEntity();	// this removed by DeactivateProxy
 				spiritProxy->DeactivateProxy();
 				SwapBindInfo(temp);	// untested
 			}
 		}
-		else {	// Normal case
+		else
+		{	// Normal case
 			spiritProxy->DeactivateProxy();
 		}
 	}
@@ -4992,16 +5604,20 @@ void hhPlayer::DisableEthereal(void) {
 	spawnArgs.Set("produces_splats", "1");
 
 	// Turn off low-pass effect
-	if (gameLocal.localClientNum == entityNumber) { //rww - don't do this for anyone but the local client on listen servers
+	if (gameLocal.localClientNum == entityNumber)
+	{ //rww - don't do this for anyone but the local client on listen servers
 		gameLocal.SpiritWalkSoundMode(false);
 	}
 
 	// HUMANHEAD mdl:  Let our enemies know the spirit proxy is going away
-	for (int i = 0; i < hhMonsterAI::allSimpleMonsters.Num(); i++) {
-		if (hhMonsterAI::allSimpleMonsters[i]->GetEnemy() == spiritProxy.GetEntity()) {
+	for (int i = 0; i < hhMonsterAI::allSimpleMonsters.Num(); i++)
+	{
+		if (hhMonsterAI::allSimpleMonsters[i]->GetEnemy() == spiritProxy.GetEntity())
+		{
 			hhMonsterAI::allSimpleMonsters[i]->ProcessEvent(&MA_EnemyIsPhysical, this, spiritProxy.GetEntity());
 		}
-		else if (hhMonsterAI::allSimpleMonsters[i]->GetEnemy() == this) { // Targetting spirit that is going away
+		else if (hhMonsterAI::allSimpleMonsters[i]->GetEnemy() == this)
+		{ // Targetting spirit that is going away
 			hhMonsterAI::allSimpleMonsters[i]->ProcessEvent(&MA_EnemyIsPhysical, this, NULL);
 		}
 	}
@@ -5020,22 +5636,26 @@ void hhPlayer::DisableEthereal(void) {
 //
 // Get the position/orientation for resurrection after deathwalk
 //=============================================================================
-void hhPlayer::GetResurrectionPoint(idVec3& origin, idMat3& axis, idVec3& viewDir, idAngles& angles, idMat3& eyeAxis, const idBounds& absBounds, const idVec3& defaultOrigin, const idMat3& defaultAxis, const idVec3& defaultViewDir, const idAngles& defaultAngles) {
+void hhPlayer::GetResurrectionPoint(idVec3& origin, idMat3& axis, idVec3& viewDir, idAngles& angles, idMat3& eyeAxis, const idBounds& absBounds, const idVec3& defaultOrigin, const idMat3& defaultAxis, const idVec3& defaultViewDir, const idAngles& defaultAngles)
+{
 	idClipModel *clipModelList[MAX_GENTITIES];
 	idClipModel* clipModel = NULL;
 	idEntity*	entity = NULL;
 	hhSafeResurrectionVolume* volume = NULL;
 
 	int num = gameLocal.clip.ClipModelsTouchingBounds(absBounds, CONTENTS_DEATHVOLUME, clipModelList, MAX_GENTITIES);
-	for (int ix = 0; ix < num; ++ix) {
+	for (int ix = 0; ix < num; ++ix)
+	{
 		clipModel = clipModelList[ix];
 
-		if (!clipModel) {
+		if (!clipModel)
+		{
 			continue;
 		}
 
 		entity = clipModel->GetEntity();
-		if (!entity || !entity->IsType(hhSafeResurrectionVolume::Type)) {
+		if (!entity || !entity->IsType(hhSafeResurrectionVolume::Type))
+		{
 			continue;
 		}
 
@@ -5066,13 +5686,16 @@ void hhPlayer::GetResurrectionPoint(idVec3& origin, idMat3& axis, idVec3& viewDi
 //	hhPlayer::SquishedByDoor
 //
 //=============================================================================
-void hhPlayer::SquishedByDoor(idEntity *door) {
-	if (door == this) { // Don't allow the squished code to send a player back it the squisher is the player itself
+void hhPlayer::SquishedByDoor(idEntity *door)
+{
+	if (door == this)
+	{ // Don't allow the squished code to send a player back it the squisher is the player itself
 		return;
 	}
 
 	// If there is a spirit player in the door, make him go back to physical so he doesn't become stuck
-	if (IsSpiritWalking()) {
+	if (IsSpiritWalking())
+	{
 		StopSpiritWalk();
 	}
 }
@@ -5086,9 +5709,11 @@ void hhPlayer::SquishedByDoor(idEntity *door) {
 // HUMANHEAD cjr
 //=============================================================================
 
-void hhPlayer::UpdatePossession(void) {
+void hhPlayer::UpdatePossession(void)
+{
 
-	if (!IsPossessed()) { // Player is not possessed
+	if (!IsPossessed())
+	{ // Player is not possessed
 		return;
 	}
 
@@ -5124,10 +5749,13 @@ void hhPlayer::UpdatePossession(void) {
 // HUMANHEAD cjr
 //=============================================================================
 
-void hhPlayer::Event_RechargeHealth(void) {
+void hhPlayer::Event_RechargeHealth(void)
+{
 
-	if (health > 0 && health < spawnArgs.GetInt("healthRecharge", "25") && !IsSpiritOrDeathwalking()) { // Only recharge if the player is alive and in the critical zone		
-		if (gameLocal.time - lastDamagedTime >= spawnArgs.GetInt("healthRechargeDelay", "1500")) { // Delay before recharging
+	if (health > 0 && health < spawnArgs.GetInt("healthRecharge", "25") && !IsSpiritOrDeathwalking())
+	{ // Only recharge if the player is alive and in the critical zone
+		if (gameLocal.time - lastDamagedTime >= spawnArgs.GetInt("healthRechargeDelay", "1500"))
+		{ // Delay before recharging
 			health++;
 		}
 	}
@@ -5146,15 +5774,18 @@ void hhPlayer::Event_RechargeHealth(void) {
 // HUMANHEAD cjr
 //=============================================================================
 
-void hhPlayer::Event_RechargeRifleAmmo(void) {
+void hhPlayer::Event_RechargeRifleAmmo(void)
+{
 
 	int ammoIndex = inventory.AmmoIndexForAmmoClass("ammo_rifle");
 	int ammoCount = inventory.ammo[ammoIndex];
 
 	int maxAmmo = spawnArgs.GetInt("rifleAmmoRechargeMax", "20");
-	if (ammoCount < maxAmmo && !AI_ATTACK_HELD) { // CJR PCF 04/26/06
+	if (ammoCount < maxAmmo && !AI_ATTACK_HELD)
+	{ // CJR PCF 04/26/06
 		inventory.ammo[ammoIndex] += 2;
-		if (inventory.ammo[ammoIndex] > maxAmmo) {
+		if (inventory.ammo[ammoIndex] > maxAmmo)
+		{
 			inventory.ammo[ammoIndex] = maxAmmo;
 		}
 	}
@@ -5168,27 +5799,34 @@ void hhPlayer::Event_RechargeRifleAmmo(void) {
 //
 // HUMANHEAD pdm: 10 Hz timer used to drain spirit power at differing rates
 //=============================================================================
-void hhPlayer::Event_DrainSpiritPower() {
+void hhPlayer::Event_DrainSpiritPower()
+{
 
-	// JRM: God mode, don't drain! 
-	if (godmode) {
+	// JRM: God mode, don't drain!
+	if (godmode)
+	{
 		return;
 	}
 
 	ammo_t ammo_spiritpower = idWeapon::GetAmmoNumForName("ammo_spiritpower");
 
-	if (gameLocal.isMultiplayer) { // CJR:  Drain spirit power in MP
-		if (!UseAmmo(ammo_spiritpower, 1)) {
+	if (gameLocal.isMultiplayer)
+	{ // CJR:  Drain spirit power in MP
+		if (!UseAmmo(ammo_spiritpower, 1))
+		{
 			StopSpiritWalk();
 			return;
 		}
 	}
 
 	// spirit bow alt mode drain
-	if (weapon.IsValid() && weapon->IsType(hhWeaponSpiritBow::Type)) {
+	if (weapon.IsValid() && weapon->IsType(hhWeaponSpiritBow::Type))
+	{
 		hhWeaponSpiritBow *bow = static_cast<hhWeaponSpiritBow *>(weapon.GetEntity());
-		if (bow->BowVisionIsEnabled()) {
-			if (!UseAmmo(ammo_spiritpower, 1)) { // Bow vision drains spirit power
+		if (bow->BowVisionIsEnabled())
+		{
+			if (!UseAmmo(ammo_spiritpower, 1))
+			{ // Bow vision drains spirit power
 				return;
 			}
 		}
@@ -5203,8 +5841,10 @@ void hhPlayer::Event_DrainSpiritPower() {
 //
 //=============================================================================
 
-void hhPlayer::DeathWalk(const idVec3& resurrectOrigin, const idMat3& resurrectBBoxAxis, const idMat3& resurrectViewAxis, const idAngles& resurrectViewAngles, const idMat3& resurrectEyeAxis) {
-	if (IsSpiritWalking()) { // Ensure that two proxies cannot be active at the same time
+void hhPlayer::DeathWalk(const idVec3& resurrectOrigin, const idMat3& resurrectBBoxAxis, const idMat3& resurrectViewAxis, const idAngles& resurrectViewAngles, const idMat3& resurrectEyeAxis)
+{
+	if (IsSpiritWalking())
+	{ // Ensure that two proxies cannot be active at the same time
 		StopSpiritWalk();
 	}
 
@@ -5216,7 +5856,8 @@ void hhPlayer::DeathWalk(const idVec3& resurrectOrigin, const idMat3& resurrectB
 	deathWalkPower = spawnArgs.GetInt("deathWalkPowerStart"); // Power in deathwalk.  When full, the player will return
 	fl.takedamage = false; // can no longer be damaged in deathwalk mode
 
-	if (hud) {
+	if (hud)
+	{
 		hud->HandleNamedEvent("SwitchToEthereal");
 	}
 
@@ -5237,13 +5878,15 @@ void hhPlayer::DeathWalk(const idVec3& resurrectOrigin, const idMat3& resurrectB
 	PostEventMS(&EV_SetOverlayMaterial, 1, spawnArgs.GetString("mtr_deathWalk"), false);
 
 	//Don't allow weapon use for a bit
-	if (weapon.GetEntity()) {
+	if (weapon.GetEntity())
+	{
 		weapon.GetEntity()->PutAway();
 	}
 
 	// Alert the scripts that death has occured so they can manage music
 	idEntity *dwJustDied = gameLocal.FindEntity("dw_justdied");
-	if (dwJustDied) {
+	if (dwJustDied)
+	{
 		dwJustDied->PostEventMS(&EV_Activate, 0, this);
 	}
 
@@ -5258,9 +5901,11 @@ void hhPlayer::DeathWalk(const idVec3& resurrectOrigin, const idMat3& resurrectB
 	CancelEvents(&EV_RechargeRifleAmmo);
 
 	// If this is our first time, tell the script
-	if (!gameLocal.IsCompetitive() && !inventory.bHasDeathwalked) {
+	if (!gameLocal.IsCompetitive() && !inventory.bHasDeathwalked)
+	{
 		const function_t *firstFunc = gameLocal.program.FindFunction("map_deathwalk::FirstDeathwalk");
-		if (firstFunc) {
+		if (firstFunc)
+		{
 			idThread *thread = new idThread();
 			thread->CallFunction(firstFunc, false);
 			thread->DelayedStart(0);
@@ -5268,9 +5913,11 @@ void hhPlayer::DeathWalk(const idVec3& resurrectOrigin, const idMat3& resurrectB
 	}
 
 	//rww - if there is a deathwalk portal, let's create a target for it and activate it
-	if (!gameLocal.FindEntity("dw_deathLocation")) { //check to see if we've made ourselves a target yet
+	if (!gameLocal.FindEntity("dw_deathLocation"))
+	{ //check to see if we've made ourselves a target yet
 		idEntity *dwPortal = gameLocal.FindEntity("dw_deathPortal");
-		if (dwPortal) {
+		if (dwPortal)
+		{
 			trace_t tr;
 			idVec3 camPos, camDir;
 			idAngles camAngles;
@@ -5294,7 +5941,8 @@ void hhPlayer::DeathWalk(const idVec3& resurrectOrigin, const idMat3& resurrectB
 
 			dwPortal->ProcessEvent(&EV_UpdateCameraTarget); //update for the newly placed cameraTarget
 			dwPortal->PostEventMS(&EV_Activate, 0, this);
-			if (dwPortal->cameraTarget) { //if camera target was legitimate, force an update to the remoteRenderView now
+			if (dwPortal->cameraTarget)
+			{ //if camera target was legitimate, force an update to the remoteRenderView now
 				dwPortal->GetRenderEntity()->remoteRenderView = dwPortal->cameraTarget->GetRenderView();
 			}
 		}
@@ -5311,13 +5959,16 @@ void hhPlayer::DeathWalk(const idVec3& resurrectOrigin, const idMat3& resurrectB
 // Flashes the screen / fades the FOV
 //=============================================================================
 
-void hhPlayer::Event_PrepareForDeathWorld() {
+void hhPlayer::Event_PrepareForDeathWorld()
+{
 	deathWalkFlash += spawnArgs.GetFloat("deathWalkFlashChange", "0.05");
-	if (deathWalkFlash >= 1.0f) {
+	if (deathWalkFlash >= 1.0f)
+	{
 		deathWalkFlash = 1.0f;
 		PostEventSec(&EV_EnterDeathWorld, 0.0f); // Actually send player into the deathworld
 	}
-	else {
+	else
+	{
 		PostEventSec(&EV_PrepareForDeathWorld, 0.02f);
 	}
 
@@ -5334,20 +5985,23 @@ void hhPlayer::Event_PrepareForDeathWorld() {
 // - Gives the player a weapon
 //=============================================================================
 
-void hhPlayer::Event_EnterDeathWorld() {
+void hhPlayer::Event_EnterDeathWorld()
+{
 	// Reset player view information
 	playerView.SetViewOverlayColor(idVec4(1.0f, 1.0f, 1.0f, 0.0f)); // Turn off the flash
 	possessionFOV = 0.0f;
 	bDeathWalkStage2 = false;
 
 	// Spawn in DeathWraiths after a short period of time
-	if (!inventory.bHasDeathwalked) { // Delay the wraiths the first time the player deathwalks
+	if (!inventory.bHasDeathwalked)
+	{ // Delay the wraiths the first time the player deathwalks
 		int firstDelay = spawnArgs.GetInt("deathWalk_firstTimeDelay", "15000");
 		PostEventMS(&EV_SpawnDeathWraith, firstDelay); // CJR:  delay the deathwraiths for several seconds while the Grandfather DW speech is going on
 		PostEventMS(&EV_AdjustSpiritPowerDeathWalk, firstDelay + 2000);
 		inventory.bHasDeathwalked = true;
 	}
-	else {
+	else
+	{
 		PostEventMS(&EV_SpawnDeathWraith, 0); // CJR:  Non-first time, spawn the wraiths instantly
 		PostEventMS(&EV_AdjustSpiritPowerDeathWalk, 2000);
 	}
@@ -5357,10 +6011,12 @@ void hhPlayer::Event_EnterDeathWorld() {
 
 	// get the entity which tells us where we want to place our dw proxy
 	idEntity *dwProxyPosEnt = gameLocal.FindEntity("dw_floatingBodyMarker");
-	if (dwProxyPosEnt) {
+	if (dwProxyPosEnt)
+	{
 		//if we found that, then this is the new deathwalk, so create the deathwalk proxy.
-		hhDeathWalkProxy *dwProxy = (hhDeathWalkProxy *)gameLocal.SpawnObject(spawnArgs.GetString("def_deathWalkProxy"), NULL);
-		if (!dwProxy) {
+		hhDeathWalkProxy *dwProxy = (hhDeathWalkProxy *) gameLocal.SpawnObject(spawnArgs.GetString("def_deathWalkProxy"), NULL);
+		if (!dwProxy)
+		{
 			gameLocal.Error("hhPlayer::Event_EnterDeathWorld: Could not create hhDeathWalkProxy");
 			return;
 		}
@@ -5370,19 +6026,22 @@ void hhPlayer::Event_EnterDeathWorld() {
 	}
 
 	idEntity* deathWalkPlayerStartManager = gameLocal.FindEntity("dw_deathWalkPlayerStartManager");
-	if (!deathWalkPlayerStartManager) {
+	if (!deathWalkPlayerStartManager)
+	{
 		return;
 	}
 
 	idEntity* deathWalkStart = deathWalkPlayerStartManager->PickRandomTarget();
-	if (deathWalkStart) {
+	if (deathWalkStart)
+	{
 		deathWalkStart->ProcessEvent(&EV_Activate, this);
 	}
 
 	// Trigger the 'DeathWalkEntered' entity
 	// This allows the scripters to do something upon entering deathwalk
 	idEntity *dwe = gameLocal.FindEntity("dw_DeathWalkEntered");
-	if (dwe) {
+	if (dwe)
+	{
 		dwe->PostEventMS(&EV_Activate, 0, this);
 	}
 
@@ -5401,8 +6060,10 @@ void hhPlayer::Event_EnterDeathWorld() {
 // hhPlayer::Event_AdjustSpiritPowerDeathWalk
 //
 //=============================================================================
-void hhPlayer::Event_AdjustSpiritPowerDeathWalk() {
-	if (!IsDeathWalking()) {
+void hhPlayer::Event_AdjustSpiritPowerDeathWalk()
+{
+	if (!IsDeathWalking())
+	{
 		return;
 	}
 
@@ -5412,7 +6073,8 @@ void hhPlayer::Event_AdjustSpiritPowerDeathWalk() {
 	SetDeathWalkPower(power);
 
 	// Check if deathWalkPower has exceeded the maximum
-	if (deathWalkPower >= spawnArgs.GetInt("deathWalkPowerMax", "1000")) {
+	if (deathWalkPower >= spawnArgs.GetInt("deathWalkPowerMax", "1000"))
+	{
 		DeathWalkSuccess();
 		return;
 	}
@@ -5427,12 +6089,14 @@ void hhPlayer::Event_AdjustSpiritPowerDeathWalk() {
 //
 // Called when deathwalk timer runs out or we run out of spirit power
 //=============================================================================
-void hhPlayer::DeathWalkSuccess() {
+void hhPlayer::DeathWalkSuccess()
+{
 	CancelEvents(&EV_AdjustSpiritPowerDeathWalk);
 	bDeathWalkStage2 = true;
 
 	idEntity *dw_deathWalkResult = gameLocal.FindEntity("dw_deathWalkSuccess");
-	if (dw_deathWalkResult) { //if we have a result, activate it.
+	if (dw_deathWalkResult)
+	{ //if we have a result, activate it.
 		dw_deathWalkResult->ProcessEvent(&EV_Activate, this);
 	}
 }
@@ -5445,8 +6109,10 @@ void hhPlayer::DeathWalkSuccess() {
 // Funnels through Killed(), but disabled the deathwalk functionality
 //=============================================================================
 
-void hhPlayer::ReallyKilled(idEntity *inflictor, idEntity *attacker, int damage, const idVec3 &dir, int location) {
-	if (!IsSpiritOrDeathwalking()) {
+void hhPlayer::ReallyKilled(idEntity *inflictor, idEntity *attacker, int damage, const idVec3 &dir, int location)
+{
+	if (!IsSpiritOrDeathwalking())
+	{
 		return;
 	}
 
@@ -5456,14 +6122,17 @@ void hhPlayer::ReallyKilled(idEntity *inflictor, idEntity *attacker, int damage,
 	bReallyDead = true;
 
 	// Turn off low-pass effect
-	if (!gameLocal.isClient) { //rww
-		if (gameLocal.localClientNum == entityNumber) { //rww - don't do this for anyone but the local client on listen servers
+	if (!gameLocal.isClient)
+	{ //rww
+		if (gameLocal.localClientNum == entityNumber)
+		{ //rww - don't do this for anyone but the local client on listen servers
 			gameLocal.SpiritWalkSoundMode(false);
 			gameLocal.DialogSoundMode(false);
 		}
 	}
 
-	if (hud) {
+	if (hud)
+	{
 		hud->HandleNamedEvent("SwitchFromEthereal");
 	}
 
@@ -5477,12 +6146,14 @@ void hhPlayer::ReallyKilled(idEntity *inflictor, idEntity *attacker, int damage,
 // Spawns in a special type of wraith that is only visible in deathwalk
 //=============================================================================
 
-void hhPlayer::Event_SpawnDeathWraith() {
+void hhPlayer::Event_SpawnDeathWraith()
+{
 	idDict		args;
 	idEntity	*ent;
 	int			maxDeathWalkWraiths = spawnArgs.GetInt("deathWalkMaxWraiths");
 
-	if (!IsDeathWalking()) { // Don't spawn in a wraith if the player has resurrected
+	if (!IsDeathWalking())
+	{ // Don't spawn in a wraith if the player has resurrected
 		return;
 	}
 
@@ -5493,20 +6164,24 @@ void hhPlayer::Event_SpawnDeathWraith() {
 	args.SetVector("origin", GetEyePosition() + startPoint);
 	args.SetMatrix("rotation", idAngles(0.0f, (-viewAxis[0]).ToYaw(), 0.0f).ToMat3());
 	ent = gameLocal.SpawnObject(spawnArgs.GetString("def_deathWraith"), &args);
-	if (ent) {
+	if (ent)
+	{
 		hhDeathWraith *wraith = static_cast<hhDeathWraith *> (ent);
 		wraith->SetEnemy(this);
 	}
 
 	// Check the number of deathwraiths in the world
 	int count = 0;
-	for (ent = gameLocal.activeEntities.Next(); ent != NULL; ent = ent->activeNode.Next()) {
-		if (ent && ent->IsType(hhDeathWraith::Type)) {
+	for (ent = gameLocal.activeEntities.Next(); ent != NULL; ent = ent->activeNode.Next())
+	{
+		if (ent && ent->IsType(hhDeathWraith::Type))
+		{
 			count++;
 		}
 	}
 
-	if (count < maxDeathWalkWraiths) {
+	if (count < maxDeathWalkWraiths)
+	{
 		PostEventMS(&EV_SpawnDeathWraith, 0);
 	}
 }
@@ -5516,7 +6191,8 @@ void hhPlayer::Event_SpawnDeathWraith() {
 // hhPlayer::GetDeathwalkEnergyDestination
 //
 //=============================================================================
-idEntity *hhPlayer::GetDeathwalkEnergyDestination() {
+idEntity *hhPlayer::GetDeathwalkEnergyDestination()
+{
 	return gameLocal.FindEntityOfType(hhDeathWalkProxy::Type, NULL);
 }
 
@@ -5525,7 +6201,8 @@ idEntity *hhPlayer::GetDeathwalkEnergyDestination() {
 // hhPlayer::DeathWalkDamagedByWraith
 //
 //=============================================================================
-void hhPlayer::DeathWalkDamagedByWraith(idEntity *attacker, const char *damageType) {
+void hhPlayer::DeathWalkDamagedByWraith(idEntity *attacker, const char *damageType)
+{
 	Damage(attacker, attacker, vec3_origin, damageType, spawnArgs.GetFloat("deathWalkWraithDamage", "10"), INVALID_JOINT);
 
 	CancelEvents(&EV_SpawnDeathWraith);
@@ -5538,7 +6215,8 @@ void hhPlayer::DeathWalkDamagedByWraith(idEntity *attacker, const char *damageTy
 //
 //=============================================================================
 
-void hhPlayer::KilledDeathWraith(void) {
+void hhPlayer::KilledDeathWraith(void)
+{
 	CancelEvents(&EV_SpawnDeathWraith);
 	PostEventMS(&EV_SpawnDeathWraith, 0);
 }
@@ -5549,12 +6227,15 @@ void hhPlayer::KilledDeathWraith(void) {
 //
 //=============================================================================
 
-void hhPlayer::DeathWraithEnergyArived(bool energyHealth) {
-	if (energyHealth) {
+void hhPlayer::DeathWraithEnergyArived(bool energyHealth)
+{
+	if (energyHealth)
+	{
 		const char *healthAmount = spawnArgs.GetString("deathWraithHealthAmount");
 		Give("health", healthAmount);
 	}
-	else {
+	else
+	{
 		Give("ammo_spiritpower", spawnArgs.GetString("deathWraithSpiritAmount"));
 	}
 
@@ -5570,7 +6251,8 @@ void hhPlayer::DeathWraithEnergyArived(bool energyHealth) {
 //
 //=============================================================================
 
-void hhPlayer::Resurrect(void) {
+void hhPlayer::Resurrect(void)
+{
 
 	bDeathWalk = false;
 
@@ -5598,7 +6280,8 @@ void hhPlayer::Resurrect(void) {
 	ProcessEvent(&EV_RechargeHealth);
 	ProcessEvent(&EV_RechargeRifleAmmo);
 
-	if (hud) {
+	if (hud)
+	{
 		hud->HandleNamedEvent("SwitchFromEthereal");
 	}
 
@@ -5612,7 +6295,8 @@ void hhPlayer::Resurrect(void) {
 
 	// trigger the 'DeathWalkExited' entity
 	idEntity *dwe = gameLocal.FindEntity("dw_DeathWalkExited");
-	if (dwe) {
+	if (dwe)
+	{
 		dwe->PostEventMS(&EV_Activate, 0, this);
 	}
 
@@ -5622,12 +6306,14 @@ void hhPlayer::Resurrect(void) {
 
 	//rww - deactivate dw portal and remove cam target
 	idEntity *dwPortal = gameLocal.FindEntity("dw_deathPortal");
-	if (dwPortal && dwPortal->IsActive()) {
+	if (dwPortal && dwPortal->IsActive())
+	{
 		dwPortal->cameraTarget = NULL; //reset the camera target
 		dwPortal->PostEventMS(&EV_Activate, 0, dwPortal);
 	}
 	idEntity *dwCamTarget = gameLocal.FindEntity("dw_deathLocation");
-	if (dwCamTarget) {
+	if (dwCamTarget)
+	{
 		dwCamTarget->PostEventMS(&EV_Remove, 50); //make sure this is removed after the portal has stopped.
 	}
 }
@@ -5637,7 +6323,8 @@ void hhPlayer::Resurrect(void) {
 hhPlayer::IsWallWalking
 ============
 */
-bool hhPlayer::IsWallWalking(void) const {
+bool hhPlayer::IsWallWalking(void) const
+{
 	return(physicsObj.IsWallWalking());
 }
 
@@ -5646,7 +6333,8 @@ bool hhPlayer::IsWallWalking(void) const {
 hhPlayer::WasWallWalking
 ============
 */
-bool hhPlayer::WasWallWalking(void) const {
+bool hhPlayer::WasWallWalking(void) const
+{
 	return(physicsObj.WasWallWalking());
 }
 
@@ -5655,14 +6343,18 @@ bool hhPlayer::WasWallWalking(void) const {
 hhPlayer::MangleControls
 ============
 */
-void hhPlayer::MangleControls(usercmd_t *cmd) {
+void hhPlayer::MangleControls(usercmd_t *cmd)
+{
 	// When frozen in a cinematic, we want to restrict any movement and disallow many features
-	if (guiWantsControls.IsValid()) {
-		if (cmd->buttons & BUTTON_ATTACK_ALT) {
+	if (guiWantsControls.IsValid())
+	{
+		if (cmd->buttons & BUTTON_ATTACK_ALT)
+		{
 			guiWantsControls->LockedGuiReleased(this);
 			guiWantsControls = NULL;	// release
 		}
-		else {
+		else
+		{
 			guiWantsControls->PlayerControls(cmd);
 		}
 		cmd->forwardmove = 0;
@@ -5671,7 +6363,8 @@ void hhPlayer::MangleControls(usercmd_t *cmd) {
 		cmd->buttons &= ~(BUTTON_ATTACK | BUTTON_ZOOM | BUTTON_ATTACK_ALT);
 		cmd->impulse = 0;
 	}
-	else if (InCinematic()) {
+	else if (InCinematic())
+	{
 		cmd->forwardmove = 0;
 		cmd->rightmove = 0;
 		cmd->upmove = 0;
@@ -5687,7 +6380,8 @@ hhPlayer::GetPilotInput
 Called from PilotVehicleInterface
 ============
 */
-void hhPlayer::GetPilotInput(usercmd_t& pilotCmds, idAngles& pilotViewAngles) {
+void hhPlayer::GetPilotInput(usercmd_t& pilotCmds, idAngles& pilotViewAngles)
+{
 	pilotCmds = gameLocal.usercmds[entityNumber];
 	pilotViewAngles = DetermineViewAngles(pilotCmds, cmdAngles);
 }
@@ -5698,7 +6392,8 @@ hhPlayer::Think
 	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
 ==============
 */
-void hhPlayer::Think(void) {
+void hhPlayer::Think(void)
+{
 	renderEntity_t *headRenderEnt;
 
 	UpdatePossession();
@@ -5714,12 +6409,14 @@ void hhPlayer::Think(void) {
 	buttonMask &= usercmd.buttons;
 	usercmd.buttons &= ~buttonMask;
 
-	if (gameLocal.inCinematic && gameLocal.skipCinematic) {
+	if (gameLocal.inCinematic && gameLocal.skipCinematic)
+	{
 		return;
 	}
 
 	//HUMANHEAD rww - keep air attacker timer refreshed
-	if (!AI_ONGROUND && airAttackerTime > gameLocal.time) {
+	if (!AI_ONGROUND && airAttackerTime > gameLocal.time)
+	{
 		airAttackerTime = gameLocal.time + 300;
 	}
 
@@ -5732,20 +6429,23 @@ void hhPlayer::Think(void) {
 
 	// if this is the very first frame of the map, set the delta view angles
 	// based on the usercmd angles
-	if (!spawnAnglesSet && (gameLocal.GameState() != GAMESTATE_STARTUP)) {
+	if (!spawnAnglesSet && (gameLocal.GameState() != GAMESTATE_STARTUP))
+	{
 		spawnAnglesSet = true;
 		SetViewAngles(spawnAngles);
 		oldFlags = usercmd.flags;
 	}
 
-	if (gameLocal.inCinematic || influenceActive) {
+	if (gameLocal.inCinematic || influenceActive)
+	{
 		usercmd.forwardmove = 0;
 		usercmd.rightmove = 0;
 		usercmd.upmove = 0;
 	}
 
 	// log movement changes for weapon bobbing effects
-	if (usercmd.forwardmove != oldCmd.forwardmove) {
+	if (usercmd.forwardmove != oldCmd.forwardmove)
+	{
 		loggedAccel_t	*acc = &loggedAccel[currentLoggedAccel&(NUM_LOGGED_ACCELS - 1)];
 		currentLoggedAccel++;
 		acc->time = gameLocal.time;
@@ -5753,7 +6453,8 @@ void hhPlayer::Think(void) {
 		acc->dir[1] = acc->dir[2] = 0;
 	}
 
-	if (usercmd.rightmove != oldCmd.rightmove) {
+	if (usercmd.rightmove != oldCmd.rightmove)
+	{
 		loggedAccel_t	*acc = &loggedAccel[currentLoggedAccel&(NUM_LOGGED_ACCELS - 1)];
 		currentLoggedAccel++;
 		acc->time = gameLocal.time;
@@ -5762,21 +6463,26 @@ void hhPlayer::Think(void) {
 	}
 
 	// freelook centering
-	if ((usercmd.buttons ^ oldCmd.buttons) & BUTTON_MLOOK) {
+	if ((usercmd.buttons ^ oldCmd.buttons) & BUTTON_MLOOK)
+	{
 		centerView.Init(gameLocal.time, 200, viewAngles.pitch, 0);
 	}
 
 	// zooming
-	if ((usercmd.buttons ^ oldCmd.buttons) & BUTTON_ZOOM) {
-		if ((usercmd.buttons & BUTTON_ZOOM) && weapon.GetEntity()) {
+	if ((usercmd.buttons ^ oldCmd.buttons) & BUTTON_ZOOM)
+	{
+		if ((usercmd.buttons & BUTTON_ZOOM) && weapon.GetEntity())
+		{
 			zoomFov.Init(gameLocal.time, 200.0f, CalcFov(false), weapon.GetEntity()->GetZoomFov());
 		}
-		else {
+		else
+		{
 			zoomFov.Init(gameLocal.time, 200.0f, zoomFov.GetCurrentValue(gameLocal.time), DefaultFov());
 		}
 	}
 
-	if (g_fov.IsModified()) {
+	if (g_fov.IsModified())
+	{
 		idEntity *weaponEnt = weapon.GetEntity();
 		if (!(weaponEnt &&
 			weaponEnt->IsType(hhWeaponZoomable::Type) &&
@@ -5790,31 +6496,37 @@ void hhPlayer::Think(void) {
 	// if we have an active gui, we will unrotate the view angles as
 	// we turn the mouse movements into gui events
 	idUserInterface *gui = ActiveGui();
-	if (gui && gui != focusUI) {
+	if (gui && gui != focusUI)
+	{
 		RouteGuiMouse(gui);
 	}
 
 	// set the push velocity on the weapon before running the physics
-	if (weapon.GetEntity()) {
+	if (weapon.GetEntity())
+	{
 		weapon.GetEntity()->SetPushVelocity(physicsObj.GetPushedLinearVelocity());
 	}
 
 	EvaluateControls();
 
-	if (!af.IsActive()) {
+	if (!af.IsActive())
+	{
 		AdjustBodyAngles();
 		CopyJointsFromBodyToHead();
 	}
 
 	//HUMANHEAD: aob - added vehicle check.  Vehicle moves us
-	if (!InVehicle()) {
+	if (!InVehicle())
+	{
 		Move();
 	}
 	//HUMANHEAD END
 
-	if (!g_stopTime.GetBool()) {
+	if (!g_stopTime.GetBool())
+	{
 		//HUMANHEAD: aob - changed heath check to IsDead check.  Player needs to touch triggers when deathwalking.
-		if (!noclip && !spectating && !IsDead() && !IsHidden()) {
+		if (!noclip && !spectating && !IsDead() && !IsHidden())
+		{
 			TouchTriggers();
 		}
 
@@ -5829,7 +6541,8 @@ void hhPlayer::Think(void) {
 		UpdateScript();
 
 		// service animations
-		if (!spectating && !af.IsActive() && !gameLocal.inCinematic) {
+		if (!spectating && !af.IsActive() && !gameLocal.inCinematic)
+		{
 			UpdateConditions();
 			UpdateAnimState();
 			CheckBlink();
@@ -5846,71 +6559,89 @@ void hhPlayer::Think(void) {
 	// this may use firstPersonView, or a thirdPeroson / camera view
 	CalculateRenderView();
 
-	if (spectating) {
-		if (!gameLocal.isClient) {
+	if (spectating)
+	{
+		if (!gameLocal.isClient)
+		{
 			UpdateSpectating();
 		}
 		//HUMANHEAD: aob - changed heath check to IsDead check.  Player needs to update weapon when deathwalking
 	}
-	else if (!IsDead() && !bFrozen) {	//HUMANHEAD bjk PCF (4-27-06) - no setting unnecessary weapon state
-		if (!gameLocal.isClient || weapon.GetEntity()) {
+	else if (!IsDead() && !bFrozen)
+	{	//HUMANHEAD bjk PCF (4-27-06) - no setting unnecessary weapon state
+		if (!gameLocal.isClient || weapon.GetEntity())
+		{
 			UpdateWeapon();
 		}
 	}
 
-	if (InVehicle()) {
+	if (InVehicle())
+	{
 		UpdateHud(GetVehicleInterfaceLocal()->GetHUD());
 	}
-	else {
+	else
+	{
 		UpdateHud(hud);
 	}
 
 	UpdateDeathSkin(false);
 
-	if (gameLocal.isMultiplayer) {
+	if (gameLocal.isMultiplayer)
+	{
 		DrawPlayerIcons();
 	}
 
-	if (head.GetEntity()) {
+	if (head.GetEntity())
+	{
 		headRenderEnt = head.GetEntity()->GetRenderEntity();
 	}
-	else {
+	else
+	{
 		headRenderEnt = NULL;
 	}
 
-	if (gameLocal.isMultiplayer || g_showPlayerShadow.GetBool()) {
+	if (gameLocal.isMultiplayer || g_showPlayerShadow.GetBool())
+	{
 		renderEntity.suppressShadowInViewID = 0;
-		if (headRenderEnt) {
+		if (headRenderEnt)
+		{
 			headRenderEnt->suppressShadowInViewID = 0;
 		}
 	}
-	else {
+	else
+	{
 		renderEntity.suppressShadowInViewID = entityNumber + 1;
-		if (headRenderEnt) {
+		if (headRenderEnt)
+		{
 			headRenderEnt->suppressShadowInViewID = entityNumber + 1;
 		}
 	}
 	// never cast shadows from our first-person muzzle flashes
 	renderEntity.suppressShadowInLightID = LIGHTID_VIEW_MUZZLE_FLASH + entityNumber;
-	if (headRenderEnt) {
+	if (headRenderEnt)
+	{
 		headRenderEnt->suppressShadowInLightID = LIGHTID_VIEW_MUZZLE_FLASH + entityNumber;
 	}
 
-	if (!g_stopTime.GetBool()) {
+	if (!g_stopTime.GetBool())
+	{
 		UpdateAnimation();
 		Present();
 		UpdateDamageEffects();
-		if (gameLocal.isMultiplayer) { //rww
+		if (gameLocal.isMultiplayer)
+		{ //rww
 			UpdateWounds();
 		}
 		LinkCombat();
 		playerView.CalculateShake();
 	}
 
-	if (g_showEnemies.GetBool()) {
+	if (g_showEnemies.GetBool())
+	{
 		idActor *ent;
 		int num = 0;
-		for (ent = enemyList.Next(); ent != NULL; ent = ent->enemyNode.Next()) {
+		for (ent = enemyList.Next(); ent != NULL; ent = ent->enemyNode.Next())
+		{
 			gameLocal.Printf("enemy (%d)'%s'\n", ent->entityNumber, ent->name.c_str());
 			gameRenderWorld->DebugBounds(colorRed, ent->GetPhysics()->GetBounds().Expand(2), ent->GetPhysics()->GetOrigin());
 			num++;
@@ -5924,19 +6655,25 @@ void hhPlayer::Think(void) {
 hhPlayer::AdjustBodyAngles
 ==============
 */
-void hhPlayer::AdjustBodyAngles(void) {
-	if (InVehicle()) {
+void hhPlayer::AdjustBodyAngles(void)
+{
+	if (InVehicle())
+	{
 		return;
 	}
 
-	if (bClampYaw) { //rww - for slabs
-		//first, clamp the viewangles while bound to a slab
-		if (maxRelativePitch >= 0.0f) {
-			if (untransformedViewAngles.pitch > maxRelativePitch) {
+	if (bClampYaw)
+	{ //rww - for slabs
+//first, clamp the viewangles while bound to a slab
+		if (maxRelativePitch >= 0.0f)
+		{
+			if (untransformedViewAngles.pitch > maxRelativePitch)
+			{
 				untransformedViewAngles.pitch = maxRelativePitch;
 				SetViewAngles(untransformedViewAngles);
 			}
-			else if (untransformedViewAngles.pitch < -maxRelativePitch) {
+			else if (untransformedViewAngles.pitch < -maxRelativePitch)
+			{
 				untransformedViewAngles.pitch = -maxRelativePitch;
 				SetViewAngles(untransformedViewAngles);
 			}
@@ -5945,13 +6682,15 @@ void hhPlayer::AdjustBodyAngles(void) {
 		animator.SetJointAxis(hipJoint, JOINTMOD_WORLD, mat3_identity); //no leg offset while slabbed
 
 #if 0 //old headlook code
-		if (head.IsValid() && head.GetEntity()) { //has a head
+		if (head.IsValid() && head.GetEntity())
+		{ //has a head
 			idVec3 origin;
 			idMat3 axis;
 
 			head->GetPhysics()->Evaluate(gameLocal.time - gameLocal.previousTime, gameLocal.time); //make sure it is bolted up to date
 
-			if (GetMasterPosition(origin, axis)) {
+			if (GetMasterPosition(origin, axis))
+			{
 				idAngles masterAngles = axis.ToAngles(); //bound angles
 				idAngles ang;
 				idMat3 rot;
@@ -5979,14 +6718,15 @@ void hhPlayer::AdjustBodyAngles(void) {
 		}
 #endif
 	}
-	else {
+	else
+	{
 #if 0 //old headlook code
 		//rww - reset head joint override when not on a slab
 		animator.SetJointAxis(headJoint, JOINTMOD_LOCAL, idAngles(0.0f, 0.0f, 0.0f).ToMat3());
 #endif
 		idPlayer::AdjustBodyAngles();
 	}
-		}
+}
 
 /*
 ==============
@@ -5994,7 +6734,8 @@ hhPlayer::Move
 	PDMMERGE PERSISTENTMERGE: Overridden, Done for 6-03-05 merge
 ==============
 */
-void hhPlayer::Move(void) {
+void hhPlayer::Move(void)
+{
 	float newEyeOffset;
 	idVec3 oldOrigin;
 	idVec3 oldVelocity;
@@ -6009,52 +6750,65 @@ void hhPlayer::Move(void) {
 	physicsObj.SetMaxStepHeight(GetStepHeight());//HUMANHEAD: aob
 	physicsObj.SetMaxJumpHeight(pm_jumpheight.GetFloat());
 
-	if (noclip) {
+	if (noclip)
+	{
 		physicsObj.SetContents(0);
 		physicsObj.SetMovementType(PM_NOCLIP);
 	}
-	else if (spectating) {
+	else if (spectating)
+	{
 		physicsObj.SetContents(0);
 		physicsObj.SetMovementType(PM_SPECTATOR);
 	}
-	else if (bInDeathwalkTransition) {		// In between life and death, don't allow ragdoll to collide with player
+	else if (bInDeathwalkTransition)
+	{		// In between life and death, don't allow ragdoll to collide with player
 		physicsObj.SetContents(0);
 		physicsObj.SetMovementType(PM_NORMAL);
 	}
-	else if (IsDead()) { 					// HUMANHEAD cjr:  Replaced health <= 0 with IsDead() call for deathwalk override
-		if (gameLocal.isMultiplayer) {			// HUMANHEAD rww - contents 0 because we use a dead body proxy in mp
+	else if (IsDead())
+	{ 					// HUMANHEAD cjr:  Replaced health <= 0 with IsDead() call for deathwalk override
+		if (gameLocal.isMultiplayer)
+		{			// HUMANHEAD rww - contents 0 because we use a dead body proxy in mp
 			physicsObj.SetContents(0);
 		}
-		else {
+		else
+		{
 			physicsObj.SetContents(CONTENTS_CORPSE | CONTENTS_MONSTERCLIP);
 		} //HUMANHEAD END
 		physicsObj.SetMovementType(PM_DEAD);
 	}
-	else if (gameLocal.inCinematic || gameLocal.GetCamera() || privateCameraView) {
+	else if (gameLocal.inCinematic || gameLocal.GetCamera() || privateCameraView)
+	{
 		physicsObj.SetContents(CONTENTS_BODY);
 		physicsObj.SetMovementType(PM_FREEZE);
 	}
-	else if (bFrozen && !IsSpiritOrDeathwalking()) {		// HUMANHEAD: freeze support
+	else if (bFrozen && !IsSpiritOrDeathwalking())
+	{		// HUMANHEAD: freeze support
 		physicsObj.SetContents(CONTENTS_BODY);
 		physicsObj.SetMovementType(PM_FREEZE);
 	}
-	else {
+	else
+	{
 		physicsObj.SetContents(CONTENTS_BODY);
 		physicsObj.SetMovementType(PM_NORMAL);
 	}
 
-	if (spectating) {
+	if (spectating)
+	{
 		physicsObj.SetClipMask(MASK_SPECTATOR);
 	}
-	else if (IsDead()) {	// HUMANHEAD cjr:  Replaced health <= 0 with IsDead() call for deathwalk override
+	else if (IsDead())
+	{	// HUMANHEAD cjr:  Replaced health <= 0 with IsDead() call for deathwalk override
 		physicsObj.SetClipMask(MASK_DEADSOLID);
 		// HUMANHEAD cjr: allow spirit walk
 	}
-	else if (IsSpiritOrDeathwalking()) {
+	else if (IsSpiritOrDeathwalking())
+	{
 		physicsObj.SetClipMask(MASK_SPIRITPLAYER);
 		// HUMANHEAD END
 	}
-	else {
+	else
+	{
 		physicsObj.SetClipMask(MASK_PLAYERSOLID);
 	}
 
@@ -6070,34 +6824,42 @@ void hhPlayer::Move(void) {
 	// update our last valid AAS location for the AI
 	SetAASLocation();
 
-	if (spectating) {
+	if (spectating)
+	{
 		newEyeOffset = 0.0f;
 		// HUMANHEAD cjr:  Replaced health <= 0 with IsDead() call for deathwalk override
 	}
-	else if (IsDead()) {
+	else if (IsDead())
+	{
 		newEyeOffset = pm_deadviewheight.GetFloat();
 	}
-	else if (physicsObj.IsCrouching()) {
+	else if (physicsObj.IsCrouching())
+	{
 		newEyeOffset = pm_crouchviewheight.GetFloat();
 	}
-	else if (GetBindMaster() && GetBindMaster()->IsType(idAFEntity_Vehicle::Type)) {
+	else if (GetBindMaster() && GetBindMaster()->IsType(idAFEntity_Vehicle::Type))
+	{
 		newEyeOffset = 0.0f;
 	}
-	else {
+	else
+	{
 		newEyeOffset = pm_normalviewheight.GetFloat();
 	}
 
-	if (EyeHeight() != newEyeOffset) {
+	if (EyeHeight() != newEyeOffset)
+	{
 		//AOB: camera does smoothing
 		SetEyeHeight(newEyeOffset);
 	}
 
-	// HUMANHEAD aob 
+	// HUMANHEAD aob
 	float camRotScale = p_camRotRateScale.GetFloat();
 	//rww - if on a wallwalk mover, increase the scale
-	if (GetPhysics() == &physicsObj && physicsObj.GetGroundTrace().fraction < 1.0f) {
+	if (GetPhysics() == &physicsObj && physicsObj.GetGroundTrace().fraction < 1.0f)
+	{
 		const trace_t &grTr = physicsObj.GetGroundTrace();
-		if (grTr.c.entityNum >= 0 && grTr.c.entityNum < MAX_GENTITIES && gameLocal.entities[grTr.c.entityNum] && gameLocal.entities[grTr.c.entityNum]->IsType(hhMover::Type) && grTr.c.material && grTr.c.material->GetSurfaceType() == SURFTYPE_WALLWALK) {
+		if (grTr.c.entityNum >= 0 && grTr.c.entityNum < MAX_GENTITIES && gameLocal.entities[grTr.c.entityNum] && gameLocal.entities[grTr.c.entityNum]->IsType(hhMover::Type) && grTr.c.material && grTr.c.material->GetSurfaceType() == SURFTYPE_WALLWALK)
+		{
 			camRotScale *= 5.0f;
 		}
 	}
@@ -6111,22 +6873,25 @@ void hhPlayer::Move(void) {
 	// HUMANHEAD pdm: Experimental: allow player to jump up onto wallwalk
 #define WALLWALK_EXPERIMENT 0
 #if WALLWALK_EXPERIMENT
-	if (!physicsObj.IsWallWalking() && physicsObj.HasJumped()) {
+	if (!physicsObj.IsWallWalking() && physicsObj.HasJumped())
+	{
 		trace_t trace;
 		memset(&trace, 0, sizeof(trace));
 		idVec3 start, end;
 		start = physicsObj.GetOrigin();
 		end = start + idVec3(0, 0, 100);	//fixme: jumpheight
-		if (gameLocal.clip.TracePoint(trace, start, end, MASK_SOLID, this)) {
-			if (gameLocal.GetMatterType(trace, NULL) == SURFTYPE_WALLWALK) {
+		if (gameLocal.clip.TracePoint(trace, start, end, MASK_SOLID, this))
+		{
+			if (gameLocal.GetMatterType(trace, NULL) == SURFTYPE_WALLWALK)
+			{
 				gameLocal.Printf("Trying to flip over for wallwalk\n");
 
 				// Clear velocity, so won't miss wallwalk above
 				physicsObj.SetLinearVelocity(vec3_origin);
 
 				SetGravity(-trace.c.normal * DEFAULT_GRAVITY);
-				ProcessEvent(&EV_ShouldRemainAlignedToAxial, (int)false);
-				ProcessEvent(&EV_OrientToGravity, (int)true);
+				ProcessEvent(&EV_ShouldRemainAlignedToAxial, (int) false);
+				ProcessEvent(&EV_OrientToGravity, (int) true);
 
 				physicsObj.IsWallWalking(true);
 
@@ -6150,37 +6915,44 @@ void hhPlayer::Move(void) {
 #endif
 	// HUMANHEAD END
 
-	if (noclip || gameLocal.inCinematic) {
+	if (noclip || gameLocal.inCinematic)
+	{
 		AI_CROUCH = false;
 		AI_ONGROUND = false;
 		AI_ONLADDER = false;
 		AI_JUMP = false;
 		AI_REALLYFALL = true; //HUMANHEAD rww - well, it fits with ONGROUND false
 	}
-	else {
+	else
+	{
 		AI_CROUCH = physicsObj.IsCrouching();
 		AI_ONGROUND = physicsObj.HasGroundContacts();
 		AI_ONLADDER = physicsObj.OnLadder();
 		AI_JUMP = physicsObj.HasJumped();
 		//HUMANHEAD rww
-		if (!physicsObj.IsInwardGravity()) {
+		if (!physicsObj.IsInwardGravity())
+		{
 			AI_REALLYFALL = !AI_ONGROUND;
 		}
-		else if (!AI_ONGROUND) { //for inward gravity zones, do an extra ground check when in-air
+		else if (!AI_ONGROUND)
+		{ //for inward gravity zones, do an extra ground check when in-air
 			AI_REALLYFALL = !physicsObj.ExtraGroundCheck();
 		}
 		//HUMANHEAD END
 
 		// check if we're standing on top of a monster and give a push if we are
 		idEntity *groundEnt = physicsObj.GetGroundEntity();
-		if (groundEnt && groundEnt->IsType(idAI::Type)) {
+		if (groundEnt && groundEnt->IsType(idAI::Type))
+		{
 			idVec3 vel = physicsObj.GetLinearVelocity();
-			if (vel.ToVec2().LengthSqr() < 0.1f) {
+			if (vel.ToVec2().LengthSqr() < 0.1f)
+			{
 				vel.ToVec2() = physicsObj.GetOrigin().ToVec2() - groundEnt->GetPhysics()->GetAbsBounds().GetCenter().ToVec2();
 				vel.ToVec2().NormalizeFast();
 				vel.ToVec2() *= pm_walkspeed.GetFloat();
 			}
-			else {
+			else
+			{
 				// give em a push in the direction they're going
 				vel *= 1.1f;
 			}
@@ -6188,7 +6960,8 @@ void hhPlayer::Move(void) {
 		}
 	}
 
-	if (AI_JUMP) {
+	if (AI_JUMP)
+	{
 		// bounce the view weapon
 		loggedAccel_t	*acc = &loggedAccel[currentLoggedAccel&(NUM_LOGGED_ACCELS - 1)];
 		currentLoggedAccel++;
@@ -6198,38 +6971,46 @@ void hhPlayer::Move(void) {
 	}
 
 	BobCycle(pushVelocity);
-	if (!noclip) { // HUMANHEAD: Only crashland if not spiritwalking or not deathwalking
+	if (!noclip)
+	{ // HUMANHEAD: Only crashland if not spiritwalking or not deathwalking
 		CrashLand(oldOrigin, oldVelocity);
 	}
 
 	//HUMANHEAD: aob - put this into helper func
-	if (!gameLocal.isClient) {
-		if (IsWallWalking() && !WasWallWalking()) {
+	if (!gameLocal.isClient)
+	{
+		if (IsWallWalking() && !WasWallWalking())
+		{
 			wallwalkSoundController.StartSound(SND_CHANNEL_WALLWALK, SND_CHANNEL_WALLWALK2, SSF_LOOPING, false);
 		}
-		else if (!IsWallWalking() && WasWallWalking()) {
+		else if (!IsWallWalking() && WasWallWalking())
+		{
 			wallwalkSoundController.StopSound(SND_CHANNEL_WALLWALK, SND_CHANNEL_WALLWALK2, false);
 		}
 	}
 	physicsObj.WasWallWalking(IsWallWalking()); //rww - moved here
 	//HUMANHEAD END
-	}
+}
 
 /*
 ===============
 hhPlayer::ShouldTouchTrigger
 ===============
 */
-bool hhPlayer::ShouldTouchTrigger(idEntity* entity) const {
-	if (!entity) {
+bool hhPlayer::ShouldTouchTrigger(idEntity* entity) const
+{
+	if (!entity)
+	{
 		return false;
 	}
 
-	if (entity->fl.onlySpiritWalkTouch) { // cjr - Trigger can only be touched by spirit
+	if (entity->fl.onlySpiritWalkTouch)
+	{ // cjr - Trigger can only be touched by spirit
 		return IsSpiritWalking();
 	}
 
-	if (IsSpiritOrDeathwalking() && !entity->fl.allowSpiritWalkTouch) { // Trigger can be touched by either physical or spirit
+	if (IsSpiritOrDeathwalking() && !entity->fl.allowSpiritWalkTouch)
+	{ // Trigger can be touched by either physical or spirit
 		return false; // jrm - reversed logic
 	}
 
@@ -6241,22 +7022,27 @@ bool hhPlayer::ShouldTouchTrigger(idEntity* entity) const {
 hhPlayer::HandleSingleGuiCommand
 ===============
 */
-bool hhPlayer::HandleSingleGuiCommand(idEntity *entityGui, idLexer *src) {
+bool hhPlayer::HandleSingleGuiCommand(idEntity *entityGui, idLexer *src)
+{
 
 	idToken token;
 
-	if (!src->ReadToken(&token)) {
+	if (!src->ReadToken(&token))
+	{
 		return false;
 	}
 
-	if (token == ";") {
+	if (token == ";")
+	{
 		return false;
 	}
 
-	if (token.Icmp("guilockplayer") == 0) {
+	if (token.Icmp("guilockplayer") == 0)
+	{
 		//Now locked in place:
 		// manglecontrols() will route controls to current gui focus
-		if (entityGui->IsType(hhConsole::Type)) {
+		if (entityGui->IsType(hhConsole::Type))
+		{
 			guiWantsControls = static_cast<hhConsole*>(entityGui);
 		}
 		return true;
@@ -6266,14 +7052,18 @@ bool hhPlayer::HandleSingleGuiCommand(idEntity *entityGui, idLexer *src) {
 	return idPlayer::HandleSingleGuiCommand(entityGui, src);
 }
 
-void hhPlayer::SetOverlayGui(const char *guiName) {
-	if (guiName && *guiName && guiOverlay == NULL) {
+void hhPlayer::SetOverlayGui(const char *guiName)
+{
+	if (guiName && *guiName && guiOverlay == NULL)
+	{
 		guiOverlay = uiManager->FindGui(guiName, true);
-		if (guiOverlay) {
+		if (guiOverlay)
+		{
 			guiOverlay->Activate(true, gameLocal.time);
 		}
 	}
-	else {
+	else
+	{
 		guiOverlay = NULL;
 	}
 }
@@ -6284,22 +7074,26 @@ hhPlayer::ForceWeapon
 nla: used to instantly force the spirit weapon, without lowering and raising
 ============
 */
-void hhPlayer::ForceWeapon(int weaponNum) {
+void hhPlayer::ForceWeapon(int weaponNum)
+{
 	const char *		weaponDef;
 	hhWeapon *			newWeapon;
 
-	if (spectating) { //rww - if spectating this is bad.
+	if (spectating)
+	{ //rww - if spectating this is bad.
 		gameLocal.Error("hhPlayer::ForceWeapon called on spectator. (client %i)", entityNumber);
 	}
 
 	// HUMANHEAD mdl:  Special case - coming out of spirit mode when no physical weapon is available
-	if (weaponNum == -1) {
+	if (weaponNum == -1)
+	{
 		idealWeapon = 0;
 		currentWeapon = -1;
 		return;
 	}
 
-	if (weaponNum < 1) {
+	if (weaponNum < 1)
+	{
 		gameLocal.Warning("Error: Illegal weapon num passed: %d\n", weaponNum);
 	}
 
@@ -6321,7 +7115,8 @@ void hhPlayer::ForceWeapon(int weaponNum) {
 hhPlayer::ForceWeapon
 ============
 */
-void hhPlayer::ForceWeapon(hhWeapon *newWeapon) {
+void hhPlayer::ForceWeapon(hhWeapon *newWeapon)
+{
 	int weaponNum;
 
 
@@ -6340,7 +7135,8 @@ hhPlayer::Teleport
 HUMANHEAD cjr:  Now calls TeleportNoKillBox, then applies a kill box
 ============
 */
-void hhPlayer::Teleport(const idVec3& origin, const idAngles& angles, idEntity *destination) {
+void hhPlayer::Teleport(const idVec3& origin, const idAngles& angles, idEntity *destination)
+{
 	//pdm - converted this to call our other version so it doesn't unalign the clip model
 	TeleportNoKillBox(origin, mat3_identity, angles.ToForward(), angles);
 
@@ -6361,7 +7157,8 @@ hhPlayer::Teleport
 HUMANHEAD aob:  Needed for coming back from deathwalk
 ============
 */
-void hhPlayer::Teleport(const idVec3& origin, const idMat3& bboxAxis, const idVec3& viewDir, const idAngles& newUntransformedViewAngles, idEntity *destination) {
+void hhPlayer::Teleport(const idVec3& origin, const idMat3& bboxAxis, const idVec3& viewDir, const idAngles& newUntransformedViewAngles, idEntity *destination)
+{
 	TeleportNoKillBox(origin, bboxAxis, viewDir, newUntransformedViewAngles);
 
 	// kill anything at the new position
@@ -6377,7 +7174,8 @@ hhPlayer::TeleportNoKillBox
 HUMANHEAD cjr:  Called from SpiritProxy
 ============
 */
-void hhPlayer::TeleportNoKillBox(const idVec3& origin, const idMat3& bboxAxis, const idVec3& viewDir, const idAngles& newUntransformedViewAngles) {
+void hhPlayer::TeleportNoKillBox(const idVec3& origin, const idMat3& bboxAxis, const idVec3& viewDir, const idAngles& newUntransformedViewAngles)
+{
 	DisableIK();
 
 	SetOrientation(origin, bboxAxis, viewDir, newUntransformedViewAngles);
@@ -6396,7 +7194,8 @@ HUMANHEAD cjr: Teleport, but don't telefrag anything
 ============
 */
 
-void hhPlayer::TeleportNoKillBox(const idVec3& origin, const idMat3& bboxAxis) {
+void hhPlayer::TeleportNoKillBox(const idVec3& origin, const idMat3& bboxAxis)
+{
 	TeleportNoKillBox(origin, bboxAxis, GetAxis()[0], GetUntransformedViewAngles());
 }
 
@@ -6407,7 +7206,8 @@ hhPlayer::Possess
 //HUMANHEAD: cjr - this is the entry point for possession.
 =====================
 */
-void hhPlayer::Possess(idEntity* possessor) {
+void hhPlayer::Possess(idEntity* possessor)
+{
 	bPossessed = true;
 
 	/* TODO:
@@ -6423,7 +7223,8 @@ void hhPlayer::Possess(idEntity* possessor) {
 
 	// If we're spirit walking when we're possessed, snap back to our body for a moment, then get thrown back out.
 	//TODO this isn't ideal
-	if (IsSpiritOrDeathwalking()) {
+	if (IsSpiritOrDeathwalking())
+	{
 		DisableEthereal();
 	}
 
@@ -6435,18 +7236,20 @@ void hhPlayer::Possess(idEntity* possessor) {
 
 	// test:  spawn in a possessed version
 	// need: effects here...flash or whatever
-	possessedTommy = (hhPossessedTommy *)gameLocal.SpawnObject("monster_possessed_tommy", NULL);
+	possessedTommy = (hhPossessedTommy *) gameLocal.SpawnObject("monster_possessed_tommy", NULL);
 
-	if (possessedTommy.IsValid()) { // Copy player stats to the possessed Tommy
-		/*if ( IsSpiritOrDeathwalking() ) { //TODO mdl:  Remove this if we go with wraiths knocking players back to their body
-			// This should means we were called by
-			possessedTommy->SetOrigin( spiritProxy->GetOrigin() );
-			possessedTommy->SetAxis( spiritProxy->GetAxis() );
-		} else*/ {
+	if (possessedTommy.IsValid())
+	{ // Copy player stats to the possessed Tommy
+/*if ( IsSpiritOrDeathwalking() ) { //TODO mdl:  Remove this if we go with wraiths knocking players back to their body
+	// This should means we were called by
+	possessedTommy->SetOrigin( spiritProxy->GetOrigin() );
+	possessedTommy->SetAxis( spiritProxy->GetAxis() );
+		} else*/
+		{
 			possessedTommy->SetOrigin(GetOrigin());
 			possessedTommy->SetAxis(GetAxis());
 		}
-	possessedTommy->SetPossessedProxy(spiritProxy.GetEntity());
+		possessedTommy->SetPossessedProxy(spiritProxy.GetEntity());
 	}
 }
 
@@ -6457,7 +7260,8 @@ hhPlayer::Unpossess
 //HUMANHEAD: cjr
 =====================*/
 
-void hhPlayer::Unpossess() {
+void hhPlayer::Unpossess()
+{
 	bPossessed = false;
 
 	possessedTommy = NULL;
@@ -6489,8 +7293,10 @@ void hhPlayer::Unpossess() {
 // Players can only be possessed if they are are not currently possessed
 //=============================================================================
 
-bool hhPlayer::CanBePossessed(void) {
-	if (godmode || noclip || !bAllowSpirit) { // Don't possess if in god mode or noclipping
+bool hhPlayer::CanBePossessed(void)
+{
+	if (godmode || noclip || !bAllowSpirit)
+	{ // Don't possess if in god mode or noclipping
 		return false;
 	}
 
@@ -6502,13 +7308,15 @@ bool hhPlayer::CanBePossessed(void) {
 // hhPlayer::PossessKilled
 //
 // Killed when possessed (spirit power ran out)
-// 
+//
 // - Ragdoll the possessed body
 // - Return to the location of the possessed tommy and die
 //=============================================================================
 
-void hhPlayer::PossessKilled(void) {
-	if (possessedTommy.IsValid()) {
+void hhPlayer::PossessKilled(void)
+{
+	if (possessedTommy.IsValid())
+	{
 		possessedTommy->PostEventMS(&EV_Remove, 0);
 	}
 
@@ -6524,18 +7332,22 @@ void hhPlayer::PossessKilled(void) {
 // Player just portalled
 //=============================================================================
 
-void hhPlayer::Portalled(idEntity *portal) {
-	if (talon.IsValid() && talon->GetBindMaster() != this) { // If Talon isn't bound to Tommy, portal him with the player
+void hhPlayer::Portalled(idEntity *portal)
+{
+	if (talon.IsValid() && talon->GetBindMaster() != this)
+	{ // If Talon isn't bound to Tommy, portal him with the player
 		talon->Portalled(portal);
 	}
 
-	if (gameLocal.isClient) { //HUMANHEAD rww - compensate for angle jump
+	if (gameLocal.isClient)
+	{ //HUMANHEAD rww - compensate for angle jump
 		bBufferNextSnapAngles = true;
 		smoothedAngles = viewAngles;
 	}
 	smoothedFrame = 0; //HUMANHEAD rww - skip smoothing on the portalled frame
 	walkIK.InvalidateHeights(); //HUMANHEAD rww - don't try to interpolate ik positions between two equal planes on either side of a portal
-	if (gameLocal.isServer) { //HUMANHEAD rww - send an unreliable event in the coming snapshot
+	if (gameLocal.isServer)
+	{ //HUMANHEAD rww - send an unreliable event in the coming snapshot
 		idBitMsg	msg;
 		byte		msgBuf[MAX_EVENT_PARAM_SIZE];
 
@@ -6550,18 +7362,21 @@ void hhPlayer::Portalled(idEntity *portal) {
 hhPlayer::UpdateModelTransform
 ================
 */
-void hhPlayer::UpdateModelTransform(void) {
+void hhPlayer::UpdateModelTransform(void)
+{
 	idVec3 origin;
 	idMat3 axis;
 
-	if (GetPhysicsToVisualTransform(origin, axis)) {
+	if (GetPhysicsToVisualTransform(origin, axis))
+	{
 		//HUMANHEAD: aob
 		GetRenderEntity()->axis = axis;
 		idVec3 absOrigin = TransformToPlayerSpaceNotInterpolated(origin); //rww - don't use interpolated origin
 		GetRenderEntity()->origin = absOrigin;
 		//HUMANHEAD END
 	}
-	else {
+	else
+	{
 		//HUMANHEAD: aob
 		GetRenderEntity()->axis = GetAxis();
 		GetRenderEntity()->origin = GetOrigin();
@@ -6579,7 +7394,8 @@ Takes possession FOV into account
 HUMANHEAD cjr
 ====================
 */
-float hhPlayer::CalcFov(bool honorZoom) {
+float hhPlayer::CalcFov(bool honorZoom)
+{
 	float	fov;
 
 	// HUMANHEAD mdl:  Refactored this to work properly with possessionFOV.  Being zoomed in will ignore possessionFOV, however.
@@ -6591,16 +7407,20 @@ float hhPlayer::CalcFov(bool honorZoom) {
 	{
 		fov = possessionFOV;
 	}
-	else if (IsDeathWalking()) {
+	else if (IsDeathWalking())
+	{
 		fov = spawnArgs.GetFloat("deathwalkFOV", "90");
 	}
-	else if (pm_thirdPerson.GetBool()) {
+	else if (pm_thirdPerson.GetBool())
+	{
 		fov = g_fov.GetFloat();
 	}
-	else if (InCinematic()) {
+	else if (InCinematic())
+	{
 		fov = cinematicFOV.GetCurrentValue(gameLocal.time);
 	}
-	else {
+	else
+	{
 		fov = zoomFov.GetCurrentValue(gameLocal.time);
 	}
 
@@ -6616,9 +7436,12 @@ float hhPlayer::CalcFov(bool honorZoom) {
 hhPlayer::EnterVehicle
 ===============
 */
-void hhPlayer::EnterVehicle(hhVehicle* vehicle) {
-	if (!gameLocal.isClient) { //HUMANHEAD PCF rww 05/04/06 - do not do the check on the client, just listen to what the snapshot says.
-		if (!vehicle->WillAcceptPilot(this)) {
+void hhPlayer::EnterVehicle(hhVehicle* vehicle)
+{
+	if (!gameLocal.isClient)
+	{ //HUMANHEAD PCF rww 05/04/06 - do not do the check on the client, just listen to what the snapshot says.
+		if (!vehicle->WillAcceptPilot(this))
+		{
 			return;
 		}
 	}
@@ -6627,7 +7450,8 @@ void hhPlayer::EnterVehicle(hhVehicle* vehicle) {
 	CancelEvents(&EV_AllowDamage);
 
 	// Set shuttle view
-	if (entityNumber == gameLocal.localClientNum) { //rww
+	if (entityNumber == gameLocal.localClientNum)
+	{ //rww
 		renderSystem->SetShuttleView(true);
 	}
 
@@ -6635,7 +7459,8 @@ void hhPlayer::EnterVehicle(hhVehicle* vehicle) {
 	SetEyeHeight(vehicle->spawnArgs.GetFloat("pilot_eyeHeight"));
 
 	// Turn off any illegal behaviors
-	if (IsSpiritWalking()) {
+	if (IsSpiritWalking())
+	{
 		StopSpiritWalk();
 	}
 
@@ -6645,7 +7470,8 @@ void hhPlayer::EnterVehicle(hhVehicle* vehicle) {
 	SetViewBob(vec3_origin);
 
 	// CJR: Inform Talon that the player has entered a vehicle
-	if (talon.IsValid()) {
+	if (talon.IsValid())
+	{
 		talon->OwnerEnteredVehicle();
 	}
 
@@ -6669,22 +7495,26 @@ hhPlayer::ExitVehicle
 This should only be called from vehicle
 ===============
 */
-void hhPlayer::ExitVehicle(hhVehicle* vehicle) {
+void hhPlayer::ExitVehicle(hhVehicle* vehicle)
+{
 
 	// Allow model in player's view again
-	if (vehicle) {
+	if (vehicle)
+	{
 		vehicle->GetRenderEntity()->suppressSurfaceInViewID = 0;
 	}
 
 	// Set shuttle view off
-	if (entityNumber == gameLocal.localClientNum) { //rww
+	if (entityNumber == gameLocal.localClientNum)
+	{ //rww
 		renderSystem->SetShuttleView(false);
 	}
 
 	ShouldRemainAlignedToAxial(true);
 
 	// CJR: Inform Talon that the player has left a vehicle
-	if (talon.IsValid()) {
+	if (talon.IsValid())
+	{
 		talon->OwnerExitedVehicle();
 	}
 
@@ -6696,7 +7526,8 @@ void hhPlayer::ExitVehicle(hhVehicle* vehicle) {
 	animPrefix = spawnArgs.GetString(va("def_weapon%d", currentWeapon));
 	animPrefix.Strip("weaponobj_");
 
-	if (vehicle) {
+	if (vehicle)
+	{
 		SetOrientation(GetOrigin(), mat3_identity, vehicle->GetAxis()[0], vehicle->GetAxis()[0].ToAngles().Normalize180());
 	}
 	cameraInterpolator.SetInterpolationType(IT_VariableMidPointSinusoidal);
@@ -6707,7 +7538,8 @@ void hhPlayer::ExitVehicle(hhVehicle* vehicle) {
 //
 // HUMANHEAD: aob
 //
-void hhPlayer::ResetClipModel() {
+void hhPlayer::ResetClipModel()
+{
 	//Needed for touching triggers.  Our bbox is its original size.
 	SetClipModel();
 }
@@ -6717,8 +7549,10 @@ void hhPlayer::ResetClipModel() {
 hhPlayer::BecameBound
 ===============
 */
-void hhPlayer::BecameBound(hhBindController *b) {
-	if (!gameLocal.isMultiplayer && weapon.IsValid()) { //rww - can use weapon while bound in mp
+void hhPlayer::BecameBound(hhBindController *b)
+{
+	if (!gameLocal.isMultiplayer && weapon.IsValid())
+	{ //rww - can use weapon while bound in mp
 		weapon->Hide();
 	}
 }
@@ -6728,26 +7562,34 @@ void hhPlayer::BecameBound(hhBindController *b) {
 hhPlayer::BecameUnbound
 ===============
 */
-void hhPlayer::BecameUnbound(hhBindController *b) {
-	if (!gameLocal.isMultiplayer && weapon.IsValid()) { //rww - can use weapon while bound in mp
+void hhPlayer::BecameUnbound(hhBindController *b)
+{
+	if (!gameLocal.isMultiplayer && weapon.IsValid())
+	{ //rww - can use weapon while bound in mp
 		weapon->Show();
 	}
 }
 
-void hhPlayer::GetLocationText(idStr &locationString) {
+void hhPlayer::GetLocationText(idStr &locationString)
+{
 	idLocationEntity* locationEntity = gameLocal.LocationForPoint(GetEyePosition());
-	if (locationEntity) {
+	if (locationEntity)
+	{
 		locationString = locationEntity->GetLocation();
 	}
-	else {
+	else
+	{
 		locationString = common->GetLanguageDict()->GetString("#str_02911");
 	}
 }
 
-void hhPlayer::UpdateLocation(void) {
-	if (hud) {
+void hhPlayer::UpdateLocation(void)
+{
+	if (hud)
+	{
 		hud->SetStateBool("showlocations", developer.GetBool());
-		if (developer.GetBool()) {
+		if (developer.GetBool())
+		{
 			idStr locationString;
 			GetLocationText(locationString);
 			hud->SetStateString("location", locationString.c_str());
@@ -6761,10 +7603,12 @@ void hhPlayer::UpdateLocation(void) {
 hhPlayer::FillDebugVars
 ===============
 */
-void hhPlayer::FillDebugVars(idDict *args, int page) {
+void hhPlayer::FillDebugVars(idDict *args, int page)
+{
 	idStr text;
 
-	switch (page) {
+	switch (page)
+	{
 	case 1:
 		args->SetInt("deathpower", GetDeathWalkPower());
 		args->SetInt("spiritpower", GetSpiritPower());
@@ -6805,7 +7649,8 @@ void hhPlayer::FillDebugVars(idDict *args, int page) {
 		args->SetInt("usercmd.rightmove", usercmd.rightmove);
 		args->SetInt("legsForward", legsForward);
 
-		switch (physicsObj.GetWaterLevel()) {
+		switch (physicsObj.GetWaterLevel())
+		{
 		case WATERLEVEL_NONE:	text = "none"; break;
 		case WATERLEVEL_FEET:	text = "feet"; break;
 		case WATERLEVEL_WAIST:	text = "waist"; break;
@@ -6824,7 +7669,8 @@ void hhPlayer::FillDebugVars(idDict *args, int page) {
 //
 // GetAimPosition()
 //
-idVec3 hhPlayer::GetAimPosition() const {
+idVec3 hhPlayer::GetAimPosition() const
+{
 	return GetEyePosition();
 }
 
@@ -6833,7 +7679,8 @@ idVec3 hhPlayer::GetAimPosition() const {
 hhPlayer::WriteToSnapshot
 ===============
 */
-void hhPlayer::WriteToSnapshot(idBitMsgDelta &msg) const {
+void hhPlayer::WriteToSnapshot(idBitMsgDelta &msg) const
+{
 	bool vehControlling = vehicleInterfaceLocal.ControllingVehicle();
 
 	msg.WriteBits(vehControlling, 1);
@@ -6841,7 +7688,8 @@ void hhPlayer::WriteToSnapshot(idBitMsgDelta &msg) const {
 	//rww - our stuff is now intermingled with id's for more ideal send ordering
 	physicsObj.WriteToSnapshot(msg, vehControlling);
 
-	if (!vehControlling) {
+	if (!vehControlling)
+	{
 		//not syncing these causes denormalization/nan issues, FIXME
 		msg.WriteFloat(untransformedViewAngles[0]);
 		msg.WriteFloat(untransformedViewAngles[1]);
@@ -6860,7 +7708,8 @@ void hhPlayer::WriteToSnapshot(idBitMsgDelta &msg) const {
 		//msg.WriteDeltaFloat( 0.0f, deltaViewAngles[2] );
 	}
 #if 0 //for debugging differences in snapshot
-	else {
+	else
+	{
 		msg.WriteFloat(0.0f);
 		msg.WriteFloat(0.0f);
 		msg.WriteFloat(0.0f);
@@ -6936,23 +7785,29 @@ void hhPlayer::WriteToSnapshot(idBitMsgDelta &msg) const {
 	//in scripts and so on, and will be predicted wrong for other players (we get our own ammo in the playerstate)
 	//rwwFIXME: if we have proper weapon switching when you run out of ammo will this actually be necessary?
 	//i don't think it's all that costly, but still.
-	if (weapon.IsValid()) {
+	if (weapon.IsValid())
+	{
 		ammo_t ammoType = weapon->GetAmmoType();
-		if (ammoType > 0) {
+		if (ammoType > 0)
+		{
 			msg.WriteBits(inventory.ammo[ammoType], ASYNC_PLAYER_INV_AMMO_BITS);
 		}
-		else {
+		else
+		{
 			msg.WriteBits(0, ASYNC_PLAYER_INV_AMMO_BITS);
 		}
 		ammoType = weapon->GetAltAmmoType();
-		if (ammoType > 0) {
+		if (ammoType > 0)
+		{
 			msg.WriteBits(inventory.ammo[ammoType], ASYNC_PLAYER_INV_AMMO_BITS);
 		}
-		else {
+		else
+		{
 			msg.WriteBits(0, ASYNC_PLAYER_INV_AMMO_BITS);
 		}
 	}
-	else {
+	else
+	{
 		msg.WriteBits(0, ASYNC_PLAYER_INV_AMMO_BITS);
 		msg.WriteBits(0, ASYNC_PLAYER_INV_AMMO_BITS);
 	}
@@ -6991,23 +7846,26 @@ void hhPlayer::WriteToSnapshot(idBitMsgDelta &msg) const {
 	//note - current weapon's ammo always sent now
 	//ammo_t energyammo = hhWeaponFireController::GetAmmoType("ammo_energy");
 	//msg.WriteBits(inventory.ammo[energyammo], ASYNC_PLAYER_INV_AMMO_BITS);
-	}
+}
 
 /*
 ===============
 hhPlayer::ReadFromSnapshot
 ===============
 */
-void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
+void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg)
+{
 	int		i, oldHealth, newIdealWeapon, weaponSpawnId;
 	bool	newHitToggle, stateHitch;
 
 	bool vehControlling = !!msg.ReadBits(1);
 
-	if (snapshotSequence - lastSnapshotSequence > 1) {
+	if (snapshotSequence - lastSnapshotSequence > 1)
+	{
 		stateHitch = true;
 	}
-	else {
+	else
+	{
 		stateHitch = false;
 	}
 	lastSnapshotSequence = snapshotSequence;
@@ -7016,9 +7874,11 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 
 	physicsObj.ReadFromSnapshot(msg, vehControlling);
 
-	if (!vehControlling) {
+	if (!vehControlling)
+	{
 		//not syncing these causes denormalization/nan issues, FIXME
-		if (bBufferNextSnapAngles) {
+		if (bBufferNextSnapAngles)
+		{
 			idAngles n;
 			n[0] = msg.ReadFloat();
 			n[1] = msg.ReadFloat();
@@ -7027,7 +7887,8 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 			untransformedViewAngles = n;
 			bBufferNextSnapAngles = false;
 		}
-		else {
+		else
+		{
 			untransformedViewAngles[0] = msg.ReadFloat();
 			untransformedViewAngles[1] = msg.ReadFloat();
 			untransformedViewAngles[2] = msg.ReadFloat();
@@ -7046,7 +7907,8 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 		//deltaViewAngles[2] = msg.ReadDeltaFloat( 0.0f );
 	}
 #if 0 //for debugging differences in snapshot
-	else {
+	else
+	{
 		msg.ReadFloat();
 		msg.ReadFloat();
 		msg.ReadFloat();
@@ -7122,14 +7984,18 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 	lastWeaponSpirit = msg.ReadBits(32);
 
 	bool spiritWalking = !!msg.ReadBits(1);
-	if (spiritWalking != bSpiritWalk && (weapon.IsValid() || !spiritWalking)) {
+	if (spiritWalking != bSpiritWalk && (weapon.IsValid() || !spiritWalking))
+	{
 		bSpiritWalk = spiritWalking;
 
 		LighterOff(); //make sure lighter is off when switching spiritwalk
 
-		if (bSpiritWalk) {
-			if (gameLocal.localClientNum == entityNumber) {
-				if (hud) {
+		if (bSpiritWalk)
+		{
+			if (gameLocal.localClientNum == entityNumber)
+			{
+				if (hud)
+				{
 					hud->HandleNamedEvent("SwitchToEthereal");
 				}
 				gameLocal.SpiritWalkSoundMode(true);
@@ -7142,9 +8008,12 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 			//put bow in proper state
 			SelectEtherealWeapon();
 		}
-		else {
-			if (gameLocal.localClientNum == entityNumber) {
-				if (hud) {
+		else
+		{
+			if (gameLocal.localClientNum == entityNumber)
+			{
+				if (hud)
+				{
 					hud->HandleNamedEvent("SwitchFromEthereal");
 				}
 				gameLocal.SpiritWalkSoundMode(false);
@@ -7164,8 +8033,10 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 	*/
 
 	// if not a local client assume the client has all ammo types
-	if (entityNumber != gameLocal.localClientNum) {
-		for (i = 0; i < AMMO_NUMTYPES; i++) {
+	if (entityNumber != gameLocal.localClientNum)
+	{
+		for (i = 0; i < AMMO_NUMTYPES; i++)
+		{
 			inventory.ammo[i] = 999;
 		}
 	}
@@ -7176,15 +8047,19 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 	//i don't think it's all that costly, but still.
 	int primAmmo = msg.ReadBits(ASYNC_PLAYER_INV_AMMO_BITS);
 	int altAmmo = msg.ReadBits(ASYNC_PLAYER_INV_AMMO_BITS);
-	if (entityNumber != gameLocal.localClientNum) {
+	if (entityNumber != gameLocal.localClientNum)
+	{
 		//since we have our own ammo in the playerstate, don't want to stomp it
-		if (weapon.IsValid()) {
+		if (weapon.IsValid())
+		{
 			ammo_t ammoType = weapon->GetAmmoType();
-			if (ammoType > 0) {
+			if (ammoType > 0)
+			{
 				inventory.ammo[ammoType] = primAmmo;
 			}
 			ammoType = weapon->GetAltAmmoType();
-			if (ammoType > 0) {
+			if (ammoType > 0)
+			{
 				inventory.ammo[ammoType] = altAmmo;
 			}
 		}
@@ -7207,10 +8082,13 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 
 	//HUMANHEAD PCF rww 05/04/06 - base this check on AI_VEHICLE and make sure the player is exited,
 	//even if the vehicle is not in the snapshot at this point.
-	if (!vehControlling && AI_VEHICLE) { //then exit on the client
-		if (vehicleInterfaceLocal.ControllingVehicle()) {
+	if (!vehControlling && AI_VEHICLE)
+	{ //then exit on the client
+		if (vehicleInterfaceLocal.ControllingVehicle())
+		{
 			hhVehicle *veh = GetVehicleInterface()->GetVehicle();
-			if (veh && veh->GetPilot() == this) {
+			if (veh && veh->GetPilot() == this)
+			{
 				veh->EjectPilot();
 			}
 		}
@@ -7222,10 +8100,13 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 	//HUMANHEAD PCF rww 05/04/06 - base this check ON AI_VEHICLE, in case snapshot where controlling and
 	//where the vehicle is set do not exactly coincide.
 	vehicleInterfaceLocal.SetVehicleSpawnId(vehSpawnId);
-	if (!AI_VEHICLE) {
-		if (vehControlling) {
+	if (!AI_VEHICLE)
+	{
+		if (vehControlling)
+		{
 			hhVehicle *veh = vehicleInterfaceLocal.GetVehicle();
-			if (veh && veh->IsType(hhVehicle::Type)) {
+			if (veh && veh->IsType(hhVehicle::Type))
+			{
 				//GetVehicleInterface()->TakeControl( vehicleInterfaceLocal.GetVehicle(), this );
 				EnterVehicle(vehicleInterfaceLocal.GetVehicle());
 			}
@@ -7242,7 +8123,8 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 
 	//rww - lighter sync validation
 	bool newLighterOn = !!msg.ReadBits(1);
-	if (newLighterOn != IsLighterOn()) {
+	if (newLighterOn != IsLighterOn())
+	{
 		ToggleLighter();
 	}
 
@@ -7254,12 +8136,14 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 	wallwalkSoundController.ReadFromSnapshot(msg);
 
 	//=========================================== start id code
-	if (weapon.SetSpawnId(weaponSpawnId)) {
+	if (weapon.SetSpawnId(weaponSpawnId))
+	{
 		//HUMANHEAD rww - i am getting crashes here and the stack is all messed up,
 		//claiming that SetOwner is off into null, when supposedly the entity is not.
 		//rearranging this code so it's easier to see what's going on in a crash.
 		hhWeapon *weapEnt = weapon.GetEntity();
-		if (weapEnt) {
+		if (weapEnt)
+		{
 			// maintain ownership locally
 			weapEnt->SetOwner(this);
 		}
@@ -7271,8 +8155,10 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 	//ammo_t energyammo = hhWeaponFireController::GetAmmoType("ammo_energy");
 	//inventory.ammo[energyammo] = msg.ReadBits(ASYNC_PLAYER_INV_AMMO_BITS);
 
-	if (oldHealth > 0 && health <= 0) {
-		if (stateHitch) {
+	if (oldHealth > 0 && health <= 0)
+	{
+		if (stateHitch)
+		{
 			// so we just hide and don't show a death skin
 			UpdateDeathSkin(true);
 		}
@@ -7296,17 +8182,21 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 		fl.clientEvents = false;
 		StartRagdoll();
 		physicsObj.SetMovementType(PM_DEAD);
-		if (!stateHitch) {
+		if (!stateHitch)
+		{
 			//HUMANHEAD PCF rww 09/15/06 - female mp sounds
-			if (IsFemale()) {
+			if (IsFemale())
+			{
 				StartSound("snd_death_female", SND_CHANNEL_VOICE, 0, false, NULL);
 			}
-			else {
+			else
+			{
 				//HUMANHEAD END
 				StartSound("snd_death", SND_CHANNEL_VOICE, 0, false, NULL);
 			}
 		}
-		if (weapon.GetEntity()) {
+		if (weapon.GetEntity())
+		{
 			weapon.GetEntity()->OwnerDied();
 		}
 
@@ -7319,7 +8209,8 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 		maxRespawnTime = minRespawnTime + 10000;
 		//HUMANHEAD END
 	}
-	else if (oldHealth <= 0 && health > 0) {
+	else if (oldHealth <= 0 && health > 0)
+	{
 		// respawn
 		Init();
 		StopRagdoll();
@@ -7327,79 +8218,97 @@ void hhPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 		physicsObj.EnableClip();
 		SetCombatContents(true);
 		//HUMANHEAD rww
-		if (!spectating) {
+		if (!spectating)
+		{
 			Show();
 		}
 		//HUMANHEAD END
 	}
-	else if (health < oldHealth && health > 0) {
-		if (stateHitch) {
+	else if (health < oldHealth && health > 0)
+	{
+		if (stateHitch)
+		{
 			lastDmgTime = gameLocal.time;
 		}
-		else {
+		else
+		{
 			// damage feedback
 			const idDeclEntityDef *def = static_cast<const idDeclEntityDef *>(declManager->DeclByIndex(DECL_ENTITYDEF, lastDamageDef, false));
-			if (def) {
+			if (def)
+			{
 				playerView.DamageImpulse(lastDamageDir * viewAxis.Transpose(), &def->dict);
 				AI_PAIN = Pain(NULL, NULL, oldHealth - health, lastDamageDir, lastDamageLocation);
 				lastDmgTime = gameLocal.time;
 			}
-			else {
+			else
+			{
 				common->Warning("NET: no damage def for damage feedback '%s'\n", lastDamageDef);
 			}
 		}
 	}
 
 	// If the player is alive, restore proper physics object
-	if (health > 0 && IsActiveAF()) {
+	if (health > 0 && IsActiveAF())
+	{
 		StopRagdoll();
 		SetPhysics(&physicsObj);
 		physicsObj.EnableClip();
 		SetCombatContents(true);
 	}
 
-	if (idealWeapon != newIdealWeapon) {
-		if (stateHitch) {
+	if (idealWeapon != newIdealWeapon)
+	{
+		if (stateHitch)
+		{
 			weaponCatchup = true;
 		}
 		idealWeapon = newIdealWeapon;
 		UpdateHudWeapon();
 	}
 
-	if (lastHitToggle != newHitToggle) {
+	if (lastHitToggle != newHitToggle)
+	{
 		SetLastHitTime(gameLocal.realClientTime);
 	}
 	//=========================================== end id code
 
-	if (msg.HasChanged()) {
+	if (msg.HasChanged())
+	{
 		UpdateVisuals();
 	}
-	}
+}
 
 /*
 ================
 hhPlayer::ServerReceiveEvent
 ================
 */
-bool hhPlayer::ServerReceiveEvent(int event, int time, const idBitMsg &msg) {
-	if (idEntity::ServerReceiveEvent(event, time, msg)) {
+bool hhPlayer::ServerReceiveEvent(int event, int time, const idBitMsg &msg)
+{
+	if (idEntity::ServerReceiveEvent(event, time, msg))
+	{
 		return true;
 	}
 
 	// client->server events
-	switch (event) {
-	case EVENT_IMPULSE: {
+	switch (event)
+	{
+	case EVENT_IMPULSE:
+	{
 		int impulse = msg.ReadBits(6);
 		PerformImpulse(impulse);
-		if (vehicleInterfaceLocal.ControllingVehicle()) {
+		if (vehicleInterfaceLocal.ControllingVehicle())
+		{
 			hhVehicle *veh = vehicleInterfaceLocal.GetVehicle();
-			if (veh) {
+			if (veh)
+			{
 				veh->DoPlayerImpulse(impulse);
 			}
 		}
 		return true;
 	}
-	default: {
+	default:
+	{
 		return false;
 	}
 	}
@@ -7410,7 +8319,8 @@ bool hhPlayer::ServerReceiveEvent(int event, int time, const idBitMsg &msg) {
 hhPlayer::WritePlayerStateToSnapshot
 ================
 */
-void hhPlayer::WritePlayerStateToSnapshot(idBitMsgDelta &msg) const {
+void hhPlayer::WritePlayerStateToSnapshot(idBitMsgDelta &msg) const
+{
 	idPlayer::WritePlayerStateToSnapshot(msg);
 
 	//rww - extra playerView stuff
@@ -7434,7 +8344,8 @@ void hhPlayer::WritePlayerStateToSnapshot(idBitMsgDelta &msg) const {
 hhPlayer::ReadPlayerStateFromSnapshot
 ================
 */
-void hhPlayer::ReadPlayerStateFromSnapshot(const idBitMsgDelta &msg) {
+void hhPlayer::ReadPlayerStateFromSnapshot(const idBitMsgDelta &msg)
+{
 	idPlayer::ReadPlayerStateFromSnapshot(msg);
 
 	//rww - extra playerView stuff
@@ -7442,9 +8353,11 @@ void hhPlayer::ReadPlayerStateFromSnapshot(const idBitMsgDelta &msg) {
 
 	//rww - scope and fov handling
 	bool canOverrideView = true;
-	if (weapon.IsValid() && weapon->IsType(hhWeaponZoomable::Type)) { //if we have a zoomed weapon, don't override with snapshot while the prediction fudge timer is on
+	if (weapon.IsValid() && weapon->IsType(hhWeaponZoomable::Type))
+	{ //if we have a zoomed weapon, don't override with snapshot while the prediction fudge timer is on
 		hhWeaponZoomable *weap = static_cast<hhWeaponZoomable *>(weapon.GetEntity());
-		if (weap->clientZoomTime >= gameLocal.time) {
+		if (weap->clientZoomTime >= gameLocal.time)
+		{
 			canOverrideView = false;
 		}
 	}
@@ -7457,9 +8370,11 @@ void hhPlayer::ReadPlayerStateFromSnapshot(const idBitMsgDelta &msg) {
 
 	renderSystem->SetShuttleView(InVehicle());
 
-	if (canOverrideView) { //if we are currently allowed to override with snapshot values, do so.
+	if (canOverrideView)
+	{ //if we are currently allowed to override with snapshot values, do so.
 		bScopeView = scopeView;
-		if (bScopeView != renderSystem->IsScopeView()) {
+		if (bScopeView != renderSystem->IsScopeView())
+		{
 			renderSystem->SetScopeView(bScopeView);
 		}
 		zoomFov.SetDuration(zfDur);
@@ -7477,21 +8392,26 @@ void hhPlayer::ReadPlayerStateFromSnapshot(const idBitMsgDelta &msg) {
 hhPlayer::ClientPredictionThink
 ================
 */
-void hhPlayer::ClientPredictionThink(void) {
-	if (gameLocal.localClientNum != entityNumber && forcePredictionButtons) {
+void hhPlayer::ClientPredictionThink(void)
+{
+	if (gameLocal.localClientNum != entityNumber && forcePredictionButtons)
+	{
 		//used by some weapons which rely on prediction-based projectiles, to ensure we don't miss a launch
 		gameLocal.usercmds[entityNumber].buttons |= forcePredictionButtons;
-		if (gameLocal.isNewFrame) {
+		if (gameLocal.isNewFrame)
+		{
 			forcePredictionButtons = 0;
 		}
 	}
 
 	idPlayer::ClientPredictionThink();
 
-	if (InVehicle()) {
+	if (InVehicle())
+	{
 		UpdateHud(GetVehicleInterfaceLocal()->GetHUD());
 	}
-	else {
+	else
+	{
 		UpdateHud(hud);
 	}
 }
@@ -7501,31 +8421,39 @@ void hhPlayer::ClientPredictionThink(void) {
 hhPlayer::GetPhysicsToVisualTransform
 ================
 */
-bool hhPlayer::GetPhysicsToVisualTransform(idVec3 &origin, idMat3 &axis) {
-	if (af.IsActive()) {
+bool hhPlayer::GetPhysicsToVisualTransform(idVec3 &origin, idMat3 &axis)
+{
+	if (af.IsActive())
+	{
 		af.GetPhysicsToVisualTransform(origin, axis);
 		return true;
 	}
 
 	//rww - adopted id's smoothing code
-	if (gameLocal.isClient && !bindMaster && gameLocal.framenum >= smoothedFrame && (entityNumber != gameLocal.localClientNum || selfSmooth)) {
-		if (!smoothedOriginUpdated) {
+	if (gameLocal.isClient && !bindMaster && gameLocal.framenum >= smoothedFrame && (entityNumber != gameLocal.localClientNum || selfSmooth))
+	{
+		if (!smoothedOriginUpdated)
+		{
 			idVec3 renderOrigin = TransformToPlayerSpace(modelOffset);
 			idVec3 originalOrigin = renderOrigin;
 
 			//id's cheesy smooth code (changed to vec3 because there is no "down" in prey)
 			idVec3 originDiff = renderOrigin - smoothedOrigin;
-			if (smoothedFrame == 0) { //for teleporting
+			if (smoothedFrame == 0)
+			{ //for teleporting
 				originDiff = vec3_origin;
 			}
 			smoothedOrigin = renderOrigin;
-			if (originDiff.LengthSqr() < Square(100.0f)) {
+			if (originDiff.LengthSqr() < Square(100.0f))
+			{
 				// smoothen by pushing back to the previous position
-				if (selfSmooth) {
+				if (selfSmooth)
+				{
 					assert(entityNumber == gameLocal.localClientNum);
 					renderOrigin -= net_clientSelfSmoothing.GetFloat() * originDiff;
 				}
-				else {
+				else
+				{
 					renderOrigin -= gameLocal.clientSmoothing * originDiff;
 				}
 
@@ -7544,11 +8472,13 @@ bool hhPlayer::GetPhysicsToVisualTransform(idVec3 &origin, idMat3 &axis) {
 		return true;
 	}
 
-	if (bClampYaw) { //rww - lock model angles
+	if (bClampYaw)
+	{ //rww - lock model angles
 		idVec3 masterOrigin;
 		idMat3 masterAxis;
 
-		if (GetMasterPosition(masterOrigin, masterAxis)) {
+		if (GetMasterPosition(masterOrigin, masterAxis))
+		{
 			axis = masterAxis;
 			origin = modelOffset;
 
@@ -7562,14 +8492,17 @@ bool hhPlayer::GetPhysicsToVisualTransform(idVec3 &origin, idMat3 &axis) {
 	return true;
 }
 
-bool hhPlayer::UpdateAnimationControllers(void) {
+bool hhPlayer::UpdateAnimationControllers(void)
+{
 	bool retValue = idPlayer::UpdateAnimationControllers();
 
 	hhAnimator *theAnimator;
-	if (head.IsValid()) {
+	if (head.IsValid())
+	{
 		theAnimator = head->GetAnimator();
 	}
-	else {
+	else
+	{
 		theAnimator = GetAnimator();
 	}
 	JawFlap(theAnimator);
@@ -7582,35 +8515,42 @@ bool hhPlayer::UpdateAnimationControllers(void) {
 hhPlayer::Event_PlayWeaponAnim
 ===============
 */
-void hhPlayer::Event_PlayWeaponAnim(const char* animName, int numTries) {
+void hhPlayer::Event_PlayWeaponAnim(const char* animName, int numTries)
+{
 	//AOB: I would like a better solution then constantly banging until weapon is valid.
-	if ((!weapon.IsValid() || GetCurrentWeapon() != idealWeapon) && numTries > 0) {
+	if ((!weapon.IsValid() || GetCurrentWeapon() != idealWeapon) && numTries > 0)
+	{
 		CancelEvents(&EV_PlayWeaponAnim);
 		PostEventMS(&EV_PlayWeaponAnim, 50, animName, numTries - 1);
 		return;
 	}
 
 	CancelEvents(&EV_PlayWeaponAnim);
-	if (weapon.IsValid()) {
+	if (weapon.IsValid())
+	{
 		weapon->ProcessEvent(&EV_PlayAnimWhenReady, animName);
 	}
 }
 
-void hhPlayer::DialogStart(bool bDisallowPlayerDeath, bool bVoiceDucking, bool bLowerWeapon) {
+void hhPlayer::DialogStart(bool bDisallowPlayerDeath, bool bVoiceDucking, bool bLowerWeapon)
+{
 	bDialogDamageMode = bDisallowPlayerDeath;
 	bDialogWeaponMode = bLowerWeapon;
 	gameLocal.DialogSoundMode(bVoiceDucking);
-	if (bDialogWeaponMode) {	// Lock weapon
+	if (bDialogWeaponMode)
+	{	// Lock weapon
 		preCinematicWeaponFlags = weaponFlags;
 		preCinematicWeapon = GetIdealWeapon();
 		LockWeapon(-1);
 	}
 }
 
-void hhPlayer::DialogStop() {
+void hhPlayer::DialogStop()
+{
 	bDialogDamageMode = false;
 	gameLocal.DialogSoundMode(false);
-	if (bDialogWeaponMode) {
+	if (bDialogWeaponMode)
+	{
 		weaponFlags = preCinematicWeaponFlags;
 		SelectWeapon(preCinematicWeapon, true);
 		bDialogWeaponMode = false;
@@ -7623,7 +8563,8 @@ hhPlayer::Event_DialogStart
 	HUMANHEAD pdm
 ===============
 */
-void hhPlayer::Event_DialogStart(int bDisallowPlayerDeath, int bVoiceDucking, int bLowerWeapon) {
+void hhPlayer::Event_DialogStart(int bDisallowPlayerDeath, int bVoiceDucking, int bLowerWeapon)
+{
 	DialogStart(bDisallowPlayerDeath != 0, bVoiceDucking != 0, bLowerWeapon != 0);
 }
 
@@ -7633,7 +8574,8 @@ hhPlayer::Event_DialogStop
 	HUMANHEAD pdm
 ===============
 */
-void hhPlayer::Event_DialogStop() {
+void hhPlayer::Event_DialogStop()
+{
 	DialogStop();
 }
 
@@ -7643,7 +8585,8 @@ hhPlayer::Event_LotaTunnelMode
 	HUMANHEAD pdm
 ===============
 */
-void hhPlayer::Event_LotaTunnelMode(bool on) {
+void hhPlayer::Event_LotaTunnelMode(bool on)
+{
 	bLotaTunnelMode = on;
 }
 
@@ -7653,15 +8596,19 @@ hhPlayer::Event_Cinematic
 	HUMANHEAD pdm
 ===============
 */
-void hhPlayer::Event_Cinematic(int on, int lockView) {
+void hhPlayer::Event_Cinematic(int on, int lockView)
+{
 	bool cinematic = (on != 0);
 	InCinematic(cinematic);
 	playerView.SetLetterBox(cinematic);
-	if (cinematic) {
-		if (IsSpiritOrDeathwalking()) {
+	if (cinematic)
+	{
+		if (IsSpiritOrDeathwalking())
+		{
 			StopSpiritWalk();
 		}
-		if (IsPossessed()) {
+		if (IsPossessed())
+		{
 			Unpossess();
 		}
 
@@ -7674,7 +8621,8 @@ void hhPlayer::Event_Cinematic(int on, int lockView) {
 		fl.takedamage = false;
 		this->lockView = (lockView != 0);
 	}
-	else {
+	else
+	{
 		fl.takedamage = true;
 		this->lockView = false;
 
@@ -7692,7 +8640,8 @@ void hhPlayer::Event_Cinematic(int on, int lockView) {
 // Flashes the screen / fades the FOV
 //=============================================================================
 
-void hhPlayer::Event_PrepareToResurrect() {
+void hhPlayer::Event_PrepareToResurrect()
+{
 	deathWalkFlash = 0;
 	possessionFOV = 90.0f;
 	PostEventSec(&EV_ResurrectScreenFade, 0);
@@ -7705,13 +8654,16 @@ void hhPlayer::Event_PrepareToResurrect() {
 // The actual code to incrementally flash the screen
 //=============================================================================
 
-void hhPlayer::Event_ResurrectScreenFade() {
+void hhPlayer::Event_ResurrectScreenFade()
+{
 	deathWalkFlash += spawnArgs.GetFloat("resurrectFlashChange", "0.04");
-	if (deathWalkFlash >= 1.0f) {
+	if (deathWalkFlash >= 1.0f)
+	{
 		deathWalkFlash = 1.0f;
 		PostEventSec(&EV_Resurrect, 0.0f); // Actually send player back to the physical realm
 	}
-	else {
+	else
+	{
 		PostEventSec(&EV_ResurrectScreenFade, 0.02f);
 	}
 
@@ -7724,7 +8676,8 @@ void hhPlayer::Event_ResurrectScreenFade() {
 // hhPlayer::Event_Resurrect
 //
 //=============================================================================
-void hhPlayer::Event_Resurrect() {
+void hhPlayer::Event_Resurrect()
+{
 	Resurrect();
 }
 
@@ -7733,7 +8686,8 @@ void hhPlayer::Event_Resurrect() {
 // hhPlayer::Event_Event_ShouldRemainAlignedToAxial
 //
 //=============================================================================
-void hhPlayer::Event_ShouldRemainAlignedToAxial(bool remainAligned) {
+void hhPlayer::Event_ShouldRemainAlignedToAxial(bool remainAligned)
+{
 	ShouldRemainAlignedToAxial(remainAligned);
 }
 
@@ -7742,7 +8696,8 @@ void hhPlayer::Event_ShouldRemainAlignedToAxial(bool remainAligned) {
 // hhPlayer::Event_OrientToGravity
 //
 //=============================================================================
-void hhPlayer::Event_OrientToGravity(bool orient) {
+void hhPlayer::Event_OrientToGravity(bool orient)
+{
 	OrientToGravity(orient);
 }
 
@@ -7751,12 +8706,15 @@ void hhPlayer::Event_OrientToGravity(bool orient) {
 // hhPlayer::Event_ResetGravity
 //	HUMANHEAD: pdm: Posted when entity is leaving a gravity zone
 //=============================================================================
-void hhPlayer::Event_ResetGravity() {
-	if (IsWallWalking()) {
+void hhPlayer::Event_ResetGravity()
+{
+	if (IsWallWalking())
+	{
 		return;	// Don't reset if wallwalking
 	}
 
-	if (spectating) { //HUMANHEAD rww - don't reset if spectating
+	if (spectating)
+	{ //HUMANHEAD rww - don't reset if spectating
 		return;
 	}
 
@@ -7770,11 +8728,14 @@ void hhPlayer::Event_ResetGravity() {
 // hhPlayer::Event_SetOverlayMaterial
 //
 //=============================================================================
-void hhPlayer::Event_SetOverlayMaterial(const char *mtrName, const int requiresScratch) {
-	if (mtrName && mtrName[0]) {
+void hhPlayer::Event_SetOverlayMaterial(const char *mtrName, const int requiresScratch)
+{
+	if (mtrName && mtrName[0])
+	{
 		playerView.SetViewOverlayMaterial(declManager->FindMaterial(mtrName), requiresScratch);
 	}
-	else {
+	else
+	{
 		playerView.SetViewOverlayMaterial(NULL);
 	}
 }
@@ -7784,7 +8745,8 @@ void hhPlayer::Event_SetOverlayMaterial(const char *mtrName, const int requiresS
 // hhPlayer::Event_SetOverlayTime
 //
 //=============================================================================
-void hhPlayer::Event_SetOverlayTime(const float newTime, const int requiresScratch) {
+void hhPlayer::Event_SetOverlayTime(const float newTime, const int requiresScratch)
+{
 	playerView.SetViewOverlayTime(newTime, requiresScratch);
 }
 
@@ -7793,7 +8755,8 @@ void hhPlayer::Event_SetOverlayTime(const float newTime, const int requiresScrat
 // hhPlayer::Event_SetOverlayColor
 //
 //=============================================================================
-void hhPlayer::Event_SetOverlayColor(const float r, const float g, const float b, const float a) {
+void hhPlayer::Event_SetOverlayColor(const float r, const float g, const float b, const float a)
+{
 	idVec4 color;
 
 	color.x = r;
@@ -7810,7 +8773,8 @@ void hhPlayer::Event_SetOverlayColor(const float r, const float g, const float b
 //
 //=============================================================================
 
-void hhPlayer::Event_DDAHeartBeat() {
+void hhPlayer::Event_DDAHeartBeat()
+{
 	gameLocal.GetDDA()->DDA_Heartbeat(this);
 	PostEventMS(&EV_DDAHeartbeat, ddaHeartbeatMS);
 }
@@ -7818,7 +8782,8 @@ void hhPlayer::Event_DDAHeartBeat() {
 //================
 //hhPlayer::Save
 //================
-void hhPlayer::Save(idSaveGame *savefile) const {
+void hhPlayer::Save(idSaveGame *savefile) const
+{
 	// Public vars
 	savefile->Write(weaponInfo, sizeof(weaponInfo_t) * 15);
 	savefile->Write(altWeaponInfo, sizeof(weaponInfo_t) * 15);
@@ -7913,13 +8878,15 @@ void hhPlayer::Save(idSaveGame *savefile) const {
 	savefile->WriteBool(bLotaTunnelMode);
 	savefile->WriteInt(forcePredictionButtons);
 
-	for (int ix = 0; ix < MAX_TRACKED_ATTACKERS; ix++) {
+	for (int ix = 0; ix < MAX_TRACKED_ATTACKERS; ix++)
+	{
 		lastAttackers[ix].attacker.Save(savefile);
 		savefile->WriteInt(lastAttackers[ix].time);
 		savefile->WriteBool(lastAttackers[ix].displayed);
 	}
 
-	if (InVehicle()) {
+	if (InVehicle())
+	{
 		savefile->WriteMat3(vehicleInterfaceLocal.GetVehicle()->GetPhysics()->GetAxis());
 		savefile->WriteVec3(vehicleInterfaceLocal.GetVehicle()->GetAxis()[0]);
 	}
@@ -7933,7 +8900,8 @@ void hhPlayer::Save(idSaveGame *savefile) const {
 //================
 //hhPlayer::Restore
 //================
-void hhPlayer::Restore(idRestoreGame *savefile) {
+void hhPlayer::Restore(idRestoreGame *savefile)
+{
 	// Public vars
 	savefile->Read(weaponInfo, sizeof(weaponInfo_t) * 15);
 	savefile->Read(altWeaponInfo, sizeof(weaponInfo_t) * 15);
@@ -7972,7 +8940,8 @@ void hhPlayer::Restore(idRestoreGame *savefile) {
 
 	hhVehicle *vehicle;
 	savefile->ReadObject(reinterpret_cast<idClass *&> (vehicle));
-	if (vehicle) {
+	if (vehicle)
+	{
 		vehicle->RestorePilot(&vehicleInterfaceLocal);
 	}
 
@@ -8043,7 +9012,8 @@ void hhPlayer::Restore(idRestoreGame *savefile) {
 	savefile->ReadBool(bLotaTunnelMode);
 	savefile->ReadInt(forcePredictionButtons);
 
-	for (int ix = 0; ix < MAX_TRACKED_ATTACKERS; ix++) {
+	for (int ix = 0; ix < MAX_TRACKED_ATTACKERS; ix++)
+	{
 		lastAttackers[ix].attacker.Restore(savefile);
 		savefile->ReadInt(lastAttackers[ix].time);
 		savefile->ReadBool(lastAttackers[ix].displayed);
@@ -8055,7 +9025,8 @@ void hhPlayer::Restore(idRestoreGame *savefile) {
 	kickSpring = spawnArgs.GetFloat("kickSpring");	//HUMANHEAD bjk
 	kickDamping = spawnArgs.GetFloat("kickDamping");	//HUMANHEAD bjk
 
-	if (InVehicle()) {
+	if (InVehicle())
+	{
 		hhVehicle *vehicle = vehicleInterfaceLocal.GetVehicle();
 		HH_ASSERT(vehicle);
 
@@ -8070,12 +9041,14 @@ void hhPlayer::Restore(idRestoreGame *savefile) {
 		RestoreOrientation(GetOrigin(), axis, axis0, axis0.ToAngles());
 
 		//HUMANHEAD PCF mdl 05/02/06 - Added this to re-enable shuttle view
-		if (renderSystem) {
+		if (renderSystem)
+		{
 			// Set shuttle view
 			renderSystem->SetShuttleView(true);
 		}
 	}
-	else {
+	else
+	{
 		// Keep orientation correct for walkwalk and gravity rooms
 		RestoreOrientation(GetOrigin(), physicsObj.GetAxis(), viewAngles.ToMat3()[0], untransformedViewAngles);
 	}
@@ -8086,70 +9059,87 @@ void hhPlayer::Restore(idRestoreGame *savefile) {
 	//HUMANHEAD PCF mdl 05/04/06 - Restore lighter
 	bool bLighter;
 	savefile->ReadBool(bLighter);
-	if (bLighter) {
+	if (bLighter)
+	{
 		lighterHandle = gameRenderWorld->AddLightDef(&lighter);
 	}
 }
 
-int hhPlayer::GetSpiritPower() {
+int hhPlayer::GetSpiritPower()
+{
 	ammo_t ammo_spiritpower = idWeapon::GetAmmoNumForName("ammo_spiritpower");
 	return inventory.ammo[ammo_spiritpower];
 }
 
-void hhPlayer::SetSpiritPower(int amount) {
+void hhPlayer::SetSpiritPower(int amount)
+{
 	ammo_t ammo_spiritpower = idWeapon::GetAmmoNumForName("ammo_spiritpower");
 	inventory.ammo[ammo_spiritpower] = amount;
-	if (inventory.ammo[ammo_spiritpower] > inventory.maxSpirit) {
+	if (inventory.ammo[ammo_spiritpower] > inventory.maxSpirit)
+	{
 		inventory.ammo[ammo_spiritpower] = inventory.maxSpirit;
 	}
 }
 
-void hhPlayer::Event_StartHUDTranslation() {
+void hhPlayer::Event_StartHUDTranslation()
+{
 	vehicleInterfaceLocal.StartHUDTranslation();
 }
 
-void hhPlayer::Freeze(float unfreezeDelay) {
+void hhPlayer::Freeze(float unfreezeDelay)
+{
 	bFrozen = true;
 	StopFiring();
-	if (weapon.IsValid()) {
+	if (weapon.IsValid())
+	{
 		weapon->PutAway();
 	}
-	if (unfreezeDelay > 0.0f) {
+	if (unfreezeDelay > 0.0f)
+	{
 		PostEventSec(&EV_Unfreeze, unfreezeDelay);
 	}
 }
 
-void hhPlayer::Unfreeze(void) {
+void hhPlayer::Unfreeze(void)
+{
 	bFrozen = false;
-	if (weapon.IsValid()) {
+	if (weapon.IsValid())
+	{
 		weapon->PostEventMS(&EV_Show, 1000);
 		weapon->PostEventMS(&EV_Weapon_WeaponRising, 1000);
 	}
 }
 
-void hhPlayer::Event_Unfreeze() {
+void hhPlayer::Event_Unfreeze()
+{
 	Unfreeze();
-	if (bindMaster && bindMaster->RespondsTo(EV_BindUnfroze)) {
+	if (bindMaster && bindMaster->RespondsTo(EV_BindUnfroze))
+	{
 		GetBindMaster()->PostEventMS(&EV_BindUnfroze, 0, this);
 	}
 }
 
-void hhPlayer::Event_GetSpiritPower() { //rww
-	idThread::ReturnFloat((float)GetSpiritPower());
+void hhPlayer::Event_GetSpiritPower()
+{ //rww
+	idThread::ReturnFloat((float) GetSpiritPower());
 }
 
-void hhPlayer::Event_SetSpiritPower(const float s) { //rww
-	SetSpiritPower((int)s);
+void hhPlayer::Event_SetSpiritPower(const float s)
+{ //rww
+	SetSpiritPower((int) s);
 }
 
-void hhPlayer::Event_OnGround() { // bg
+void hhPlayer::Event_OnGround()
+{ // bg
 	idThread::ReturnFloat(physicsObj.HasGroundContacts());
 }
 
-void hhPlayer::SetupWeaponFlags(void) {
+void hhPlayer::SetupWeaponFlags(void)
+{
 	const char *mapName = gameLocal.serverInfo.GetString("si_map");
 	const idDecl *mapDecl = declManager->FindType(DECL_MAPDEF, mapName, false);
-	if (!mapDecl) {
+	if (!mapDecl)
+	{
 		weaponFlags = -1; // No map decls?  Allow all weapons
 		return;
 	}
@@ -8157,48 +9147,62 @@ void hhPlayer::SetupWeaponFlags(void) {
 
 	const char *weaponList = mapInfo->dict.GetString("disableWeapons");
 	weaponFlags = 0;
-	if (weaponList && weaponList[0]) {
-		if (!idStr::Icmp(weaponList, "all")) {
+	if (weaponList && weaponList[0])
+	{
+		if (!idStr::Icmp(weaponList, "all"))
+		{
 			// No weapons are enabled, so just return
 			return;
 		}
 
-		if (idStr::FindText(weaponList, "wrench", false) == -1) {
+		if (idStr::FindText(weaponList, "wrench", false) == -1)
+		{
 			weaponFlags |= HH_WEAPON_WRENCH;
 		}
-		if (idStr::FindText(weaponList, "rifle", false) == -1) {
+		if (idStr::FindText(weaponList, "rifle", false) == -1)
+		{
 			weaponFlags |= HH_WEAPON_RIFLE;
 		}
-		if (idStr::FindText(weaponList, "crawler", false) == -1) {
+		if (idStr::FindText(weaponList, "crawler", false) == -1)
+		{
 			weaponFlags |= HH_WEAPON_CRAWLER;
 		}
-		if (idStr::FindText(weaponList, "autocannon", false) == -1) {
+		if (idStr::FindText(weaponList, "autocannon", false) == -1)
+		{
 			weaponFlags |= HH_WEAPON_AUTOCANNON;
 		}
-		if (idStr::FindText(weaponList, "hiderweapon", false) == -1) {
+		if (idStr::FindText(weaponList, "hiderweapon", false) == -1)
+		{
 			weaponFlags |= HH_WEAPON_HIDERWEAPON;
 		}
-		if (idStr::FindText(weaponList, "rocketlauncher", false) == -1) {
+		if (idStr::FindText(weaponList, "rocketlauncher", false) == -1)
+		{
 			weaponFlags |= HH_WEAPON_ROCKETLAUNCHER;
 		}
-		if (idStr::FindText(weaponList, "soulstripper", false) == -1) {
+		if (idStr::FindText(weaponList, "soulstripper", false) == -1)
+		{
 			weaponFlags |= HH_WEAPON_SOULSTRIPPER;
 		}
 	}
 
-	if (weaponFlags == 0) {
+	if (weaponFlags == 0)
+	{
 		// Allow all weapons by default
 		weaponFlags = -1;
 	}
 }
 
-void hhPlayer::LockWeapon(int weaponNum) {
+void hhPlayer::LockWeapon(int weaponNum)
+{
 	// Special case, -1 locks all weapons AND the lighter
-	if (weaponNum == -1) {
-		if (IsLighterOn()) {
+	if (weaponNum == -1)
+	{
+		if (IsLighterOn())
+		{
 			LighterOff();
 		}
-		if (weapon.IsValid()) {
+		if (weapon.IsValid())
+		{
 			weapon->PutAway();
 		}
 		weaponFlags = 0;
@@ -8207,15 +9211,19 @@ void hhPlayer::LockWeapon(int weaponNum) {
 		return;
 	}
 
-	if (weaponNum <= 0 || weaponNum >= MAX_WEAPONS) {
+	if (weaponNum <= 0 || weaponNum >= MAX_WEAPONS)
+	{
 		gameLocal.Error("Attempted to unlock unknown weapon '%d'", weaponNum);
 	}
 
 	int flag = (1 << (weaponNum - 1));
-	if (weaponFlags & flag) { // Only lock if not already locked
+	if (weaponFlags & flag)
+	{ // Only lock if not already locked
 		weaponFlags &= ~flag;
-		if (idealWeapon == weaponNum) {
-			if (weapon.IsValid()) {
+		if (idealWeapon == weaponNum)
+		{
+			if (weapon.IsValid())
+			{
 				weapon->PutAway();
 			}
 			NextWeapon();
@@ -8223,22 +9231,27 @@ void hhPlayer::LockWeapon(int weaponNum) {
 	}
 }
 
-void hhPlayer::UnlockWeapon(int weaponNum) {
+void hhPlayer::UnlockWeapon(int weaponNum)
+{
 	// Special case, -1 unlocks all weapons
-	if (weaponNum == -1) {
+	if (weaponNum == -1)
+	{
 		weaponFlags = -1;
-		if (idealWeapon == 0) {
+		if (idealWeapon == 0)
+		{
 			idealWeapon = 1; // Default to the wrench
 		}
 		return;
 	}
 
-	if (weaponNum <= 0 || weaponNum >= MAX_WEAPONS) {
+	if (weaponNum <= 0 || weaponNum >= MAX_WEAPONS)
+	{
 		gameLocal.Error("Attempted to unlock unknown weapon '%d'", weaponNum);
 	}
 
 	int flag = (1 << (weaponNum - 1));
-	if (weaponFlags & flag) {
+	if (weaponFlags & flag)
+	{
 		// Already unlocked
 		return;
 	}
@@ -8247,72 +9260,91 @@ void hhPlayer::UnlockWeapon(int weaponNum) {
 	idealWeapon = weaponNum;
 }
 
-bool hhPlayer::IsLocked(int weaponNum) {
+bool hhPlayer::IsLocked(int weaponNum)
+{
 	//HUMANHEAD PCF mdl 05/05/06 - Changed to < 1 to catch weaponNum = -1
-	if (weaponNum < 1) {
+	if (weaponNum < 1)
+	{
 		return true; // CJR: if the player has no weapons, then consider all weapons locked
 	}
 	return !(weaponFlags & (1 << (weaponNum - 1)));
 }
 
-void hhPlayer::Event_LockWeapon(int weaponNum) {
+void hhPlayer::Event_LockWeapon(int weaponNum)
+{
 	LockWeapon(weaponNum);
 }
 
-void hhPlayer::Event_UnlockWeapon(int weaponNum) {
+void hhPlayer::Event_UnlockWeapon(int weaponNum)
+{
 	UnlockWeapon(weaponNum);
 }
 
 //HUMANHEAD rdr
-void hhPlayer::Event_SetPrivateCameraView(idEntity *camView, int noHide) {
-	if (camView && camView->IsType(idCamera::Type)) {
+void hhPlayer::Event_SetPrivateCameraView(idEntity *camView, int noHide)
+{
+	if (camView && camView->IsType(idCamera::Type))
+	{
 		idPlayer::SetPrivateCameraView(static_cast<idCamera*>(camView), noHide != 0);
 	}
-	else {
+	else
+	{
 		idPlayer::SetPrivateCameraView(NULL);
 	}
 }
 
 //HUMANHEAD rdr
-void hhPlayer::Event_SetCinematicFOV(float fieldOfView, float accelTime, float decelTime, float duration) {
-	if (duration > 0.f) {
+void hhPlayer::Event_SetCinematicFOV(float fieldOfView, float accelTime, float decelTime, float duration)
+{
+	if (duration > 0.f)
+	{
 		cinematicFOV.Init(gameLocal.time, SEC2MS(accelTime), SEC2MS(decelTime), SEC2MS(duration), cinematicFOV.GetCurrentValue(gameLocal.GetTime()), fieldOfView);
 	}
-	else {
+	else
+	{
 		cinematicFOV.Init(gameLocal.time, 0.f, 0.f, 0.f, cinematicFOV.GetEndValue(), fieldOfView);
 	}
 }
 
 //HUMANHEAD rww
-void hhPlayer::Event_StopSpiritWalk() {
+void hhPlayer::Event_StopSpiritWalk()
+{
 	StopSpiritWalk();
 }
 
-void hhPlayer::Event_DamagePlayer(idEntity *inflictor, idEntity *attacker, const idVec3 &dir, char *damageDefName, float damageScale, int location) {
+void hhPlayer::Event_DamagePlayer(idEntity *inflictor, idEntity *attacker, const idVec3 &dir, char *damageDefName, float damageScale, int location)
+{
 	Damage(inflictor, attacker, dir, damageDefName, damageScale, location);
 }
 //HUMANHEAD END
 
-void hhPlayer::Event_GetSpiritProxy() {
-	if (spiritProxy.IsValid()) {
+void hhPlayer::Event_GetSpiritProxy()
+{
+	if (spiritProxy.IsValid())
+	{
 		idThread::ReturnEntity(spiritProxy.GetEntity());
 	}
-	else {
+	else
+	{
 		idThread::ReturnEntity(NULL);
 	}
 }
 
-void hhPlayer::Event_IsSpiritWalking() {
+void hhPlayer::Event_IsSpiritWalking()
+{
 	idThread::ReturnInt(IsSpiritWalking() ? 1 : 0);
 }
 
-void hhPlayer::Event_IsDeathWalking() {
+void hhPlayer::Event_IsDeathWalking()
+{
 	idThread::ReturnInt(IsDeathWalking() ? 1 : 0);
 }
 
-void hhPlayer::Event_AllowLighter(bool allow) {
+void hhPlayer::Event_AllowLighter(bool allow)
+{
 	inventory.requirements.bCanUseLighter = allow;
-	if (!allow && IsLighterOn()) {
+	if (!allow && IsLighterOn())
+	{
 		LighterOff();
 	}
 }
@@ -8324,18 +9356,21 @@ void hhPlayer::Event_AllowLighter(bool allow) {
 // Returns the current DDA value from zero to one
 //=============================================================================
 
-void hhPlayer::Event_GetDDAValue() {
+void hhPlayer::Event_GetDDAValue()
+{
 	idThread::ReturnFloat(gameLocal.GetDDAValue());
 }
 
 //HUMANHEAD rww
-hhArtificialPlayer::hhArtificialPlayer(void) {
+hhArtificialPlayer::hhArtificialPlayer(void)
+{
 	memset(&lastAICmd, 0, sizeof(lastAICmd));
 	testCrouchActive = false;
 	testCrouchTime = 0;
 }
 
-void hhArtificialPlayer::Spawn(void) {
+void hhArtificialPlayer::Spawn(void)
+{
 	idDict apUI;
 	gameLocal.GetAPUserInfo(apUI, entityNumber);
 	gameLocal.SetUserInfo(entityNumber, apUI, gameLocal.isClient, false);
@@ -8343,7 +9378,8 @@ void hhArtificialPlayer::Spawn(void) {
 	SetPlayerModel(false); //force an update on the player model
 }
 
-void hhArtificialPlayer::Think(void) {
+void hhArtificialPlayer::Think(void)
+{
 	PROFILE_START("hhArtificialPlayer::Think", PROFMASK_NORMAL);
 	bool iFeelHoppy = false;
 	usercmd_t *nextCmd = &gameLocal.usercmds[entityNumber];
@@ -8362,20 +9398,26 @@ void hhArtificialPlayer::Think(void) {
 	numSourceAreas = gameRenderWorld->BoundsInAreas(GetPlayerPhysics()->GetAbsBounds(), sourceAreas, idEntity::MAX_PVS_AREAS);
 	pvsHandle_t pvsHandle = gameLocal.pvs.SetupCurrentPVS(sourceAreas, numSourceAreas, PVS_NORMAL);
 
-	for (int i = 0;i < gameLocal.numClients;i++) {
+	for (int i = 0; i < gameLocal.numClients; i++)
+	{
 		idEntity *ent = gameLocal.entities[i];
-		if (ent) {
+		if (ent)
+		{
 			HH_ASSERT(ent->IsType(hhPlayer::Type));
 			hhPlayer *plEnt = static_cast<hhPlayer *>(ent);
 
 			float l = (ent->GetOrigin() - GetOrigin()).Length();
-			if (l < 4096.0f && (l < closestDist || !closestEnt) && ent->PhysicsTeamInPVS(pvsHandle)) {
+			if (l < 4096.0f && (l < closestDist || !closestEnt) && ent->PhysicsTeamInPVS(pvsHandle))
+			{
 				trace_t tr;
 
 				gameLocal.clip.TracePoint(tr, GetOrigin(), ent->GetOrigin(), GetPhysics()->GetClipMask(), this);
-				if (tr.c.entityNum == ent->entityNumber) { //if we hit the thing then it's visible.
-					if (ent->health > 0) {
-						if (gameLocal.gameType != GAME_TDM || plEnt->team != team) {
+				if (tr.c.entityNum == ent->entityNumber)
+				{ //if we hit the thing then it's visible.
+					if (ent->health > 0)
+					{
+						if (gameLocal.gameType != GAME_TDM || plEnt->team != team)
+						{
 							closestDist = l;
 							closestEnt = ent;
 						}
@@ -8387,42 +9429,52 @@ void hhArtificialPlayer::Think(void) {
 
 	gameLocal.pvs.FreeCurrentPVS(pvsHandle);
 
-	if (closestEnt) {
+	if (closestEnt)
+	{
 		idealAngles = (closestEnt->GetOrigin() - GetOrigin()).ToAngles();
 	}
-	else { //if no one to run mindlessly at, do some stuff.
+	else
+	{ //if no one to run mindlessly at, do some stuff.
 		const float testDist = 64.0f;
 		idVec3 fwd = GetOrigin() + (idealAngles.ToForward()*testDist);
 
 		trace_t tr;
 		gameLocal.clip.TraceBounds(tr, GetOrigin(), fwd, GetPhysics()->GetBounds(), GetPhysics()->GetClipMask(), this);
-		if (tr.fraction != 1.0f) { //if we hit something set the yaw to a new random angle.
+		if (tr.fraction != 1.0f)
+		{ //if we hit something set the yaw to a new random angle.
 			iFeelHoppy = true;
 
 			idealAngles.yaw = rand() % 360;
 		}
 	}
 
-	if ((closestEnt || health <= 0) && rand() % 2 == 1) {
+	if ((closestEnt || health <= 0) && rand() % 2 == 1)
+	{
 		nextCmd->buttons |= BUTTON_ATTACK;
 	}
-	else {
+	else
+	{
 		nextCmd->buttons &= ~BUTTON_ATTACK;
 	}
 
-	if (testCrouchTime < gameLocal.time) {
+	if (testCrouchTime < gameLocal.time)
+	{
 		testCrouchTime = gameLocal.time + rand() % 4000;
 		testCrouchActive = !testCrouchActive;
 	}
 
-	if (iFeelHoppy) {
+	if (iFeelHoppy)
+	{
 		nextCmd->upmove = idMath::ClampChar(127);
 	}
-	else {
-		if (testCrouchActive) {
+	else
+	{
+		if (testCrouchActive)
+		{
 			nextCmd->upmove = idMath::ClampChar(-127);
 		}
-		else {
+		else
+		{
 			nextCmd->upmove = 0;
 		}
 	}
@@ -8437,12 +9489,14 @@ void hhArtificialPlayer::Think(void) {
 	hhPlayer::Think();
 }
 
-void hhArtificialPlayer::ClientPredictionThink(void) {
+void hhArtificialPlayer::ClientPredictionThink(void)
+{
 	gameLocal.usercmds[entityNumber] = lastAICmd; //copy over the last manually snapshotted usercmd first
 	hhPlayer::ClientPredictionThink();
 }
 
-void hhArtificialPlayer::WriteToSnapshot(idBitMsgDelta &msg) const {
+void hhArtificialPlayer::WriteToSnapshot(idBitMsgDelta &msg) const
+{
 	//instead of sync'ing, just mirror what the server has in ::Spawn
 	/*
 	msg.WriteDict(*gameLocal.GetUserInfo(entityNumber));	//ap's don't broadcast their info to the server, so the server otherwise
@@ -8466,7 +9520,8 @@ void hhArtificialPlayer::WriteToSnapshot(idBitMsgDelta &msg) const {
 	msg.WriteBits(spectating, 1);
 }
 
-void hhArtificialPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
+void hhArtificialPlayer::ReadFromSnapshot(const idBitMsgDelta &msg)
+{
 	/*
 	((idBitMsgDelta)msg).ReadDict(*((idDict *)gameLocal.GetUserInfo(entityNumber)));
 	if (!clientReceivedUI) {
@@ -8490,13 +9545,15 @@ void hhArtificialPlayer::ReadFromSnapshot(const idBitMsgDelta &msg) {
 	cmd.angles[2] = msg.ReadShort();
 
 	bool spec = !!msg.ReadBits(1);	//doesn't go through right for ap's or something based on events sometimes, hack fix
-	if (spec != spectating) {
+	if (spec != spectating)
+	{
 		Spectate(spec);
 	}
 }
 //HUMANHEAD END
 
-void hhPlayer::DisableSpiritWalk(int timeout) {
+void hhPlayer::DisableSpiritWalk(int timeout)
+{
 	nextSpiritTime = gameLocal.time + SEC2MS(timeout);
 	StopSpiritWalk();
 }
@@ -8505,11 +9562,12 @@ void hhPlayer::DisableSpiritWalk(int timeout) {
 //
 // hhPlayer::Event_UpdateDDA
 //
-// CJR:  Update the probability the player will die this tick, and 
+// CJR:  Update the probability the player will die this tick, and
 // adjust the difficulty accordingly
 //=============================================================================
 
-void hhPlayer::Event_UpdateDDA() {
+void hhPlayer::Event_UpdateDDA()
+{
 	idEntity	*ent;
 	int			updateFlags;
 
@@ -8518,25 +9576,30 @@ void hhPlayer::Event_UpdateDDA() {
 	ddaProbabilityAccum = 1.0f;
 	updateFlags = 0;
 
-	for (ent = gameLocal.activeEntities.Next(); ent != NULL; ent = ent->activeNode.Next()) {
-		if (ent->fl.isDormant || !ent->IsType(hhMonsterAI::Type) || ent->fl.hidden || ent->health <= 0) {
+	for (ent = gameLocal.activeEntities.Next(); ent != NULL; ent = ent->activeNode.Next())
+	{
+		if (ent->fl.isDormant || !ent->IsType(hhMonsterAI::Type) || ent->fl.hidden || ent->health <= 0)
+		{
 			continue;
 		}
 
 		hhMonsterAI *monster = static_cast<hhMonsterAI *>(ent);
-		if (monster->GetEnemy() != this) {
+		if (monster->GetEnemy() != this)
+		{
 			continue;
 		}
 
 		// PVS Check:  only include creatures that the player can attack or be attacked by
-		if (!gameLocal.InPlayerPVS(ent)) {
+		if (!gameLocal.InPlayerPVS(ent))
+		{
 			continue;
 		}
 
 		// Accumulate the survival rate against each enemy
 		int index = monster->spawnArgs.GetInt("ddaIndex", "0");
 
-		if (index == -1) { // Skip certain monsters, such as the vacuum or the crawlers
+		if (index == -1)
+		{ // Skip certain monsters, such as the vacuum or the crawlers
 			continue;
 		}
 
@@ -8554,49 +9617,59 @@ void hhPlayer::Event_UpdateDDA() {
 
 	PostEventSec(&EV_UpdateDDA, spawnArgs.GetFloat("updateDDARate", "0.25"));
 
-	if (g_printDDA.GetBool()) {
-		if (ddaNumEnemies > 0) {
+	if (g_printDDA.GetBool())
+	{
+		if (ddaNumEnemies > 0)
+		{
 			common->Printf("Probability [%.2f]\n", ddaProbabilityAccum);
 		}
 	}
 }
 
-void hhPlayer::Event_DisableSpirit(void) {
+void hhPlayer::Event_DisableSpirit(void)
+{
 	// HUMANHEAD PCF pdm 05-17-06: Removed assert, as scripters were potentially calling during deathwalk
 	// HUMANHEAD PCF pdm 05-17-06: Only exit spirit realm if spiritwalking, not deathwalking
 
-	if (IsSpiritWalking()) {
+	if (IsSpiritWalking())
+	{
 		StopSpiritWalk();
 	}
 
 	bAllowSpirit = false;
 }
 
-void hhPlayer::Event_EnableSpirit(void) {
+void hhPlayer::Event_EnableSpirit(void)
+{
 	// HUMANHEAD PCF pdm 05-17-06: Removed assert
 
 	bAllowSpirit = true;
 }
 
 //HUMANHEAD bjk
-void hhPlayer::ProjectOverlay(const idVec3 &origin, const idVec3 &dir, float size, const char *material) {
+void hhPlayer::ProjectOverlay(const idVec3 &origin, const idVec3 &dir, float size, const char *material)
+{
 	// no need for these in sp
-	if (gameLocal.isMultiplayer) {
+	if (gameLocal.isMultiplayer)
+	{
 		idActor::ProjectOverlay(origin, dir, size, material);
 	}
 }
 
 // HUMANHEAD mdl:  Ripped from idAI for short invulnerability after returning from deathwalk
-void hhPlayer::Event_AllowDamage(void) {
+void hhPlayer::Event_AllowDamage(void)
+{
 	fl.takedamage = true;
 }
 
-void hhPlayer::Event_IgnoreDamage(void) {
+void hhPlayer::Event_IgnoreDamage(void)
+{
 	fl.takedamage = false;
 }
 
 // Precompute all the weapons' info for faster HUD updates
-void hhPlayer::SetupWeaponInfo() {
+void hhPlayer::SetupWeaponInfo()
+{
 	const char *fireInfoName = NULL;
 	const idDeclEntityDef *decl = NULL;
 	const char *ammoName = NULL;
@@ -8605,15 +9678,19 @@ void hhPlayer::SetupWeaponInfo() {
 	memset(weaponInfo, 0, sizeof(weaponInfo_t) * 15);
 	memset(altWeaponInfo, 0, sizeof(weaponInfo_t) * 15);
 
-	for (int ix = 0; ix < 15; ix++) {
+	for (int ix = 0; ix < 15; ix++)
+	{
 		const char *weaponClassName = spawnArgs.GetString(va("def_weapon%d", ix), NULL);
-		if (weaponClassName && *weaponClassName) {
+		if (weaponClassName && *weaponClassName)
+		{
 
 			const idDeclEntityDef *weaponObjDecl = gameLocal.FindEntityDef(weaponClassName, false);
-			if (weaponObjDecl) {
+			if (weaponObjDecl)
+			{
 				fireInfoName = weaponObjDecl->dict.GetString("def_fireInfo");
 				decl = gameLocal.FindEntityDef(fireInfoName, false);
-				if (decl) {
+				if (decl)
+				{
 					weaponInfo[ix].ammoType = inventory.AmmoIndexForAmmoClass(decl->dict.GetString("ammoType"));
 					weaponInfo[ix].ammoRequired = decl->dict.GetInt("ammoRequired");
 					weaponInfo[ix].ammoLow = decl->dict.GetInt("lowAmmo");
@@ -8625,7 +9702,8 @@ void hhPlayer::SetupWeaponInfo() {
 
 				fireInfoName = weaponObjDecl->dict.GetString("def_altFireInfo");
 				decl = gameLocal.FindEntityDef(fireInfoName, false);
-				if (decl) {
+				if (decl)
+				{
 					altWeaponInfo[ix].ammoType = inventory.AmmoIndexForAmmoClass(decl->dict.GetString("ammoType"));
 					altWeaponInfo[ix].ammoRequired = decl->dict.GetInt("ammoRequired");
 					altWeaponInfo[ix].ammoLow = decl->dict.GetInt("lowAmmo");
@@ -8645,26 +9723,31 @@ hhPlayer::ThrowGrenade
 HUMANHEAD bjk
 ===============
 */
-void hhPlayer::ThrowGrenade(void) {
+void hhPlayer::ThrowGrenade(void)
+{
 	idMat3 axis;
 	idVec3 muzzle;
 
 	if (inventory.HasAmmo(inventory.AmmoIndexForAmmoClass("ammo_crawler"), 1) == false)
 		return;
 
-	if (IsSpiritOrDeathwalking() || InVehicle() || bReallyDead) {
+	if (IsSpiritOrDeathwalking() || InVehicle() || bReallyDead)
+	{
 		return;
 	}
 
 	if (privateCameraView || !weaponEnabled || spectating || gameLocal.inCinematic || health < 0 || gameLocal.isClient)
 		return;
 
-	if (weapon.IsValid()) {
-		if (inventory.weapons & (1 << 12) && currentWeapon != 12 && currentWeapon != 3 && idealWeapon == currentWeapon) {
+	if (weapon.IsValid())
+	{
+		if (inventory.weapons & (1 << 12) && currentWeapon != 12 && currentWeapon != 3 && idealWeapon == currentWeapon)
+		{
 			idealWeapon = 12;
 			previousWeapon = currentWeapon;
 		}
-		else if (currentWeapon == 3) {
+		else if (currentWeapon == 3)
+		{
 			FireWeapon();
 			usercmd.buttons = usercmd.buttons | BUTTON_ATTACK;
 		}
@@ -8672,32 +9755,38 @@ void hhPlayer::ThrowGrenade(void) {
 }
 
 //HUMANHEAD bjk
-void hhPlayer::Event_ReturnToWeapon() {
+void hhPlayer::Event_ReturnToWeapon()
+{
 	const char *weap;
 
-	if (!weaponEnabled || spectating || gameLocal.inCinematic || health < 0) {
+	if (!weaponEnabled || spectating || gameLocal.inCinematic || health < 0)
+	{
 		idThread::ReturnInt(0);
 		return;
 	}
 
-	if ((previousWeapon < 0) || (previousWeapon >= MAX_WEAPONS)) {
+	if ((previousWeapon < 0) || (previousWeapon >= MAX_WEAPONS))
+	{
 		idThread::ReturnInt(0);
 		return;
 	}
 
-	if (gameLocal.isClient) {
+	if (gameLocal.isClient)
+	{
 		idThread::ReturnInt(0);
 		return;
 	}
 
 	weap = spawnArgs.GetString(va("def_weapon%d", previousWeapon));
-	if (!weap[0]) {
+	if (!weap[0])
+	{
 		gameLocal.Printf("Invalid weapon\n");
 		idThread::ReturnInt(0);
 		return;
 	}
 
-	if (inventory.weapons & (1 << previousWeapon)) {
+	if (inventory.weapons & (1 << previousWeapon))
+	{
 		idealWeapon = previousWeapon;
 	}
 
@@ -8705,13 +9794,16 @@ void hhPlayer::Event_ReturnToWeapon() {
 }
 
 //HUMANHEAD rww
-void hhPlayer::Event_CanAnimateTorso(void) {
-	if (!gameLocal.isMultiplayer) { //don't worry about it
+void hhPlayer::Event_CanAnimateTorso(void)
+{
+	if (!gameLocal.isMultiplayer)
+	{ //don't worry about it
 		idThread::ReturnInt(1);
 		return;
 	}
 
-	if (!weapon.IsValid() || !weapon->IsType(hhWeapon::Type)) { //bad
+	if (!weapon.IsValid() || !weapon->IsType(hhWeapon::Type))
+	{ //bad
 		idThread::ReturnInt(0);
 		return;
 	}
@@ -8719,16 +9811,20 @@ void hhPlayer::Event_CanAnimateTorso(void) {
 	idThread::ReturnInt(1);
 }
 
-void hhPlayer::Show(void) {
+void hhPlayer::Show(void)
+{
 	idActor::Show();
 
 	hhWeapon *weap;
 	weap = weapon.GetEntity();
-	if (weap) {
-		if (!IsLocked(currentWeapon)) {
+	if (weap)
+	{
+		if (!IsLocked(currentWeapon))
+		{
 			weap->ShowWorldModel();
 		}
-		else {
+		else
+		{
 			weap->HideWorldModel();
 		}
 	}

@@ -6,7 +6,7 @@
 
 namespace pr
 {
-	constexpr char* pr_backuptmr_path{ "backuptmr" };
+	constexpr char pr_backuptmr_path[] { "backuptmr" };
 
 	static void WriteToFile(const char* mapName)
 	{
@@ -21,7 +21,7 @@ namespace pr
 			return;
 		}
 
-		file->WriteBool(true); // Is this a valid backuptmr file? : Yes so we actually can recover the time from this file! 
+		file->WriteBool(true); // Is this a valid backuptmr file? : Yes so we actually can recover the time from this file!
 		file->WriteFloat(GetBackupTime()); // The actual time returned by pr_gametimer.ClockTicks()
 		file->WriteString(mapName); // The map you were on when the timer was last saved
 
@@ -62,7 +62,7 @@ namespace pr
 			return;
 		}
 
-		bool isValid{ false };
+		bool isValid { false };
 		float ms;
 		idStr mapName;
 

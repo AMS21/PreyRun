@@ -25,15 +25,16 @@ idCVar pr_autopause("PR_AutoPause", "0", CVAR_GAME | CVAR_BOOL, "Automaticly pau
 idCVar pr_preysplit("PR_PreySplit", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle support for interaction with PreySplit a LiveSplit component");
 idCVar pr_preysplit_update("PR_PreySplit_update", "41", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The time in milliseconds PreyRun shoud wait before update the game timer of PreySplit again, note that this is only for displaying the current game time the splits will always be acurate", 0, 1000, idCmdSystem::ArgCompletion_Integer<0, 1000>);
 
-bool pr_preysplit_pipeopen{ false };
-bool pr_preysplit_mapchanged{ false };
+bool pr_preysplit_pipeopen { false };
+bool pr_preysplit_mapchanged { false };
+
 #ifdef PR_DEVELOP
 idCVar pr_fixedseed("PR_FixedSeed", "0", CVAR_GAME | CVAR_BOOL, "Forces the RNG seed to PR_FixedSeed_Value");
 idCVar pr_fixedseed_value("PR_FixedSeed_Value", "0", CVAR_GAME | CVAR_INTEGER, "The Value the RNG seed shoud be set to if pr_fixedseed is set to 1");
 #endif // PR_DEVELOP
 
-idStr pr_reload_latestsave{};
-bool pr_reload_ready{ false };
+idStr pr_reload_latestsave {};
+bool pr_reload_ready { false };
 
 idCVar pr_freeze("PR_Freeze", "0", CVAR_GAME | CVAR_BOOL, "Completley freezes the game until pr_Freeze is set back to 0");
 
@@ -54,8 +55,8 @@ idCVar pr_hud_speedometer_y("PR_hud_Speedometer_Y", "460", CVAR_GAME | CVAR_INTE
 // Timer
 prTimer pr_gametimer; // The actual timer
 idTimer pr_demo_timer;
-bool pr_timedemo{ false };
-bool pr_gametimer_running{ false };
+bool pr_timedemo { false };
+bool pr_gametimer_running { false };
 
 idCVar pr_timer_autostart("PR_Timer_AutoStart", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly start the hud timer at run begin check PR_Timer_Methode for information when this might be");
 idCVar pr_timer_autostop("PR_Timer_AutoStop", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly stop the hud timer check PR_Timer_Methode for information when this might be");
@@ -80,7 +81,7 @@ idCVar pr_hud_jumpspeed_r("PR_hud_JumpSpeed_R", "255", CVAR_GAME | CVAR_FLOAT | 
 idCVar pr_hud_jumpspeed_g("PR_hud_JumpSpeed_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0, 255);
 idCVar pr_hud_jumpspeed_b("PR_hud_JumpSpeed_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0, 255);
 idCVar pr_hud_jumpspeed_precision("PR_hud_JumpSpeed_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed precision", 0, 6);
-idCVar pr_hud_jumpspeed_style("PR_hud_JumpSpeed_Style", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "PR_FIXME: description");
+idCVar pr_hud_jumpspeed_style("PR_hud_JumpSpeed_Style", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "0 - Always display your jumpspeed\n1 - jumspeed fades out when on the ground\n2 - jumpspeed only visible while in the air", 0, 2, idCmdSystem::ArgCompletion_Integer<0, 2>);
 
 // Viewangles
 idCVar pr_hud_viewangles("PR_hud_ViewAngles", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of your current viewangles");
@@ -90,7 +91,7 @@ idCVar pr_hud_velocity("PR_hud_Velocity", "0", CVAR_GAME | CVAR_BOOL, "Toggle di
 
 // Location
 idCVar pr_hud_location("PR_hud_Location", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of your current position in the level");
-idCVar pr_hud_location_methode("PR_hud_Location_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Swtich the different location methodes.\n0 - Display eye (viewpoint) position (default)\n1 - Display feet position", 0, 1);
+idCVar pr_hud_location_methode("PR_hud_Location_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Switch the different location methodes.\n0 - Display eye (viewpoint / camera) position (default)\n1 - Display feet position", 0, 1);
 
 // Entity Info
 idCVar pr_hud_entityinfo("PR_hud_EntityInfo", "0", CVAR_GAME | CVAR_BOOL, "Shows infos about the entity aimed at. Which info will be displayed can be selected with pr_hud_entityinfo_*");
@@ -99,7 +100,7 @@ idCVar pr_hud_entityinfo_name("PR_hud_EntityInfo_Name", "1", CVAR_GAME | CVAR_BO
 idCVar pr_hud_entityinfo_type("PR_hud_EntityInfo_Type", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entitys type when pr_hud_entityinfo is enabled");
 
 // Ammo
-idCVar pr_hud_ammo("PR_hud_Ammo", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current ammo (White = loaded magazine, Yellow = empty magazine, Red = No ammo left)");
+idCVar pr_hud_ammo("PR_hud_Ammo", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current ammo (White = loaded magazine, Yellow = empty magazine, Red = no ammo left)");
 
 // Health
 idCVar pr_hud_health("PR_hud_Health", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current health and maximum health, will be greyed out if god mode is enabled");
@@ -108,10 +109,10 @@ idCVar pr_hud_health("PR_hud_Health", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE,
 idCVar pr_hud_spiritpower("PR_hud_SpiritPower", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current spirit power / mana, will be greyed out when not having the ability to spirit walk");
 
 // Distance
-idCVar pr_hud_distance("PR_hud_Distance", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of the distance between your eyes position (view position) and the object or entity aimed at");
+idCVar pr_hud_distance("PR_hud_Distance", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of the distance between your eyes position (view position / camera) and the object or entity aimed at");
 
 // Custom hud element
-idCVar pr_hud_custom("PR_hud_Custom", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of the custom hud element this will display any text given to PR_hud_Custom_Text");
+idCVar pr_hud_custom("PR_hud_Custom", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of the custom hud element, this will display any text given to PR_hud_Custom_Text");
 idCVar pr_hud_custom_x("PR_hud_Custom_x", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "X position of the custom hud element", 0, 639);
 idCVar pr_hud_custom_y("PR_hud_Custom_y", "250", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Y position of the custom hud element", 0, 479);
 idCVar pr_hud_custom_r("PR_hud_Custom_r", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Custom hud element color", 0, 255);
@@ -126,7 +127,7 @@ idCVar pr_hud_keys_methode("PR_hud_Keys_Style", "0", CVAR_GAME | CVAR_INTEGER | 
 #ifdef PR_DEBUG
 idCVar pr_dbg_hud_drawtime("pr_dbg_hud_drawtime", "0", CVAR_GAME | CVAR_BOOL, "*Debug*: Shows the time in milliseconds it took to draw the hud");
 idCVar pr_dbg_hud_frametime("pr_dbg_hud_frametime", "0", CVAR_GAME | CVAR_BOOL, "*Debug*: Shows the time in milliseconds it took to render this frame");
-double pr_dbg_frametimer_value{ 0 };
+double pr_dbg_frametimer_value { 0 };
 idTimer pr_dbg_frametimer;
 idTimer pr_dbg_timer;
 #endif // PR_DEBUG
@@ -215,7 +216,8 @@ const char *si_spectateArgs[] = { "Play", "Spectate", NULL };
 //const char *ui_skinArgs[]			= { "skins/characters/player/marine_mp", "skins/characters/player/marine_mp_red", "skins/characters/player/marine_mp_blue", "skins/characters/player/marine_mp_green", "skins/characters/player/marine_mp_yellow", NULL };
 const char *ui_teamArgs[] = { "Red", "Blue", NULL };
 
-struct gameVersion_s {
+struct gameVersion_s
+{
 	gameVersion_s(void) { sprintf(string, "%s 1.0.%d%s%s %s %s %s", GAME_NAME, BUILD_NUMBER, BUILD_DEBUG, ID_VERSIONTAG, BUILD_STRING, __DATE__, __TIME__); }
 	char	string[256];
 } gameVersion;
@@ -457,7 +459,14 @@ idCVar g_gun_y("g_gunY", "0", CVAR_GAME | CVAR_FLOAT, "");
 idCVar g_gun_z("g_gunZ", "0", CVAR_GAME | CVAR_FLOAT, "");
 idCVar g_viewNodalX("g_viewNodalX", "0", CVAR_GAME | CVAR_FLOAT, "");
 idCVar g_viewNodalZ("g_viewNodalZ", "0", CVAR_GAME | CVAR_FLOAT, "");
+// PreyRun Edit BEGIN
+/* Original:
 idCVar g_fov("g_fov", "90", CVAR_GAME | CVAR_INTEGER | CVAR_NOCHEAT, "");
+*/
+
+// Edited Version:
+idCVar g_fov("g_fov", "90", CVAR_GAME | CVAR_INTEGER | CVAR_NOCHEAT | CVAR_ARCHIVE, "");
+// PreyRun Edit END
 idCVar g_skipViewEffects("g_skipViewEffects", "0", CVAR_GAME | CVAR_BOOL, "skip damage and other view effects");
 idCVar g_mpWeaponAngleScale("g_mpWeaponAngleScale", "0", CVAR_GAME | CVAR_FLOAT, "Control the weapon sway in MP");
 

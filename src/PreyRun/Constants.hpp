@@ -39,7 +39,8 @@ enum class PR_keys_style
 enum class PR_jumpspeed_style
 {
 	Normal,
-	Fading
+	Fading,
+	OnlyInAir
 };
 
 // From Doom 3 SDK - UsecmdcmdGen.h 132 - 186

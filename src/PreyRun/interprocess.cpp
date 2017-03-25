@@ -195,8 +195,8 @@ namespace pr
 
 	void WriteMapChange(const Time& time, idStr& map)
 	{
-		// normal map path   : maps/game/roadhouse.map
-		// gets turneded into: roadhouse.map
+		// normal map path    : maps/game/roadhouse.map
+		// gets turneded into : roadhouse.map
 
 		map.Replace("maps/game/", "");
 
@@ -287,6 +287,6 @@ namespace pr
 	{
 		auto times = PR_ms2time(pr_gametimer.Milliseconds());
 
-		return Time{ times.hours, times.minutes, times.seconds, times.milliseconds };
+		return Time { times.hours, times.minutes, times.seconds, times.milliseconds };
 	}
 }

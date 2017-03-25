@@ -5,11 +5,11 @@
 #include "PreyRun.hpp"
 #include "GameTimer.hpp"
 
-prTimer::prTimer() : isRunning(false), acuTime(std::chrono::duration<pr::timer::storageType, pr::timer::periodType>(0)), lastStarted(timer.now()) { }
+prTimer::prTimer() : isRunning(false), acuTime(std::chrono::duration<pr::timer::storageType, pr::timer::periodType>(0)), lastStarted(timer.now()) {}
 
-prTimer::prTimer(pr::timer::storageType ct) : isRunning(false), acuTime(std::chrono::duration <pr::timer::storageType, pr::timer::periodType>(ct)), lastStarted(timer.now()) { }
+prTimer::prTimer(pr::timer::storageType ct) : isRunning(false), acuTime(std::chrono::duration <pr::timer::storageType, pr::timer::periodType>(ct)), lastStarted(timer.now()) {}
 
-prTimer::~prTimer() { }
+prTimer::~prTimer() {}
 
 void prTimer::Start()
 {

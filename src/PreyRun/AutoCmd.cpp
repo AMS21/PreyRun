@@ -9,16 +9,17 @@ namespace pr
 	template <class CharType>
 	auto split(std::basic_string<CharType> const &str,
 		std::basic_string<CharType> const &delims)
-		/*-> std::vector<std::basic_string<CharType>> */ {
+		/*-> std::vector<std::basic_string<CharType>> */
+	{
 		using StringType = std::basic_string<CharType>;
 		using container_type = std::vector<StringType>;
-		container_type result{};
+		container_type result {};
 		result.reserve(7U);
 		auto lambda
 		{
 			[&](auto c)
 		{
-			return std::any_of(std::begin(delims), std::end(delims), [c](auto ch)
+			return std::any_of(std::begin(delims), std::end(delims), [c] (auto ch)
 			{
 				return ch == c;
 			});
@@ -37,7 +38,7 @@ namespace pr
 		}
 
 		result.erase(std::remove_if(std::begin(result), std::end(result),
-			[](auto &&e)
+			[] (auto &&e)
 		{
 			return e.empty();
 		}), std::end(result));
@@ -51,14 +52,14 @@ namespace pr
 	{
 		if (!activated)
 		{
-			static std::string const delims{ ";" };
+			static std::string const delims { ";" };
 
-			auto f = [](auto &&e)
+			auto f = [] (auto &&e)
 			{
 				return split(std::forward<decltype(e)>(e), delims);
 			};
 
-			std::vector<std::vector<std::string>> v{};
+			std::vector<std::vector<std::string>> v {};
 			v.push_back(f(std::string(cmds.c_str())));
 
 			for (auto const &vec : v)
@@ -73,14 +74,14 @@ namespace pr
 			}
 
 			activated = true;
-				}
-			}
+		}
+	}
 
 	void AutocmdzoneHandler::Autocmdzone::Draw() const
 	{
 		if (gameLocal.GetLocalPlayer())
 		{
-			auto axis{ gameLocal.GetLocalPlayer()->viewAngles.ToMat3() };
+			auto axis { gameLocal.GetLocalPlayer()->viewAngles.ToMat3() };
 
 			idBounds bounds(pos1, pos2);
 			idStr string;
@@ -102,7 +103,7 @@ namespace pr
 		return instance;
 	}
 
-	AutocmdzoneHandler::AutocmdzoneHandler() { }
+	AutocmdzoneHandler::AutocmdzoneHandler() {}
 
 	// Checks if any of the autocommandzones shoud be triggerd and triggers them
 	void AutocmdzoneHandler::CheckForTriggering()
@@ -113,7 +114,7 @@ namespace pr
 
 			for (auto& e : this->acz)
 			{
-				idBounds bounds{ e.GetPos1(),e.GetPos2() };
+				idBounds bounds { e.GetPos1(),e.GetPos2() };
 
 				// Do we intersect with the Player?
 				if (bounds.IntersectsBounds(playerbounds)) { e.Run(); }
@@ -148,4 +149,4 @@ namespace pr
 		acz[num].SetPos2(pos2_);
 		acz[num].SetCmds(cmds_);
 	}
-	}
+}

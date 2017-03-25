@@ -16,7 +16,8 @@ Random number generator
 ===============================================================================
 */
 
-class prRandom {
+class prRandom
+{
 public:
 	prRandom(int seed = 0);
 
@@ -37,25 +38,27 @@ private:
 	class idRandomHolder
 	{
 	public:
-		enum class idRandomHolderCreationFlag {
+		enum class idRandomHolderCreationFlag
+		{
 			dontCreate,
 			create
 		};
 
-		struct idRandomInfo {
+		struct idRandomInfo
+		{
 			explicit idRandomInfo(int seed_ = 0, bool keepSeed_ = false)
-				: seed{ seed_ }, keepSeed{ keepSeed_ } {}
+				: seed { seed_ }, keepSeed { keepSeed_ } {}
 
 			int seed;
 			bool keepSeed;
 		};
 
-		idRandomHolder(idRandomHolderCreationFlag flag, idRandomInfo info = idRandomInfo{})
-			: hasObject{ flag == idRandomHolderCreationFlag::create }
+		idRandomHolder(idRandomHolderCreationFlag flag, idRandomInfo info = idRandomInfo {})
+			: hasObject { flag == idRandomHolderCreationFlag::create }
 		{
 			if (hasObject)
 			{
-				new (&idRandom_) idRandom{ info.seed, info.keepSeed };
+				new (&idRandom_) idRandom { info.seed, info.keepSeed };
 			}
 		}
 
@@ -92,7 +95,8 @@ private:
 	private:
 		bool hasObject;
 
-		union {
+		union
+		{
 			idRandom idRandom_;
 		};
 	};
@@ -103,7 +107,7 @@ private:
 };
 
 PR_FINLINE prRandom::prRandom(int seed)
-	: holder{ idRandomHolder::idRandomHolderCreationFlag::dontCreate }
+	: holder { idRandomHolder::idRandomHolderCreationFlag::dontCreate }
 {
 	this->seed = seed;
 }
@@ -121,11 +125,11 @@ inline prRandom::operator idRandom&()
 {
 	if (pr_fixedseed.GetBool())
 	{
-		holder = idRandomHolder::idRandomInfo{ pr_fixedseed_value.GetInteger(),true };
+		holder = idRandomHolder::idRandomInfo { pr_fixedseed_value.GetInteger(),true };
 		auto p = holder.get();
 		return *p;
 	}
-	holder = idRandomHolder::idRandomInfo{ this->seed,false };
+	holder = idRandomHolder::idRandomInfo { this->seed,false };
 	auto p = holder.get();
 	return *p;
 }
@@ -142,7 +146,8 @@ PR_FINLINE void prRandom::SetSeed(int seed)
 	}
 }
 
-PR_FINLINE int prRandom::GetSeed(void) const {
+PR_FINLINE int prRandom::GetSeed(void) const
+{
 	if (pr_fixedseed.GetBool())
 	{
 		return pr_fixedseed_value.GetInteger();
@@ -150,7 +155,8 @@ PR_FINLINE int prRandom::GetSeed(void) const {
 	return seed;
 }
 
-PR_FINLINE int prRandom::RandomInt(void) {
+PR_FINLINE int prRandom::RandomInt(void)
+{
 	if (pr_fixedseed.GetBool())
 	{
 		return ((69069 * pr_fixedseed_value.GetInteger() + 1) & prRandom::MAX_RAND);
@@ -160,17 +166,21 @@ PR_FINLINE int prRandom::RandomInt(void) {
 	return (seed & prRandom::MAX_RAND);
 }
 
-PR_FINLINE int prRandom::RandomInt(int max) {
-	if (max == 0) {
+PR_FINLINE int prRandom::RandomInt(int max)
+{
+	if (max == 0)
+	{
 		return 0;			// avoid divide by zero error
 	}
 	return RandomInt() % max;
 }
 
-PR_FINLINE float prRandom::RandomFloat(void) {
-	return (RandomInt() / (float)(prRandom::MAX_RAND + 1));
+PR_FINLINE float prRandom::RandomFloat(void)
+{
+	return (RandomInt() / (float) (prRandom::MAX_RAND + 1));
 }
 
-PR_FINLINE float prRandom::CRandomFloat(void) {
+PR_FINLINE float prRandom::CRandomFloat(void)
+{
 	return (2.0f * (RandomFloat() - 0.5f));
 }

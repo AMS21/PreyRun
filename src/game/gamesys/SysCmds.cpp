@@ -91,10 +91,7 @@ void Cmd_PR_ch_setpos_f(const idCmdArgs &args)
 	}
 
 	auto localPlayer = gameLocal.GetLocalPlayer();
-	if (!localPlayer || !gameLocal.CheatsOk(true))
-	{
-		return;
-	}
+	if (!localPlayer || !gameLocal.CheatsOk(true)) { return; }
 
 	localPlayer->SetOrigin(idVec3(atof(args.Argv(1)), atof(args.Argv(2)), atof(args.Argv(3))));
 }
@@ -113,10 +110,7 @@ void Cmd_PR_ch_setpos_offset_f(const idCmdArgs &args)
 	}
 
 	auto localPlayer = gameLocal.GetLocalPlayer();
-	if (!localPlayer || !gameLocal.CheatsOk(true))
-	{
-		return;
-	}
+	if (!localPlayer || !gameLocal.CheatsOk(true)) { return; }
 
 	auto origin = localPlayer->GetOrigin();
 
@@ -915,7 +909,7 @@ void Cmd_Give_f(const idCmdArgs &args) {
 	//HUMANHEAD PCF rww 05/16/06
 	declManager->SetInsideLevelLoad(wasInside);
 	//HUMANHEAD END
-		}
+}
 
 /*
 ==================
@@ -1149,7 +1143,7 @@ static void Cmd_Say(bool team, const idCmdArgs &args) {
 	{
 		gameLocal.mpGame.ProcessChatMessage(gameLocal.localClientNum, team, name, text, NULL);
 	}
-	}
+}
 
 /*
 ==================
@@ -1430,7 +1424,7 @@ void Cmd_PlayerShadowToggle_f(const idCmdArgs &args) {
 		if (gameLocal.entities[i]->IsType(hhPlayer::Type))
 		{
 			gameLocal.entities[i]->GetRenderEntity()->noShadow = setShadows;
-}
+		}
 	}
 }
 #endif
@@ -3091,7 +3085,7 @@ void Cmd_PrintTypeName_f(const idCmdArgs &args)
 	}
 	else {
 		common->Printf("Invalid typenum.\n");
-}
+	}
 }
 #endif
 /*
