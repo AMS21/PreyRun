@@ -1,4 +1,4 @@
-// Copyright (C) 2004 Id Software, Inc.
+﻿// Copyright (C) 2004 Id Software, Inc.
 //
 
 #ifndef __SYS_CVAR_H__
@@ -11,6 +11,7 @@ extern idCVar pr_autojump;
 extern idCVar pr_autopause;
 extern idCVar pr_preysplit;
 extern idCVar pr_preysplit_update;
+extern idCVar pr_disablejukeboxes;
 extern bool pr_preysplit_pipeopen;
 extern bool pr_preysplit_mapchanged;
 #ifdef PR_DEVELOP

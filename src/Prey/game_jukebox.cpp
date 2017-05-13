@@ -1,4 +1,4 @@
-#include "../idlib/precompiled.h"
+﻿#include "../idlib/precompiled.h"
 #pragma hdrstop
 
 #include "prey_local.h"
@@ -108,7 +108,8 @@ void hhJukeBox::PlayCurrentTrack() {
 			}
 		}
 	}
-	else {
+	else 
+	{
 		StartSound(va("snd_song%d", track), SND_CHANNEL_VOICE, 0, true, &time);
 	}
 	UpdateVolume();
@@ -198,11 +199,21 @@ void hhJukeBox::UpdateVolume() {
 	}
 }
 
-void hhJukeBox::Think() {
+void hhJukeBox::Think()
+{
 
 	hhConsole::Think();
 
-	if (thinkFlags & TH_MISC3) {
+	if (thinkFlags & TH_MISC3)
+	{
+		// PreyRun BEGIN
+		if (cvarSystem->GetCVarBool("pr_disablejukeboxes"))
+		{
+			StopCurrentTrack();
+			return;
+		}
+		// PreyRun END
+
 		float amplitude = 0.0f;
 
 		//TODO: This sampling really only needs to take place once/render
