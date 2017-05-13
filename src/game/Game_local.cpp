@@ -1,4 +1,4 @@
-// Copyright (C) 2004 Id Software, Inc.
+﻿// Copyright (C) 2004 Id Software, Inc.
 //
 
 #include "../idlib/precompiled.h"
@@ -1418,7 +1418,7 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 
 	// PreyRun BEGIN
 #ifdef PR_DEBUG
-	gameLocal.Printf("PreyRunDBG: Loading savegame %s from map %s\n", saveGameFile->GetName(), mapName);
+	gameLocal.Printf("PreyRun DBG: Loading savegame %s from map %s\n", saveGameFile->GetName(), mapName);
 #endif // PR_DEBUG
 
 	if (static_cast<PR_timer_methode> (pr_timer_methode.GetInteger()) == PR_timer_methode::INDIVIDUALLEVEL)

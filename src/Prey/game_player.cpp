@@ -1,4 +1,4 @@
-#include "../idlib/precompiled.h"
+﻿#include "../idlib/precompiled.h"
 #pragma hdrstop
 
 #include "prey_local.h"
@@ -1288,9 +1288,9 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 
 #ifdef PR_DEBUG
 		auto time = PR_ms2time(pr_gametimer.Milliseconds());
-		gameLocal.Printf("PreyRunDBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		gameLocal.Printf("PreyRun DBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
 
-		gameLocal.Printf("PreyRunDBG: Changed map to: %s\n", gameLocal.GetMapName());
+		gameLocal.Printf("PreyRun DBG: Changed map to: %s\n", gameLocal.GetMapName());
 #endif // PR_DEBUG
 	}
 	// PreyRun END

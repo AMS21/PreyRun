@@ -1,4 +1,4 @@
-// Copyright (C) 2004 Id Software, Inc.
+﻿// Copyright (C) 2004 Id Software, Inc.
 //
 
 #include "../../idlib/precompiled.h"
@@ -51,7 +51,7 @@ idSaveGame::idSaveGame( idFile *savefile )
 
 #ifdef PR_DEBUG
 		auto time = PR_ms2time(pr_gametimer.Milliseconds());
-		gameLocal.Printf("PreyRunDBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		gameLocal.Printf("PreyRun DBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DEBUG
 	}
 #ifdef PR_DEBUG
@@ -88,7 +88,7 @@ idSaveGame::~idSaveGame()
 
 #ifdef PR_DEBUG
 		auto time = PR_ms2time(pr_gametimer.Milliseconds());
-		gameLocal.Printf("PreyRunDBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		gameLocal.Printf("PreyRun DBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DEBUG
 	}
 	// PreyRun END

@@ -1,4 +1,4 @@
-#include "../idLib/precompiled.h"
+﻿#include "../idLib/precompiled.h"
 #pragma hdrstop
 
 // Credits to Ivan Molodetskikh (Yalter) and Chong Jiang Wei (Matherunner) for their interprocess.cpp from BunnymodXT (https://github.com/YaLTeR/BunnymodXT/blob/master/BunnymodXT/Windows/interprocess.cpp)
@@ -162,7 +162,7 @@ namespace pr
 		AddTimeToBuffer(buf.data() + 3, time);
 
 #ifdef PR_DBG_INTERPROCESS
-		gameLocal.Printf("PreyRunDBG: WriteGameEnd: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		gameLocal.Printf("PreyRun DBG: WriteGameEnd: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);
@@ -201,7 +201,7 @@ namespace pr
 		map.Replace("maps/game/", "");
 
 #ifdef PR_DBG_INTERPROCESS
-		gameLocal.Printf("PreyRunDBG: WriteMapChange: Map exited: %s\nPreyRunDBG: WriteMapChange: Time %02d:%02d:%02d.%03d\n", map.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
+		gameLocal.Printf("PreyRun DBG: WriteMapChange: Map exited: %s\nPreyRun DBG: WriteMapChange: Time %02d:%02d:%02d.%03d\n", map.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DBG_INTERPROCESS
 
 		auto size = static_cast<int32_t>(map.Size());
@@ -227,7 +227,7 @@ namespace pr
 		AddTimeToBuffer(buf.data() + 3, time);
 
 #ifdef PR_DBG_INTERPROCESS
-		gameLocal.Printf("PreyRunDBG: WriteTimerReset: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		gameLocal.Printf("PreyRun DBG: WriteTimerReset: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);
@@ -242,7 +242,7 @@ namespace pr
 		AddTimeToBuffer(buf.data() + 3, time);
 
 #ifdef PR_DBG_INTERPROCESS
-		gameLocal.Printf("PreyRunDBG: WriteTimerStart: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		gameLocal.Printf("PreyRun DBG: WriteTimerStart: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);
@@ -262,7 +262,7 @@ namespace pr
 		std::memcpy(buf.data() + 3 + time_size + 4, boss.c_str(), size);
 
 #ifdef PR_DBG_INTERPROCESS
-		gameLocal.Printf("PreyRunDBG: WriteBossKill: Boss: %s Time: %02d:%02d:%02d.%03d\n", boss.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
+		gameLocal.Printf("PreyRun DBG: WriteBossKill: Boss: %s Time: %02d:%02d:%02d.%03d\n", boss.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);
@@ -277,7 +277,7 @@ namespace pr
 		AddTimeToBuffer(buf.data() + 3, time);
 
 #ifdef PR_DBG_INTERPROCESS
-		gameLocal.Printf("PreyRunDBG: CustomSplit: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		gameLocal.Printf("PreyRun DBG: CustomSplit: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);

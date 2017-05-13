@@ -1,4 +1,4 @@
-#include "../idlib/precompiled.h"
+﻿#include "../idlib/precompiled.h"
 #pragma hdrstop
 
 #include "prey_local.h"
@@ -105,7 +105,7 @@ void hhGameLocal::MapShutdown(void) {
 
 #ifdef PR_DEBUG
 		auto time = PR_ms2time(pr_gametimer.Milliseconds());
-		Printf("PreyRunDBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		Printf("PreyRun DBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DEBUG
 	}
 
@@ -120,7 +120,7 @@ void hhGameLocal::MapShutdown(void) {
 		pr::ClearBackupTimer();
 
 #ifdef PR_DEBUG
-		Printf("PreyRunDBG: Leaving map:%s\n", GetMapName());
+		Printf("PreyRun DBG: Leaving map:%s\n", GetMapName());
 #endif // PR_DEBUG
 	}
 	// PreyRun END
@@ -149,7 +149,7 @@ void hhGameLocal::InitFromNewMap(const char *mapName, idRenderWorld *renderWorld
 
 	// PreyRun BEGIN
 #ifdef PR_DEBUG
-	Printf("PreyRunDBG: Starting Map: %s\n", mapName);
+	Printf("PreyRun DBG: Starting Map: %s\n", mapName);
 #endif // PR_DEBUG
 
 	if (static_cast<PR_timer_methode> (pr_timer_methode.GetInteger()) == PR_timer_methode::INDIVIDUALLEVEL && static_cast<idStr>(gameLocal.GetMapName()) != idStr("maps/game/roadhouse.map"))
@@ -1013,7 +1013,7 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 			auto cmd = sessionCommand;
 
 #ifdef PR_DEBUG
-			Printf("PreyRunDBG: Session command: %s\n", cmd.c_str());
+			Printf("PreyRun DBG: Session command: %s\n", cmd.c_str());
 #endif // PR_DEBUG
 
 			if (cmd.Find("map ", false, 4))

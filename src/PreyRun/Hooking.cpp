@@ -1,4 +1,4 @@
-#include "../idLib/precompiled.h"
+﻿#include "../idLib/precompiled.h"
 #pragma hdrstop
 
 #include "PreyRun.hpp"
@@ -7,13 +7,13 @@
 namespace pr
 {
 	// Const stuff to avoid magic numbers
-	const DWORD DisplayTimeDemo = 0x4576dd;
-	const char DisplayTimeDemoOn[] = "\x90\x90\x90\x90\x90\x90";
-	const char DisplayTimeDemoOff[] = "\x0F\x84\x34\x01\x00\x00";
+	constexpr DWORD DisplayTimeDemo = 0x4576dd;
+	constexpr char DisplayTimeDemoOn[] = "\x90\x90\x90\x90\x90\x90";
+	constexpr char DisplayTimeDemoOff[] = "\x0F\x84\x34\x01\x00\x00";
 
-	const DWORD DisplayTimeDemoString = 0x7B59E4;
-	const char DisplayTimeDemoStringOn[] = "%i frames rendered in %3.3f seconds = %3.3f fps\n";
-	const char DisplayTimeDemoStringOff[] = "%i frames rendered in %3.1f seconds = %3.1f fps\n";
+	constexpr DWORD DisplayTimeDemoString = 0x7B59E4;
+	constexpr char DisplayTimeDemoStringOn[] = "%i frames rendered in %3.3f seconds = %3.3f fps\n";
+	constexpr char DisplayTimeDemoStringOff[] = "%i frames rendered in %3.1f seconds = %3.1f fps\n";
 
 	void static WriteToMemory(DWORD addressToWrite, const char* valueToWrite, const int byteNum)
 	{
@@ -35,7 +35,7 @@ namespace pr
 		WriteToMemory(DisplayTimeDemo, DisplayTimeDemoOn, sizeof(DisplayTimeDemoOn));
 		WriteToMemory(DisplayTimeDemoString, DisplayTimeDemoStringOn, sizeof(DisplayTimeDemoStringOn));
 #ifdef PR_DEBUG
-		gameLocal.Printf("PreyRunDBG: Hooked timeDemo\n");
+		gameLocal.Printf("PreyRun DBG: Hooked timeDemo\n");
 #endif // PR_DEBUG
 	}
 
@@ -44,7 +44,7 @@ namespace pr
 		WriteToMemory(DisplayTimeDemo, DisplayTimeDemoOff, sizeof(DisplayTimeDemoOff));
 		WriteToMemory(DisplayTimeDemoString, DisplayTimeDemoStringOff, sizeof(DisplayTimeDemoStringOff));
 #ifdef PR_DEBUG
-		gameLocal.Printf("PreyRunDBG: Unhooked timeDemo\n");
+		gameLocal.Printf("PreyRun DBG: Unhooked timeDemo\n");
 #endif // PR_DEBUG
 	}
 }
