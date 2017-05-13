@@ -1348,7 +1348,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 
 			if (physicsObj.HasGroundContacts() || InVehicle() || noclip)
 			{
-				// are we standing on the ground or in a Vehicle or nocliping? then add Z speed as well (when wallwalking, being on stairs/slopes or flying in Vehicle or nocliping)
+				// are we standing on the ground or in a Vehicle or nocliping? then add Z speed as well (when wallwalking, being on stairs/slopes, flying in Vehicle or nocliping)
 				sprintf(strSpeedoMeter, "%.*f", pr_sm_prec, vel.Length());
 			}
 			else
@@ -1393,7 +1393,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 				}
 				else if (pr_js_style == PR_jumpspeed_style::Fading)
 				{
-					pr_js_alpha -= PR_jumpspeed_fade_factor;
+					pr_js_alpha -= PR_fade_factor;
 					pr_js_alpha = idMath::ClampFloat(0.00f, 1.00f, pr_js_alpha);
 					_hud->SetStateFloat("pr_hud_jumpspeed_alpha", pr_js_alpha);
 
@@ -1715,6 +1715,21 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 
 				renderSystem->DrawSmallStringExt(PR_health_x, PR_health_y, strHealth, colour, false, declManager->FindMaterial("textures/bigchars"));
 			}
+		}
+
+		// Health Damage
+		if (pr_hud_health_damage.GetBool())
+		{
+			auto alpha = _hud->GetStateFloat("pr_hud_health_damage_a", "0");
+
+			alpha -= PR_fade_factor;
+			alpha = idMath::ClampFloat(0.00f, 1.00f, alpha);
+			_hud->SetStateFloat("pr_hud_health_damage_a", alpha);
+
+			idStr strDamage;
+			sprintf(strDamage, "-%d", _hud->GetStateInt("pr_hud_health_damage_val"), strDamage);
+
+			renderSystem->DrawSmallStringExt(PR_health_x + 80, PR_health_y, strDamage, idVec4(1.00f, 0.00f, 0.00f, alpha), false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// SpiritPower
@@ -4633,15 +4648,35 @@ void hhPlayer::Damage(idEntity *inflictor, idEntity *attacker, const idVec3 &dir
 		int oldHealth = health;
 		idPlayer::Damage(inflictor, attacker, dir, damageDefName, static_cast<const float>(newDamageScale), location); // CJR DDA TEST
 
+		// PreyRun BEGIN
+		int damage = oldHealth - health;
+		if (static_cast<PR_health_damage_style>(pr_hud_health_damage_style.GetInteger()) == PR_health_damage_style::Last)
+		{
+			hud->SetStateInt("pr_hud_health_damage_val", damage);
+			hud->SetStateFloat("pr_hud_health_damage_a", 1.0f);
+		}
+		else if (static_cast<PR_health_damage_style>(pr_hud_health_damage_style.GetInteger()) == PR_health_damage_style::Adding)
+		{
+			if (hud->GetStateFloat("pr_hud_health_damage_a") > 0.0f)
+			{
+				hud->SetStateInt("pr_hud_health_damage_val", hud->GetStateInt("pr_hud_health_damage_val") + damage);
+			}
+			else
+			{
+				hud->SetStateInt("pr_hud_health_damage_val", damage);
+			}
+
+			hud->SetStateFloat("pr_hud_health_damage_a", 1.0f);
+		}
+		// PreyRun END
+
 		if (attacker && attacker->IsType(hhMonsterAI::Type))
 		{ // CJR DDA: Damaged by a monster, add the damage to the monster count
-			float delta = oldHealth - health;
-
 			hhMonsterAI *monster = static_cast<hhMonsterAI *>(attacker);
 
 			if (monster)
 			{
-				monster->DamagedPlayer(delta);
+				monster->DamagedPlayer(damage);
 			}
 		}
 	}

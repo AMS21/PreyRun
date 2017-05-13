@@ -1,4 +1,4 @@
-
+﻿
 #ifndef __PREY_GAME_PLAYER_H__
 #define __PREY_GAME_PLAYER_H__
 
@@ -43,76 +43,76 @@ class hhPossessedTommy;
 #include "../PreyRun/GameTimer.hpp"
 #include "../game/Game_local.h"
 
-constexpr int PR_hud_std_y_offset{ 15 };
+constexpr int PR_hud_std_y_offset { 15 };
 
-constexpr int PR_ammopos_x{ 550 };
-constexpr int PR_ammopos_y{ 448 };
-constexpr int PR_ammopos2_y{ PR_ammopos_y + PR_hud_std_y_offset };
+constexpr int PR_ammopos_x { 550 };
+constexpr int PR_ammopos_y { 448 };
+constexpr int PR_ammopos2_y { PR_ammopos_y + PR_hud_std_y_offset };
 
-constexpr int PR_ammo_vehicle_shot_cost{ 3500 };
+constexpr int PR_ammo_vehicle_shot_cost { 3500 };
 
-constexpr double PR_jumpspeed_fade_factor{ 0.02f };
+constexpr double PR_fade_factor { 0.02f };
 
-constexpr int PR_location_x{ 0 };
-constexpr int PR_location_y{ 45 };
+constexpr int PR_location_x { 0 };
+constexpr int PR_location_y { 45 };
 
-constexpr int PR_velocity_x{ 500 };
-constexpr int PR_velocity_y{ 20 };
+constexpr int PR_velocity_x { 500 };
+constexpr int PR_velocity_y { 20 };
 
-constexpr int PR_viewangles_x{ 0 };
-constexpr int PR_viewangles_y{ 0 };
+constexpr int PR_viewangles_x { 0 };
+constexpr int PR_viewangles_y { 0 };
 
-constexpr int PR_entinfo_offset{ -15 };
-constexpr int PR_entinfo_x{ 360 };
-constexpr int PR_entinfo_y{ 235 };
+constexpr int PR_entinfo_offset { -15 };
+constexpr int PR_entinfo_x { 360 };
+constexpr int PR_entinfo_y { 235 };
 
-constexpr int PR_distance_y{ 220 };
+constexpr int PR_distance_y { 220 };
 
-constexpr int PR_health_x{ 70 };
-constexpr int PR_health_y{ 448 };
+constexpr int PR_health_x { 70 };
+constexpr int PR_health_y { 448 };
 
-constexpr int PR_spiritpower_x{ 70 };
-constexpr int PR_spiritpower_y{ PR_health_y - PR_hud_std_y_offset };
+constexpr int PR_spiritpower_x { 70 };
+constexpr int PR_spiritpower_y { PR_health_y - PR_hud_std_y_offset };
 
-constexpr int PR_keys_x{ 300 };
-constexpr int PR_keys_y{ 250 };
-constexpr int PR_keys_y2{ PR_keys_y + PR_hud_std_y_offset };
+constexpr int PR_keys_x { 300 };
+constexpr int PR_keys_y { 250 };
+constexpr int PR_keys_y2 { PR_keys_y + PR_hud_std_y_offset };
 
 // Reflex
-constexpr int PR_keys_reflex_x{ PR_keys_x + 5 };
-constexpr int PR_keys_reflex_f_y{ 220 };
-constexpr int PR_keys_reflex_lr_y{ PR_keys_reflex_f_y + 10 };
-constexpr int PR_keys_reflex_bdj_y{ PR_keys_reflex_f_y + 25 };
+constexpr int PR_keys_reflex_x { PR_keys_x + 5 };
+constexpr int PR_keys_reflex_f_y { 220 };
+constexpr int PR_keys_reflex_lr_y { PR_keys_reflex_f_y + 10 };
+constexpr int PR_keys_reflex_bdj_y { PR_keys_reflex_f_y + 25 };
 
 // Momentum
-constexpr int PR_keys_momentum_fb_x{ 600 };
-constexpr int PR_keys_momentum_lrjd_x{ PR_keys_momentum_fb_x + 5 };
+constexpr int PR_keys_momentum_fb_x { 600 };
+constexpr int PR_keys_momentum_lrjd_x { PR_keys_momentum_fb_x + 5 };
 
-constexpr int PR_keys_momentum_y_offset{ 15 };
+constexpr int PR_keys_momentum_y_offset { 15 };
 
-constexpr int PR_keys_momentum_f_y{ 245 };
-constexpr int PR_keys_momentum_lr_y{ PR_keys_momentum_f_y + 1 * PR_keys_momentum_y_offset };
-constexpr int PR_keys_momentum_b_y{ PR_keys_momentum_f_y + 2 * PR_keys_momentum_y_offset };
-constexpr int PR_keys_momentum_j_y{ PR_keys_momentum_f_y + 3 * PR_keys_momentum_y_offset };
-constexpr int PR_keys_momentum_d_y{ PR_keys_momentum_f_y + 4 * PR_keys_momentum_y_offset };
+constexpr int PR_keys_momentum_f_y { 245 };
+constexpr int PR_keys_momentum_lr_y { PR_keys_momentum_f_y + 1 * PR_keys_momentum_y_offset };
+constexpr int PR_keys_momentum_b_y { PR_keys_momentum_f_y + 2 * PR_keys_momentum_y_offset };
+constexpr int PR_keys_momentum_j_y { PR_keys_momentum_f_y + 3 * PR_keys_momentum_y_offset };
+constexpr int PR_keys_momentum_d_y { PR_keys_momentum_f_y + 4 * PR_keys_momentum_y_offset };
 
-constexpr float PR_traceline_distance{ 2048.00f };
+constexpr float PR_traceline_distance { 2048.00f };
 
-const idVec4 PR_colour_white{ 1.00f, 1.00f, 1.00f, 1.00f };
-const idVec4 PR_colour_yellow{ 1.00f, 1.00f, 0.25f, 1.00f };
-const idVec4 PR_colour_red{ 1.00f, 0.00f, 0.00f, 1.00f };
-const idVec4 PR_colour_blue{ 0.00f, 0.00f, 1.00f, 1.00f };
-const idVec4 PR_colour_grey{ 0.65f, 0.65f, 0.65f, 0.65f };
+const idVec4 PR_colour_white { 1.00f, 1.00f, 1.00f, 1.00f };
+const idVec4 PR_colour_yellow { 1.00f, 1.00f, 0.25f, 1.00f };
+const idVec4 PR_colour_red { 1.00f, 0.00f, 0.00f, 1.00f };
+const idVec4 PR_colour_blue { 0.00f, 0.00f, 1.00f, 1.00f };
+const idVec4 PR_colour_grey { 0.65f, 0.65f, 0.65f, 0.65f };
 
 #ifdef PR_DEBUG
-constexpr int PR_dbg_huddrawtime_x{ 460 };
-constexpr int PR_dbg_huddrawtime_y{ 0 };
+constexpr int PR_dbg_huddrawtime_x { 460 };
+constexpr int PR_dbg_huddrawtime_y { 0 };
 
-constexpr double PR_dbg_huddrawtime_yellow{ 0.30f };
-constexpr double PR_dbg_huddrawtime_red{ 0.40f };
+constexpr double PR_dbg_huddrawtime_yellow { 0.30f };
+constexpr double PR_dbg_huddrawtime_red { 0.40f };
 
-constexpr double PR_dbg_frametime_yellow{ 1.50f };
-constexpr double PR_dbg_frametime_red{ 2.00f };
+constexpr double PR_dbg_frametime_yellow { 1.50f };
+constexpr double PR_dbg_frametime_red { 2.00f };
 #endif // PR_DEBUG
 
 // The draw function from Prey takes floats in the range from 0.0 to 1.0 but usualy colours are represented from 0 to 255 (hex)
@@ -130,7 +130,8 @@ ID_INLINE float PR_toPreyColour(float f);
 #define HH_WEAPON_SOULSTRIPPER		64
 
 // Structure to hold all info about the weapons to remove the dictionary lookups every tick
-typedef struct weaponInfo_s {
+typedef struct weaponInfo_s
+{
 	int			ammoType;
 	int			ammoLow;
 	int			ammoMax;
@@ -138,14 +139,16 @@ typedef struct weaponInfo_s {
 } weaponInfo_t;
 
 #define MAX_TRACKED_ATTACKERS		3
-typedef struct attackInfo_s {
+typedef struct attackInfo_s
+{
 	idEntityPtr<idEntity>		attacker;
 	int							time;
 	bool						displayed;
 } attackInfo_t;
 
 
-class hhPlayer : public idPlayer {
+class hhPlayer : public idPlayer
+{
 	CLASS_PROTOTYPE(hhPlayer);
 
 public:
@@ -603,8 +606,10 @@ protected:
 hhPlayer::SetEyeAxis
 =====================
 */
-ID_INLINE void hhPlayer::SetEyeAxis(const idMat3 &axis) {
-	if (!cameraInterpolator.GetIdealAxis().Compare(axis)) {
+ID_INLINE void hhPlayer::SetEyeAxis(const idMat3 &axis)
+{
+	if (!cameraInterpolator.GetIdealAxis().Compare(axis))
+	{
 		cameraInterpolator.SetTargetAxis(axis, INTERPOLATE_EYEOFFSET);
 	}
 }
@@ -614,7 +619,8 @@ ID_INLINE void hhPlayer::SetEyeAxis(const idMat3 &axis) {
 hhPlayer::SetEyeHeight
 =====================
 */
-ID_INLINE void hhPlayer::SetEyeHeight(float height) {
+ID_INLINE void hhPlayer::SetEyeHeight(float height)
+{
 	idPlayer::SetEyeHeight(height);
 
 	cameraInterpolator.SetTargetEyeOffset(height, INTERPOLATE_EYEOFFSET);
@@ -625,7 +631,8 @@ ID_INLINE void hhPlayer::SetEyeHeight(float height) {
 hhPlayer::EyeHeight
 =====================
 */
-ID_INLINE float hhPlayer::EyeHeight(void) const {
+ID_INLINE float hhPlayer::EyeHeight(void) const
+{
 	return cameraInterpolator.GetCurrentEyeHeight();
 }
 
@@ -634,7 +641,8 @@ ID_INLINE float hhPlayer::EyeHeight(void) const {
 hhPlayer::EyeOffset
 =====================
 */
-ID_INLINE idVec3 hhPlayer::EyeOffset(void) const {//HUMANHEAD
+ID_INLINE idVec3 hhPlayer::EyeOffset(void) const
+{//HUMANHEAD
 	return cameraInterpolator.GetCurrentEyeOffset();
 }
 
@@ -644,7 +652,8 @@ hhPlayer::ShouldRemainAlignedToAxial
 	HUMANHEAD
 =====================
 */
-ID_INLINE void hhPlayer::ShouldRemainAlignedToAxial(bool remainAligned) {//HUMANHEAD
+ID_INLINE void hhPlayer::ShouldRemainAlignedToAxial(bool remainAligned)
+{//HUMANHEAD
 	physicsObj.ShouldRemainAlignedToAxial(remainAligned);
 }
 
@@ -654,7 +663,8 @@ hhPlayer::OrientToGravity
 	HUMANHEAD
 =====================
 */
-ID_INLINE void hhPlayer::OrientToGravity(bool orientToGravity) {//HUMANHEAD
+ID_INLINE void hhPlayer::OrientToGravity(bool orientToGravity)
+{//HUMANHEAD
 	physicsObj.OrientToGravity(orientToGravity);
 }
 
@@ -664,7 +674,8 @@ hhPlayer::EyePosition
 	HUMANHEAD
 =====================
 */
-ID_INLINE idVec3 hhPlayer::GetEyePosition(void) const {//HUMANHEAD
+ID_INLINE idVec3 hhPlayer::GetEyePosition(void) const
+{//HUMANHEAD
 	return cameraInterpolator.GetEyePosition();
 }
 
@@ -674,7 +685,8 @@ hhPlayer::GetEyeAxis
 	HUMANHEAD
 =====================
 */
-ID_INLINE idMat3 hhPlayer::GetEyeAxis() const {
+ID_INLINE idMat3 hhPlayer::GetEyeAxis() const
+{
 	return cameraInterpolator.GetCurrentAxis();
 }
 
@@ -684,7 +696,8 @@ hhPlayer::GetEyeAxisAsAngles
 	HUMANHEAD
 =====================
 */
-ID_INLINE idAngles hhPlayer::GetEyeAxisAsAngles() const {
+ID_INLINE idAngles hhPlayer::GetEyeAxisAsAngles() const
+{
 	return cameraInterpolator.GetCurrentAngles();
 }
 
@@ -694,7 +707,8 @@ hhPlayer::GetEyeAxisAsQuat
 	HUMANHEAD
 =====================
 */
-ID_INLINE idQuat hhPlayer::GetEyeAxisAsQuat() const {
+ID_INLINE idQuat hhPlayer::GetEyeAxisAsQuat() const
+{
 	return cameraInterpolator.GetCurrentRotation();
 }
 
@@ -704,8 +718,10 @@ hhPlayer::GetStepHeight
 	HUMANHEAD
 =====================
 */
-ID_INLINE float hhPlayer::GetStepHeight() const {
-	if (IsWallWalking()) {
+ID_INLINE float hhPlayer::GetStepHeight() const
+{
+	if (IsWallWalking())
+	{
 		return pm_wallwalkstepsize.GetFloat();
 	}
 
@@ -718,7 +734,8 @@ hhPlayer::TransformToPlayerSpace
 	HUMANHEAD
 =====================
 */
-ID_INLINE idVec3 hhPlayer::TransformToPlayerSpace(const idVec3& origin) const {
+ID_INLINE idVec3 hhPlayer::TransformToPlayerSpace(const idVec3& origin) const
+{
 	return cameraInterpolator.GetCurrentPosition() + origin * GetEyeAxis();
 }
 
@@ -728,7 +745,8 @@ hhPlayer::TransformToPlayerSpaceNotInterpolated
 	HUMANHEAD rww
 =====================
 */
-ID_INLINE idVec3 hhPlayer::TransformToPlayerSpaceNotInterpolated(const idVec3& origin) const {
+ID_INLINE idVec3 hhPlayer::TransformToPlayerSpaceNotInterpolated(const idVec3& origin) const
+{
 	return cameraInterpolator.GetIdealPosition() + origin * cameraInterpolator.GetIdealAxis();
 }
 
@@ -738,7 +756,8 @@ hhPlayer::TransformToPlayerSpace
 	HUMANHEAD
 =====================
 */
-ID_INLINE idMat3 hhPlayer::TransformToPlayerSpace(const idMat3& axis) const {
+ID_INLINE idMat3 hhPlayer::TransformToPlayerSpace(const idMat3& axis) const
+{
 	return axis * GetEyeAxis();
 }
 
@@ -748,7 +767,8 @@ hhPlayer::TransformToPlayerSpace
 	HUMANHEAD
 =====================
 */
-ID_INLINE idAngles hhPlayer::TransformToPlayerSpace(const idAngles& angles) const {
+ID_INLINE idAngles hhPlayer::TransformToPlayerSpace(const idAngles& angles) const
+{
 	return (angles.ToMat3() * GetEyeAxis()).ToAngles();
 }
 
@@ -758,7 +778,8 @@ hhPlayer::GetCurrentWeapon
 	HUMANHEAD
 =====================
 */
-ID_INLINE int hhPlayer::GetCurrentWeapon(void) const {
+ID_INLINE int hhPlayer::GetCurrentWeapon(void) const
+{
 	return currentWeapon;
 }
 
@@ -768,8 +789,10 @@ hhPlayer::SetCurrentWeapon
 	HUMANHEAD
 =====================
 */
-ID_INLINE void hhPlayer::SetCurrentWeapon(const int _currentWeapon) {
-	if (_currentWeapon >= 0 && _currentWeapon < MAX_WEAPONS) {
+ID_INLINE void hhPlayer::SetCurrentWeapon(const int _currentWeapon)
+{
+	if (_currentWeapon >= 0 && _currentWeapon < MAX_WEAPONS)
+	{
 		currentWeapon = _currentWeapon;
 	}
 }
@@ -780,7 +803,8 @@ hhPlayer::GetIdealWeapon
 	HUMANHEAD
 =====================
 */
-ID_INLINE int hhPlayer::GetIdealWeapon(void) const {
+ID_INLINE int hhPlayer::GetIdealWeapon(void) const
+{
 	return idealWeapon;
 }
 
@@ -790,7 +814,8 @@ hhPlayer::GetUntransformedViewAngles
 	HUMANHEAD
 =====================
 */
-ID_INLINE const idAngles& hhPlayer::GetUntransformedViewAngles() const {
+ID_INLINE const idAngles& hhPlayer::GetUntransformedViewAngles() const
+{
 	return untransformedViewAngles;
 }
 
@@ -800,7 +825,8 @@ hhPlayer::GetUntransformedViewAxis
 	HUMANHEAD
 =====================
 */
-ID_INLINE const idMat3& hhPlayer::GetUntransformedViewAxis() const {
+ID_INLINE const idMat3& hhPlayer::GetUntransformedViewAxis() const
+{
 	return untransformedViewAxis;
 }
 
@@ -810,7 +836,8 @@ hhPlayer::GetViewAngles
 	HUMANHEAD
 =====================
 */
-ID_INLINE idAngles hhPlayer::GetViewAngles() const {
+ID_INLINE idAngles hhPlayer::GetViewAngles() const
+{
 	return viewAngles;
 }
 
@@ -820,7 +847,8 @@ hhPlayer::GetPortalPoint
 	HUMANHEAD
 =====================
 */
-ID_INLINE idVec3 hhPlayer::GetPortalPoint(void) {
+ID_INLINE idVec3 hhPlayer::GetPortalPoint(void)
+{
 	return idEntity::GetPortalPoint();
 	/*
 		idVec3 origin;
@@ -832,7 +860,8 @@ ID_INLINE idVec3 hhPlayer::GetPortalPoint(void) {
 }
 
 //HUMANHEAD rww
-class hhArtificialPlayer : public hhPlayer {
+class hhArtificialPlayer : public hhPlayer
+{
 	CLASS_PROTOTYPE(hhArtificialPlayer);
 public:
 	hhArtificialPlayer(void);

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 //#include "../game/game_local.h"
 
 // Enums
@@ -41,6 +41,12 @@ enum class PR_jumpspeed_style
 	Normal,
 	Fading,
 	OnlyInAir
+};
+
+enum class PR_health_damage_style
+{
+	Last,
+	Adding
 };
 
 // From Doom 3 SDK - UsecmdcmdGen.h 132 - 186
