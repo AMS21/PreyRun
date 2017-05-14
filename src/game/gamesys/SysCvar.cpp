@@ -106,8 +106,10 @@ idCVar pr_hud_ammo("PR_hud_Ammo", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "To
 
 // Health
 idCVar pr_hud_health("PR_hud_Health", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current health and maximum health, will be greyed out if god mode is enabled");
-idCVar pr_hud_health_damage("PR_hud_Health_Damage", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, " Toggle display of the damage you receive");
-idCVar pr_hud_health_damage_style("PR_hud_Health_Damage_Style", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE,"0 - Display the last amount of damage you received\n1 - Display the amount of damage you received in the last time",0,1,idCmdSystem::ArgCompletion_Integer<0,1>);
+
+// Damage
+idCVar pr_hud_health_damage("PR_hud_Damage", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, " Toggle display of the damage you receive");
+idCVar pr_hud_damage_style("PR_hud_Damage_Style", "1", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE,"0 - Display the last amount of damage you received\n1 - Display the amount of damage you received in the last time",0,1,idCmdSystem::ArgCompletion_Integer<0,1>);
 
 // SpiritPower
 idCVar pr_hud_spiritpower("PR_hud_SpiritPower", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current spirit power / mana, will be greyed out when not having the ability to spirit walk");

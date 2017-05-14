@@ -43,7 +43,7 @@ enum class PR_jumpspeed_style
 	OnlyInAir
 };
 
-enum class PR_health_damage_style
+enum class PR_damage_style
 {
 	Last,
 	Adding

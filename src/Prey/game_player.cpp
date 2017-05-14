@@ -1720,16 +1720,16 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		// Health Damage
 		if (pr_hud_health_damage.GetBool())
 		{
-			auto alpha = _hud->GetStateFloat("pr_hud_health_damage_a", "0");
+			auto alpha = _hud->GetStateFloat("pr_hud_damage_a", "0");
 
 			alpha -= PR_fade_factor;
 			alpha = idMath::ClampFloat(0.00f, 1.00f, alpha);
-			_hud->SetStateFloat("pr_hud_health_damage_a", alpha);
+			_hud->SetStateFloat("pr_hud_damage_a", alpha);
 
 			idStr strDamage;
-			sprintf(strDamage, "-%d", _hud->GetStateInt("pr_hud_health_damage_val"), strDamage);
+			sprintf(strDamage, "-%d", _hud->GetStateInt("pr_hud_damage_val"), strDamage);
 
-			renderSystem->DrawSmallStringExt(PR_health_x + 80, PR_health_y, strDamage, idVec4(1.00f, 0.00f, 0.00f, alpha), false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(pr_hud_health.GetBool() ? (PR_health_x + 75) : PR_health_x, PR_health_y, strDamage, idVec4(1.00f, 0.00f, 0.00f, alpha), false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// SpiritPower
@@ -4650,23 +4650,23 @@ void hhPlayer::Damage(idEntity *inflictor, idEntity *attacker, const idVec3 &dir
 
 		// PreyRun BEGIN
 		int damage = oldHealth - health;
-		if (static_cast<PR_health_damage_style>(pr_hud_health_damage_style.GetInteger()) == PR_health_damage_style::Last)
+		if (static_cast<PR_damage_style>(pr_hud_damage_style.GetInteger()) == PR_damage_style::Last)
 		{
-			hud->SetStateInt("pr_hud_health_damage_val", damage);
-			hud->SetStateFloat("pr_hud_health_damage_a", 1.0f);
+			hud->SetStateInt("pr_hud_damage_val", damage);
+			hud->SetStateFloat("pr_hud_damage_a", 1.0f);
 		}
-		else if (static_cast<PR_health_damage_style>(pr_hud_health_damage_style.GetInteger()) == PR_health_damage_style::Adding)
+		else if (static_cast<PR_damage_style>(pr_hud_damage_style.GetInteger()) == PR_damage_style::Adding)
 		{
-			if (hud->GetStateFloat("pr_hud_health_damage_a") > 0.0f)
+			if (hud->GetStateFloat("pr_hud_damage_a") > 0.0f)
 			{
-				hud->SetStateInt("pr_hud_health_damage_val", hud->GetStateInt("pr_hud_health_damage_val") + damage);
+				hud->SetStateInt("pr_hud_damage_val", hud->GetStateInt("pr_hud_damage_val") + damage);
 			}
 			else
 			{
-				hud->SetStateInt("pr_hud_health_damage_val", damage);
+				hud->SetStateInt("pr_hud_damage_val", damage);
 			}
 
-			hud->SetStateFloat("pr_hud_health_damage_a", 1.0f);
+			hud->SetStateFloat("pr_hud_damage_a", 1.0f);
 		}
 		// PreyRun END
 
