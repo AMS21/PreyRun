@@ -1421,7 +1421,7 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 	gameLocal.Printf("PreyRun DBG: Loading savegame %s from map %s\n", saveGameFile->GetName(), mapName);
 #endif // PR_DEBUG
 
-	if (static_cast<PR_timer_methode> (pr_timer_methode.GetInteger()) == PR_timer_methode::INDIVIDUALLEVEL)
+	if (static_cast<PR_timer_methode> (pr_timer_methode.GetInteger()) == PR_timer_methode::IndividualLevel)
 	{
 		pr_gametimer_running = true;
 	}

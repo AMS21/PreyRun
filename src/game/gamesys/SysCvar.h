@@ -77,7 +77,7 @@ extern idCVar pr_hud_ammo;
 // Health
 extern idCVar pr_hud_health;
 // Damage
-extern idCVar pr_hud_health_damage;
+extern idCVar pr_hud_damage;
 extern idCVar pr_hud_damage_style;
 // SpiritPower
 extern idCVar pr_hud_spiritpower;

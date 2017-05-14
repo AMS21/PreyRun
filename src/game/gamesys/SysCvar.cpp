@@ -108,7 +108,7 @@ idCVar pr_hud_ammo("PR_hud_Ammo", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "To
 idCVar pr_hud_health("PR_hud_Health", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current health and maximum health, will be greyed out if god mode is enabled");
 
 // Damage
-idCVar pr_hud_health_damage("PR_hud_Damage", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, " Toggle display of the damage you receive");
+idCVar pr_hud_damage("PR_hud_Damage", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, " Toggle display of the damage you receive");
 idCVar pr_hud_damage_style("PR_hud_Damage_Style", "1", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE,"0 - Display the last amount of damage you received\n1 - Display the amount of damage you received in the last time",0,1,idCmdSystem::ArgCompletion_Integer<0,1>);
 
 // SpiritPower

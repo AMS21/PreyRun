@@ -97,7 +97,7 @@ void hhGameLocal::MapShutdown(void) {
 		pr_gametimer.Stop();
 		Printf("PreyRun: Timer: Paused, Map Shutdown\n");
 
-		if (pr_preysplit.GetBool() && pr_preysplit_mapchanged && static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::REALTIMEATTACK)
+		if (pr_preysplit.GetBool() && pr_preysplit_mapchanged && static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::RealTimeAttack)
 		{
 			pr_preysplit_mapchanged = false;
 			pr::WriteMapChange(pr::GetTime(), static_cast<idStr>(GetMapName()));
@@ -152,7 +152,7 @@ void hhGameLocal::InitFromNewMap(const char *mapName, idRenderWorld *renderWorld
 	Printf("PreyRun DBG: Starting Map: %s\n", mapName);
 #endif // PR_DEBUG
 
-	if (static_cast<PR_timer_methode> (pr_timer_methode.GetInteger()) == PR_timer_methode::INDIVIDUALLEVEL && static_cast<idStr>(gameLocal.GetMapName()) != idStr("maps/game/roadhouse.map"))
+	if (static_cast<PR_timer_methode> (pr_timer_methode.GetInteger()) == PR_timer_methode::IndividualLevel && static_cast<idStr>(gameLocal.GetMapName()) != idStr("maps/game/roadhouse.map"))
 	{
 		pr_gametimer_running = true;
 	}
@@ -1021,7 +1021,7 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 				// The command to execute is map
 				pr_preysplit_mapchanged = true;
 
-				if (static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::INDIVIDUALLEVEL && pr_gametimer_running && pr_gametimer.IsRunning() && pr_timer_autostop.GetBool())
+				if (static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::IndividualLevel && pr_gametimer_running && pr_gametimer.IsRunning() && pr_timer_autostop.GetBool())
 				{
 					pr_gametimer_running = false;
 					pr_gametimer.Stop();

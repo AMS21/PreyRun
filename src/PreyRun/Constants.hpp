@@ -4,36 +4,36 @@
 // Enums
 enum class PR_timer_methode
 {
-	REALTIMEATTACK,
-	INDIVIDUALLEVEL
+	RealTimeAttack,
+	IndividualLevel
 };
 
 enum class PR_weapons
 {
-	NONE,
-	WRENCH,
-	RIFLE,
-	CRAWLER,
-	LEECHER,
-	MINIGUN,
-	SHOTGUN,
-	ROCKETLAUNCHER
+	None,
+	Wrench,
+	Rifle,
+	Crawler,
+	Leecher,
+	Minigun,
+	Shotgun,
+	RocketLauncher
 };
 
 enum class PR_location_methode
 {
-	EYEPOS,
-	FEETPOS
+	EyePos,
+	FeetPos
 };
 
 enum class PR_keys_style
 {
-	NORMAL,
-	NORMAL_GREY,
-	REFLEX,
-	REFLEX_GREY,
-	MOMENTUM,
-	MOMENTUM_GREY
+	Normal,
+	NormalGrey,
+	Reflex,
+	ReflexGrey,
+	Momentum,
+	MomentumGrey
 };
 
 enum class PR_jumpspeed_style
