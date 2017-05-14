@@ -1025,6 +1025,7 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 				{
 					pr_gametimer_running = false;
 					pr_gametimer.Stop();
+					pr_rtatimer.Stop();
 
 					if (pr_preysplit.GetBool())
 					{
@@ -1032,8 +1033,10 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 					}
 
 					auto times = PR_ms2time(pr_gametimer.Milliseconds());
+					auto rtatime = PR_ms2time(pr_rtatimer.Milliseconds());
 
-					gameLocal.Printf("PreyRun: Timer: Individual Level end, time: %02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
+					gameLocal.Printf("PreyRun: Timer: Individual Level end, game time: %02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
+					gameLocal.Printf("PreyRun: Timer: Individual Level end, RTA time: %02d:%02d:%02d.%03d\n", rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds);
 
 					// Prevent the map change so the player can see his time
 					sessionCommand.Clear();

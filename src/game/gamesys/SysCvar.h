@@ -34,6 +34,7 @@ extern idCVar pr_hud_speedometer_y;
 extern idCVar pr_autocmd_show;
 // Timer
 extern prTimer pr_gametimer;
+extern prTimer pr_rtatimer;
 extern bool pr_gametimer_running;
 extern bool pr_timedemo;
 

@@ -1,4 +1,4 @@
-
+﻿
 
 #include "../idlib/precompiled.h"
 #pragma hdrstop
@@ -212,6 +212,7 @@ void hhSphereBoss::Killed(idEntity *inflictor, idEntity *attacker, int damage, c
 	if (pr_gametimer_running && pr_timer_autostop.GetBool())
 	{
 		pr_gametimer.Stop();
+		pr_rtatimer.Stop();
 		pr_gametimer_running = false;
 
 		if (pr_preysplit.GetBool())
@@ -220,8 +221,10 @@ void hhSphereBoss::Killed(idEntity *inflictor, idEntity *attacker, int damage, c
 		}
 
 		auto times = PR_ms2time(pr_gametimer.Milliseconds());
+		auto rtatime = PR_ms2time(pr_rtatimer.Milliseconds());
 
-		gameLocal.Printf("PreyRun: Timer: End game, time: %02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
+		gameLocal.Printf("PreyRun: Timer: End game, game time: %02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
+		gameLocal.Printf("PreyRun: Timer: End game, RTA time: %02d:%02d:%02d.%03d\n", rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds);
 
 		times = PR_ms2time(gameLocal.GetTimePlayed());
 

@@ -56,6 +56,7 @@ idCVar pr_hud_speedometer_y("PR_hud_Speedometer_Y", "460", CVAR_GAME | CVAR_INTE
 
 // Timer
 prTimer pr_gametimer; // The actual timer
+prTimer pr_rtatimer;
 idTimer pr_demo_timer;
 bool pr_timedemo { false };
 bool pr_gametimer_running { false };

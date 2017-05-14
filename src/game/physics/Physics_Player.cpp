@@ -1,4 +1,4 @@
-// Copyright (C) 2004 Id Software, Inc.
+﻿// Copyright (C) 2004 Id Software, Inc.
 //
 
 #include "../../idlib/precompiled.h"
@@ -1753,6 +1753,7 @@ void idPhysics_Player::SetMovementType(const pmtype_t type) {
 	if (!pr_gametimer_running && pr_timer_autostart.GetBool() && static_cast<idStr>(gameLocal.GetMapName()) == idStr("maps/game/roadhouse.map") && type == PM_NORMAL && current.movementType == PM_FREEZE)
 	{
 		pr_gametimer.Start();
+		pr_rtatimer.Start();
 		pr_gametimer_running = true;
 
 		gameLocal.Printf("PreyRun: Timer: Auto starting\n");
