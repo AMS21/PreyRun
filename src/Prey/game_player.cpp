@@ -1212,8 +1212,10 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 	if (pr_gametimer_running && !pr_gametimer.IsRunning() && pr_timer_autostart.GetBool() && static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::IndividualLevel)
 	{
 		pr_gametimer.Clear();
+		pr_rtatimer.Clear();
 
 		pr_gametimer.Start();
+		pr_rtatimer.Start();
 
 		gameLocal.Printf("PreyRun: Timer: Individual Level Auto starting\n");
 
@@ -1639,7 +1641,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		{
 			auto alpha = _hud->GetStateFloat("pr_hud_damage_a", "0");
 
-			alpha -= PR_fade_factor;
+			alpha -= PR_fade_factor_slow;
 			alpha = idMath::ClampFloat(0.00f, 1.00f, alpha);
 			_hud->SetStateFloat("pr_hud_damage_a", alpha);
 

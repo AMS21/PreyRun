@@ -52,6 +52,7 @@ constexpr int PR_ammopos2_y { PR_ammopos_y + PR_hud_std_y_offset };
 constexpr int PR_ammo_vehicle_shot_cost { 3500 };
 
 constexpr double PR_fade_factor { 0.02f };
+constexpr double PR_fade_factor_slow { 0.01f };
 
 constexpr int PR_location_x { 0 };
 constexpr int PR_location_y { 45 };
