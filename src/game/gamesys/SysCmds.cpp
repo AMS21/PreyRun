@@ -1,4 +1,4 @@
-// Copyright (C) 2004 Id Software, Inc.
+﻿// Copyright (C) 2004 Id Software, Inc.
 //
 
 #include "../../idlib/precompiled.h"
@@ -75,6 +75,31 @@ void Cmd_PR_ch_sethealth_f(const idCmdArgs &args)
 	if (!localPlayer || !gameLocal.CheatsOk(true)) { return; }
 
 	localPlayer->SetHealth(atoi(args.Argv(1)));
+}
+
+/*
+==================
+Cmd_PR_ch_setspiritpower_f
+==================
+*/
+void Cmd_PR_ch_setspiritpower_f(const idCmdArgs &args)
+{
+	auto localPlayer = gameLocal.GetLocalPlayer();
+	if (!localPlayer || !gameLocal.CheatsOk(true)) { return; }
+
+	if (localPlayer->inventory.requirements.bCanSpiritWalk)
+	{
+		ammo_t ammo_spiritpower = idWeapon::GetAmmoNumForName("ammo_spiritpower");
+		localPlayer->inventory.ammo[ammo_spiritpower] = atoi(args.Argv(1));
+		if (localPlayer->inventory.ammo[ammo_spiritpower] > localPlayer->inventory.maxSpirit)
+		{
+			localPlayer->inventory.ammo[ammo_spiritpower] = localPlayer->inventory.maxSpirit;
+		}
+	}
+	else
+	{
+		gameLocal.Printf("You do not have the spirit walk ability\n");
+	}
 }
 
 /*
@@ -3124,6 +3149,7 @@ void idGameLocal::InitConsoleCommands(void)
 
 	// Cheat Commands
 	cmdSystem->AddCommand("PR_CH_SetHealth", Cmd_PR_ch_sethealth_f, CMD_FL_GAME | CMD_FL_CHEAT, "*Cheat* PreyRun cmd: Set your health to the specified value");
+	cmdSystem->AddCommand("PR_CH_SetSpiritPower", Cmd_PR_ch_setspiritpower_f, CMD_FL_GAME | CMD_FL_CHEAT, "*Cheat* PreyRun cmd: Set your spiritpower to the specified value");
 	cmdSystem->AddCommand("PR_CH_SetPos", Cmd_PR_ch_setpos_f, CMD_FL_GAME | CMD_FL_CHEAT, "*Cheat* PreyRun cmd: Set your X, Y and Z coordinate");
 	cmdSystem->AddCommand("PR_CH_SetPos_Offset", Cmd_PR_ch_setpos_offset_f, CMD_FL_GAME | CMD_FL_CHEAT, "*Cheat* PreyRun cmd: Offset your X, Y and Z coordiante by the given values");
 
