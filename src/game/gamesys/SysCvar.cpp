@@ -21,6 +21,11 @@ All game cvars should be defined here.
 
 // PreyRun BEGIN
 idCVar pr_autojump("PR_AutoJump", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly jumps when holding your jumpkey (_moveUp)");
+#ifdef PR_DEVELOP
+idCVar pr_autostrafe("PR_AutoStrafe", "1", CVAR_GAME | CVAR_BOOL, "Automaticly strafe when running");
+bool pr_autostrafe_right { false };
+int pr_autostrafe_count { 0 };
+#endif // PR_DEVELOP
 idCVar pr_autopause("PR_AutoPause", "0", CVAR_GAME | CVAR_BOOL, "Automaticly pauses the game after map load, set PR_Freeze to 0 to continue");
 idCVar pr_preysplit("PR_PreySplit", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle support for interaction with PreySplit a LiveSplit component");
 idCVar pr_preysplit_update("PR_PreySplit_update", "41", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The time in milliseconds PreyRun shoud wait before update the game timer of PreySplit again, note that this is only for displaying the current game time the splits will always be acurate", 0, 1000, idCmdSystem::ArgCompletion_Integer<0, 1000>);

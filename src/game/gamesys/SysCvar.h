@@ -8,6 +8,11 @@
 #include "../../PreyRun/GameTimer.hpp"
 
 extern idCVar pr_autojump;
+#ifdef PR_DEVELOP
+extern idCVar pr_autostrafe;
+extern bool pr_autostrafe_right;
+extern int pr_autostrafe_count;
+#endif // PR_DEVELOP
 extern idCVar pr_autopause;
 extern idCVar pr_preysplit;
 extern idCVar pr_preysplit_update;
