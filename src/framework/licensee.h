@@ -1,4 +1,4 @@
-// Copyright (C) 2004 Id Software, Inc.
+﻿// Copyright (C) 2004 Id Software, Inc.
 //
 
 /*
@@ -11,7 +11,7 @@
 
 #define GAME_NAME						"PreyRun"			// appears on window titles and errors
 
-#define	ENGINE_VERSION					"PreyRun 1.0.4.1"		// printed in console
+#define	ENGINE_VERSION					"PreyRun 1.0.5.0"		// printed in console
 
 // paths
 #define	CD_BASEDIR						"Prey"
