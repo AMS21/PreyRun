@@ -760,16 +760,20 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 	// HUMANHEAD END
 
 	// PreyRun BEGIN
-#ifdef PR_DEBUG
-	pr_dbg_frametimer.Start();
-#endif // PR_DEBUG
-
 	if (pr_freeze.GetBool())
 	{
-		if (pr_gametimer.IsRunning()) { pr_gametimer.Stop(); }
+		if (pr_gametimer.IsRunning())
+		{
+			pr_gametimer.Stop(); 
+			pr_rtatimer.Stop();
+		}
 
 		return ret;
 	}
+
+#ifdef PR_DEBUG
+	pr_dbg_frametimer.Start();
+#endif // PR_DEBUG
 	// PreyRun END
 
 	ret.sessionCommand[0] = 0;
