@@ -2,13 +2,13 @@
 //#include "../game/game_local.h"
 
 // Enums
-enum class PR_timer_methode
+enum class PR_timer_methode : int
 {
 	RealTimeAttack,
 	IndividualLevel
 };
 
-enum class PR_weapons
+enum class PR_weapons : int
 {
 	None,
 	Wrench,
@@ -20,13 +20,13 @@ enum class PR_weapons
 	RocketLauncher
 };
 
-enum class PR_location_methode
+enum class PR_location_methode : int
 {
 	EyePos,
 	FeetPos
 };
 
-enum class PR_keys_style
+enum class PR_keys_style : int
 {
 	Normal,
 	NormalGrey,
@@ -36,21 +36,21 @@ enum class PR_keys_style
 	MomentumGrey
 };
 
-enum class PR_jumpspeed_style
+enum class PR_jumpspeed_style : int
 {
 	Normal,
 	Fading,
 	OnlyInAir
 };
 
-enum class PR_damage_style
+enum class PR_damage_style : int
 {
 	Last,
 	Adding
 };
 
 // From Doom 3 SDK - UsecmdcmdGen.h 132 - 186
-enum PR_usercmdButton_t
+enum PR_usercmdButton_t : int
 {
 	UB_NONE,
 

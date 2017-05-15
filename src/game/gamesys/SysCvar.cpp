@@ -57,7 +57,9 @@ idCVar pr_hud_speedometer_y("PR_hud_Speedometer_Y", "460", CVAR_GAME | CVAR_INTE
 // Timer
 prTimer pr_gametimer; // The actual timer
 prTimer pr_rtatimer;
+
 idTimer pr_demo_timer;
+
 bool pr_timedemo { false };
 bool pr_gametimer_running { false };
 
@@ -73,8 +75,18 @@ idCVar pr_hud_timer_y("PR_hud_Timer_Y", "235", CVAR_GAME | CVAR_INTEGER | CVAR_A
 idCVar pr_hud_timer_r("PR_hud_Timer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
 idCVar pr_hud_timer_g("PR_hud_Timer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
 idCVar pr_hud_timer_b("PR_hud_Timer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
-idCVar pr_hud_timer_precision("PR_hud_Timer_Precision", "3", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer precision", 0, 3);
-idCVar pr_hud_timer_alldigits("PR_hud_Timer_AllDigits", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display all digits or only the non zero ones");
+idCVar pr_hud_timer_precision("PR_hud_Timer_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer precision", 0, 3);
+idCVar pr_hud_timer_alldigits("PR_hud_Timer_AllDigits", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display all digits or only the non zero ones");
+
+// RTA Timer
+idCVar pr_hud_rtatimer("PR_hud_RTATimer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of the RTA hud timer, note that the timer will still works even if hidden");
+idCVar pr_hud_rtatimer_x("PR_hud_RTATimer_X", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 639);
+idCVar pr_hud_rtatimer_y("PR_hud_RTATimer_Y", "220", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 479);
+idCVar pr_hud_rtatimer_r("PR_hud_RTATimer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
+idCVar pr_hud_rtatimer_g("PR_hud_RTATimer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
+idCVar pr_hud_rtatimer_b("PR_hud_RTATimer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
+idCVar pr_hud_rtatimer_precision("PR_hud_RTATimer_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer precision", 0, 3);
+idCVar pr_hud_rtatimer_alldigits("PR_hud_RTATimer_AllDigits", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display all digits or only the non zero ones");
 
 // JumpSpeed
 idCVar pr_hud_jumpspeed("PR_hud_JumpSpeed", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your jumpspeed, the speed you had before you jumped");

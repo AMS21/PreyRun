@@ -52,6 +52,15 @@ extern idCVar pr_hud_timer_g;
 extern idCVar pr_hud_timer_b;
 extern idCVar pr_hud_timer_precision;
 extern idCVar pr_hud_timer_alldigits;
+// RTA Timer
+extern idCVar pr_hud_rtatimer;
+extern idCVar pr_hud_rtatimer_x;
+extern idCVar pr_hud_rtatimer_y;
+extern idCVar pr_hud_rtatimer_r;
+extern idCVar pr_hud_rtatimer_g;
+extern idCVar pr_hud_rtatimer_b;
+extern idCVar pr_hud_rtatimer_precision;
+extern idCVar pr_hud_rtatimer_alldigits;
 // JumpSpeed
 extern idCVar pr_hud_jumpspeed;
 extern idCVar pr_hud_jumpspeed_x;

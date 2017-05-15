@@ -1698,7 +1698,8 @@ void idPhysics_Player::Restore(idRestoreGame *savefile) {
 idPhysics_Player::SetPlayerInput
 ================
 */
-void idPhysics_Player::SetPlayerInput(const usercmd_t &cmd, const idAngles &newViewAngles) {
+void idPhysics_Player::SetPlayerInput(const usercmd_t &cmd, const idAngles &newViewAngles) 
+{
 	command = cmd;
 	viewAngles = newViewAngles;		// can't use cmd.angles cause of the delta_angles
 }
@@ -1752,8 +1753,12 @@ void idPhysics_Player::SetMovementType(const pmtype_t type) {
 	// Casting GetMapName() to idStr might not be the optimal solution but you cant compare cstrings (you can but its a real pain in the ass)
 	if (!pr_gametimer_running && pr_timer_autostart.GetBool() && static_cast<idStr>(gameLocal.GetMapName()) == idStr("maps/game/roadhouse.map") && type == PM_NORMAL && current.movementType == PM_FREEZE)
 	{
+		pr_gametimer.Clear();
+		pr_rtatimer.Clear();
+
 		pr_gametimer.Start();
 		pr_rtatimer.Start();
+
 		pr_gametimer_running = true;
 
 		gameLocal.Printf("PreyRun: Timer: Auto starting\n");

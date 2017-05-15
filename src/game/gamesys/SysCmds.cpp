@@ -12,7 +12,6 @@
 ///////////////////
 
 // Includes
-#include "../../idlib/Timer.h"
 #include "../../PreyRun/Hooking.hpp"
 #include "../../PreyRun/GameTimer.hpp"
 
@@ -160,6 +159,7 @@ void Cmd_PR_timer_start_f(const idCmdArgs &args)
 	if (!pr_freeze.GetBool() && !pr_gametimer.IsRunning())
 	{
 		pr_gametimer.Start();
+		pr_rtatimer.Start();
 	}
 
 	pr_gametimer_running = true;
@@ -177,6 +177,8 @@ void Cmd_PR_timer_stop_f(const idCmdArgs &args)
 	if (pr_gametimer.IsRunning() || (pr_freeze.GetBool() && pr_gametimer_running))
 	{
 		pr_gametimer.Stop();
+		pr_rtatimer.Stop();
+
 		pr_gametimer_running = false;
 
 		gameLocal.Printf("Stopping in-game timer\n");
@@ -191,7 +193,11 @@ Cmd_PR_timer_reset_f
 void Cmd_PR_timer_reset_f(const idCmdArgs &args)
 {
 	pr_gametimer.Stop();
+	pr_rtatimer.Stop();
+
 	pr_gametimer.Clear();
+	pr_rtatimer.Clear();
+
 	pr_gametimer_running = false;
 
 	pr::WriteTimerReset(pr::GetTime());
@@ -207,8 +213,10 @@ Cmd_PR_timer_now_f
 void Cmd_PR_timer_now_f(const idCmdArgs &args)
 {
 	auto times = PR_ms2time(pr_gametimer.Milliseconds());
+	auto rtatimes = PR_ms2time(pr_rtatimer.Milliseconds());
 
 	gameLocal.Printf("In-game timer: %02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
+	gameLocal.Printf("RTA timer: %02d:%02d:%02d.%03d\n", rtatimes.hours, rtatimes.minutes, rtatimes.seconds, rtatimes.milliseconds);
 }
 
 // Autocmdzones
@@ -298,7 +306,7 @@ Cmd_PR_autocmd_list_f
 void Cmd_PR_autocmd_list_f(const idCmdArgs &args)
 {
 	auto& aczHandler = pr::AutocmdzoneHandler::getInstance();
-	auto num{ 0 };
+	auto num { 0 };
 
 	gameLocal.Printf("Index: StartX StartY StartZ  EndX EndY EndZ  Command to execute\n");
 
@@ -364,7 +372,7 @@ void Cmd_PR_test_f(const idCmdArgs &args)
 
 void Cmd_PR_crash_f(const idCmdArgs &args)
 {
-	idStr text{ "Crash" };
+	idStr text { "Crash" };
 
 	// Trying to print an idStr will cause the game to crash
 	gameLocal.Printf("%s", text);
@@ -373,8 +381,9 @@ void Cmd_PR_crash_f(const idCmdArgs &args)
 void Cmd_PR_dbg_timer_f(const idCmdArgs &args)
 {
 	auto time = PR_ms2time(pr_gametimer.Milliseconds());
+	auto rtatime = PR_ms2time(pr_gametimer.Milliseconds());
 
-	gameLocal.Printf("Timer is running: %s\nTimer shoud be on: %s\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s\n", pr_gametimer.IsRunning() ? "True" : "False", pr_gametimer_running ? "True" : "False", time.hours, time.minutes, time.seconds, time.milliseconds, pr_gametimer.Milliseconds(), pr_gametimer.ClockTicks(), pr::timer::pr_gametimer_clocktick_postfix);
+	gameLocal.Printf("Timer is running: %s\nTimer shoud be on: %s\nIn-game timer:\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s\nRTA timer:\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s\n", pr_gametimer.IsRunning() ? "True" : "False", pr_gametimer_running ? "True" : "False", time.hours, time.minutes, time.seconds, time.milliseconds, pr_gametimer.Milliseconds(), pr_gametimer.ClockTicks(), pr::timer::pr_gametimer_clocktick_postfix, rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds, pr_rtatimer.Milliseconds(), pr_rtatimer.ClockTicks(), pr::timer::pr_gametimer_clocktick_postfix);
 }
 
 void Cmd_PR_dbg_timer_set_f(const idCmdArgs &args)
@@ -386,6 +395,7 @@ void Cmd_PR_dbg_timer_set_f(const idCmdArgs &args)
 	}
 
 	pr_gametimer.SetCT(atof(args.Argv(1)));
+	pr_rtatimer.SetCT(atof(args.Argv(1)));
 }
 
 void Cmd_PR_dbg_reload_f(const idCmdArgs &args)
@@ -510,7 +520,8 @@ void Cmd_PR_dbg_autocmd_trigger_f(const idCmdArgs &args)
 Cmd_GetFloatArg
 ==================
 */
-float Cmd_GetFloatArg(const idCmdArgs &args, int &argNum) {
+float Cmd_GetFloatArg(const idCmdArgs &args, int &argNum)
+{
 	const char *value;
 
 	value = args.Argv(argNum++);
@@ -518,7 +529,8 @@ float Cmd_GetFloatArg(const idCmdArgs &args, int &argNum) {
 }
 
 //HUMANHEAD rww - make generally available so we can use it to spew an entlist on too many ents
-void Cmd_EntityList(const idStr &match) {
+void Cmd_EntityList(const idStr &match)
+{
 	int			e;
 	idEntity	*check;
 	int			count;
@@ -553,7 +565,8 @@ void Cmd_EntityList(const idStr &match) {
 Cmd_EntityList_f
 ===================
 */
-void Cmd_EntityList_f(const idCmdArgs &args) {
+void Cmd_EntityList_f(const idCmdArgs &args)
+{
 	idStr		match;
 
 	if (args.Argc() > 1)
@@ -571,7 +584,8 @@ void Cmd_EntityList_f(const idCmdArgs &args) {
 Cmd_ActiveEntityList_f
 ===================
 */
-void Cmd_ActiveEntityList_f(const idCmdArgs &args) {
+void Cmd_ActiveEntityList_f(const idCmdArgs &args)
+{
 	idEntity	*check;
 	int			count;
 
@@ -594,7 +608,8 @@ void Cmd_ActiveEntityList_f(const idCmdArgs &args) {
 Cmd_ListSpawnArgs_f
 ===================
 */
-void Cmd_ListSpawnArgs_f(const idCmdArgs &args) {
+void Cmd_ListSpawnArgs_f(const idCmdArgs &args)
+{
 	int i;
 	idEntity *ent;
 
@@ -617,7 +632,8 @@ void Cmd_ListSpawnArgs_f(const idCmdArgs &args) {
 Cmd_ReloadScript_f
 ===================
 */
-void Cmd_ReloadScript_f(const idCmdArgs &args) {
+void Cmd_ReloadScript_f(const idCmdArgs &args)
+{
 	// shutdown the map because entities may point to script objects
 	gameLocal.MapShutdown();
 
@@ -633,7 +649,8 @@ void Cmd_ReloadScript_f(const idCmdArgs &args) {
 Cmd_Script_f
 ===================
 */
-void Cmd_Script_f(const idCmdArgs &args) {
+void Cmd_Script_f(const idCmdArgs &args)
+{
 	const char *	script;
 	idStr			text;
 	idStr			funcname;
@@ -672,7 +689,8 @@ KillEntities
 Kills all the entities of the given class in a level.
 ==================
 */
-void KillEntities(const idCmdArgs &args, const idTypeInfo &superClass) {
+void KillEntities(const idCmdArgs &args, const idTypeInfo &superClass)
+{
 	idEntity	*ent;
 	idStrList	ignore;
 	const char *name;
@@ -707,7 +725,8 @@ Cmd_KillMonsters_f
 Kills all the monsters in a level.
 ==================
 */
-void Cmd_KillMonsters_f(const idCmdArgs &args) {
+void Cmd_KillMonsters_f(const idCmdArgs &args)
+{
 	//HUMANHEAD jsh dont kill monsters with "no_kill_monsters" set
 	//KillEntities( args, idAI::Type );
 	idEntity	*ent;
@@ -764,7 +783,8 @@ Cmd_KillMovables_f
 Kills all the moveables in a level.
 ==================
 */
-void Cmd_KillMovables_f(const idCmdArgs &args) {
+void Cmd_KillMovables_f(const idCmdArgs &args)
+{
 	if (!gameLocal.GetLocalPlayer() || !gameLocal.CheatsOk(false)) { return; }
 	KillEntities(args, idMoveable::Type);
 }
@@ -776,7 +796,8 @@ Cmd_KillRagdolls_f
 Kills all the ragdolls in a level.
 ==================
 */
-void Cmd_KillRagdolls_f(const idCmdArgs &args) {
+void Cmd_KillRagdolls_f(const idCmdArgs &args)
+{
 	if (!gameLocal.GetLocalPlayer() || !gameLocal.CheatsOk(false)) { return; }
 	KillEntities(args, idAFEntity_Generic::Type);
 	KillEntities(args, idAFEntity_WithAttachedHead::Type);
@@ -789,7 +810,8 @@ Cmd_Give_f
 Give items to a client
 ==================
 */
-void Cmd_Give_f(const idCmdArgs &args) {
+void Cmd_Give_f(const idCmdArgs &args)
+{
 	const char *name;
 	int			i;
 	bool		give_all;
@@ -943,7 +965,8 @@ Cmd_CenterView_f
 Centers the players pitch
 ==================
 */
-void Cmd_CenterView_f(const idCmdArgs &args) {
+void Cmd_CenterView_f(const idCmdArgs &args)
+{
 	idPlayer	*player;
 	idAngles	ang;
 
@@ -964,7 +987,8 @@ Sets client to godmode
 argv(0) god
 ==================
 */
-void Cmd_God_f(const idCmdArgs &args) {
+void Cmd_God_f(const idCmdArgs &args)
+{
 	char		*msg;
 	idPlayer	*player;
 
@@ -994,7 +1018,8 @@ Sets client to notarget
 argv(0) notarget
 ==================
 */
-void Cmd_Notarget_f(const idCmdArgs &args) {
+void Cmd_Notarget_f(const idCmdArgs &args)
+{
 	char		*msg;
 	idPlayer	*player;
 
@@ -1022,7 +1047,8 @@ Cmd_Noclip_f
 argv(0) noclip
 ==================
 */
-void Cmd_Noclip_f(const idCmdArgs &args) {
+void Cmd_Noclip_f(const idCmdArgs &args)
+{
 	char		*msg;
 	idPlayer	*player;
 
@@ -1041,7 +1067,8 @@ void Cmd_Noclip_f(const idCmdArgs &args) {
 Cmd_Kill_f
 =================
 */
-void Cmd_Kill_f(const idCmdArgs &args) {
+void Cmd_Kill_f(const idCmdArgs &args)
+{
 	idPlayer	*player;
 
 	if (gameLocal.isMultiplayer)
@@ -1079,7 +1106,8 @@ void Cmd_Kill_f(const idCmdArgs &args) {
 Cmd_PlayerModel_f
 =================
 */
-void Cmd_PlayerModel_f(const idCmdArgs &args) {
+void Cmd_PlayerModel_f(const idCmdArgs &args)
+{
 	idPlayer	*player;
 	const char *name;
 	idVec3		pos;
@@ -1107,7 +1135,8 @@ void Cmd_PlayerModel_f(const idCmdArgs &args) {
 Cmd_Say
 ==================
 */
-static void Cmd_Say(bool team, const idCmdArgs &args) {
+static void Cmd_Say(bool team, const idCmdArgs &args)
+{
 #if HUMANHEAD	// HUMANHEAD pdm
 	idStr name;
 #else
@@ -1175,7 +1204,8 @@ static void Cmd_Say(bool team, const idCmdArgs &args) {
 Cmd_Say_f
 ==================
 */
-static void Cmd_Say_f(const idCmdArgs &args) {
+static void Cmd_Say_f(const idCmdArgs &args)
+{
 	Cmd_Say(false, args);
 }
 
@@ -1184,7 +1214,8 @@ static void Cmd_Say_f(const idCmdArgs &args) {
 Cmd_SayTeam_f
 ==================
 */
-static void Cmd_SayTeam_f(const idCmdArgs &args) {
+static void Cmd_SayTeam_f(const idCmdArgs &args)
+{
 	//HUMANHEAD rww - never use teamchat in dm
 	bool teamSay = true;
 	if (gameLocal.gameType != GAME_TDM) { teamSay = false; }
@@ -1197,7 +1228,8 @@ static void Cmd_SayTeam_f(const idCmdArgs &args) {
 Cmd_AddChatLine_f
 ==================
 */
-static void Cmd_AddChatLine_f(const idCmdArgs &args) {
+static void Cmd_AddChatLine_f(const idCmdArgs &args)
+{
 	gameLocal.mpGame.AddChatLine(args.Argv(1));
 }
 
@@ -1206,7 +1238,8 @@ static void Cmd_AddChatLine_f(const idCmdArgs &args) {
 Cmd_Kick_f
 ==================
 */
-static void Cmd_Kick_f(const idCmdArgs &args) {
+static void Cmd_Kick_f(const idCmdArgs &args)
+{
 	idPlayer *player;
 
 	if (!gameLocal.isMultiplayer)
@@ -1236,7 +1269,8 @@ static void Cmd_Kick_f(const idCmdArgs &args) {
 Cmd_GetViewpos_f
 ==================
 */
-void Cmd_GetViewpos_f(const idCmdArgs &args) {
+void Cmd_GetViewpos_f(const idCmdArgs &args)
+{
 	idPlayer	*player;
 	idVec3		origin;
 	idMat3		axis;
@@ -1261,7 +1295,8 @@ void Cmd_GetViewpos_f(const idCmdArgs &args) {
 Cmd_SetViewpos_f
 =================
 */
-void Cmd_SetViewpos_f(const idCmdArgs &args) {
+void Cmd_SetViewpos_f(const idCmdArgs &args)
+{
 	idVec3		origin;
 	idAngles	angles;
 	int			i;
@@ -1296,7 +1331,8 @@ void Cmd_SetViewpos_f(const idCmdArgs &args) {
 Cmd_Teleport_f
 =================
 */
-void Cmd_Teleport_f(const idCmdArgs &args) {
+void Cmd_Teleport_f(const idCmdArgs &args)
+{
 	idVec3		origin;
 	idAngles	angles;
 	idPlayer	*player;
@@ -1330,7 +1366,8 @@ void Cmd_Teleport_f(const idCmdArgs &args) {
 Cmd_Trigger_f
 =================
 */
-void Cmd_Trigger_f(const idCmdArgs &args) {
+void Cmd_Trigger_f(const idCmdArgs &args)
+{
 	idVec3		origin;
 	idAngles	angles;
 	idPlayer	*player;
@@ -1362,7 +1399,8 @@ void Cmd_Trigger_f(const idCmdArgs &args) {
 Cmd_Spawn_f
 ===================
 */
-void Cmd_Spawn_f(const idCmdArgs &args) {
+void Cmd_Spawn_f(const idCmdArgs &args)
+{
 	const char *key, *value;
 	int			i;
 	float		yaw;
@@ -1415,7 +1453,8 @@ void Cmd_Spawn_f(const idCmdArgs &args) {
 Cmd_SpawnArtificialPlayer_f
 ===================
 */
-void Cmd_SpawnArtificialPlayer_f(const idCmdArgs &args) {
+void Cmd_SpawnArtificialPlayer_f(const idCmdArgs &args)
+{
 	if (!gameLocal.isMultiplayer || !gameLocal.isServer)
 	{
 		gameLocal.Printf("Artificial players must be spawned in multiplayer as the server.\n");
@@ -1433,7 +1472,8 @@ Cmd_PlayerShadowToggle_f
 ===================
 */
 #if !GOLD
-void Cmd_PlayerShadowToggle_f(const idCmdArgs &args) {
+void Cmd_PlayerShadowToggle_f(const idCmdArgs &args)
+{
 	bool setShadows;
 
 	if (!gameLocal.CheatsOk(false)) { return; }
@@ -1462,7 +1502,8 @@ Cmd_Damage_f
 Damages the specified entity
 ==================
 */
-void Cmd_Damage_f(const idCmdArgs &args) {
+void Cmd_Damage_f(const idCmdArgs &args)
+{
 	if (!gameLocal.GetLocalPlayer() || !gameLocal.CheatsOk(false)) { return; }
 	if (args.Argc() != 3)
 	{
@@ -1488,7 +1529,8 @@ Cmd_Remove_f
 Removes the specified entity
 ==================
 */
-void Cmd_Remove_f(const idCmdArgs &args) {
+void Cmd_Remove_f(const idCmdArgs &args)
+{
 	if (!gameLocal.GetLocalPlayer() || !gameLocal.CheatsOk(false)) { return; }
 	if (args.Argc() != 2)
 	{
@@ -1511,7 +1553,8 @@ void Cmd_Remove_f(const idCmdArgs &args) {
 Cmd_TestLight_f
 ===================
 */
-void Cmd_TestLight_f(const idCmdArgs &args) {
+void Cmd_TestLight_f(const idCmdArgs &args)
+{
 	int			i;
 	idStr		filename;
 	const char *key, *value, *name;
@@ -1569,7 +1612,8 @@ void Cmd_TestLight_f(const idCmdArgs &args) {
 Cmd_TestPointLight_f
 ===================
 */
-void Cmd_TestPointLight_f(const idCmdArgs &args) {
+void Cmd_TestPointLight_f(const idCmdArgs &args)
+{
 	const char *key, *value, *name;
 	int			i;
 	idPlayer	*player;
@@ -1614,7 +1658,8 @@ void Cmd_TestPointLight_f(const idCmdArgs &args) {
 Cmd_PopLight_f
 ==================
 */
-void Cmd_PopLight_f(const idCmdArgs &args) {
+void Cmd_PopLight_f(const idCmdArgs &args)
+{
 	idEntity	*ent;
 	idMapEntity *mapEnt;
 	idMapFile	*mapFile = gameLocal.GetLevelMap();
@@ -1663,7 +1708,8 @@ void Cmd_PopLight_f(const idCmdArgs &args) {
 Cmd_ClearLights_f
 ====================
 */
-void Cmd_ClearLights_f(const idCmdArgs &args) {
+void Cmd_ClearLights_f(const idCmdArgs &args)
+{
 	idEntity *ent;
 	idEntity *next;
 	idLight *light;
@@ -1695,7 +1741,8 @@ void Cmd_ClearLights_f(const idCmdArgs &args) {
 Cmd_TestFx_f
 ==================
 */
-void Cmd_TestFx_f(const idCmdArgs &args) {
+void Cmd_TestFx_f(const idCmdArgs &args)
+{
 	idVec3		offset;
 	const char *name;
 	idPlayer *	player;
@@ -1726,7 +1773,8 @@ void Cmd_TestFx_f(const idCmdArgs &args) {
 
 #define MAX_DEBUGLINES	128
 
-typedef struct {
+typedef struct
+{
 	bool used;
 	idVec3 start, end;
 	int color;
@@ -1741,7 +1789,8 @@ gameDebugLine_t debugLines[MAX_DEBUGLINES];
 Cmd_AddDebugLine_f
 ==================
 */
-static void Cmd_AddDebugLine_f(const idCmdArgs &args) {
+static void Cmd_AddDebugLine_f(const idCmdArgs &args)
+{
 	int i, argNum;
 	const char *value;
 
@@ -1866,7 +1915,8 @@ void Debug_AddDebugLine(idVec3 &start, idVec3 &end, int color)
 Cmd_RemoveDebugLine_f
 ==================
 */
-static void Cmd_RemoveDebugLine_f(const idCmdArgs &args) {
+static void Cmd_RemoveDebugLine_f(const idCmdArgs &args)
+{
 	int i, num;
 	const char *value;
 
@@ -1881,7 +1931,8 @@ static void Cmd_RemoveDebugLine_f(const idCmdArgs &args) {
 	num = atoi(value);
 	for (i = 0; i < MAX_DEBUGLINES; ++i)
 	{
-		if (debugLines[i].used) {
+		if (debugLines[i].used)
+		{
 			if (--num < 0) { break; }
 		}
 	}
@@ -1898,7 +1949,8 @@ static void Cmd_RemoveDebugLine_f(const idCmdArgs &args) {
 Cmd_BlinkDebugLine_f
 ==================
 */
-static void Cmd_BlinkDebugLine_f(const idCmdArgs &args) {
+static void Cmd_BlinkDebugLine_f(const idCmdArgs &args)
+{
 	int i, num;
 	const char *value;
 
@@ -1931,7 +1983,8 @@ static void Cmd_BlinkDebugLine_f(const idCmdArgs &args) {
 PrintFloat
 ==================
 */
-static void PrintFloat(float f) {
+static void PrintFloat(float f)
+{
 	char buf[128], i;
 
 	for (i = sprintf(buf, "%3.2f", f); i < 7; ++i) { buf[i] = ' '; }
@@ -1944,7 +1997,8 @@ static void PrintFloat(float f) {
 Cmd_ListDebugLines_f
 ==================
 */
-static void Cmd_ListDebugLines_f(const idCmdArgs &args) {
+static void Cmd_ListDebugLines_f(const idCmdArgs &args)
+{
 	int i, num;
 
 	if (!gameLocal.CheatsOk()) { return; }
@@ -1974,7 +2028,8 @@ static void Cmd_ListDebugLines_f(const idCmdArgs &args) {
 D_DrawDebugLines
 ==================
 */
-void D_DrawDebugLines(void) {
+void D_DrawDebugLines(void)
+{
 	int i;
 	idVec3 forward, right, up, p1, p2;
 	idVec4 color;
@@ -2013,7 +2068,8 @@ void D_DrawDebugLines(void) {
 Cmd_ListCollisionModels_f
 ==================
 */
-static void Cmd_ListCollisionModels_f(const idCmdArgs &args) {
+static void Cmd_ListCollisionModels_f(const idCmdArgs &args)
+{
 	if (!gameLocal.CheatsOk()) { return; }
 
 	collisionModelManager->ListModels();
@@ -2024,7 +2080,8 @@ static void Cmd_ListCollisionModels_f(const idCmdArgs &args) {
 Cmd_CollisionModelInfo_f
 ==================
 */
-static void Cmd_CollisionModelInfo_f(const idCmdArgs &args) {
+static void Cmd_CollisionModelInfo_f(const idCmdArgs &args)
+{
 	const char *value;
 
 	if (!gameLocal.CheatsOk()) { return; }
@@ -2046,7 +2103,8 @@ static void Cmd_CollisionModelInfo_f(const idCmdArgs &args) {
 Cmd_ExportModels_f
 ==================
 */
-static void Cmd_ExportModels_f(const idCmdArgs &args) {
+static void Cmd_ExportModels_f(const idCmdArgs &args)
+{
 	idModelExport	exporter;
 	idStr			name;
 
@@ -2069,7 +2127,8 @@ static void Cmd_ExportModels_f(const idCmdArgs &args) {
 Cmd_ReexportModels_f
 ==================
 */
-static void Cmd_ReexportModels_f(const idCmdArgs &args) {
+static void Cmd_ReexportModels_f(const idCmdArgs &args)
+{
 	idModelExport	exporter;
 	idStr			name;
 
@@ -2094,7 +2153,8 @@ static void Cmd_ReexportModels_f(const idCmdArgs &args) {
 Cmd_ReloadAnims_f
 ==================
 */
-static void Cmd_ReloadAnims_f(const idCmdArgs &args) {
+static void Cmd_ReloadAnims_f(const idCmdArgs &args)
+{
 	// don't allow reloading anims when cheats are disabled,
 	// but if we're not in the game, it's ok
 	if (gameLocal.GetLocalPlayer() && !gameLocal.CheatsOk(false)) { return; }
@@ -2107,7 +2167,8 @@ static void Cmd_ReloadAnims_f(const idCmdArgs &args) {
 Cmd_ListAnims_f
 ==================
 */
-static void Cmd_ListAnims_f(const idCmdArgs &args) {
+static void Cmd_ListAnims_f(const idCmdArgs &args)
+{
 	idEntity *		ent;
 	int				num;
 	size_t			size;
@@ -2162,7 +2223,8 @@ static void Cmd_ListAnims_f(const idCmdArgs &args) {
 Cmd_AASStats_f
 ==================
 */
-static void Cmd_AASStats_f(const idCmdArgs &args) {
+static void Cmd_AASStats_f(const idCmdArgs &args)
+{
 	int aasNum;
 
 	if (!gameLocal.CheatsOk()) { return; }
@@ -2178,7 +2240,8 @@ static void Cmd_AASStats_f(const idCmdArgs &args) {
 Cmd_TestDamage_f
 ==================
 */
-static void Cmd_TestDamage_f(const idCmdArgs &args) {
+static void Cmd_TestDamage_f(const idCmdArgs &args)
+{
 	idPlayer *player;
 	const char *damageDefName;
 
@@ -2215,7 +2278,8 @@ static void Cmd_TestDamage_f(const idCmdArgs &args) {
 Cmd_TestBoneFx_f
 ==================
 */
-static void Cmd_TestBoneFx_f(const idCmdArgs &args) {
+static void Cmd_TestBoneFx_f(const idCmdArgs &args)
+{
 	idPlayer *player;
 	const char *bone, *fx;
 
@@ -2239,7 +2303,8 @@ static void Cmd_TestBoneFx_f(const idCmdArgs &args) {
 Cmd_TestDamage_f
 ==================
 */
-static void Cmd_TestDeath_f(const idCmdArgs &args) {
+static void Cmd_TestDeath_f(const idCmdArgs &args)
+{
 	idPlayer *player;
 
 	player = gameLocal.GetLocalPlayer();
@@ -2260,7 +2325,8 @@ static void Cmd_TestDeath_f(const idCmdArgs &args) {
 Cmd_WeaponSplat_f
 ==================
 */
-static void Cmd_WeaponSplat_f(const idCmdArgs &args) {
+static void Cmd_WeaponSplat_f(const idCmdArgs &args)
+{
 	idPlayer *player;
 
 	player = gameLocal.GetLocalPlayer();
@@ -2275,7 +2341,8 @@ static void Cmd_WeaponSplat_f(const idCmdArgs &args) {
 Cmd_SaveSelected_f
 ==================
 */
-static void Cmd_SaveSelected_f(const idCmdArgs &args) {
+static void Cmd_SaveSelected_f(const idCmdArgs &args)
+{
 	int i;
 	idPlayer *player;
 	idEntity *s;
@@ -2342,7 +2409,8 @@ static void Cmd_SaveSelected_f(const idCmdArgs &args) {
 Cmd_DeleteSelected_f
 ==================
 */
-static void Cmd_DeleteSelected_f(const idCmdArgs &args) {
+static void Cmd_DeleteSelected_f(const idCmdArgs &args)
+{
 	idPlayer *player;
 
 	player = gameLocal.GetLocalPlayer();
@@ -2356,7 +2424,8 @@ static void Cmd_DeleteSelected_f(const idCmdArgs &args) {
 Cmd_SaveMoveables_f
 ==================
 */
-static void Cmd_SaveMoveables_f(const idCmdArgs &args) {
+static void Cmd_SaveMoveables_f(const idCmdArgs &args)
+{
 	int e, i;
 	idMoveable *m;
 	idMapEntity *mapEnt;
@@ -2366,7 +2435,8 @@ static void Cmd_SaveMoveables_f(const idCmdArgs &args) {
 
 	if (!gameLocal.CheatsOk()) { return; }
 
-	for (e = 0; e < MAX_GENTITIES; ++e) {
+	for (e = 0; e < MAX_GENTITIES; ++e)
+	{
 		m = static_cast<idMoveable *>(gameLocal.entities[e]);
 
 		if (!m || !m->IsType(idMoveable::Type)) { continue; }
@@ -2389,7 +2459,8 @@ static void Cmd_SaveMoveables_f(const idCmdArgs &args) {
 	}
 	else { mapName = mapFile->GetName(); }
 
-	for (e = 0; e < MAX_GENTITIES; ++e) {
+	for (e = 0; e < MAX_GENTITIES; ++e)
+	{
 		m = static_cast<idMoveable *>(gameLocal.entities[e]);
 
 		if (!m || !m->IsType(idMoveable::Type)) { continue; }
@@ -2430,7 +2501,8 @@ static void Cmd_SaveMoveables_f(const idCmdArgs &args) {
 Cmd_SaveRagdolls_f
 ==================
 */
-static void Cmd_SaveRagdolls_f(const idCmdArgs &args) {
+static void Cmd_SaveRagdolls_f(const idCmdArgs &args)
+{
 	int e, i;
 	idAFEntity_Base *af;
 	idMapEntity *mapEnt;
@@ -2448,7 +2520,8 @@ static void Cmd_SaveRagdolls_f(const idCmdArgs &args) {
 	}
 	else { mapName = mapFile->GetName(); }
 
-	for (e = 0; e < MAX_GENTITIES; ++e) {
+	for (e = 0; e < MAX_GENTITIES; ++e)
+	{
 		af = static_cast<idAFEntity_Base *>(gameLocal.entities[e]);
 
 		if (!af) { continue; }
@@ -2498,7 +2571,8 @@ static void Cmd_SaveRagdolls_f(const idCmdArgs &args) {
 Cmd_BindRagdoll_f
 ==================
 */
-static void Cmd_BindRagdoll_f(const idCmdArgs &args) {
+static void Cmd_BindRagdoll_f(const idCmdArgs &args)
+{
 	idPlayer *player;
 
 	player = gameLocal.GetLocalPlayer();
@@ -2512,7 +2586,8 @@ static void Cmd_BindRagdoll_f(const idCmdArgs &args) {
 Cmd_UnbindRagdoll_f
 ==================
 */
-static void Cmd_UnbindRagdoll_f(const idCmdArgs &args) {
+static void Cmd_UnbindRagdoll_f(const idCmdArgs &args)
+{
 	idPlayer *player;
 
 	player = gameLocal.GetLocalPlayer();
@@ -2526,7 +2601,8 @@ static void Cmd_UnbindRagdoll_f(const idCmdArgs &args) {
 Cmd_GameError_f
 ==================
 */
-static void Cmd_GameError_f(const idCmdArgs &args) {
+static void Cmd_GameError_f(const idCmdArgs &args)
+{
 	gameLocal.Error("game error");
 }
 
@@ -2535,7 +2611,8 @@ static void Cmd_GameError_f(const idCmdArgs &args) {
 Cmd_SaveLights_f
 ==================
 */
-static void Cmd_SaveLights_f(const idCmdArgs &args) {
+static void Cmd_SaveLights_f(const idCmdArgs &args)
+{
 	int e, i;
 	idLight *light;
 	idMapEntity *mapEnt;
@@ -2573,7 +2650,7 @@ static void Cmd_SaveLights_f(const idCmdArgs &args) {
 		{
 			mapEnt = new idMapEntity();
 			mapFile->AddEntity(mapEnt);
-			for (i = 0; i < 9999;++i)
+			for (i = 0; i < 9999; ++i)
 			{
 				name = va("%s_%d", light->GetEntityDefName(), i);
 				if (!gameLocal.FindEntity(name)) { break; }
@@ -2596,7 +2673,8 @@ static void Cmd_SaveLights_f(const idCmdArgs &args) {
 Cmd_SaveParticles_f
 ==================
 */
-static void Cmd_SaveParticles_f(const idCmdArgs &args) {
+static void Cmd_SaveParticles_f(const idCmdArgs &args)
+{
 	int e;
 	idEntity *ent;
 	idMapEntity *mapEnt;
@@ -2653,7 +2731,8 @@ static void Cmd_SaveParticles_f(const idCmdArgs &args) {
 Cmd_DisasmScript_f
 ==================
 */
-static void Cmd_DisasmScript_f(const idCmdArgs &args) {
+static void Cmd_DisasmScript_f(const idCmdArgs &args)
+{
 	gameLocal.program.Disassemble();
 }
 
@@ -2662,7 +2741,8 @@ static void Cmd_DisasmScript_f(const idCmdArgs &args) {
 Cmd_TestSave_f
 ==================
 */
-static void Cmd_TestSave_f(const idCmdArgs &args) {
+static void Cmd_TestSave_f(const idCmdArgs &args)
+{
 	idFile *f;
 
 	f = fileSystem->OpenFileWrite("test.sav");
@@ -2675,7 +2755,8 @@ static void Cmd_TestSave_f(const idCmdArgs &args) {
 Cmd_RecordViewNotes_f
 ==================
 */
-static void Cmd_RecordViewNotes_f(const idCmdArgs &args) {
+static void Cmd_RecordViewNotes_f(const idCmdArgs &args)
+{
 	idPlayer *player;
 	idVec3 origin;
 	idMat3 axis;
@@ -2719,7 +2800,8 @@ static void Cmd_RecordViewNotes_f(const idCmdArgs &args) {
 Cmd_CloseViewNotes_f
 ==================
 */
-static void Cmd_CloseViewNotes_f(const idCmdArgs &args) {
+static void Cmd_CloseViewNotes_f(const idCmdArgs &args)
+{
 	idPlayer *player = gameLocal.GetLocalPlayer();
 
 	if (!player) { return; }
@@ -2733,7 +2815,8 @@ static void Cmd_CloseViewNotes_f(const idCmdArgs &args) {
 Cmd_ShowViewNotes_f
 ==================
 */
-static void Cmd_ShowViewNotes_f(const idCmdArgs &args) {
+static void Cmd_ShowViewNotes_f(const idCmdArgs &args)
+{
 	static idLexer parser(LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS | LEXFL_NOSTRINGCONCAT | LEXFL_NOFATALERRORS);
 	idToken	token;
 	idPlayer *player;
@@ -2782,7 +2865,8 @@ static void Cmd_ShowViewNotes_f(const idCmdArgs &args) {
 Cmd_EraseViewNote_f
 ==================
 */
-static void Cmd_EraseViewNote_f(const idCmdArgs &args) {
+static void Cmd_EraseViewNote_f(const idCmdArgs &args)
+{
 	idLexer parser(LEXFL_ALLOWPATHNAMES | LEXFL_NOSTRINGESCAPECHARS | LEXFL_NOSTRINGCONCAT | LEXFL_NOFATALERRORS);
 	idToken	token;
 	idPlayer *player;
@@ -2834,7 +2918,8 @@ static void Cmd_EraseViewNote_f(const idCmdArgs &args) {
 		parser.Parse1DMatrix(9, axis.ToFloatPtr()) && parser.ExpectTokenString("comments") && parser.ReadToken(&token))
 	{
 
-		if (idStr::Cmp(comment, token) == 0) {
+		if (idStr::Cmp(comment, token) == 0)
+		{
 
 			if (found) { gameLocal.Warning("Found note more than once...\n"); }
 			found = true;
@@ -2856,9 +2941,10 @@ static void Cmd_EraseViewNote_f(const idCmdArgs &args) {
 	player->hud->HandleNamedEvent("hideViewComments");
 
 #if !GOLD
-	if (removeFile) {
+	if (removeFile)
+	{
 		remove(str);
-	}
+}
 #endif
 }
 // HUMANHEAD END
@@ -2871,7 +2957,8 @@ helper function for Cmd_NextGUI_f.  Checks the passed entity to determine if it
 has any valid gui surfaces.
 =================
 */
-bool FindEntityGUIs(idEntity *ent, const modelSurface_t ** surfaces, int maxSurfs, int &guiSurfaces) {
+bool FindEntityGUIs(idEntity *ent, const modelSurface_t ** surfaces, int maxSurfs, int &guiSurfaces)
+{
 	renderEntity_t			*renderEnt;
 	idRenderModel			*renderModel;
 	const modelSurface_t	*surf;
@@ -2939,7 +3026,8 @@ void Cmd_NextGUI_f(const idCmdArgs &args)
 		return;
 	}
 
-	if (args.Argc() != 1) {
+	if (args.Argc() != 1)
+	{
 		gameLocal.Printf("usage: nextgui\n");
 		return;
 	}
@@ -2950,15 +3038,19 @@ void Cmd_NextGUI_f(const idCmdArgs &args)
 	// see if we have any gui surfaces left to go to on the current entity.
 	guiSurfaces = 0;
 	newEnt = false;
-	if (ent == NULL) {
+	if (ent == NULL)
+	{
 		newEnt = true;
 	}
-	else if (FindEntityGUIs(ent, surfaces, MAX_RENDERENTITY_GUI, guiSurfaces) == true) {
-		if (gameLocal.lastGUI >= guiSurfaces) {
+	else if (FindEntityGUIs(ent, surfaces, MAX_RENDERENTITY_GUI, guiSurfaces) == true)
+	{
+		if (gameLocal.lastGUI >= guiSurfaces)
+		{
 			newEnt = true;
 		}
 	}
-	else {
+	else
+	{
 		// no actual gui surfaces on this ent, so skip it
 		newEnt = true;
 	}
@@ -3051,15 +3143,18 @@ void Cmd_TestId_f(const idCmdArgs &args)
 {
 	idStr	id;
 	int		i;
-	if (args.Argc() == 1) {
+	if (args.Argc() == 1)
+	{
 		common->Printf("usage: testid <string id>\n");
 		return;
 	}
 
-	for (i = 1; i < args.Argc(); i++) {
+	for (i = 1; i < args.Argc(); i++)
+	{
 		id += args.Argv(i);
 	}
-	if (idStr::Cmpn(id, STRTABLE_ID, STRTABLE_ID_LENGTH) != 0) {
+	if (idStr::Cmpn(id, STRTABLE_ID, STRTABLE_ID_LENGTH) != 0)
+	{
 		id = STRTABLE_ID + id;
 	}
 	gameLocal.mpGame.AddChatLine(common->GetLanguageDict()->GetString(id), "<nothing>", "<nothing>", "<nothing>");
@@ -3072,19 +3167,24 @@ void Cmd_CharSet_f(const idCmdArgs &args)
 	int ix, jx;
 
 	common->Printf("   ");
-	for (ix = 0; ix < 16; ix++) {
+	for (ix = 0; ix < 16; ix++)
+	{
 		common->Printf("%x", ix);
 	}
 	common->Printf("\n");
 
-	for (ix = 0; ix < 16; ix++) {
+	for (ix = 0; ix < 16; ix++)
+	{
 		common->Printf("%x ", ix);
-		for (jx = 0; jx < 16; jx++) {
-			if (ix == 0 && (jx == 0 || jx == 9 || jx == 10 || jx == 13)) {
+		for (jx = 0; jx < 16; jx++)
+		{
+			if (ix == 0 && (jx == 0 || jx == 9 || jx == 10 || jx == 13))
+			{
 				common->Printf(" ");
 			}
-			else {
-				common->Printf("%c", (char)(ix * 16 + jx));
+			else
+			{
+				common->Printf("%c", (char) (ix * 16 + jx));
 			}
 		}
 		common->Printf("\n");
@@ -3098,17 +3198,20 @@ Cmd_PrintTypeName_f
 */
 void Cmd_PrintTypeName_f(const idCmdArgs &args)
 {
-	if (args.Argc() == 1) {
+	if (args.Argc() == 1)
+	{
 		common->Printf("usage: printTypeName <type num>\n");
 		return;
 	}
 
 	int typeNum = atoi(args.Argv(1));
 	idTypeInfo *type = idClass::GetType(typeNum);
-	if (type) {
+	if (type)
+	{
 		common->Printf("Type '%i' is '%s'\n", typeNum, type->classname);
 	}
-	else {
+	else
+	{
 		common->Printf("Invalid typenum.\n");
 	}
 }
@@ -3141,17 +3244,12 @@ so it can perform tab completion
 void idGameLocal::InitConsoleCommands(void)
 {
 	// PreyRun BEGIN
-	// Note all new PreyRun commands shoud start with PR_
+#ifdef PR_DEVELOP
 	cmdSystem->AddCommand("PR_TimeDemo", Cmd_PR_timedemo_f, CMD_FL_GAME, "*Unfinished* PreyRun cmd: Displays plays a demo and tells you how long it took");
+#endif // PR_DEVELOP
 	cmdSystem->AddCommand("PR_Reload", Cmd_PR_reload_f, CMD_FL_GAME, "PreyRun cmd: Load the latest savegame");
 
 	cmdSystem->AddCommand("PR_PreySplit_Split", Cmd_PR_preysplit_split_f, CMD_FL_GAME, "PreyRun cmd: Tells PreySplit to do an custom split");
-
-	// Cheat Commands
-	cmdSystem->AddCommand("PR_CH_SetHealth", Cmd_PR_ch_sethealth_f, CMD_FL_GAME | CMD_FL_CHEAT, "*Cheat* PreyRun cmd: Set your health to the specified value");
-	cmdSystem->AddCommand("PR_CH_SetSpiritPower", Cmd_PR_ch_setspiritpower_f, CMD_FL_GAME | CMD_FL_CHEAT, "*Cheat* PreyRun cmd: Set your spiritpower to the specified value");
-	cmdSystem->AddCommand("PR_CH_SetPos", Cmd_PR_ch_setpos_f, CMD_FL_GAME | CMD_FL_CHEAT, "*Cheat* PreyRun cmd: Set your X, Y and Z coordinate");
-	cmdSystem->AddCommand("PR_CH_SetPos_Offset", Cmd_PR_ch_setpos_offset_f, CMD_FL_GAME | CMD_FL_CHEAT, "*Cheat* PreyRun cmd: Offset your X, Y and Z coordiante by the given values");
 
 	// Hud-Timer Commands
 	cmdSystem->AddCommand("PR_Timer_Start", Cmd_PR_timer_start_f, CMD_FL_GAME, "PreyRun cmd: Starts the in-game timer. pr_hud_timer must be enabled for the time display to appear on the screen");
@@ -3165,6 +3263,12 @@ void idGameLocal::InitConsoleCommands(void)
 	cmdSystem->AddCommand("PR_AutoCmd_Edit", Cmd_PR_autocmd_edit_f, CMD_FL_GAME, "PreyRun cmd: Edit a autocmdzone by index retrieved from PR_AutoCmd_List");
 	cmdSystem->AddCommand("PR_AutoCmd_List", Cmd_PR_autocmd_list_f, CMD_FL_GAME, "PreyRun cmd: List all autocmdzones with Index");
 	cmdSystem->AddCommand("PR_AutoCmd_Remove", Cmd_PR_autocmd_remove_f, CMD_FL_GAME, "PreyRun cmd: Removes a autocmdzone by index retrieved from PR_AutoCmd_List");
+
+	// Cheat Commands
+	cmdSystem->AddCommand("PR_CH_SetHealth", Cmd_PR_ch_sethealth_f, CMD_FL_GAME | CMD_FL_CHEAT, "*Cheat* PreyRun cmd: Set your health to the specified value");
+	cmdSystem->AddCommand("PR_CH_SetPos", Cmd_PR_ch_setpos_f, CMD_FL_GAME | CMD_FL_CHEAT, "*Cheat* PreyRun cmd: Set your X, Y and Z coordinate");
+	cmdSystem->AddCommand("PR_CH_SetPos_Offset", Cmd_PR_ch_setpos_offset_f, CMD_FL_GAME | CMD_FL_CHEAT, "*Cheat* PreyRun cmd: Offset your X, Y and Z coordiante by the given values");
+	cmdSystem->AddCommand("PR_CH_SetSpiritPower", Cmd_PR_ch_setspiritpower_f, CMD_FL_GAME | CMD_FL_CHEAT, "*Cheat* PreyRun cmd: Set your spiritpower to the specified value");
 
 	// DEBUG COMMANDS
 #ifdef PR_DEBUG

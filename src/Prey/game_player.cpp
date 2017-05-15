@@ -1199,6 +1199,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 	if (pr_freeze.GetBool() && pr_gametimer.IsRunning())
 	{
 		pr_gametimer.Stop();
+		pr_rtatimer.Stop();
 	}
 
 #ifdef PR_DEBUG
@@ -1229,6 +1230,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 	if (pr_gametimer_running && !pr_gametimer.IsRunning() && !pr_freeze.GetBool())
 	{
 		pr_gametimer.Start();
+
 		gameLocal.Printf("PreyRun: Timer: Resuming, Map load\n");
 
 #ifdef PR_DEBUG
@@ -1266,6 +1268,14 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 			auto strTime = PR_formatTimeString(PR_ms2time(pr_gametimer.Milliseconds()), pr_hud_timer_alldigits.GetBool(), pr_hud_timer_precision.GetInteger());
 
 			renderSystem->DrawSmallStringExt(pr_hud_timer_x.GetInteger(), pr_hud_timer_y.GetInteger(), strTime.c_str(), idVec4(PR_toPreyColour(pr_hud_timer_r.GetInteger()), PR_toPreyColour(pr_hud_timer_g.GetInteger()), PR_toPreyColour(pr_hud_timer_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
+		}
+
+		// RTA-Timer
+		if (pr_hud_rtatimer.GetBool())
+		{
+			auto strTime = PR_formatTimeString(PR_ms2time(pr_rtatimer.Milliseconds()), pr_hud_rtatimer_alldigits.GetBool(), pr_hud_rtatimer_precision.GetInteger());
+
+			renderSystem->DrawSmallStringExt(pr_hud_rtatimer_x.GetInteger(), pr_hud_rtatimer_y.GetInteger(), strTime.c_str(), idVec4(PR_toPreyColour(pr_hud_rtatimer_r.GetInteger()), PR_toPreyColour(pr_hud_rtatimer_g.GetInteger()), PR_toPreyColour(pr_hud_rtatimer_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// Speedometer
