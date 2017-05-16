@@ -1,4 +1,4 @@
-#include "../idLib/precompiled.h"
+﻿#include "../idLib/precompiled.h"
 #pragma hdrstop
 
 #include "PreyRun.hpp"
@@ -7,6 +7,9 @@
 namespace pr
 {
 	constexpr char pr_backuptmr_path[] { "backuptmr" };
+
+	ID_INLINE double GetBackupTime();
+	ID_INLINE double GetBackupRTATime();
 
 	static void WriteToFile(const char* mapName)
 	{
@@ -23,6 +26,7 @@ namespace pr
 
 		file->WriteBool(true); // Is this a valid backuptmr file? : Yes so we actually can recover the time from this file!
 		file->WriteFloat(GetBackupTime()); // The actual time returned by pr_gametimer.ClockTicks()
+		file->WriteFloat(GetBackupRTATime()); // The actual time returned by pr_rtatimer.ClockTicks()
 		file->WriteString(mapName); // The map you were on when the timer was last saved
 
 		// Close the opened file
@@ -63,7 +67,8 @@ namespace pr
 		}
 
 		bool isValid { false };
-		float ms;
+		float ingameTimer;
+		float rtaTimer;
 		idStr mapName;
 
 		file->ReadBool(isValid);
@@ -75,23 +80,26 @@ namespace pr
 			return;
 		}
 
-		file->ReadFloat(ms);
+		file->ReadFloat(ingameTimer);
+		file->ReadFloat(rtaTimer);
 		file->ReadString(mapName);
 
 #ifdef PR_DBG_BACKUP
-		gameLocal.Printf("pr::LoadBackupTimer ms=%f mapName=%s\n", ms, mapName.c_str());
+		gameLocal.Printf("pr::LoadBackupTimer ingameTimer=%f, rtaTimer=%f, mapName=%s\n", ingameTimer, rtaTimer, mapName.c_str());
 #endif // PR_DBG_BACKUP
 
 		// Are we on the correct map to recover our time?
 		if (static_cast<idStr>(cMap) == mapName)
 		{
-			// Set the timer
-			pr_gametimer.SetCT(ms);
+			// Set the timers
+			pr_gametimer.SetCT(ingameTimer);
+			pr_rtatimer.SetCT(rtaTimer);
 			// Let the timer continue
 			pr_gametimer_running = true;
 
 #ifdef PR_DEBUG
-			gameLocal.Printf("pr::LoadBackupTimer Successfully recoverd backup time: %f\n", ms);
+			gameLocal.Printf("pr::LoadBackupTimer Successfully recoverd backup time: %f\n", ingameTimer);
+			gameLocal.Printf("pr::LoadBackupTimer Successfully recoverd backup RTA time: %f\n", rtaTimer);
 #endif // PR_DEBUG
 		}
 #ifdef PR_DBG_BACKUP
@@ -128,11 +136,19 @@ namespace pr
 #endif // PR_DBG_BACKUP
 	}
 
-	ID_INLINE double GetBackupTime()
+	PR_FINLINE double GetBackupTime()
 	{
 #ifdef PR_DBG_BACKUP_GETTIME
 		gameLocal.Printf("pr::GetBackupTime = %f\n", pr_gametimer.ClockTicks());
 #endif // PR_DBG_BACKUP_GETTIME
 		return pr_gametimer.ClockTicks();
+	}
+
+	PR_FINLINE double GetBackupRTATime()
+	{
+#ifdef PR_DBG_BACKUP_GETTIME
+		gameLocal.Printf("pr::GetBackupRTATime = %f\n", pr_rtatimer.ClockTicks());
+#endif // PR_DBG_BACKUP_GETTIME
+		return pr_rtatimer.ClockTicks();
 	}
 }

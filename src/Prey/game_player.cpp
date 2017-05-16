@@ -1230,6 +1230,10 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 	if (pr_gametimer_running && !pr_gametimer.IsRunning() && !pr_freeze.GetBool())
 	{
 		pr_gametimer.Start();
+		if (!pr_rtatimer.IsRunning())
+		{
+			pr_rtatimer.Start();
+		}
 
 		gameLocal.Printf("PreyRun: Timer: Resuming, Map load\n");
 
