@@ -1,4 +1,16 @@
-#pragma once
+﻿#pragma once
+
+#if defined(WIN32) || defined(_WIN32)
+#define PR_FINLINE __forceinline
+#endif // WIN32 || _WIN32
+
+#if defined(MACOS_X) || defined(__APPLE__)
+#define PR_FINLINE inline
+#endif // MACOS_X || __APPLE__
+
+#ifdef __linux__
+#define PR_FINLINE inline
+#endif // __linux__
 
 #ifdef PR_DEBUG
 /* AutoCmd.cpp // Autocmd.hpp */
