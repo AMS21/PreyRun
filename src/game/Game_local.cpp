@@ -1420,14 +1420,6 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 #ifdef PR_DEBUG
 	gameLocal.Printf("PreyRun DBG: Loading savegame %s from map %s\n", saveGameFile->GetName(), mapName);
 #endif // PR_DEBUG
-
-	if (static_cast<PR_timer_methode> (pr_timer_methode.GetInteger()) == PR_timer_methode::IndividualLevel)
-	{
-		pr_gametimer_running = true;
-	}
-
-	// Timer recovery
-	pr::LoadBackupTimer(mapName);
 	// PreyRun END
 
 	Printf("------- Game Map Init SaveGame -------\n");
@@ -1677,6 +1669,16 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 	playTimeStart = gameLocal.time; // HUMANHEAD mdl:  Start new session
 
 	Printf("--------------------------------------\n");
+
+	// PreyRun BEGIN
+	if (static_cast<PR_timer_methode> (pr_timer_methode.GetInteger()) == PR_timer_methode::IndividualLevel)
+	{
+		pr_gametimer_running = true;
+	}
+
+	// Timer recovery
+	pr::LoadBackupTimer(mapName);
+	// PreyRun END
 
 	return true;
 }
