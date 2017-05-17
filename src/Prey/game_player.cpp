@@ -1224,6 +1224,8 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		{
 			pr::WriteTimerStart(pr::GetTime());
 		}
+
+		cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec ILRun.cfg");
 	}
 
 	// Might not be the optimal solution because when the game decides to not draw the hud the timer cant resume but it gives better times then hooking InitFromMap()
