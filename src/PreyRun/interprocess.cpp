@@ -197,14 +197,13 @@ namespace pr
 	{
 		// normal map path    : maps/game/roadhouse.map
 		// gets turneded into : roadhouse.map
-
-		map.Replace("maps/game/", "");
+		auto Map = map.Mid(10, map.Length() - 10);
 
 #ifdef PR_DBG_INTERPROCESS
-		gameLocal.Printf("PreyRun DBG: WriteMapChange: Map exited: %s\nPreyRun DBG: WriteMapChange: Time %02d:%02d:%02d.%03d\n", map.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
+		gameLocal.Printf("PreyRun DBG: WriteMapChange: Map exited: %s\nPreyRun DBG: WriteMapChange: Time %02d:%02d:%02d.%03d\n", Map.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DBG_INTERPROCESS
 
-		auto size = static_cast<int32_t>(map.Size());
+		auto size = static_cast<int32_t>(Map.Size());
 
 		std::vector<char> buf(15 + size);
 		buf[0] = static_cast<char>(buf.size());
@@ -213,7 +212,7 @@ namespace pr
 		auto time_size = AddTimeToBuffer(buf.data() + 3, time);
 
 		std::memcpy(buf.data() + 3 + time_size, &size, sizeof(size));
-		std::memcpy(buf.data() + 3 + time_size + 4, map.c_str(), size);
+		std::memcpy(buf.data() + 3 + time_size + 4, Map.c_str(), size);
 
 		WritePreySplit(buf);
 	}
