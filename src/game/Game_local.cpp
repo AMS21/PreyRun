@@ -1671,7 +1671,7 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 	Printf("--------------------------------------\n");
 
 	// PreyRun BEGIN
-	if (static_cast<PR_timer_methode> (pr_timer_methode.GetInteger()) == PR_timer_methode::IndividualLevel)
+	if (static_cast<PR_timer_methode> (pr_timer_methode.GetInteger()) == PR_timer_methode::IndividualLevel && !pr_gametimer.IsRunning())
 	{
 		pr_gametimer_running = true;
 	}
