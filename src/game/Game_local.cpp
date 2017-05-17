@@ -1678,6 +1678,12 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 
 	// Timer recovery
 	pr::LoadBackupTimer(mapName);
+
+	// Map script execution
+	idStr pr_str(mapName);
+
+	sprintf(pr_str, "exec MapScript/%s.cfg", pr_str.Mid(10, pr_str.Length() - 14).c_str());
+	cmdSystem->BufferCommandText(CMD_EXEC_APPEND, pr_str);
 	// PreyRun END
 
 	return true;

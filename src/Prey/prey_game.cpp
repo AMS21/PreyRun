@@ -164,13 +164,11 @@ void hhGameLocal::InitFromNewMap(const char *mapName, idRenderWorld *renderWorld
 	pr::AutocmdzoneHandler::getInstance().Clear();
 
 	// Execute map config file
-	// example: map feedingtowera.map -> exec feedingtowera.cfg
+	// mapName = maps/game/feedingtowera.map
+	// command = exec MapScript/feedingtowera.cfg
 	idStr pr_str(mapName);
 
-	pr_str.Replace("maps/game/", "");
-	pr_str.Replace(".map", "");
-
-	sprintf(pr_str, "exec MapScript/%s.cfg", pr_str.c_str());
+	sprintf(pr_str, "exec MapScript/%s.cfg", pr_str.Mid(10, pr_str.Length() - 14).c_str());
 	cmdSystem->BufferCommandText(CMD_EXEC_APPEND, pr_str);
 	// PreyRun END
 
