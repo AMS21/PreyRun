@@ -26,6 +26,8 @@ extern idCVar pr_fixedseed_value;
 extern idStr pr_reload_latestsave;
 extern bool pr_reload_ready;
 extern idCVar pr_freeze;
+extern idCVar pr_log;
+extern idFile* pr_logfile;
 // Hud
 extern idCVar pr_hud;
 // Speedometer

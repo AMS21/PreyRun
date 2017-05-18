@@ -47,6 +47,9 @@ idCVar pr_freeze("PR_Freeze", "0", CVAR_GAME | CVAR_BOOL, "Completley freezes th
 
 idCVar pr_autocmd_show("PR_AutoCmd_Show", "0", CVAR_GAME | CVAR_INTEGER, "Display autocmd zones, Note that developer must be set to 1");
 
+idCVar pr_log("pr_log", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Log PreyRun output to file");
+idFile* pr_logfile;
+
 // HUD BEGIN
 idCVar pr_hud("PR_hud", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle the display of all PreyRun hud elements, the timer and game time of PreySplit will still work they just wont be visible");
 

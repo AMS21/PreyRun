@@ -375,6 +375,9 @@ void idGameLocal::Init(void) {
 	Printf("--------------------------------------\n");
 
 	// PreyRun BEGIN
+	// Open log file
+	pr_logfile = fileSystem->OpenFileWrite(pr::LogFilePath, "fs_savepath");
+
 	pr::ConsoleWrite("Running %s", ENGINE_VERSION);
 
 #ifdef PR_DEBUG
@@ -407,8 +410,13 @@ void idGameLocal::Shutdown(void) {
 	Printf("------------ Game Shutdown -----------\n");
 
 	// PreyRun BEGIN
+	pr::Log("Game shutdown");
+
 	pr::ShutdownPreySplitPipe();
 	pr::ClearBackupTimer();
+
+	// Close log file and save to disk
+	fileSystem->CloseFile(pr_logfile);
 	// PreyRun END
 
 	mpGame.Shutdown();

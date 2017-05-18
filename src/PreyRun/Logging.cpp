@@ -6,6 +6,8 @@
 
 namespace pr
 {
+	void WriteToLogFile(const char* pre, const char* string);
+
 	void Log(const char* fmt, ...)
 	{
 		va_list		argptr;
@@ -14,6 +16,8 @@ namespace pr
 		va_start(argptr, fmt);
 		idStr::vsnPrintf(text, sizeof(text), fmt, argptr);
 		va_end(argptr);
+
+		WriteToLogFile("", text);
 
 		common->Printf("PreyRun: %s\n", text);
 	}
@@ -28,6 +32,8 @@ namespace pr
 		idStr::vsnPrintf(text, sizeof(text), fmt, argptr);
 		va_end(argptr);
 
+		WriteToLogFile("[Debug]", text);
+
 		common->Printf("PreyRun DBG: %s\n", text);
 #endif // PR_DEBUG
 	}
@@ -40,6 +46,8 @@ namespace pr
 		va_start(argptr, fmt);
 		idStr::vsnPrintf(text, sizeof(text), fmt, argptr);
 		va_end(argptr);
+
+		WriteToLogFile(func, text);
 
 		common->Printf("%s: %s\n",func, text);
 	}
@@ -66,6 +74,8 @@ namespace pr
 		idStr::vsnPrintf(text, sizeof(text), fmt, argptr);
 		va_end(argptr);
 
+		WriteToLogFile("[WARNING]", text);
+
 		thread = idThread::CurrentThread();
 		if (thread)
 		{
@@ -87,6 +97,8 @@ namespace pr
 		idStr::vsnPrintf(text, sizeof(text), fmt, argptr);
 		va_end(argptr);
 
+		WriteToLogFile("[ERROR]", text);
+
 		thread = idThread::CurrentThread();
 		if (thread)
 		{
@@ -95,6 +107,25 @@ namespace pr
 		else
 		{
 			common->Error("PreyRun: %s\n", text);
+		}
+	}
+
+	void WriteToLogFile(const char* pre, const char* string)
+	{
+		if (pr_log.GetBool())
+		{
+			idStr str;
+
+			if (pre != "")
+			{
+				sprintf(str, "%s: %s\n", pre, string);
+			}
+			else
+			{
+				sprintf(str, "%s\n", string);
+			}
+
+			pr_logfile->Write(str.c_str(),strlen(str.c_str()));
 		}
 	}
 }

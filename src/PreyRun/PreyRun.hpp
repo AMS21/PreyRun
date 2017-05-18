@@ -29,3 +29,8 @@
 #define PR_DBG_INTERPROCESS
 
 #endif // PR_DEBUG
+
+namespace pr
+{
+	const char LogFilePath[] { "PreyRun.log" };
+}
