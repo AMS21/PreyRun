@@ -27,14 +27,12 @@ namespace pr
 				NULL);
 			if (pipe_preysplit == INVALID_HANDLE_VALUE)
 			{
-#ifdef PR_DEBUG
-				gameLocal.Printf("Error opening the PreySplit pipe: %d\n", GetLastError());
-#endif // PR_DEBUG
+				pr::DebugLog("Error opening the PreySplit pipe: %d", GetLastError());
 				gameLocal.Warning("PreyRun: PreySplit integration is not available.\n");
 				return;
 			}
 
-			gameLocal.Printf("PreyRun: Opened the PreySplit pipe.\n");
+			pr::Log("Opened the PreySplit pipe.");
 			pr_preysplit_pipeopen = true;
 
 			std::memset(&overlapped, 0, sizeof(overlapped));
@@ -42,11 +40,9 @@ namespace pr
 
 			if (overlapped.hEvent == NULL)
 			{
-#ifdef PR_DEBUG
-				gameLocal.Printf("Error creating an event for overlapped: %d. Closing the PreySplit pipe.\n", GetLastError());
-#endif // PR_DEBUG
+				pr::DebugLog("Error creating an event for overlapped: %d. Closing the PreySplit pipe.", GetLastError());
 
-				gameLocal.Warning("PreyRun: PreySplit integration is not available.\n");
+				pr::Warning("PreySplit integration is not available!");
 				CloseHandle(pipe_preysplit);
 				pipe_preysplit = INVALID_HANDLE_VALUE;
 				pr_preysplit_pipeopen = false;
@@ -55,7 +51,7 @@ namespace pr
 #ifdef PR_DEBUG
 		else
 		{
-			gameLocal.Printf("Skipping PreySplit initialization\n");
+			pr::Log("Skipping PreySplit initialization");
 		}
 #endif // PR_DEBUG
 	}
@@ -65,7 +61,7 @@ namespace pr
 		if (pipe_preysplit != INVALID_HANDLE_VALUE)
 		{
 			CloseHandle(pipe_preysplit);
-			gameLocal.Printf("PreyRun: Closed the PreySplit pipe.\n");
+			pr::Log("Closed the PreySplit pipe.");
 		}
 
 		pipe_preysplit = INVALID_HANDLE_VALUE;
@@ -84,9 +80,7 @@ namespace pr
 			if (WaitForSingleObject(overlapped.hEvent, INFINITE) != WAIT_OBJECT_0)
 			{
 				// Some weird error?
-#ifdef PR_DEBUG
-				gameLocal.Printf("WaitForSingleObject failed with %d.\n", GetLastError());
-#endif // PR_DEBUG
+				pr::DebugLog("WaitForSingleObject failed with %d.", GetLastError());
 
 				DisconnectNamedPipe(pipe_preysplit);
 				return WritePreySplit(data);
@@ -115,9 +109,7 @@ namespace pr
 			{
 				// Some weird error with pipe?
 				// Try remaking it.
-#ifdef PR_DEBUG
-				gameLocal.Printf("ConnectNamedPipe failed with %d.\n", err);
-#endif // PR_DEBUG
+				pr::DebugLog("ConnectNamedPipe failed with %d.", err);
 
 				ShutdownPreySplitPipe();
 				InitPreySplitPipe();
@@ -135,9 +127,7 @@ namespace pr
 			}
 			else
 			{
-#ifdef PR_DEBUG
-				gameLocal.Printf("WriteFile failed with %d.\n", err);
-#endif // PR_DEBUG
+				pr::DebugLog("WriteFile failed with %d.", err);
 				DisconnectNamedPipe(pipe_preysplit);
 			}
 		}
@@ -162,7 +152,7 @@ namespace pr
 		AddTimeToBuffer(buf.data() + 3, time);
 
 #ifdef PR_DBG_INTERPROCESS
-		gameLocal.Printf("PreyRun DBG: WriteGameEnd: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		pr::DebugLog("WriteGameEnd: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);
@@ -200,7 +190,8 @@ namespace pr
 		auto Map = map.Mid(10, map.Length() - 10);
 
 #ifdef PR_DBG_INTERPROCESS
-		gameLocal.Printf("PreyRun DBG: WriteMapChange: Map exited: %s\nPreyRun DBG: WriteMapChange: Time %02d:%02d:%02d.%03d\n", Map.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
+		pr::DebugLog("WriteMapChange: Map exited: %s", Map.c_str());
+		pr::DebugLog("WriteMapChange: Time %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DBG_INTERPROCESS
 
 		auto size = static_cast<int32_t>(Map.Size());
@@ -226,7 +217,7 @@ namespace pr
 		AddTimeToBuffer(buf.data() + 3, time);
 
 #ifdef PR_DBG_INTERPROCESS
-		gameLocal.Printf("PreyRun DBG: WriteTimerReset: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		pr::DebugLog("WriteTimerReset: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);
@@ -241,7 +232,7 @@ namespace pr
 		AddTimeToBuffer(buf.data() + 3, time);
 
 #ifdef PR_DBG_INTERPROCESS
-		gameLocal.Printf("PreyRun DBG: WriteTimerStart: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		pr::DebugLog("WriteTimerStart: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);
@@ -261,7 +252,7 @@ namespace pr
 		std::memcpy(buf.data() + 3 + time_size + 4, boss.c_str(), size);
 
 #ifdef PR_DBG_INTERPROCESS
-		gameLocal.Printf("PreyRun DBG: WriteBossKill: Boss: %s Time: %02d:%02d:%02d.%03d\n", boss.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
+		pr::DebugLog("WriteBossKill: Boss: %s Time: %02d:%02d:%02d.%03d", boss.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);
@@ -276,7 +267,7 @@ namespace pr
 		AddTimeToBuffer(buf.data() + 3, time);
 
 #ifdef PR_DBG_INTERPROCESS
-		gameLocal.Printf("PreyRun DBG: CustomSplit: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		pr::DebugLog("CustomSplit: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);

@@ -47,17 +47,15 @@ idSaveGame::idSaveGame( idFile *savefile )
 	if (pr_gametimer_running && pr_gametimer.IsRunning())
 	{
 		pr_gametimer.Stop();
-		gameLocal.Printf("PreyRun: Timer: Paused, Game saved\n");
+		pr::Log("Timer: Paused, Game saved");
 
 #ifdef PR_DEBUG
 		auto time = PR_ms2time(pr_gametimer.Milliseconds());
-		gameLocal.Printf("PreyRun DBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		pr::DebugLog("Time: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DEBUG
 	}
 
-#ifdef PR_DEBUG
-	gameLocal.Printf("PreyRun DBG: Saved game: %s\n", savefile->GetName());
-#endif // PR_DEBUG
+	pr::DebugLog("Saved game: %s", savefile->GetName());
 
 	pr_reload_latestsave = savefile->GetName();
 	pr_reload_ready = true;
@@ -85,11 +83,11 @@ idSaveGame::~idSaveGame()
 	if (pr_gametimer_running && !pr_gametimer.IsRunning() && pr_rtatimer.IsRunning() && !pr_freeze.GetBool())
 	{
 		pr_gametimer.Start();
-		gameLocal.Printf("PreyRun: Timer: Resuming, Game saved\n");
+		pr::Log("Timer, Resuming, Game saved");
 
 #ifdef PR_DEBUG
 		auto time = PR_ms2time(pr_gametimer.Milliseconds());
-		gameLocal.Printf("PreyRun DBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		pr::DebugLog("Time: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DEBUG
 	}
 	// PreyRun END
@@ -864,9 +862,7 @@ idRestoreGame::idRestoreGame( idFile *savefile )
 	file = savefile;
 
 	// PreyRun BEGIN
-#ifdef PR_DEBUG
-	gameLocal.Printf("PreyRun DBG: Loading savefile: %s\n", savefile->GetName());
-#endif // PR_DEBUG
+	pr::DebugLog("Loading savefile: %s", savefile->GetName());
 
 	pr_reload_latestsave = savefile->GetName();
 	pr_reload_ready = true;

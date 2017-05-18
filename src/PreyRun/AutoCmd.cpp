@@ -1,4 +1,4 @@
-#include "../idLib/precompiled.h"
+ï»¿#include "../idLib/precompiled.h"
 #pragma hdrstop
 
 #include "PreyRun.hpp"
@@ -67,7 +67,7 @@ namespace pr
 				for (auto const &str : vec)
 				{
 #ifdef PR_DBG_AUTOCMD
-					gameLocal.Printf("Autocmdzone::Run(): executing '%s'\n", str.c_str());
+					pr::FunctionLog(__FUNCTION__, "Executing '%s'", str.c_str());
 #endif // PR_DBG_AUTOCMD
 					cmdSystem->BufferCommandText(CMD_EXEC_NOW, str.c_str());
 				}
@@ -134,16 +134,16 @@ namespace pr
 	void AutocmdzoneHandler::Add(const idVec3 &pos1_, const idVec3 &pos2_, const cmdType &cmds_)
 	{
 #ifdef PR_DBG_AUTOCMD
-		gameLocal.Printf("AutocmdzoneHandler::Add() Adding autocmdzone: %f %f %f %f %f %f %s\n", pos1_.x, pos1_.y, pos1_.z, pos2_.x, pos2_.y, pos2_.z, cmds_.c_str());
+		pr::FunctionLog(__FUNCTION__, "Adding autocmdzone: %f %f %f %f %f %f %s", pos1_.x, pos1_.y, pos1_.z, pos2_.x, pos2_.y, pos2_.z, cmds_.c_str());
 #endif // PR_DBG_AUTOCMD
 		this->acz.emplace_back(pos1_, pos2_, cmds_);
 	}
 
-	// !Under the premise that const int ´num´ will always be > 0 and < acz.size()!
+	// !Under the premise that const int Â´numÂ´ will always be > 0 and < acz.size()!
 	void AutocmdzoneHandler::Edit(const int &num, const idVec3 &pos1_, const idVec3 &pos2_, const cmdType &cmds_)
 	{
 #ifdef PR_DBG_AUTOCMD
-		gameLocal.Printf("AutocmdzoneHandler::Edit() editing number: %d\n", num);
+		pr::FunctionLog(__FUNCTION__, "Editing number: %d", num);
 #endif // PR_DBG_AUTOCMD
 		acz[num].SetPos1(pos1_);
 		acz[num].SetPos2(pos2_);

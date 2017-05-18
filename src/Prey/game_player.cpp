@@ -1218,7 +1218,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		pr_gametimer.Start();
 		pr_rtatimer.Start();
 
-		gameLocal.Printf("PreyRun: Timer: Individual Level Auto starting\n");
+		pr::Log("Timer: Individual Level Auto starting");
 
 		if (pr_preysplit.GetBool())
 		{
@@ -1237,13 +1237,13 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 			pr_rtatimer.Start();
 		}
 
-		gameLocal.Printf("PreyRun: Timer: Resuming, Map load\n");
+		pr::Log("Timer: Resuming, Map load");
 
 #ifdef PR_DEBUG
 		auto time = PR_ms2time(pr_gametimer.Milliseconds());
-		gameLocal.Printf("PreyRun DBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		pr::DebugLog("Time: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
 
-		gameLocal.Printf("PreyRun DBG: Changed map to: %s\n", gameLocal.GetMapName());
+		pr::DebugLog("Changed map to: %s", gameLocal.GetMapName());
 #endif // PR_DEBUG
 	}
 	// PreyRun END

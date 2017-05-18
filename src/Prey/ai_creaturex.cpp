@@ -1,4 +1,4 @@
-
+﻿
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
@@ -999,9 +999,7 @@ void hhCreatureX::Killed(idEntity *inflictor, idEntity *attacker, int damage, co
 	// PreyRun BEGIN
 	if (pr_gametimer_running && pr_preysplit.GetBool() && bBossBar)
 	{
-#ifdef PR_DEBUG
-		gameLocal.Printf("PreyRun DBG: CreatureX killed\n");
-#endif // PR_DEBUG
+		pr::DebugLog("CreatureX killed");
 
 		// game/girlfriendx.map / Resolutions / CreatureX
 		pr::WriteBossKill(pr::GetTime(), "creaturex");

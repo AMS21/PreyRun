@@ -47,18 +47,16 @@ namespace pr
 	{
 		WriteToMemory(DisplayTimeDemo, DisplayTimeDemoOn, sizeof(DisplayTimeDemoOn));
 		WriteToMemory(DisplayTimeDemoString, DisplayTimeDemoStringOn, sizeof(DisplayTimeDemoStringOn));
-#ifdef PR_DEBUG
-		gameLocal.Printf("PreyRun DBG: Hooked timeDemo\n");
-#endif // PR_DEBUG
+
+		pr::DebugLog("Hooked timeDemo");
 	}
 
 	void timeDemoShutdown()
 	{
 		WriteToMemory(DisplayTimeDemo, DisplayTimeDemoOff, sizeof(DisplayTimeDemoOff));
 		WriteToMemory(DisplayTimeDemoString, DisplayTimeDemoStringOff, sizeof(DisplayTimeDemoStringOff));
-#ifdef PR_DEBUG
-		gameLocal.Printf("PreyRun DBG: Unhooked timeDemo\n");
-#endif // PR_DEBUG
+
+		pr::DebugLog("Unhooked timeDemo");
 	}
 
 	void hookVersionDisplay()

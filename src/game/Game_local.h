@@ -1116,6 +1116,7 @@ const int	CINEMATIC_SKIP_DELAY = SEC2MS(2.0f);
 //#include "../PreyRun/Random.hpp"
 #include "../PreyRun/AutoCmd.hpp"
 #include "../PreyRun/Backup.hpp"
+#include "../PreyRun/Logging.hpp"
 
 #include <cstdint>
 

@@ -95,7 +95,7 @@ void hhGameLocal::MapShutdown(void) {
 	if (pr_gametimer_running)
 	{
 		pr_gametimer.Stop();
-		Printf("PreyRun: Timer: Paused, Map Shutdown\n");
+		pr::Log("Timer: Paused, Map shutdown");
 
 		if (pr_preysplit.GetBool() && pr_preysplit_mapchanged && static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::RealTimeAttack)
 		{
@@ -105,7 +105,7 @@ void hhGameLocal::MapShutdown(void) {
 
 #ifdef PR_DEBUG
 		auto time = PR_ms2time(pr_gametimer.Milliseconds());
-		Printf("PreyRun DBG: Time: %02d:%02d:%02d.%03d\n", time.hours, time.minutes, time.seconds, time.milliseconds);
+		pr::DebugLog("Time: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DEBUG
 	}
 
@@ -119,9 +119,7 @@ void hhGameLocal::MapShutdown(void) {
 	{
 		pr::ClearBackupTimer();
 
-#ifdef PR_DEBUG
-		Printf("PreyRun DBG: Leaving map:%s\n", GetMapName());
-#endif // PR_DEBUG
+		pr::DebugLog("Leaving map: %s", GetMapName());
 	}
 	// PreyRun END
 
@@ -148,9 +146,7 @@ void hhGameLocal::MapShutdown(void) {
 void hhGameLocal::InitFromNewMap(const char *mapName, idRenderWorld *renderWorld, idSoundWorld *soundWorld, bool isServer, bool isClient, int randseed) {
 
 	// PreyRun BEGIN
-#ifdef PR_DEBUG
-	Printf("PreyRun DBG: Starting Map: %s\n", mapName);
-#endif // PR_DEBUG
+	pr::DebugLog("Starting Map: %s", mapName);
 
 	if (static_cast<PR_timer_methode> (pr_timer_methode.GetInteger()) == PR_timer_methode::IndividualLevel && static_cast<idStr>(gameLocal.GetMapName()) != idStr("maps/game/roadhouse.map"))
 	{
@@ -197,7 +193,7 @@ void hhGameLocal::InitFromNewMap(const char *mapName, idRenderWorld *renderWorld
 	// PreyRun BEGIN
 	if (pr_autopause.GetBool())
 	{
-		Printf("PreyRun: Autopause: paused map load\n");
+		pr::Log("Autopause: paused, map load");
 		pr_freeze.SetBool(true);
 	}
 	// PreyRun END
@@ -1014,9 +1010,7 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 			// PreyRun BEGIN
 			auto cmd = sessionCommand;
 
-#ifdef PR_DEBUG
-			Printf("PreyRun DBG: Session command: %s\n", cmd.c_str());
-#endif // PR_DEBUG
+			pr::DebugLog("Session command: %s", cmd.c_str());
 
 			if (cmd.Find("map ", false, 4))
 			{
@@ -1037,8 +1031,8 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 					auto times = PR_ms2time(pr_gametimer.Milliseconds());
 					auto rtatime = PR_ms2time(pr_rtatimer.Milliseconds());
 
-					gameLocal.Printf("PreyRun: Timer: Individual Level end, game time: %02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
-					gameLocal.Printf("PreyRun: Timer: Individual Level end, RTA time: %02d:%02d:%02d.%03d\n", rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds);
+					pr::Log("Timer: Individual Level end, game time: %02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
+					pr::Log("Timer: Individual Level end, RTA time: %02d:%02d:%02d.%03d", rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds);
 
 					// Prevent the map change so the player can see his time
 					sessionCommand.Clear();

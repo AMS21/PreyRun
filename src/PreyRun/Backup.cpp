@@ -8,8 +8,8 @@ namespace pr
 {
 	constexpr char pr_backuptmr_path[] { "backuptmr" };
 
-	ID_INLINE double GetBackupTime();
-	ID_INLINE double GetBackupRTATime();
+	PR_FINLINE double GetBackupTime();
+	PR_FINLINE double GetBackupRTATime();
 
 	static void WriteToFile(const char* mapName)
 	{
@@ -19,7 +19,7 @@ namespace pr
 		if (file == nullptr)
 		{
 #ifdef PR_DEBUG
-			gameLocal.Printf("pr::WriteToFile Couldn't open %s\n", pr_backuptmr_path);
+			pr::FunctionLog(__FUNCTION__, "Couldn't open %s", pr_backuptmr_path);
 #endif // PR_DEBUG
 			return;
 		}
@@ -61,7 +61,7 @@ namespace pr
 		if (file == nullptr)
 		{
 #ifdef PR_DEBUG
-			gameLocal.Printf("pr::LoadBackupTimer Couldn't open %s\n", pr_backuptmr_path);
+			pr::FunctionLog(__FUNCTION__, "Couldn't open %s", pr_backuptmr_path);
 #endif // PR_DEBUG
 			return;
 		}
@@ -75,7 +75,7 @@ namespace pr
 		if (!isValid)
 		{
 #ifdef PR_DBG_BACKUP
-			gameLocal.Printf("pr::LoadBackupTimer backuptimer is invalid\n");
+			pr::FunctionLog(__FUNCTION__, "backuptimer is invalid");
 #endif // PR_DBG_BACKUP
 			return;
 		}
@@ -85,7 +85,7 @@ namespace pr
 		file->ReadString(mapName);
 
 #ifdef PR_DBG_BACKUP
-		gameLocal.Printf("pr::LoadBackupTimer ingameTimer=%f, rtaTimer=%f, mapName=%s\n", ingameTimer, rtaTimer, mapName.c_str());
+		pr::FunctionLog(__FUNCTION__, "ingameTimer = %f, rtaTimer = %f, mapName = %s", ingameTimer, rtaTimer, mapName.c_str());
 #endif // PR_DBG_BACKUP
 
 		// Are we on the correct map to recover our time?
@@ -98,14 +98,14 @@ namespace pr
 			pr_gametimer_running = true;
 
 #ifdef PR_DEBUG
-			gameLocal.Printf("pr::LoadBackupTimer Successfully recoverd backup time: %f\n", ingameTimer);
-			gameLocal.Printf("pr::LoadBackupTimer Successfully recoverd backup RTA time: %f\n", rtaTimer);
+			pr::FunctionLog(__FUNCTION__, "Successfully recoverd backup time: %f", ingameTimer);
+			pr::FunctionLog(__FUNCTION__, "Successfully recoverd backup RTA time: %f", rtaTimer);
 #endif // PR_DEBUG
 		}
 #ifdef PR_DBG_BACKUP
 		else
 		{
-			gameLocal.Printf("pr::LoadBackupTimer wrong map to recover time. CurrentMap=%s mapName=%s\n", cMap, mapName.c_str());
+			pr::FunctionLog(__FUNCTION__, "Wrong map to recover time. CurrentMap=%s mapName=%s", cMap, mapName.c_str());
 		}
 #endif // PR_DBG_BACKUP
 
@@ -121,7 +121,7 @@ namespace pr
 		if (file == nullptr)
 		{
 #ifdef PR_DBG_BACKUP
-			gameLocal.Printf("pr::ClearBackupTimer Coud'nt open file\n");
+			pr::FunctionLog(__FUNCTION__, "Couldn't open file: %s", pr_backuptmr_path);
 #endif // PR_DBG_BACKUP
 			return;
 		}
@@ -132,14 +132,14 @@ namespace pr
 		fileSystem->CloseFile(file);
 
 #ifdef PR_DBG_BACKUP
-		gameLocal.Printf("pr::ClearBackupTimer successfully cleared backup timer\n");
+		pr::FunctionLog(__FUNCTION__, "Successfully, cleared backup timer");
 #endif // PR_DBG_BACKUP
 	}
 
 	PR_FINLINE double GetBackupTime()
 	{
 #ifdef PR_DBG_BACKUP_GETTIME
-		gameLocal.Printf("pr::GetBackupTime = %f\n", pr_gametimer.ClockTicks());
+		pr::FunctionLog(__FUNCTION__, "%f", pr_gametimer.ClockTicks());
 #endif // PR_DBG_BACKUP_GETTIME
 		return pr_gametimer.ClockTicks();
 	}
@@ -147,7 +147,7 @@ namespace pr
 	PR_FINLINE double GetBackupRTATime()
 	{
 #ifdef PR_DBG_BACKUP_GETTIME
-		gameLocal.Printf("pr::GetBackupRTATime = %f\n", pr_rtatimer.ClockTicks());
+		pr::FunctionLog(__FUNCTION__, "%f", pr_rtatimer.ClockTicks());
 #endif // PR_DBG_BACKUP_GETTIME
 		return pr_rtatimer.ClockTicks();
 	}

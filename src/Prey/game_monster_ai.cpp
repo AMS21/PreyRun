@@ -495,9 +495,7 @@ void hhMonsterAI::Killed(idEntity *inflictor, idEntity *attacker,
 		}
 
 		// PreyRun BEGIN
-#ifdef PR_DEBUG
-		gameLocal.Printf("PreyRun DBG: HP Boss died: %s\n", GetName());
-#endif // PR_DEBUG
+		pr::DebugLog("HP Boss died: %s", GetName());
 		
 		if (pr_gametimer_running && pr_preysplit.GetBool())
 		{

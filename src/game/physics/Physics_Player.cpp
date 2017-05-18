@@ -1761,7 +1761,7 @@ void idPhysics_Player::SetMovementType(const pmtype_t type) {
 
 		pr_gametimer_running = true;
 
-		gameLocal.Printf("PreyRun: Timer: Auto starting\n");
+		pr::Log("Timer: Auto starting");
 
 		if (pr_preysplit.GetBool())
 		{

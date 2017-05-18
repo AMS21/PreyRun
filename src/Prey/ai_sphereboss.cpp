@@ -223,12 +223,12 @@ void hhSphereBoss::Killed(idEntity *inflictor, idEntity *attacker, int damage, c
 		auto times = PR_ms2time(pr_gametimer.Milliseconds());
 		auto rtatime = PR_ms2time(pr_rtatimer.Milliseconds());
 
-		gameLocal.Printf("PreyRun: Timer: End game, game time: %02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
-		gameLocal.Printf("PreyRun: Timer: End game, RTA time: %02d:%02d:%02d.%03d\n", rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds);
+		pr::Log("Timer: End game, game time: %02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
+		pr::Log("Timer: End game, RTA time: %02d:%02d:%02d.%03d", rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds);
 
 		times = PR_ms2time(gameLocal.GetTimePlayed());
 
-		gameLocal.Printf("Playtime: %02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
+		pr::Log("Playtime: %02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
 	}
 	// PreyRun END
 
