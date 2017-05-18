@@ -375,19 +375,18 @@ void idGameLocal::Init(void) {
 	Printf("--------------------------------------\n");
 
 	// PreyRun BEGIN
-	pr::InitPreySplitPipe();
-
-	pr::hookVersionDisplay();
-
-	// Load PreyRun.cfg
-	cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec preyrun.cfg\n");
-
 	Printf("Running %s\n", ENGINE_VERSION);
 
 #ifdef PR_DEBUG
 	Printf("Running extra PreyRun debug functionality!\n");
 	Printf("Compiled on %s %s\n", __DATE__, __TIME__);
 #endif // PR_DEBUG
+
+	pr::InitPreySplitPipe();
+
+	pr::hookVersionDisplay();
+
+	// Load PreyRun.cfg
 	// PreyRun END
 }
 
