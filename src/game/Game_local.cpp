@@ -380,7 +380,7 @@ void idGameLocal::Init(void) {
 	pr::hookVersionDisplay();
 
 	// Load PreyRun.cfg
-	cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec preyrun.cfg");
+	cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec preyrun.cfg\n");
 
 	Printf("Running %s\n", ENGINE_VERSION);
 
@@ -1684,7 +1684,7 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 	// Map script execution
 	idStr pr_str(mapName);
 
-	sprintf(pr_str, "exec MapScript/%s.cfg", pr_str.Mid(10, pr_str.Length() - 14).c_str());
+	sprintf(pr_str, "exec MapScript/%s.cfg\n", pr_str.Mid(10, pr_str.Length() - 14).c_str());
 	cmdSystem->BufferCommandText(CMD_EXEC_APPEND, pr_str);
 	// PreyRun END
 

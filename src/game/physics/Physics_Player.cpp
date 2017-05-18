@@ -1770,11 +1770,11 @@ void idPhysics_Player::SetMovementType(const pmtype_t type) {
 
 		if (static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::RealTimeAttack)
 		{
-			cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec RTARun.cfg");
+			cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec RTARun.cfg\n");
 		}
 		else if (static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::IndividualLevel)
 		{
-			cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec ILRun.cfg");
+			cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec ILRun.cfg\n");
 		}
 	}
 	// PreyRun END

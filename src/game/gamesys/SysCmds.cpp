@@ -24,7 +24,7 @@ void Cmd_PR_timedemo_f(const idCmdArgs &args)
 {
 	pr::timeDemoInit();
 
-	cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("playDemo %s", args.Argv(1)));
+	cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("playDemo %s\n", args.Argv(1)));
 
 	pr_timedemo = true;
 }
@@ -38,7 +38,7 @@ void Cmd_PR_reload_f(const idCmdArgs &args)
 {
 	if (pr_reload_ready)
 	{
-		cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("loadgame %s", pr_reload_latestsave.Mid(10, pr_reload_latestsave.Length()).c_str()));
+		cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("loadgame %s\n", pr_reload_latestsave.Mid(10, pr_reload_latestsave.Length()).c_str()));
 
 		gameLocal.Printf("Loading save %s\n", pr_reload_latestsave.c_str());
 	}

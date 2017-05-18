@@ -168,7 +168,7 @@ void hhGameLocal::InitFromNewMap(const char *mapName, idRenderWorld *renderWorld
 	// command = exec MapScript/feedingtowera.cfg
 	idStr pr_str(mapName);
 
-	sprintf(pr_str, "exec MapScript/%s.cfg", pr_str.Mid(10, pr_str.Length() - 14).c_str());
+	sprintf(pr_str, "exec MapScript/%s.cfg\n", pr_str.Mid(10, pr_str.Length() - 14).c_str());
 	cmdSystem->BufferCommandText(CMD_EXEC_APPEND, pr_str);
 	// PreyRun END
 
