@@ -1,4 +1,4 @@
-// Copyright (C) 2004 Id Software, Inc.
+﻿// Copyright (C) 2004 Id Software, Inc.
 //
 
 #ifndef __GAME_LOCAL_H__
@@ -38,11 +38,6 @@ extern idSoundWorld *				gameSoundWorld;
 extern hhProfiler *					profiler;
 #endif
 // HUMANHEAD END
-
-// PreyRun BEGIN
-// the "gameversion" client command will print this plus compile date
-#define	GAME_VERSION		"PreyRun-1.0.4.1"
-// PreyRun END
 
 // classes used by idGameLocal
 class idEntity;

@@ -3,6 +3,7 @@
 
 #include "PreyRun.hpp"
 #include "Hooking.hpp"
+#include "../framework/licensee.h"
 
 namespace pr
 {
@@ -14,6 +15,18 @@ namespace pr
 	constexpr DWORD DisplayTimeDemoString = 0x7B59E4;
 	constexpr char DisplayTimeDemoStringOn[] = "%i frames rendered in %3.3f seconds = %3.3f fps\n";
 	constexpr char DisplayTimeDemoStringOff[] = "%i frames rendered in %3.1f seconds = %3.1f fps\n";
+
+	constexpr DWORD PreyVersionString = 0x7AC500;
+	constexpr char PreyVersionStringNew[] = ENGINE_VERSION;
+
+	constexpr DWORD PreyVerionFormatString = 0x7AF038;
+	constexpr char PreyVersionFormatStringNew[] = "   %s"; // orig: '%s.%i'
+
+	constexpr DWORD PreyVersionDateString = 0x7AC514;
+	constexpr char PreyVersionDateStringNew[] = __DATE__;
+
+	constexpr DWORD PreyVersionTimeString = 0x7AC520;
+	constexpr char PreyVersionTimeStringNew[] = __TIME__;
 
 	void static WriteToMemory(DWORD addressToWrite, const char* valueToWrite, const int byteNum)
 	{
@@ -46,5 +59,13 @@ namespace pr
 #ifdef PR_DEBUG
 		gameLocal.Printf("PreyRun DBG: Unhooked timeDemo\n");
 #endif // PR_DEBUG
+	}
+
+	void hookVersionDisplay()
+	{
+		WriteToMemory(PreyVersionString, PreyVersionStringNew, sizeof(PreyVersionStringNew));
+		WriteToMemory(PreyVerionFormatString, PreyVersionFormatStringNew, sizeof(PreyVersionFormatStringNew));
+		WriteToMemory(PreyVersionDateString, PreyVersionDateStringNew, sizeof(PreyVersionDateStringNew));
+		WriteToMemory(PreyVersionTimeString, PreyVersionTimeStringNew, sizeof(PreyVersionTimeStringNew));
 	}
 }

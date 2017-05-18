@@ -308,7 +308,7 @@ void idGameLocal::Init(void) {
 	//HUMANHEAD END
 
 	Printf("--------- Initializing Game ----------\n");
-	Printf("gamename: %s\n", GAME_VERSION);
+	Printf("gamename: %s\n", ENGINE_VERSION);
 	Printf("gamedate: %s\n", __DATE__);
 
 	// register game specific decl types
@@ -376,6 +376,8 @@ void idGameLocal::Init(void) {
 
 	// PreyRun BEGIN
 	pr::InitPreySplitPipe();
+
+	pr::hookVersionDisplay();
 
 	// Load PreyRun.cfg
 	cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec preyrun.cfg");
