@@ -1008,11 +1008,9 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 		// see if a target_sessionCommand has forced a changelevel
 		if (sessionCommand.Length()) {
 			// PreyRun BEGIN
-			auto cmd = sessionCommand;
+			pr::DebugLog("Session command: %s", sessionCommand.c_str());
 
-			pr::DebugLog("Session command: %s", cmd.c_str());
-
-			if (cmd.Find("map ", false, 4))
+			if (sessionCommand.Find("map ", false, 4))
 			{
 				// The command to execute is map
 				pr_preysplit_mapchanged = true;
@@ -1039,6 +1037,7 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 				}
 			}
 			// PreyRun END
+
 			strncpy(ret.sessionCommand, sessionCommand, sizeof(ret.sessionCommand));
 			break;
 		}
