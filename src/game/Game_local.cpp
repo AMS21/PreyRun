@@ -387,6 +387,7 @@ void idGameLocal::Init(void) {
 	pr::hookVersionDisplay();
 
 	// Load PreyRun.cfg
+	cmdSystem->BufferCommandText(CMD_EXEC_NOW, "exec preyrun.cfg\n");
 	// PreyRun END
 }
 
