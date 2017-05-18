@@ -40,11 +40,11 @@ void Cmd_PR_reload_f(const idCmdArgs &args)
 	{
 		cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("loadgame %s\n", pr_reload_latestsave.Mid(10, pr_reload_latestsave.Length()).c_str()));
 
-		gameLocal.Printf("Loading save %s\n", pr_reload_latestsave.c_str());
+		pr::ConsoleWrite("Loading save %s", pr_reload_latestsave.c_str());
 	}
 	else
 	{
-		gameLocal.Printf("There is no most recent save, sorry!\n");
+		pr::ConsoleWrite("There is no most recent save, sorry!");
 	}
 }
 
@@ -59,7 +59,7 @@ void Cmd_PR_preysplit_split_f(const idCmdArgs &args)
 	{
 		pr::WriteCustomSplit(pr::GetTime());
 
-		gameLocal.Printf("Send custom split to PreySplit\n");
+		pr::ConsoleWrite("Send custom split to PreySplit");
 	}
 }
 
@@ -97,7 +97,7 @@ void Cmd_PR_ch_setspiritpower_f(const idCmdArgs &args)
 	}
 	else
 	{
-		gameLocal.Printf("You do not have the spirit walk ability\n");
+		pr::ConsoleWrite("You do not have the spirit walk ability");
 	}
 }
 
@@ -110,7 +110,7 @@ void Cmd_PR_ch_setpos_f(const idCmdArgs &args)
 {
 	if (args.Argc() != 4)
 	{
-		gameLocal.Printf("Usage: PR_CH_SetPos <X (Float)> <Y (Float)> <Z (Float)>\n");
+		pr::ConsoleWrite("Usage: PR_CH_SetPos <X (Float)> <Y (Float)> <Z (Float)>");
 		return;
 	}
 
@@ -129,7 +129,7 @@ void Cmd_PR_ch_setpos_offset_f(const idCmdArgs &args)
 {
 	if (args.Argc() != 4)
 	{
-		gameLocal.Printf("Usage: PR_CH_SetPos_Offset <X (Float)> <Y (Float)> <Z (Float)>\n");
+		pr::ConsoleWrite("Usage: PR_CH_SetPos_Offset <X (Float)> <Y (Float)> <Z (Float)>");
 		return;
 	}
 
@@ -164,7 +164,7 @@ void Cmd_PR_timer_start_f(const idCmdArgs &args)
 
 	pr_gametimer_running = true;
 
-	gameLocal.Printf("Starting in-game timer\n");
+	pr::ConsoleWrite("Starting in-game and RTA timer");
 }
 
 /*
@@ -181,7 +181,7 @@ void Cmd_PR_timer_stop_f(const idCmdArgs &args)
 
 		pr_gametimer_running = false;
 
-		gameLocal.Printf("Stopping in-game timer\n");
+		pr::ConsoleWrite("Stopping in-game and RTA timer");
 	}
 }
 
@@ -202,7 +202,7 @@ void Cmd_PR_timer_reset_f(const idCmdArgs &args)
 
 	pr::WriteTimerReset(pr::GetTime());
 
-	gameLocal.Printf("Resetting in-game timer\n");
+	pr::ConsoleWrite("Resetting in-game and RTA timer");
 }
 
 /*
@@ -215,8 +215,8 @@ void Cmd_PR_timer_now_f(const idCmdArgs &args)
 	auto times = PR_ms2time(pr_gametimer.Milliseconds());
 	auto rtatimes = PR_ms2time(pr_rtatimer.Milliseconds());
 
-	gameLocal.Printf("In-game timer: %02d:%02d:%02d.%03d\n", times.hours, times.minutes, times.seconds, times.milliseconds);
-	gameLocal.Printf("RTA timer: %02d:%02d:%02d.%03d\n", rtatimes.hours, rtatimes.minutes, rtatimes.seconds, rtatimes.milliseconds);
+	pr::ConsoleWrite("In-game timer: %02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
+	pr::ConsoleWrite("RTA timer: %02d:%02d:%02d.%03d", rtatimes.hours, rtatimes.minutes, rtatimes.seconds, rtatimes.milliseconds);
 }
 
 // Autocmdzones
@@ -230,7 +230,7 @@ void Cmd_PR_autocmd_add_f(const idCmdArgs &args)
 {
 	if (args.Argc() != 8)
 	{
-		gameLocal.Printf("Usage: Pr_AutoCmd_Add <Start X (Float)> <Start Y (Float)> <Start 1 Z (Float)> <End 2 X (Float)> <End 2 Y (Float)> <End 2 Z (Float)> <Command (String)>\n");
+		pr::ConsoleWrite("Usage: Pr_AutoCmd_Add <Start X (Float)> <Start Y (Float)> <Start 1 Z (Float)> <End 2 X (Float)> <End 2 Y (Float)> <End 2 Z (Float)> <Command (String)>");
 		return;
 	}
 
@@ -240,7 +240,7 @@ void Cmd_PR_autocmd_add_f(const idCmdArgs &args)
 		, static_cast<idStr>(args.Argv(7)) // commands
 	);
 
-	gameLocal.Printf("Succesfully added autocmdzone number %d\n", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+	pr::ConsoleWrite("Successfully added autocmdzone number %d", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
 }
 
 /*
@@ -250,7 +250,7 @@ Cmd_PR_autocmd_clear_f
 */
 void Cmd_PR_autocmd_clear_f(const idCmdArgs &args)
 {
-	gameLocal.Printf("Cleared %d autocmdzones\n", pr::AutocmdzoneHandler::getInstance().NumOfZones());
+	pr::ConsoleWrite("Cleared %d autocmdzones", pr::AutocmdzoneHandler::getInstance().NumOfZones());
 
 	pr::AutocmdzoneHandler::getInstance().Clear();
 }
@@ -266,12 +266,12 @@ void Cmd_PR_autocmd_edit_f(const idCmdArgs &args)
 	{
 		if (pr::AutocmdzoneHandler::getInstance().NumOfZones() > 1)
 		{
-			gameLocal.Printf("Usage: PR_AutoCmd_Edit <Index (0-%d)> <Start X (Float)> <Start Y (Float)> <Start 1 Z (Float)> <End 2 X (Float)> <End 2 Y (Float)> <End 2 Z (Float)> <Command (String)>\n", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+			pr::ConsoleWrite("Usage: PR_AutoCmd_Edit <Index (0-%d)> <Start X (Float)> <Start Y (Float)> <Start 1 Z (Float)> <End 2 X (Float)> <End 2 Y (Float)> <End 2 Z (Float)> <Command (String)>", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
 		}
 		else
 		{
 			// If there are actually 0 autocmdzones this here will still be printed but i guess thats okay
-			gameLocal.Printf("Usage: Pr_AutoCmd_Edit <Index (0)> <Start X (Float)> <Start Y (Float)> <Start 1 Z (Float)> <End 2 X (Float)> <End 2 Y (Float)> <End 2 Z (Float)> <Command (String)>\n");
+			pr::ConsoleWrite("Usage: Pr_AutoCmd_Edit <Index (0)> <Start X (Float)> <Start Y (Float)> <Start 1 Z (Float)> <End 2 X (Float)> <End 2 Y (Float)> <End 2 Z (Float)> <Command (String)>");
 		}
 		return;
 	}
@@ -281,11 +281,11 @@ void Cmd_PR_autocmd_edit_f(const idCmdArgs &args)
 	{
 		if (pr::AutocmdzoneHandler::getInstance().NumOfZones() == 0)
 		{
-			gameLocal.Printf("There are no autocmds you need to create one first using PR_AutoCmd_Add\n");
+			pr::ConsoleWrite("There are no autocmds you need to create one first using PR_AutoCmd_Add");
 		}
 		else
 		{
-			gameLocal.Printf("Out of bounds: %d max: %d\n", atoi(args.Argv(1)), pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+			pr::ConsoleWrite("Out of bounds: %d max: %d", atoi(args.Argv(1)), pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
 		}
 		return;
 	}
@@ -308,7 +308,7 @@ void Cmd_PR_autocmd_list_f(const idCmdArgs &args)
 	auto& aczHandler = pr::AutocmdzoneHandler::getInstance();
 	auto num { 0 };
 
-	gameLocal.Printf("Index: StartX StartY StartZ  EndX EndY EndZ  Command to execute\n");
+	pr::ConsoleWrite("Index: StartX StartY StartZ  EndX EndY EndZ  Command to execute");
 
 	for (auto && e : aczHandler)
 	{
@@ -316,7 +316,7 @@ void Cmd_PR_autocmd_list_f(const idCmdArgs &args)
 		idVec3 pos2 = e.GetPos2();
 		auto cmds = e.GetCmds();
 
-		gameLocal.Printf("%d: %.2f %.2f %.2f %.2f %.2f %.2f %s\n", num, pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z, cmds.c_str());
+		pr::ConsoleWrite("%d: %.2f %.2f %.2f %.2f %.2f %.2f %s", num, pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z, cmds.c_str());
 
 		num++;
 	}
@@ -333,12 +333,12 @@ void Cmd_PR_autocmd_remove_f(const idCmdArgs &args)
 	{
 		if (pr::AutocmdzoneHandler::getInstance().NumOfZones() > 1)
 		{
-			gameLocal.Printf("Usage: PR_AutoCmd_Remove <Index (0-%d)>\n", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+			pr::ConsoleWrite("Usage: PR_AutoCmd_Remove <Index (0-%d)>", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
 		}
 		else
 		{
 			// If there are actually 0 autocmdzones this here will still be printed but i guess thats okay
-			gameLocal.Printf("Usage: PR_AutoCmd_Remove <Index (0)>\n");
+			pr::ConsoleWrite("Usage: PR_AutoCmd_Remove <Index (0)>");
 		}
 
 		return;
@@ -349,11 +349,11 @@ void Cmd_PR_autocmd_remove_f(const idCmdArgs &args)
 	{
 		if (pr::AutocmdzoneHandler::getInstance().NumOfZones() == 0)
 		{
-			gameLocal.Printf("There are no autocmds you need to create one first using PR_AutoCmd_Add\n");
+			pr::ConsoleWrite("There are no autocmds you need to create one first using PR_AutoCmd_Add");
 		}
 		else
 		{
-			gameLocal.Printf("Out of bounds: %d max: %d\n", atoi(args.Argv(1)), pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+			pr::ConsoleWrite("Out of bounds: %d max: %d", atoi(args.Argv(1)), pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
 		}
 
 		return;
@@ -361,7 +361,7 @@ void Cmd_PR_autocmd_remove_f(const idCmdArgs &args)
 
 	pr::AutocmdzoneHandler::getInstance().Remove(atoi(args.Argv(1)));
 
-	gameLocal.Printf("Succesfully removed autocmdzone number %d\n", atoi(args.Argv(1)));
+	pr::ConsoleWrite("Succesfully removed autocmdzone number %d", atoi(args.Argv(1)));
 }
 
 #ifdef PR_DEBUG
@@ -383,14 +383,14 @@ void Cmd_PR_dbg_timer_f(const idCmdArgs &args)
 	auto time = PR_ms2time(pr_gametimer.Milliseconds());
 	auto rtatime = PR_ms2time(pr_gametimer.Milliseconds());
 
-	gameLocal.Printf("Timer is running: %s\nTimer shoud be on: %s\nIn-game timer:\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s\nRTA timer:\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s\n", pr_gametimer.IsRunning() ? "True" : "False", pr_gametimer_running ? "True" : "False", time.hours, time.minutes, time.seconds, time.milliseconds, pr_gametimer.Milliseconds(), pr_gametimer.ClockTicks(), pr::timer::pr_gametimer_clocktick_postfix, rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds, pr_rtatimer.Milliseconds(), pr_rtatimer.ClockTicks(), pr::timer::pr_gametimer_clocktick_postfix);
+	pr::ConsoleWrite("Timer is running: %s\nTimer shoud be on: %s\nIn-game timer:\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s\nRTA timer:\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s", pr_gametimer.IsRunning() ? "True" : "False", pr_gametimer_running ? "True" : "False", time.hours, time.minutes, time.seconds, time.milliseconds, pr_gametimer.Milliseconds(), pr_gametimer.ClockTicks(), pr::timer::pr_gametimer_clocktick_postfix, rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds, pr_rtatimer.Milliseconds(), pr_rtatimer.ClockTicks(), pr::timer::pr_gametimer_clocktick_postfix);
 }
 
 void Cmd_PR_dbg_timer_set_f(const idCmdArgs &args)
 {
 	if (args.Argc() != 2)
 	{
-		gameLocal.Printf("Usage: PR_dbg_timer_set <Microseconds (Float)>\n");
+		pr::ConsoleWrite("Usage: PR_dbg_timer_set <Microseconds (Float)>");
 		return;
 	}
 
@@ -402,11 +402,11 @@ void Cmd_PR_dbg_reload_f(const idCmdArgs &args)
 {
 	if (pr_reload_ready)
 	{
-		gameLocal.Printf("ready: %s, filename: %s\n", pr_reload_ready ? "True" : "False", pr_reload_latestsave.c_str());
+		pr::ConsoleWrite("ready: %s, filename: %s", pr_reload_ready ? "True" : "False", pr_reload_latestsave.c_str());
 	}
 	else
 	{
-		gameLocal.Printf("pr_reload is not ready cant print info\n");
+		pr::ConsoleWrite("pr_reload is not ready cant print info");
 	}
 }
 
@@ -417,7 +417,7 @@ void Cmd_PR_dbg_backup_f(const idCmdArgs &args)
 
 	if (file == nullptr)
 	{
-		gameLocal.Printf("backuptmr cant be opend\n");
+		pr::ConsoleWrite("backuptmr can't be opend");
 		return;
 	}
 
@@ -425,7 +425,7 @@ void Cmd_PR_dbg_backup_f(const idCmdArgs &args)
 	file->ReadBool(isValid);
 	if (!isValid)
 	{
-		gameLocal.Printf("backuptmr is not valid!\n");
+		pr::ConsoleWrite("backuptmr is not valid!");
 		return;
 	}
 
@@ -439,7 +439,7 @@ void Cmd_PR_dbg_backup_f(const idCmdArgs &args)
 
 	if (mapName.IsEmpty())
 	{
-		gameLocal.Printf("backuptmr is empty\n");
+		pr::ConsoleWrite("backuptmr is empty");
 		return;
 	}
 
@@ -448,60 +448,60 @@ void Cmd_PR_dbg_backup_f(const idCmdArgs &args)
 
 	auto correctMap = static_cast<idStr>(gameLocal.GetMapName()) == mapName;
 
-	gameLocal.Printf("Backup Timer: time: %f, mapName: $s CorrectMap: %s\n", ms, mapName.c_str(), correctMap ? "True" : "False");
+	pr::ConsoleWrite("Backup Timer: time: %f, mapName: $s CorrectMap: %s", ms, mapName.c_str(), correctMap ? "True" : "False");
 }
 
 void Cmd_PR_dbg_rng(const idCmdArgs &args)
 {
 	auto rng = gameLocal.random;
 
-	gameLocal.Printf("Seed: %d, Int: %d, Int: %d, Float: %f, Float: %f\n", rng.GetSeed(), rng.RandomInt(), rng.RandomInt(), rng.RandomFloat(), rng.RandomFloat());
+	pr::ConsoleWrite("Seed: %d, Int: %d, Int: %d, Float: %f, Float: %f", rng.GetSeed(), rng.RandomInt(), rng.RandomInt(), rng.RandomFloat(), rng.RandomFloat());
 }
 
 void Cmd_PR_dbg_randseed_f(const idCmdArgs &args)
 {
-	gameLocal.Printf("Seed: %d\n", gameLocal.random.GetSeed());
+	pr::ConsoleWrite("Seed: %d", gameLocal.random.GetSeed());
 }
 
 void Cmd_PR_dbg_rngint_f(const idCmdArgs &args)
 {
-	gameLocal.Printf("Int: %d\n", gameLocal.random.RandomInt());
+	pr::ConsoleWrite("Int: %d", gameLocal.random.RandomInt());
 }
 
 void Cmd_PR_dbg_rngfloat_f(const idCmdArgs &args)
 {
-	gameLocal.Printf("Float: %f\n", gameLocal.random.RandomFloat());
+	pr::ConsoleWrite("Float: %f", gameLocal.random.RandomFloat());
 }
 
 void Cmd_PR_dbg_autocmd_f(const idCmdArgs &args)
 {
 	if (args.Argc() != 2)
 	{
-		gameLocal.Printf("Usage: PR_dbg_autocmd <Index (0-%d)>\n", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		pr::ConsoleWrite("Usage: PR_dbg_autocmd <Index (0-%d)>", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
 		return;
 	}
 
 	if (atoi(args.Argv(1)) > pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1 || atoi(args.Argv(1)) < 0)
 	{
-		gameLocal.Printf("Out of bounds: %d max: %d\n", atoi(args.Argv(1)), pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		pr::ConsoleWrite("Out of bounds: %d max: %d", atoi(args.Argv(1)), pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
 		return;
 	}
 
 	auto acz = pr::AutocmdzoneHandler::getInstance().at(atoi(args.Argv(1)));
 
-	gameLocal.Printf("activated: %s\n", acz.GetActivated() ? "True" : "False");
+	pr::ConsoleWrite("activated: %s", acz.GetActivated() ? "True" : "False");
 }
 
 void Cmd_PR_dbg_autocmd_trigger_f(const idCmdArgs &args)
 {
 	if (args.Argc() != 2)
 	{
-		gameLocal.Printf("Usage: PR_dbg_autocmd_trigger <Index (0-%d)>\n", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		pr::ConsoleWrite("Usage: PR_dbg_autocmd_trigger <Index (0-%d)>", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
 	}
 
 	if (atoi(args.Argv(1)) > pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1)
 	{
-		gameLocal.Printf("Out of bounds: %d max: %d\n", atoi(args.Argv(1)), pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
+		pr::ConsoleWrite("Out of bounds: %d max: %d", atoi(args.Argv(1)), pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
 		return;
 	}
 

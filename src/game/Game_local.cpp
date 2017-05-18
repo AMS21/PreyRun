@@ -375,11 +375,11 @@ void idGameLocal::Init(void) {
 	Printf("--------------------------------------\n");
 
 	// PreyRun BEGIN
-	Printf("Running %s\n", ENGINE_VERSION);
+	pr::ConsoleWrite("Running %s", ENGINE_VERSION);
 
 #ifdef PR_DEBUG
-	Printf("Running extra PreyRun debug functionality!\n");
-	Printf("Compiled on %s %s\n", __DATE__, __TIME__);
+	pr::ConsoleWrite("Running extra PreyRun debug functionality!");
+	pr::ConsoleWrite("Compiled on %s %s", __DATE__, __TIME__);
 #endif // PR_DEBUG
 
 	pr::InitPreySplitPipe();

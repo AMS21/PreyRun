@@ -44,6 +44,18 @@ namespace pr
 		common->Printf("%s: %s\n",func, text);
 	}
 
+	void ConsoleWrite(const char* fmt, ...)
+	{
+		va_list		argptr;
+		char		text[MAX_STRING_CHARS];
+
+		va_start(argptr, fmt);
+		idStr::vsnPrintf(text, sizeof(text), fmt, argptr);
+		va_end(argptr);
+
+		common->Printf("%s\n", text);
+	}
+
 	void Warning(const char* fmt, ...)
 	{
 		va_list		argptr;
@@ -62,6 +74,27 @@ namespace pr
 		else
 		{
 			common->Warning("PreyRun: %s\n", text);
+		}
+	}
+
+	void Error(const char* fmt, ...)
+	{
+		va_list		argptr;
+		char		text[MAX_STRING_CHARS];
+		idThread *	thread;
+
+		va_start(argptr, fmt);
+		idStr::vsnPrintf(text, sizeof(text), fmt, argptr);
+		va_end(argptr);
+
+		thread = idThread::CurrentThread();
+		if (thread)
+		{
+			thread->Error("PreyRun: %s\n", text);
+		}
+		else
+		{
+			common->Error("PreyRun: %s\n", text);
 		}
 	}
 }
