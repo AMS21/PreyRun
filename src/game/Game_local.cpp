@@ -375,6 +375,12 @@ void idGameLocal::Init(void) {
 	Printf("--------------------------------------\n");
 
 	// PreyRun BEGIN
+#ifdef PR_DEBUG
+	// Enable console logging
+	cvarSystem->SetCVarString("logFileName", "Console.log");
+	cvarSystem->SetCVarInteger("logFile", 1);
+#endif // PR_DEBUG
+
 	// Open log file
 	pr_logfile = fileSystem->OpenFileWrite(pr::LogFilePath, "fs_savepath");
 
