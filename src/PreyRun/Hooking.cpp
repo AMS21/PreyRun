@@ -20,13 +20,13 @@ namespace pr
 	constexpr char PreyVersionStringNew[] = ENGINE_VERSION;
 
 	constexpr DWORD PreyVerionFormatString = 0x7AF038;
-	constexpr char PreyVersionFormatStringNew[] = "   %s"; // orig: '%s.%i'
+	constexpr char PreyVersionFormatStringNew[6] = "   %s"; // orig: '%s.%i'
 
 	constexpr DWORD PreyVersionDateString = 0x7AC514;
-	constexpr char PreyVersionDateStringNew[] = __DATE__;
+	constexpr char PreyVersionDateStringNew[12] = __DATE__;
 
 	constexpr DWORD PreyVersionTimeString = 0x7AC520;
-	constexpr char PreyVersionTimeStringNew[] = __TIME__;
+	constexpr char PreyVersionTimeStringNew[9] = __TIME__;
 
 	void static WriteToMemory(DWORD addressToWrite, const char* valueToWrite, const int byteNum)
 	{
