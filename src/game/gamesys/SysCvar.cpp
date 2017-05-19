@@ -8,10 +8,14 @@
 #include "../../framework/BuildVersion.h" // HUMANHEAD mdl
 
 #if defined( _DEBUG )
-#define	BUILD_DEBUG	"-debug"
+#    define	BUILD_DEBUG	"debug"
 #else
-#define	BUILD_DEBUG "-release"
-#endif
+#    ifdef PR_DEBUG
+#        define BUILD_DEBUG "preyrun-debug"
+#    else
+#        define	BUILD_DEBUG "release"
+#    endif // PR_DEBUG
+#endif // _DEBUG
 
 /*
 
@@ -245,7 +249,7 @@ const char *ui_teamArgs[] = { "Red", "Blue", NULL };
 
 struct gameVersion_s
 {
-	gameVersion_s(void) { sprintf(string, "%s 1.0.%d%s%s %s %s %s", GAME_NAME, BUILD_NUMBER, BUILD_DEBUG, ID_VERSIONTAG, BUILD_STRING, __DATE__, __TIME__); }
+	gameVersion_s(void) { sprintf(string, "%s/Prey-1.0.%d %s%s %s %s %s", ENGINE_VERSION, BUILD_NUMBER, BUILD_DEBUG, ID_VERSIONTAG, BUILD_STRING, __DATE__, __TIME__); }
 	char	string[256];
 } gameVersion;
 
