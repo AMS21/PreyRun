@@ -1,10 +1,12 @@
-// Copyright (C) 2004 Id Software, Inc.
+﻿// Copyright (C) 2004 Id Software, Inc.
 //
 #pragma once
 
 #include "../game/gamesys/SysCvar.h" // pr_fixedseed,pr_fixedseed_value
 #include <new>
 #include "../sys/sys_public.h"
+
+#include "PreyRun.hpp"
 
 // My own Version of the Random Number Generator from Random.h
 
@@ -25,12 +27,12 @@ public:
 	operator idRandom&();
 
 	void				SetSeed(int seed);
-	int					GetSeed(void) const;
+	int					GetSeed() const;
 
-	int					RandomInt(void);			// random integer in the range [0, MAX_RAND]
+	int					RandomInt();			// random integer in the range [0, MAX_RAND]
 	int					RandomInt(int max);		// random integer in the range [0, max]
-	float				RandomFloat(void);		// random number in the range [0.0f, 1.0f]
-	float				CRandomFloat(void);		// random number in the range [-1.0f, 1.0f]
+	float				RandomFloat();		// random number in the range [0.0f, 1.0f]
+	float				CRandomFloat();		// random number in the range [-1.0f, 1.0f]
 
 	static const int	MAX_RAND = 0x7fff;
 
@@ -112,7 +114,7 @@ PR_FINLINE prRandom::prRandom(int seed)
 	this->seed = seed;
 }
 
-inline prRandom::operator idRandom() const
+PR_FINLINE prRandom::operator idRandom() const
 {
 	if (pr_fixedseed.GetBool())
 	{
@@ -121,7 +123,7 @@ inline prRandom::operator idRandom() const
 	return idRandom(this->seed);
 }
 
-inline prRandom::operator idRandom&()
+PR_FINLINE prRandom::operator idRandom&()
 {
 	if (pr_fixedseed.GetBool())
 	{
