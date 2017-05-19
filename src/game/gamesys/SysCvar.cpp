@@ -51,7 +51,7 @@ idCVar pr_freeze("PR_Freeze", "0", CVAR_GAME | CVAR_BOOL, "Completley freezes th
 
 idCVar pr_autocmd_show("PR_AutoCmd_Show", "0", CVAR_GAME | CVAR_INTEGER, "Display autocmd zones, Note that developer must be set to 1");
 
-idCVar pr_log("pr_log", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Log PreyRun output to file");
+idCVar pr_log("PR_Log", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Log PreyRun output to file");
 idFile* pr_logfile;
 
 // HUD BEGIN
