@@ -24,146 +24,161 @@ All game cvars should be defined here.
 */
 
 // PreyRun BEGIN
-idCVar pr_autojump("PR_AutoJump", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly jumps when holding your jumpkey (_moveUp)");
-#ifdef PR_DEVELOP
-idCVar pr_autostrafe("PR_AutoStrafe", "1", CVAR_GAME | CVAR_BOOL, "Automaticly strafe when running");
-bool pr_autostrafe_right { false };
-int pr_autostrafe_count { 0 };
-#endif // PR_DEVELOP
-idCVar pr_autopause("PR_AutoPause", "0", CVAR_GAME | CVAR_BOOL, "Automaticly pauses the game after map load, set PR_Freeze to 0 to continue");
-idCVar pr_preysplit("PR_PreySplit", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle support for interaction with PreySplit a LiveSplit component");
-idCVar pr_preysplit_update("PR_PreySplit_update", "41", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The time in milliseconds PreyRun shoud wait before update the game timer of PreySplit again, note that this is only for displaying the current game time the splits will always be acurate", 0, 1000, idCmdSystem::ArgCompletion_Integer<0, 1000>);
+namespace pr
+{
+	bool preysplit_pipeopen { false };
+	bool preysplit_mapchanged { false };
 
-idCVar pr_disablejukeboxes("PR_DisableJukeBoxes", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Disable all jukeboxes which play copyrighted music. This shoud make it easier to upload you runs direcly to Youtube without changing the music in the bar.");
+	idStr reload_latestsave {};
+	bool reload_ready { false };
 
-bool pr_preysplit_pipeopen { false };
-bool pr_preysplit_mapchanged { false };
+	idFile* logfile;
 
-#ifdef PR_DEVELOP
-idCVar pr_fixedseed("PR_FixedSeed", "0", CVAR_GAME | CVAR_BOOL, "Forces the RNG seed to PR_FixedSeed_Value");
-idCVar pr_fixedseed_value("PR_FixedSeed_Value", "0", CVAR_GAME | CVAR_INTEGER, "The Value the RNG seed shoud be set to if pr_fixedseed is set to 1");
-#endif // PR_DEVELOP
+	namespace Timer
+	{
+		prTimer inGame; // The actual in-game timer
+		bool running { false };
+		prTimer RTA; // The RTA timer
 
-idStr pr_reload_latestsave {};
-bool pr_reload_ready { false };
-
-idCVar pr_freeze("PR_Freeze", "0", CVAR_GAME | CVAR_BOOL, "Completley freezes the game until pr_Freeze is set back to 0");
-
-idCVar pr_autocmd_show("PR_AutoCmd_Show", "0", CVAR_GAME | CVAR_INTEGER, "Display autocmd zones, Note that developer must be set to 1");
-
-idCVar pr_log("PR_Log", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Log PreyRun output to file");
-idFile* pr_logfile;
-
-// HUD BEGIN
-idCVar pr_hud("PR_hud", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle the display of all PreyRun hud elements, the timer and game time of PreySplit will still work they just wont be visible");
-
-// Speedometer
-idCVar pr_hud_speedometer("PR_hud_Speedometer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of the speedometer which displays your velocity");
-idCVar pr_hud_speedometer_r("PR_hud_Speedometer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the red value of the speedometer", 0, 255);
-idCVar pr_hud_speedometer_g("PR_hud_Speedometer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the green value of the speedometer", 0, 255);
-idCVar pr_hud_speedometer_b("PR_hud_Speedometer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the blue value of the speedometer", 0, 255);
-idCVar pr_hud_speedometer_precision("PR_hud_Speedometer_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "the amount of numbers shown after the comma", 0, 6);
-idCVar pr_hud_speedometer_x("PR_hud_Speedometer_X", "310", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer x coordinate", 0, 639);
-idCVar pr_hud_speedometer_y("PR_hud_Speedometer_Y", "460", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer y coordinate", 0, 479);
-
-// Timer
-prTimer pr_gametimer; // The actual timer
-prTimer pr_rtatimer;
-
-idTimer pr_demo_timer;
-
-bool pr_timedemo { false };
-bool pr_gametimer_running { false };
-
-idCVar pr_timer_autostart("PR_Timer_AutoStart", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly start the hud timer at run begin check PR_Timer_Methode for information when this might be");
-idCVar pr_timer_autostop("PR_Timer_AutoStop", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly stop the hud timer check PR_Timer_Methode for information when this might be");
-idCVar pr_timer_methode("PR_Timer_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Switch the diffrent timing methodes\n0 - RTA - Real Time Attack, the whole game from start (the first frame you can control Tommy) to finish (when the sphere boss is killed) with game time (default)\n1 - Individual Level, Starts when a map or savegame, is loaded and stops when the map has been completed", 0, 1);
-idCVar pr_timer_backup("PR_Timer_Backup", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle support for backing up the game time to resume it after the game crashed");
-idCVar pr_timer_backup_interval("PR_Timer_Backup_Interval", "250", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The interval for updating the backup timer");
-
-idCVar pr_hud_timer("PR_hud_Timer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of the hud timer, note that the timer will still works even if hidden");
-idCVar pr_hud_timer_x("PR_hud_Timer_X", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 639);
-idCVar pr_hud_timer_y("PR_hud_Timer_Y", "235", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 479);
-idCVar pr_hud_timer_r("PR_hud_Timer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
-idCVar pr_hud_timer_g("PR_hud_Timer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
-idCVar pr_hud_timer_b("PR_hud_Timer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
-idCVar pr_hud_timer_precision("PR_hud_Timer_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer precision", 0, 3);
-idCVar pr_hud_timer_alldigits("PR_hud_Timer_AllDigits", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display all digits or only the non zero ones");
-
-// RTA Timer
-idCVar pr_hud_rtatimer("PR_hud_RTATimer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of the RTA hud timer, note that the timer will still works even if hidden");
-idCVar pr_hud_rtatimer_x("PR_hud_RTATimer_X", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 639);
-idCVar pr_hud_rtatimer_y("PR_hud_RTATimer_Y", "220", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 479);
-idCVar pr_hud_rtatimer_r("PR_hud_RTATimer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
-idCVar pr_hud_rtatimer_g("PR_hud_RTATimer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
-idCVar pr_hud_rtatimer_b("PR_hud_RTATimer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
-idCVar pr_hud_rtatimer_precision("PR_hud_RTATimer_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer precision", 0, 3);
-idCVar pr_hud_rtatimer_alldigits("PR_hud_RTATimer_AllDigits", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display all digits or only the non zero ones");
-
-// JumpSpeed
-idCVar pr_hud_jumpspeed("PR_hud_JumpSpeed", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your jumpspeed, the speed you had before you jumped");
-idCVar pr_hud_jumpspeed_x("PR_hud_JumpSpeed_X", "310", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed position", 0, 639);
-idCVar pr_hud_jumpspeed_y("PR_hud_JumpSpeed_Y", "445", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed position", 0, 479);
-idCVar pr_hud_jumpspeed_r("PR_hud_JumpSpeed_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0, 255);
-idCVar pr_hud_jumpspeed_g("PR_hud_JumpSpeed_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0, 255);
-idCVar pr_hud_jumpspeed_b("PR_hud_JumpSpeed_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0, 255);
-idCVar pr_hud_jumpspeed_precision("PR_hud_JumpSpeed_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed precision", 0, 6);
-idCVar pr_hud_jumpspeed_style("PR_hud_JumpSpeed_Style", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "0 - Always display your jumpspeed\n1 - jumspeed fades out when on the ground\n2 - jumpspeed only visible while in the air", 0, 2, idCmdSystem::ArgCompletion_Integer<0, 2>);
-
-// Viewangles
-idCVar pr_hud_viewangles("PR_hud_ViewAngles", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of your current viewangles");
-
-// Velocity
-idCVar pr_hud_velocity("PR_hud_Velocity", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of detailed information about your current verlocity");
-
-// Location
-idCVar pr_hud_location("PR_hud_Location", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of your current position in the level");
-idCVar pr_hud_location_methode("PR_hud_Location_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Switch the different location methodes.\n0 - Display eye (viewpoint / camera) position (default)\n1 - Display feet position", 0, 1);
-
-// Entity Info
-idCVar pr_hud_entityinfo("PR_hud_EntityInfo", "0", CVAR_GAME | CVAR_BOOL, "Shows infos about the entity aimed at. Which info will be displayed can be selected with pr_hud_entityinfo_*");
-idCVar pr_hud_entityinfo_health("PR_hud_EntityInfo_Health", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entitys health when pr_hud_entityinfo is enabled");
-idCVar pr_hud_entityinfo_name("PR_hud_EntityInfo_Name", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entitys name when pr_hud_entityinfo is enabled");
-idCVar pr_hud_entityinfo_type("PR_hud_EntityInfo_Type", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entitys type when pr_hud_entityinfo is enabled");
-
-// Ammo
-idCVar pr_hud_ammo("PR_hud_Ammo", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current ammo (White = loaded magazine, Yellow = empty magazine, Red = no ammo left)");
-
-// Health
-idCVar pr_hud_health("PR_hud_Health", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current health and maximum health, will be greyed out if god mode is enabled");
-
-// Damage
-idCVar pr_hud_damage("PR_hud_Damage", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, " Toggle display of the damage you receive");
-idCVar pr_hud_damage_style("PR_hud_Damage_Style", "1", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE,"0 - Display the last amount of damage you received\n1 - Display the amount of damage you received in the last time",0,1,idCmdSystem::ArgCompletion_Integer<0,1>);
-
-// SpiritPower
-idCVar pr_hud_spiritpower("PR_hud_SpiritPower", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current spirit power / mana, will be greyed out when not having the ability to spirit walk");
-
-// Distance
-idCVar pr_hud_distance("PR_hud_Distance", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of the distance between your eyes position (view position / camera) and the object or entity aimed at");
-
-// Custom hud element
-idCVar pr_hud_custom("PR_hud_Custom", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of the custom hud element, this will display any text given to PR_hud_Custom_Text");
-idCVar pr_hud_custom_x("PR_hud_Custom_x", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "X position of the custom hud element", 0, 639);
-idCVar pr_hud_custom_y("PR_hud_Custom_y", "250", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Y position of the custom hud element", 0, 479);
-idCVar pr_hud_custom_r("PR_hud_Custom_r", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Custom hud element color", 0, 255);
-idCVar pr_hud_custom_g("PR_hud_Custom_g", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Custom hud element color", 0, 255);
-idCVar pr_hud_custom_b("PR_hud_Custom_b", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Custom hud element color", 0, 255);
-idCVar pr_hud_custom_text("PR_hud_Custom_text", "", CVAR_GAME, "The text to display");
-
-// Keys
-idCVar pr_hud_keys("PR_hud_Keys", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of showing the pressed movement keys");
-idCVar pr_hud_keys_methode("PR_hud_Keys_Style", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Select the style in which the pressed movement keys are displayed\n0 - Under the crosshair, only pressed keys are shown\n1 - Under the crosshair, pressed keys are white and not pressed keys are grey\n2 - Around the crosshair, only pressed keys are shown\n3 - Around the corsshair, pressed keys are white and not pressed keys are grey\n4 - At the right side of the screen, only pressed keys are displayed\n5 - At the right side of the screen, pressed keys are white and not not pressed keys are grey", 0, 5);
-
+		idTimer demo;
+		bool timedemo { false };
+	}
+	
 #ifdef PR_DEBUG
-idCVar pr_dbg_hud_drawtime("pr_dbg_hud_drawtime", "0", CVAR_GAME | CVAR_BOOL, "*Debug*: Shows the time in milliseconds it took to draw the hud");
-idCVar pr_dbg_hud_frametime("pr_dbg_hud_frametime", "0", CVAR_GAME | CVAR_BOOL, "*Debug*: Shows the time in milliseconds it took to render this frame");
-double pr_dbg_frametimer_value { 0 };
-idTimer pr_dbg_frametimer;
-idTimer pr_dbg_timer;
+	namespace dbg
+	{
+		double frametimer_value { 0 };
+		idTimer frametimer;
+		idTimer timer;
+	}
 #endif // PR_DEBUG
 
-// HUD END
+	namespace Cvar
+	{
+		idCVar autojump("PR_AutoJump", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly jumps when holding your jumpkey (_moveUp)");
+		idCVar autopause("PR_AutoPause", "0", CVAR_GAME | CVAR_BOOL, "Automaticly pauses the game after map load, set PR_Freeze to 0 to continue");
+		idCVar preysplit("PR_PreySplit", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle support for interaction with PreySplit a LiveSplit component");
+		idCVar preysplit_update("PR_PreySplit_update", "41", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The time in milliseconds PreyRun shoud wait before update the game timer of PreySplit again, note that this is only for displaying the current game time the splits will always be acurate", 0, 1000, idCmdSystem::ArgCompletion_Integer<0, 1000>);
+		idCVar disablejukeboxes("PR_DisableJukeBoxes", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Disable all jukeboxes which play copyrighted music. This should make it easier to upload your runs direcly to Youtube without changing the music in the bar.");
+		idCVar freeze("PR_Freeze", "0", CVAR_GAME | CVAR_BOOL, "Completley freezes the game until pr_Freeze is set back to 0");
+		idCVar autocmd_show("PR_AutoCmd_Show", "0", CVAR_GAME | CVAR_INTEGER, "Display autocmd zones, Note that developer must be set to 1");
+		idCVar log("PR_Log", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Log PreyRun output to file");
+
+		idCVar timer_autostart("PR_Timer_AutoStart", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly start the hud timer at run begin check PR_Timer_Methode for information when this might be");
+		idCVar timer_autostop("PR_Timer_AutoStop", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly stop the hud timer check PR_Timer_Methode for information when this might be");
+		idCVar timer_methode("PR_Timer_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Switch the diffrent timing methodes\n0 - RTA - Real Time Attack, the whole game from start (the first frame you can control Tommy) to finish (when the sphere boss is killed) with game time (default)\n1 - Individual Level, Starts when a map or savegame, is loaded and stops when the map has been completed", 0, 1);
+		idCVar timer_backup("PR_Timer_Backup", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle support for backing up the game time to resume it after the game crashed");
+		idCVar timer_backup_interval("PR_Timer_Backup_Interval", "250", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The interval for updating the backup timer");
+
+#ifdef PR_DEVELOP
+		idCVar autostrafe("PR_AutoStrafe", "1", CVAR_GAME | CVAR_BOOL, "Automaticly strafe when running");
+		bool autostrafe_right { false };
+		int autostrafe_count { 0 };
+
+		idCVar fixedseed("PR_FixedSeed", "0", CVAR_GAME | CVAR_BOOL, "Forces the RNG seed to PR_FixedSeed_Value");
+		idCVar fixedseed_value("PR_FixedSeed_Value", "0", CVAR_GAME | CVAR_INTEGER, "The Value the RNG seed shoud be set to if pr_fixedseed is set to 1");
+#endif // PR_DEVELOP
+
+#ifdef PR_DEBUG
+		namespace dbg
+		{
+			namespace Hud
+			{
+				idCVar drawtime("pr_dbg_hud_drawtime", "0", CVAR_GAME | CVAR_BOOL, "*Debug*: Shows the time in milliseconds it took to draw the hud");
+				idCVar frametime("pr_dbg_hud_frametime", "0", CVAR_GAME | CVAR_BOOL, "*Debug*: Shows the time in milliseconds it took to render this frame");
+			} // namespace: Hud
+		} // namespace: dbg
+#endif // PR_DEBUG
+
+		namespace Hud
+		{
+			idCVar hud("PR_hud", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle the display of all PreyRun hud elements, the timer and game time of PreySplit will still work they just wont be visible");
+
+			// Speedometer
+			idCVar speedometer("PR_hud_Speedometer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of the speedometer which displays your velocity");
+			idCVar speedometer_r("PR_hud_Speedometer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the red value of the speedometer", 0, 255);
+			idCVar speedometer_g("PR_hud_Speedometer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the green value of the speedometer", 0, 255);
+			idCVar speedometer_b("PR_hud_Speedometer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the blue value of the speedometer", 0, 255);
+			idCVar speedometer_precision("PR_hud_Speedometer_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "the amount of numbers shown after the comma", 0, 6);
+			idCVar speedometer_x("PR_hud_Speedometer_X", "310", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer x coordinate", 0, 639);
+			idCVar speedometer_y("PR_hud_Speedometer_Y", "460", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer y coordinate", 0, 479);
+
+			idCVar timer("PR_hud_Timer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of the hud timer, note that the timer will still works even if hidden");
+			idCVar timer_x("PR_hud_Timer_X", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 639);
+			idCVar timer_y("PR_hud_Timer_Y", "235", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 479);
+			idCVar timer_r("PR_hud_Timer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
+			idCVar timer_g("PR_hud_Timer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
+			idCVar timer_b("PR_hud_Timer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
+			idCVar timer_precision("PR_hud_Timer_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer precision", 0, 3);
+			idCVar timer_alldigits("PR_hud_Timer_AllDigits", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display all digits or only the non zero ones");
+
+			// RTA Timer
+			idCVar rtatimer("PR_hud_RTATimer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of the RTA hud timer, note that the timer will still works even if hidden");
+			idCVar rtatimer_x("PR_hud_RTATimer_X", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 639);
+			idCVar rtatimer_y("PR_hud_RTATimer_Y", "220", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 479);
+			idCVar rtatimer_r("PR_hud_RTATimer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
+			idCVar rtatimer_g("PR_hud_RTATimer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
+			idCVar rtatimer_b("PR_hud_RTATimer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
+			idCVar rtatimer_precision("PR_hud_RTATimer_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer precision", 0, 3);
+			idCVar rtatimer_alldigits("PR_hud_RTATimer_AllDigits", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display all digits or only the non zero ones");
+
+			// JumpSpeed
+			idCVar jumpspeed("PR_hud_JumpSpeed", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your jumpspeed, the speed you had before you jumped");
+			idCVar jumpspeed_x("PR_hud_JumpSpeed_X", "310", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed position", 0, 639);
+			idCVar jumpspeed_y("PR_hud_JumpSpeed_Y", "445", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed position", 0, 479);
+			idCVar jumpspeed_r("PR_hud_JumpSpeed_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0, 255);
+			idCVar jumpspeed_g("PR_hud_JumpSpeed_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0, 255);
+			idCVar jumpspeed_b("PR_hud_JumpSpeed_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0, 255);
+			idCVar jumpspeed_precision("PR_hud_JumpSpeed_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed precision", 0, 6);
+			idCVar jumpspeed_style("PR_hud_JumpSpeed_Style", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "0 - Always display your jumpspeed\n1 - jumspeed fades out when on the ground\n2 - jumpspeed only visible while in the air", 0, 2, idCmdSystem::ArgCompletion_Integer<0, 2>);
+
+			// Viewangles
+			idCVar viewangles("PR_hud_ViewAngles", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of your current viewangles");
+
+			// Velocity
+			idCVar velocity("PR_hud_Velocity", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of detailed information about your current verlocity");
+
+			// Location
+			idCVar location("PR_hud_Location", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of your current position in the level");
+			idCVar location_methode("PR_hud_Location_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Switch the different location methodes.\n0 - Display eye (viewpoint / camera) position (default)\n1 - Display feet position", 0, 1);
+
+			// Entity Info
+			idCVar entityinfo("PR_hud_EntityInfo", "0", CVAR_GAME | CVAR_BOOL, "Shows infos about the entity aimed at. Which info will be displayed can be selected with entityinfo_*");
+			idCVar entityinfo_health("PR_hud_EntityInfo_Health", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entitys health when pr_hud_entityinfo is enabled");
+			idCVar entityinfo_name("PR_hud_EntityInfo_Name", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entitys name when pr_hud_entityinfo is enabled");
+			idCVar entityinfo_type("PR_hud_EntityInfo_Type", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entitys type when pr_hud_entityinfo is enabled");
+
+			// Ammo
+			idCVar ammo("PR_hud_Ammo", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current ammo (White = loaded magazine, Yellow = empty magazine, Red = no ammo left)");
+
+			// Health
+			idCVar health("PR_hud_Health", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current health and maximum health, will be greyed out if god mode is enabled");
+
+			// Damage
+			idCVar damage("PR_hud_Damage", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, " Toggle display of the damage you receive");
+			idCVar damage_style("PR_hud_Damage_Style", "1", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "0 - Display the last amount of damage you received\n1 - Display the amount of damage you received in the last time", 0, 1, idCmdSystem::ArgCompletion_Integer<0, 1>);
+
+			// SpiritPower
+			idCVar spiritpower("PR_hud_SpiritPower", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current spirit power / mana, will be greyed out when not having the ability to spirit walk");
+
+			// Distance
+			idCVar distance("PR_hud_Distance", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of the distance between your eyes position (view position / camera) and the object or entity aimed at");
+
+			// Custom hud element
+			idCVar custom("PR_hud_Custom", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of the custom hud element, this will display any text given to PR_hud_Custom_Text");
+			idCVar custom_x("PR_hud_Custom_x", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "X position of the custom hud element", 0, 639);
+			idCVar custom_y("PR_hud_Custom_y", "250", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Y position of the custom hud element", 0, 479);
+			idCVar custom_r("PR_hud_Custom_r", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Custom hud element color", 0, 255);
+			idCVar custom_g("PR_hud_Custom_g", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Custom hud element color", 0, 255);
+			idCVar custom_b("PR_hud_Custom_b", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Custom hud element color", 0, 255);
+			idCVar custom_text("PR_hud_Custom_text", "", CVAR_GAME, "The text to display");
+
+			// Keys
+			idCVar keys("PR_hud_Keys", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of showing the pressed movement keys");
+			idCVar keys_methode("PR_hud_Keys_Style", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Select the style in which the pressed movement keys are displayed\n0 - Under the crosshair, only pressed keys are shown\n1 - Under the crosshair, pressed keys are white and not pressed keys are grey\n2 - Around the crosshair, only pressed keys are shown\n3 - Around the corsshair, pressed keys are white and not pressed keys are grey\n4 - At the right side of the screen, only pressed keys are displayed\n5 - At the right side of the screen, pressed keys are white and not not pressed keys are grey", 0, 5);
+		} // namespace: Hud
+	} // namespace: Cvar
+} // namespace: pr
 // PreyRun END
 
 #ifdef HUMANHEAD	// HUMANHEAD

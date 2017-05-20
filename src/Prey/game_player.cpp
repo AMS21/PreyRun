@@ -1104,13 +1104,13 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud)
 
 	// PreyRun BEGIN
 	// PreySplit pipe shoud be open but isnt
-	if (pr_preysplit.GetBool() && !pr_preysplit_pipeopen)
+	if (pr::Cvar::preysplit.GetBool() && !pr::preysplit_pipeopen)
 	{
 		pr::InitPreySplitPipe();
 	}
 
 	// PreySplit pipe shoudnt be open but is
-	else if (!pr_preysplit.GetBool() && pr_preysplit_pipeopen)
+	else if (!pr::Cvar::preysplit.GetBool() && pr::preysplit_pipeopen)
 	{
 		pr::ShutdownPreySplitPipe();
 	}
@@ -1196,31 +1196,31 @@ hhPlayer::DrawHUD
 void hhPlayer::DrawHUD(idUserInterface *_hud)
 {
 	// PreyRun BEGIN
-	if (pr_freeze.GetBool() && pr_gametimer.IsRunning())
+	if (pr::Cvar::freeze.GetBool() && pr::Timer::inGame.IsRunning())
 	{
-		pr_gametimer.Stop();
-		pr_rtatimer.Stop();
+		pr::Timer::inGame.Stop();
+		pr::Timer::RTA.Stop();
 	}
 
 #ifdef PR_DEBUG
-	if (pr_dbg_hud_drawtime.GetBool())
+	if (pr::Cvar::dbg::Hud::drawtime.GetBool())
 	{
-		pr_dbg_timer.Start();
+		pr::dbg::timer.Start();
 	}
 #endif // PR_DEBUG
 
 	// Individual Level timer
-	if (pr_gametimer_running && !pr_gametimer.IsRunning() && pr_timer_autostart.GetBool() && static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::IndividualLevel)
+	if (pr::Timer::running && !pr::Timer::inGame.IsRunning() && pr::Cvar::timer_autostart.GetBool() && static_cast<pr::TimerMethode>(pr::Cvar::timer_methode.GetInteger()) == pr::TimerMethode::IndividualLevel)
 	{
-		pr_gametimer.Clear();
-		pr_rtatimer.Clear();
+		pr::Timer::inGame.Clear();
+		pr::Timer::RTA.Clear();
 
-		pr_gametimer.Start();
-		pr_rtatimer.Start();
+		pr::Timer::inGame.Start();
+		pr::Timer::RTA.Start();
 
 		pr::Log("Timer: Individual Level Auto starting");
 
-		if (pr_preysplit.GetBool())
+		if (pr::Cvar::preysplit.GetBool())
 		{
 			pr::WriteTimerStart(pr::GetTime());
 		}
@@ -1229,18 +1229,18 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 	}
 
 	// Might not be the optimal solution because when the game decides to not draw the hud the timer cant resume but it gives better times then hooking InitFromMap()
-	if (pr_gametimer_running && !pr_gametimer.IsRunning() && !pr_freeze.GetBool())
+	if (pr::Timer::running && !pr::Timer::inGame.IsRunning() && !pr::Cvar::freeze.GetBool())
 	{
-		pr_gametimer.Start();
-		if (!pr_rtatimer.IsRunning())
+		pr::Timer::inGame.Start();
+		if (!pr::Timer::RTA.IsRunning())
 		{
-			pr_rtatimer.Start();
+			pr::Timer::RTA.Start();
 		}
 
 		pr::Log("Timer: Resuming, Map load");
 
 #ifdef PR_DEBUG
-		auto time = PR_ms2time(pr_gametimer.Milliseconds());
+		auto time = PR_ms2time(pr::Timer::inGame.Milliseconds());
 		pr::DebugLog("Time: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
 
 		pr::DebugLog("Changed map to: %s", gameLocal.GetMapName());
@@ -1266,26 +1266,26 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 	UpdateHudStats(_hud);
 
 	// PreyRun BEGIN
-	if (pr_hud.GetBool())
+	if (pr::Cvar::Hud::hud.GetBool())
 	{
 		// Timer
-		if (pr_hud_timer.GetBool())
+		if (pr::Cvar::Hud::timer.GetBool())
 		{
-			auto strTime = PR_formatTimeString(PR_ms2time(pr_gametimer.Milliseconds()), pr_hud_timer_alldigits.GetBool(), pr_hud_timer_precision.GetInteger());
+			auto strTime = PR_formatTimeString(PR_ms2time(pr::Timer::inGame.Milliseconds()), pr::Cvar::Hud::timer_alldigits.GetBool(), pr::Cvar::Hud::timer_precision.GetInteger());
 
-			renderSystem->DrawSmallStringExt(pr_hud_timer_x.GetInteger(), pr_hud_timer_y.GetInteger(), strTime.c_str(), idVec4(PR_toPreyColour(pr_hud_timer_r.GetInteger()), PR_toPreyColour(pr_hud_timer_g.GetInteger()), PR_toPreyColour(pr_hud_timer_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(pr::Cvar::Hud::timer_x.GetInteger(), pr::Cvar::Hud::timer_y.GetInteger(), strTime.c_str(), idVec4(PR_toPreyColour(pr::Cvar::Hud::timer_r.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::timer_g.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::timer_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// RTA-Timer
-		if (pr_hud_rtatimer.GetBool())
+		if (pr::Cvar::Hud::rtatimer.GetBool())
 		{
-			auto strTime = PR_formatTimeString(PR_ms2time(pr_rtatimer.Milliseconds()), pr_hud_rtatimer_alldigits.GetBool(), pr_hud_rtatimer_precision.GetInteger());
+			auto strTime = PR_formatTimeString(PR_ms2time(pr::Timer::RTA.Milliseconds()), pr::Cvar::Hud::rtatimer_alldigits.GetBool(), pr::Cvar::Hud::rtatimer_precision.GetInteger());
 
-			renderSystem->DrawSmallStringExt(pr_hud_rtatimer_x.GetInteger(), pr_hud_rtatimer_y.GetInteger(), strTime.c_str(), idVec4(PR_toPreyColour(pr_hud_rtatimer_r.GetInteger()), PR_toPreyColour(pr_hud_rtatimer_g.GetInteger()), PR_toPreyColour(pr_hud_rtatimer_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(pr::Cvar::Hud::rtatimer_x.GetInteger(), pr::Cvar::Hud::rtatimer_y.GetInteger(), strTime.c_str(), idVec4(PR_toPreyColour(pr::Cvar::Hud::rtatimer_r.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::rtatimer_g.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::rtatimer_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// Speedometer
-		if (pr_hud_speedometer.GetBool())
+		if (pr::Cvar::Hud::speedometer.GetBool())
 		{
 			auto vel = physicsObj.GetLinearVelocity();
 
@@ -1294,24 +1294,24 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 			if (physicsObj.HasGroundContacts() || InVehicle() || noclip)
 			{
 				// are we standing on the ground or in a Vehicle or nocliping? then add Z speed as well (when wallwalking, being on stairs/slopes, flying in Vehicle or nocliping)
-				sprintf(strSpeedoMeter, "%.*f", pr_hud_speedometer_precision.GetInteger(), vel.Length());
+				sprintf(strSpeedoMeter, "%.*f", pr::Cvar::Hud::speedometer_precision.GetInteger(), vel.Length());
 			}
 			else
 			{
-				sprintf(strSpeedoMeter, "%.*f", pr_hud_speedometer_precision.GetInteger(), static_cast<float>(idMath::Sqrt(vel.x * vel.x + vel.y * vel.y)));
+				sprintf(strSpeedoMeter, "%.*f", pr::Cvar::Hud::speedometer_precision.GetInteger(), static_cast<float>(idMath::Sqrt(vel.x * vel.x + vel.y * vel.y)));
 
 			}
-			renderSystem->DrawSmallStringExt(pr_hud_speedometer_x.GetInteger(), pr_hud_speedometer_y.GetInteger(), strSpeedoMeter.c_str(), idVec4(PR_toPreyColour(pr_hud_speedometer_r.GetInteger()), PR_toPreyColour(pr_hud_speedometer_g.GetInteger()), PR_toPreyColour(pr_hud_speedometer_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(pr::Cvar::Hud::speedometer_x.GetInteger(), pr::Cvar::Hud::speedometer_y.GetInteger(), strSpeedoMeter.c_str(), idVec4(PR_toPreyColour(pr::Cvar::Hud::speedometer_r.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::speedometer_g.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::speedometer_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// JumpSpeed
-		if (pr_hud_jumpspeed.GetBool())
+		if (pr::Cvar::Hud::jumpspeed.GetBool())
 		{
 			idStr strJumpSpeed;
 
 			auto pr_js_alpha { 1.00f };
 
-			if (static_cast<PR_jumpspeed_style>(pr_hud_jumpspeed_style.GetInteger()) == PR_jumpspeed_style::Fading)
+			if (static_cast<pr::JumpspeedStyle>(pr::Cvar::Hud::jumpspeed_style.GetInteger()) == pr::JumpspeedStyle::Fading)
 			{
 				pr_js_alpha = _hud->GetStateFloat("pr_hud_jumpspeed_alpha", "0");
 			}
@@ -1322,37 +1322,37 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 				auto vel = physicsObj.GetLinearVelocity().Length();
 				_hud->SetStateFloat("pr_hud_jumpspeed_val", vel);
 
-				if (static_cast<PR_jumpspeed_style>(pr_hud_jumpspeed_style.GetInteger()) == PR_jumpspeed_style::Normal)
+				if (static_cast<pr::JumpspeedStyle>(pr::Cvar::Hud::jumpspeed_style.GetInteger()) == pr::JumpspeedStyle::Normal)
 				{
-					sprintf(strJumpSpeed, "%.*f", pr_hud_jumpspeed_precision.GetInteger(), vel);
+					sprintf(strJumpSpeed, "%.*f", pr::Cvar::Hud::jumpspeed_precision.GetInteger(), vel);
 				}
-				else if (static_cast<PR_jumpspeed_style>(pr_hud_jumpspeed_style.GetInteger()) == PR_jumpspeed_style::Fading)
+				else if (static_cast<pr::JumpspeedStyle>(pr::Cvar::Hud::jumpspeed_style.GetInteger()) == pr::JumpspeedStyle::Fading)
 				{
 					pr_js_alpha -= PR_fade_factor;
 					pr_js_alpha = idMath::ClampFloat(0.00f, 1.00f, pr_js_alpha);
 					_hud->SetStateFloat("pr_hud_jumpspeed_alpha", pr_js_alpha);
 
-					sprintf(strJumpSpeed, "%.*f", pr_hud_jumpspeed_precision.GetInteger(), _hud->GetStateFloat("pr_hud_jumpspeed_oldval", "0"));
+					sprintf(strJumpSpeed, "%.*f", pr::Cvar::Hud::jumpspeed_precision.GetInteger(), _hud->GetStateFloat("pr_hud_jumpspeed_oldval", "0"));
 				}
 			}
 			// Were arent standing on the ground so were in mid air, so we display the last speedvalue we had while on the ground
 			else
 			{
-				if (static_cast<PR_jumpspeed_style>(pr_hud_jumpspeed_style.GetInteger()) == PR_jumpspeed_style::Fading)
+				if (static_cast<pr::JumpspeedStyle>(pr::Cvar::Hud::jumpspeed_style.GetInteger()) == pr::JumpspeedStyle::Fading)
 				{
 					pr_js_alpha = 1.00f;
 					_hud->SetStateFloat("pr_hud_jumpspeed_alpha", pr_js_alpha);
 					_hud->SetStateFloat("pr_hud_jumpspeed_oldval", _hud->GetStateFloat("pr_hud_jumpspeed_val", "0"));
 				}
 
-				sprintf(strJumpSpeed, "%.*f", pr_hud_jumpspeed_precision.GetInteger(), _hud->GetStateFloat("pr_hud_jumpspeed_val", "0"));
+				sprintf(strJumpSpeed, "%.*f", pr::Cvar::Hud::jumpspeed_precision.GetInteger(), _hud->GetStateFloat("pr_hud_jumpspeed_val", "0"));
 			}
 
-			renderSystem->DrawSmallStringExt(pr_hud_jumpspeed_x.GetInteger(), pr_hud_jumpspeed_y.GetInteger(), strJumpSpeed.c_str(), idVec4(PR_toPreyColour(pr_hud_jumpspeed_r.GetInteger()), PR_toPreyColour(pr_hud_jumpspeed_g.GetInteger()), PR_toPreyColour(pr_hud_jumpspeed_b.GetInteger()), pr_js_alpha), true, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(pr::Cvar::Hud::jumpspeed_x.GetInteger(), pr::Cvar::Hud::jumpspeed_y.GetInteger(), strJumpSpeed.c_str(), idVec4(PR_toPreyColour(pr::Cvar::Hud::jumpspeed_r.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::jumpspeed_g.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::jumpspeed_b.GetInteger()), pr_js_alpha), true, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// Viewangles
-		if (pr_hud_viewangles.GetBool())
+		if (pr::Cvar::Hud::viewangles.GetBool())
 		{
 			idStr pitch;
 			idStr yaw;
@@ -1379,7 +1379,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		}
 
 		// Velocity
-		if (pr_hud_velocity.GetBool())
+		if (pr::Cvar::Hud::velocity.GetBool())
 		{
 			auto vel = physicsObj.GetLinearVelocity();
 
@@ -1402,7 +1402,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		}
 
 		// Location
-		if (pr_hud_location.GetBool())
+		if (pr::Cvar::Hud::location.GetBool())
 		{
 			auto eyePos = GetEyePosition();
 
@@ -1413,7 +1413,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 
 			idStr posZ;
 			auto zpos = eyePos.z;
-			if (static_cast<PR_location_methode>(pr_hud_location_methode.GetInteger()) == PR_location_methode::FeetPos)
+			if (static_cast<pr::LocationMethode>(pr::Cvar::Hud::location_methode.GetInteger()) == pr::LocationMethode::FeetPos)
 			{
 				zpos -= EyeHeight();
 			}
@@ -1425,7 +1425,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		}
 
 		// Entity Info
-		if (pr_hud_entityinfo.GetBool())
+		if (pr::Cvar::Hud::entityinfo.GetBool())
 		{
 			trace_t trace;
 			idVec3 end;
@@ -1473,7 +1473,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 
 						if (!(className == "hhShuttle" && static_cast<hhShuttle*> (ent)->IsConsole()))
 						{
-							if (pr_hud_entityinfo_health.GetBool())
+							if (pr::Cvar::Hud::entityinfo_health.GetBool())
 							{
 								idStr strHealth;
 								sprintf(strHealth, "        %03d/%03d", ent->GetHealth(), maxHealth);
@@ -1493,7 +1493,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 								++displayIndex;
 							}
 
-							if (pr_hud_entityinfo_name.GetBool())
+							if (pr::Cvar::Hud::entityinfo_name.GetBool())
 							{
 								idStr strName;
 								sprintf(strName, "Name: %s", ent->GetName());
@@ -1503,7 +1503,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 								++displayIndex;
 							}
 
-							if (pr_hud_entityinfo_type.GetBool())
+							if (pr::Cvar::Hud::entityinfo_type.GetBool())
 							{
 								idStr strType;
 								sprintf(strType, "Type: %s", className.c_str());
@@ -1519,7 +1519,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		}
 
 		// Ammo
-		if (pr_hud_ammo.GetBool())
+		if (pr::Cvar::Hud::ammo.GetBool())
 		{
 			if (InVehicle())
 			{
@@ -1541,10 +1541,10 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 			else
 			{
 
-				switch (static_cast<PR_weapons>(currentWeapon))
+				switch (static_cast<pr::Weapons>(currentWeapon))
 				{
-				case PR_weapons::Rifle:
-				case PR_weapons::Shotgun:
+				case pr::Weapons::Rifle:
+				case pr::Weapons::Shotgun:
 				{
 					auto clip = weapon->AmmoInClip();
 					auto avail = weapon->AmmoAvailable();
@@ -1565,9 +1565,9 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 					renderSystem->DrawSmallStringExt(PR_ammopos_x, PR_ammopos_y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
 					break;
 				}
-				case PR_weapons::Crawler:
-				case PR_weapons::Leecher:
-				case PR_weapons::RocketLauncher:
+				case pr::Weapons::Crawler:
+				case pr::Weapons::Leecher:
+				case pr::Weapons::RocketLauncher:
 				{
 					auto avail = weapon->AmmoAvailable();
 					idVec4 colour;
@@ -1581,7 +1581,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 					renderSystem->DrawSmallStringExt(PR_ammopos_x, PR_ammopos_y, strAmmo, colour, false, declManager->FindMaterial("textures/bigchars"));
 					break;
 				}
-				case PR_weapons::Minigun: // Minigun
+				case pr::Weapons::Minigun: // Minigun
 				{
 					auto avail = weapon->AmmoAvailable();
 					auto altAvail = weapon->AltAmmoAvailable();
@@ -1610,7 +1610,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		}
 
 		// Health
-		if (pr_hud_health.GetBool())
+		if (pr::Cvar::Hud::health.GetBool())
 		{
 			// Player is alive, Dead != Deathwalking
 			if (!IsDead())
@@ -1653,7 +1653,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		}
 
 		// Damage
-		if (pr_hud_damage.GetBool())
+		if (pr::Cvar::Hud::damage.GetBool())
 		{
 			auto alpha = _hud->GetStateFloat("pr_hud_damage_a", "0");
 
@@ -1664,11 +1664,11 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 			idStr strDamage;
 			sprintf(strDamage, "-%d", _hud->GetStateInt("pr_hud_damage_val"), strDamage);
 
-			renderSystem->DrawSmallStringExt(pr_hud_health.GetBool() ? (PR_health_x + 75) : PR_health_x, PR_health_y, strDamage, idVec4(1.00f, 0.00f, 0.00f, alpha), false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(pr::Cvar::Hud::health.GetBool() ? (PR_health_x + 75) : PR_health_x, PR_health_y, strDamage, idVec4(1.00f, 0.00f, 0.00f, alpha), false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// SpiritPower
-		if (pr_hud_spiritpower.GetBool())
+		if (pr::Cvar::Hud::spiritpower.GetBool())
 		{
 			if (!IsDead())
 			{
@@ -1696,7 +1696,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		}
 
 		// Distance
-		if (pr_hud_distance.GetBool())
+		if (pr::Cvar::Hud::distance.GetBool())
 		{
 			trace_t trace;
 			idVec3 end;
@@ -1739,15 +1739,15 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		}
 
 		// Custom Hud Element
-		if (pr_hud_custom.GetBool())
+		if (pr::Cvar::Hud::custom.GetBool())
 		{
-			renderSystem->DrawSmallStringExt(pr_hud_custom_x.GetInteger() , pr_hud_custom_y.GetInteger(), pr_hud_custom_text.GetString(), idVec4(PR_toPreyColour(pr_hud_custom_r.GetInteger()), PR_toPreyColour(pr_hud_custom_g.GetInteger()), PR_toPreyColour(pr_hud_custom_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(pr::Cvar::Hud::custom_x.GetInteger() , pr::Cvar::Hud::custom_y.GetInteger(), pr::Cvar::Hud::custom_text.GetString(), idVec4(PR_toPreyColour(pr::Cvar::Hud::custom_r.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::custom_g.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::custom_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// Keys
-		if (pr_hud_keys.GetBool())
+		if (pr::Cvar::Hud::keys.GetBool())
 		{
-			auto pr_mthd = static_cast<PR_keys_style>(pr_hud_keys_methode.GetInteger());
+			auto pr_mthd = static_cast<pr::KeysStyle>(pr::Cvar::Hud::keys_methode.GetInteger());
 
 			auto movef { false };
 			auto moveb { false };
@@ -1782,7 +1782,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 			auto colourb { PR_colour_white };
 			auto colourr { PR_colour_white };
 
-			if (pr_mthd == PR_keys_style::NormalGrey || pr_mthd == PR_keys_style::ReflexGrey || pr_mthd == PR_keys_style::MomentumGrey)
+			if (pr_mthd == pr::KeysStyle::NormalGrey || pr_mthd == pr::KeysStyle::ReflexGrey || pr_mthd == pr::KeysStyle::MomentumGrey)
 			{
 				if (!moved) { colourd = PR_colour_grey; }
 				if (!movef) { colourf = PR_colour_grey; }
@@ -1793,7 +1793,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 				if (!mover) { colourr = PR_colour_grey; }
 			}
 
-			if (pr_mthd == PR_keys_style::Normal)
+			if (pr_mthd == pr::KeysStyle::Normal)
 			{
 				idStr strText;
 				idStr strText2;
@@ -1805,7 +1805,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y2, strText2.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 			}
 
-			else if (pr_mthd == PR_keys_style::NormalGrey)
+			else if (pr_mthd == pr::KeysStyle::NormalGrey)
 			{
 				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y, "D", colourd, false, declManager->FindMaterial("textures/bigchars"));
 				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y, "  F", colourf, false, declManager->FindMaterial("textures/bigchars"));
@@ -1816,7 +1816,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 				renderSystem->DrawSmallStringExt(PR_keys_x, PR_keys_y2, "    R", colourr, false, declManager->FindMaterial("textures/bigchars"));
 			}
 
-			else if (pr_mthd == PR_keys_style::Reflex)
+			else if (pr_mthd == pr::KeysStyle::Reflex)
 			{
 				idStr strText;
 				idStr strText2;
@@ -1833,7 +1833,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 				renderSystem->DrawSmallStringExt(PR_keys_reflex_x, PR_keys_reflex_bdj_y, strText2.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 			}
 
-			else if (pr_mthd == PR_keys_style::ReflexGrey)
+			else if (pr_mthd == pr::KeysStyle::ReflexGrey)
 			{
 				renderSystem->DrawSmallStringExt(PR_keys_reflex_x, PR_keys_reflex_lr_y, "L", colourl, false, declManager->FindMaterial("textures/bigchars"));
 				renderSystem->DrawSmallStringExt(PR_keys_reflex_x, PR_keys_reflex_lr_y, "   R", colourr, false, declManager->FindMaterial("textures/bigchars"));
@@ -1845,7 +1845,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 				renderSystem->DrawSmallStringExt(PR_keys_reflex_x, PR_keys_reflex_bdj_y, "   J", colourj, false, declManager->FindMaterial("textures/bigchars"));
 			}
 
-			else if (pr_mthd == PR_keys_style::Momentum)
+			else if (pr_mthd == pr::KeysStyle::Momentum)
 			{
 				idStr strText;
 
@@ -1861,7 +1861,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 				renderSystem->DrawSmallStringExt(PR_keys_momentum_lrjd_x, PR_keys_momentum_lr_y, strText.c_str(), PR_colour_white, false, declManager->FindMaterial("textures/bigchars"));
 			}
 
-			else if (pr_mthd == PR_keys_style::MomentumGrey)
+			else if (pr_mthd == pr::KeysStyle::MomentumGrey)
 			{
 				renderSystem->DrawSmallStringExt(PR_keys_momentum_fb_x, PR_keys_momentum_f_y, "  F", colourf, false, declManager->FindMaterial("textures/bigchars"));
 				renderSystem->DrawSmallStringExt(PR_keys_momentum_fb_x, PR_keys_momentum_b_y, "  B", colourb, false, declManager->FindMaterial("textures/bigchars"));
@@ -1917,13 +1917,13 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 	}
 
 #ifdef PR_DEBUG
-	if (pr_dbg_hud_drawtime.GetBool())
+	if (pr::Cvar::dbg::Hud::drawtime.GetBool())
 	{
-		pr_dbg_timer.Stop();
+		pr::dbg::timer.Stop();
 
 		idStr strDrawTime;
 		auto colour { PR_colour_white };
-		auto time { pr_dbg_timer.Milliseconds() };
+		auto time { pr::dbg::timer.Milliseconds() };
 
 		if (time >= PR_dbg_huddrawtime_yellow)
 		{
@@ -1931,25 +1931,25 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 			else { colour = PR_colour_yellow; }
 		}
 
-		sprintf(strDrawTime, "%f ms", pr_dbg_timer.Milliseconds());
+		sprintf(strDrawTime, "%f ms", pr::dbg::timer.Milliseconds());
 
 		renderSystem->DrawSmallStringExt(PR_dbg_huddrawtime_x, PR_dbg_huddrawtime_y, strDrawTime, colour, false, declManager->FindMaterial("textures/bigchars"));
 
-		pr_dbg_timer.Clear();
+		pr::dbg::timer.Clear();
 	}
 
-	if (pr_dbg_hud_frametime.GetBool())
+	if (pr::Cvar::dbg::Hud::frametime.GetBool())
 	{
 		idStr strDrawTime;
 		auto colour { PR_colour_white };
 
-		if (pr_dbg_frametimer_value >= PR_dbg_frametime_yellow)
+		if (pr::dbg::frametimer_value >= PR_dbg_frametime_yellow)
 		{
-			if (pr_dbg_frametimer_value >= PR_dbg_frametime_red) { colour = PR_colour_red; }
+			if (pr::dbg::frametimer_value >= PR_dbg_frametime_red) { colour = PR_colour_red; }
 			else { colour = PR_colour_yellow; }
 		}
 
-		sprintf(strDrawTime, "%f ms", pr_dbg_frametimer_value);
+		sprintf(strDrawTime, "%f ms", pr::dbg::frametimer_value);
 
 		renderSystem->DrawSmallStringExt(PR_dbg_huddrawtime_x, PR_dbg_huddrawtime_y + PR_hud_std_y_offset, strDrawTime, colour, false, declManager->FindMaterial("textures/bigchars"));
 	}
@@ -4576,12 +4576,12 @@ void hhPlayer::Damage(idEntity *inflictor, idEntity *attacker, const idVec3 &dir
 
 		// PreyRun BEGIN
 		int damage = oldHealth - health;
-		if (static_cast<PR_damage_style>(pr_hud_damage_style.GetInteger()) == PR_damage_style::Last)
+		if (static_cast<pr::DamageStyle>(pr::Cvar::Hud::damage_style.GetInteger()) == pr::DamageStyle::Last)
 		{
 			hud->SetStateInt("pr_hud_damage_val", damage);
 			hud->SetStateFloat("pr_hud_damage_a", 1.0f);
 		}
-		else if (static_cast<PR_damage_style>(pr_hud_damage_style.GetInteger()) == PR_damage_style::Adding)
+		else if (static_cast<pr::DamageStyle>(pr::Cvar::Hud::damage_style.GetInteger()) == pr::DamageStyle::Adding)
 		{
 			if (hud->GetStateFloat("pr_hud_damage_a") > 0.0f)
 			{

@@ -4,8 +4,6 @@
 
 namespace pr
 {
-	// Public functions
-
 	void timeDemoInit();
 	void timeDemoShutdown();
 

@@ -92,26 +92,26 @@ void hhGameLocal::UnregisterEntity(idEntity *ent) {
 //---------------------------------------------------
 void hhGameLocal::MapShutdown(void) {
 	// PreyRun BEGIN
-	if (pr_gametimer_running)
+	if (pr::Timer::running)
 	{
-		pr_gametimer.Stop();
+		pr::Timer::inGame.Stop();
 		pr::Log("Timer: Paused, Map shutdown");
 
-		if (pr_preysplit.GetBool() && pr_preysplit_mapchanged && static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::RealTimeAttack)
+		if (pr::Cvar::preysplit.GetBool() && pr::preysplit_mapchanged && static_cast<pr::TimerMethode>(pr::Cvar::timer_methode.GetInteger()) == pr::TimerMethode::RealTimeAttack)
 		{
-			pr_preysplit_mapchanged = false;
+			pr::preysplit_mapchanged = false;
 			pr::WriteMapChange(pr::GetTime(), static_cast<idStr>(GetMapName()));
 		}
 
 #ifdef PR_DEBUG
-		auto time = PR_ms2time(pr_gametimer.Milliseconds());
+		auto time = PR_ms2time(pr::Timer::inGame.Milliseconds());
 		pr::DebugLog("Time: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DEBUG
 	}
 
-	if (pr_timedemo)
+	if (pr::Timer::timedemo)
 	{
-		pr_timedemo = false;
+		pr::Timer::timedemo = false;
 		pr::timeDemoShutdown();
 	}
 
@@ -148,9 +148,9 @@ void hhGameLocal::InitFromNewMap(const char *mapName, idRenderWorld *renderWorld
 	// PreyRun BEGIN
 	pr::DebugLog("Starting Map: %s", mapName);
 
-	if (static_cast<PR_timer_methode> (pr_timer_methode.GetInteger()) == PR_timer_methode::IndividualLevel && static_cast<idStr>(gameLocal.GetMapName()) != idStr("maps/game/roadhouse.map"))
+	if (static_cast<pr::TimerMethode> (pr::Cvar::timer_methode.GetInteger()) == pr::TimerMethode::IndividualLevel && static_cast<idStr>(gameLocal.GetMapName()) != idStr("maps/game/roadhouse.map"))
 	{
-		pr_gametimer_running = true;
+		pr::Timer::running = true;
 	}
 
 	// Timer recovery
@@ -191,10 +191,10 @@ void hhGameLocal::InitFromNewMap(const char *mapName, idRenderWorld *renderWorld
 	}
 
 	// PreyRun BEGIN
-	if (pr_autopause.GetBool())
+	if (pr::Cvar::autopause.GetBool())
 	{
 		pr::Log("Autopause: paused, map load");
-		pr_freeze.SetBool(true);
+		pr::Cvar::freeze.SetBool(true);
 	}
 	// PreyRun END
 }
@@ -754,19 +754,19 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 	// HUMANHEAD END
 
 	// PreyRun BEGIN
-	if (pr_freeze.GetBool())
+	if (pr::Cvar::freeze.GetBool())
 	{
-		if (pr_gametimer.IsRunning())
+		if (pr::Timer::inGame.IsRunning())
 		{
-			pr_gametimer.Stop(); 
-			pr_rtatimer.Stop();
+			pr::Timer::inGame.Stop(); 
+			pr::Timer::RTA.Stop();
 		}
 
 		return ret;
 	}
 
 #ifdef PR_DEBUG
-	pr_dbg_frametimer.Start();
+	pr::dbg::frametimer.Start();
 #endif // PR_DEBUG
 	// PreyRun END
 
@@ -813,12 +813,12 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 
 		// PreyRun BEGIN
 		// only update the timer when PreySplit is eneabled and the timer is running
-		if (pr_preysplit.GetBool() && pr_gametimer_running)
+		if (pr::Cvar::preysplit.GetBool() && pr::Timer::running)
 		{
 			pr::WriteTime(pr::GetTime());
 		}
 
-		if (pr_timer_backup.GetBool() && pr_gametimer_running && pr_gametimer.IsRunning())
+		if (pr::Cvar::timer_backup.GetBool() && pr::Timer::running && pr::Timer::inGame.IsRunning())
 		{
 			pr::WriteBackupTime(GetMapName());
 		}
@@ -1013,21 +1013,21 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 			if (sessionCommand.Find("map ", false, 4))
 			{
 				// The command to execute is map
-				pr_preysplit_mapchanged = true;
+				pr::preysplit_mapchanged = true;
 
-				if (static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::IndividualLevel && pr_gametimer_running && pr_gametimer.IsRunning() && pr_timer_autostop.GetBool())
+				if (static_cast<pr::TimerMethode>(pr::Cvar::timer_methode.GetInteger()) == pr::TimerMethode::IndividualLevel && pr::Timer::running && pr::Timer::inGame.IsRunning() && pr::Cvar::timer_autostop.GetBool())
 				{
-					pr_gametimer_running = false;
-					pr_gametimer.Stop();
-					pr_rtatimer.Stop();
+					pr::Timer::running = false;
+					pr::Timer::inGame.Stop();
+					pr::Timer::RTA.Stop();
 
-					if (pr_preysplit.GetBool())
+					if (pr::Cvar::preysplit.GetBool())
 					{
 						pr::WriteGameEnd(pr::GetTime());
 					}
 
-					auto times = PR_ms2time(pr_gametimer.Milliseconds());
-					auto rtatime = PR_ms2time(pr_rtatimer.Milliseconds());
+					auto times = PR_ms2time(pr::Timer::inGame.Milliseconds());
+					auto rtatime = PR_ms2time(pr::Timer::RTA.Milliseconds());
 
 					pr::Log("Timer: Individual Level end, game time: %02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
 					pr::Log("Timer: Individual Level end, RTA time: %02d:%02d:%02d.%03d", rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds);
@@ -1070,9 +1070,9 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 
 	// PreyRun BEGIN
 #ifdef PR_DEBUG
-	pr_dbg_frametimer.Stop();
-	pr_dbg_frametimer_value = pr_dbg_frametimer.Milliseconds();
-	pr_dbg_frametimer.Clear();
+	pr::dbg::frametimer.Stop();
+	pr::dbg::frametimer_value = pr::dbg::frametimer.Milliseconds();
+	pr::dbg::frametimer.Clear();
 #endif // PR_DEBUG
 	// PreyRun END
 

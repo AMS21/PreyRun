@@ -35,13 +35,13 @@ namespace pr
 
 	void WriteBackupTime(const char* mapName)
 	{
-		if (pr_timer_backup_interval.GetFloat() > 0.0f)
+		if (pr::Cvar::timer_backup_interval.GetFloat() > 0.0f)
 		{
-			static auto last_time = std::chrono::steady_clock::now() - std::chrono::milliseconds(static_cast<long long>(pr_timer_backup_interval.GetFloat()) + 1);
+			static auto last_time = std::chrono::steady_clock::now() - std::chrono::milliseconds(static_cast<long long>(pr::Cvar::timer_backup_interval.GetFloat()) + 1);
 
 			auto now = std::chrono::steady_clock::now();
 
-			if (now >= last_time + std::chrono::milliseconds(static_cast<long long>(pr_timer_backup_interval.GetFloat())))
+			if (now >= last_time + std::chrono::milliseconds(static_cast<long long>(pr::Cvar::timer_backup_interval.GetFloat())))
 			{
 				WriteToFile(mapName);
 				last_time = now;
@@ -92,10 +92,10 @@ namespace pr
 		if (static_cast<idStr>(cMap) == mapName)
 		{
 			// Set the timers
-			pr_gametimer.SetCT(ingameTimer);
-			pr_rtatimer.SetCT(rtaTimer);
+			pr::Timer::inGame.SetCT(ingameTimer);
+			pr::Timer::RTA.SetCT(rtaTimer);
 			// Let the timer continue
-			pr_gametimer_running = true;
+			pr::Timer::running = true;
 
 #ifdef PR_DEBUG
 			pr::FunctionLog(__FUNCTION__, "Successfully recoverd backup time: %f", ingameTimer);
@@ -141,7 +141,7 @@ namespace pr
 #ifdef PR_DBG_BACKUP_GETTIME
 		pr::FunctionLog(__FUNCTION__, "%f", pr_gametimer.ClockTicks());
 #endif // PR_DBG_BACKUP_GETTIME
-		return pr_gametimer.ClockTicks();
+		return pr::Timer::inGame.ClockTicks();
 	}
 
 	PR_FINLINE double GetBackupRTATime()
@@ -149,6 +149,6 @@ namespace pr
 #ifdef PR_DBG_BACKUP_GETTIME
 		pr::FunctionLog(__FUNCTION__, "%f", pr_rtatimer.ClockTicks());
 #endif // PR_DBG_BACKUP_GETTIME
-		return pr_rtatimer.ClockTicks();
+		return pr::Timer::RTA.ClockTicks();
 	}
 }

@@ -382,7 +382,7 @@ void idGameLocal::Init(void) {
 #endif // PR_DEBUG
 
 	// Open log file
-	pr_logfile = fileSystem->OpenFileWrite(pr::LogFilePath, "fs_savepath");
+	pr::logfile = fileSystem->OpenFileWrite(pr::LogFilePath, "fs_savepath");
 
 	pr::ConsoleWrite("Running %s", ENGINE_VERSION);
 
@@ -422,7 +422,7 @@ void idGameLocal::Shutdown(void) {
 	pr::ClearBackupTimer();
 
 	// Close log file and save to disk
-	fileSystem->CloseFile(pr_logfile);
+	fileSystem->CloseFile(pr::logfile);
 	// PreyRun END
 
 	mpGame.Shutdown();
@@ -1685,9 +1685,9 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 	Printf("--------------------------------------\n");
 
 	// PreyRun BEGIN
-	if (static_cast<PR_timer_methode> (pr_timer_methode.GetInteger()) == PR_timer_methode::IndividualLevel && !pr_gametimer.IsRunning())
+	if (static_cast<pr::TimerMethode> (pr::Cvar::timer_methode.GetInteger()) == pr::TimerMethode::IndividualLevel && !pr::Timer::inGame.IsRunning())
 	{
-		pr_gametimer_running = true;
+		pr::Timer::running = true;
 	}
 
 	// Timer recovery
@@ -3448,7 +3448,7 @@ void idGameLocal::RunDebugInfo(void) {
 	collisionModelManager->DebugOutput(player->GetEyePosition());
 
 	// PreyRun BEGIN
-	if (pr_autocmd_show.GetBool())
+	if (pr::Cvar::autocmd_show.GetBool())
 	{
 		pr::AutocmdzoneHandler::getInstance().Draw();
 	}

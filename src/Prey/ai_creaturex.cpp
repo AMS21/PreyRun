@@ -997,7 +997,7 @@ bool hhCreatureX::UpdateAnimationControllers( void ) {
 
 void hhCreatureX::Killed(idEntity *inflictor, idEntity *attacker, int damage, const idVec3 &dir, int location ) {
 	// PreyRun BEGIN
-	if (pr_gametimer_running && pr_preysplit.GetBool() && bBossBar)
+	if (pr::Timer::running && pr::Cvar::preysplit.GetBool() && bBossBar)
 	{
 		pr::DebugLog("CreatureX killed");
 

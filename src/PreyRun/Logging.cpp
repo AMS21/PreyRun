@@ -112,7 +112,7 @@ namespace pr
 
 	void WriteToLogFile(const char* pre, const char* string)
 	{
-		if (pr_log.GetBool())
+		if (pr::Cvar::log.GetBool())
 		{
 			idStr str;
 
@@ -125,7 +125,7 @@ namespace pr
 				sprintf(str, "%s\n", string);
 			}
 
-			pr_logfile->Write(str.c_str(),strlen(str.c_str()));
+			pr::logfile->Write(str.c_str(),strlen(str.c_str()));
 		}
 	}
 }

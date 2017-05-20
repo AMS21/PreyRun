@@ -1205,7 +1205,7 @@ bool idPhysics_Player::CheckJump(void) {
 	// PreyRun Edit BEGIN
 
 	// autojump feature
-	if (current.movementFlags & PMF_JUMP_HELD && !pr_autojump.GetBool()) {
+	if (current.movementFlags & PMF_JUMP_HELD && !pr::Cvar::autojump.GetBool()) {
 		return false;
 	}
 	// PreyRun Edit END
@@ -1751,28 +1751,28 @@ void idPhysics_Player::SetMovementType(const pmtype_t type) {
 	// Autostart the game IF autosplit is turend on we havent started yet, were on the correct map and the users movement type was set to freeze (cutscene) is now set to normal
 
 	// Casting GetMapName() to idStr might not be the optimal solution but you cant compare cstrings (you can but its a real pain in the ass)
-	if (!pr_gametimer_running && pr_timer_autostart.GetBool() && static_cast<idStr>(gameLocal.GetMapName()) == idStr("maps/game/roadhouse.map") && type == PM_NORMAL && current.movementType == PM_FREEZE)
+	if (!pr::Timer::running && pr::Cvar::timer_autostart.GetBool() && static_cast<idStr>(gameLocal.GetMapName()) == idStr("maps/game/roadhouse.map") && type == PM_NORMAL && current.movementType == PM_FREEZE)
 	{
-		pr_gametimer.Clear();
-		pr_rtatimer.Clear();
+		pr::Timer::inGame.Clear();
+		pr::Timer::RTA.Clear();
 
-		pr_gametimer.Start();
-		pr_rtatimer.Start();
+		pr::Timer::inGame.Start();
+		pr::Timer::RTA.Start();
 
-		pr_gametimer_running = true;
+		pr::Timer::running = true;
 
 		pr::Log("Timer: Auto starting");
 
-		if (pr_preysplit.GetBool())
+		if (pr::Cvar::preysplit.GetBool())
 		{
 			pr::WriteTimerStart(pr::GetTime());
 		}
 
-		if (static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::RealTimeAttack)
+		if (static_cast<pr::TimerMethode>(pr::Cvar::timer_methode.GetInteger()) == pr::TimerMethode::RealTimeAttack)
 		{
 			cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec RTARun.cfg\n");
 		}
-		else if (static_cast<PR_timer_methode>(pr_timer_methode.GetInteger()) == PR_timer_methode::IndividualLevel)
+		else if (static_cast<pr::TimerMethode>(pr::Cvar::timer_methode.GetInteger()) == pr::TimerMethode::IndividualLevel)
 		{
 			cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec ILRun.cfg\n");
 		}

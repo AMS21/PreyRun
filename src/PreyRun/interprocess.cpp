@@ -14,7 +14,7 @@ namespace pr
 
 	void InitPreySplitPipe()
 	{
-		if (pr_preysplit.GetBool())
+		if (pr::Cvar::preysplit.GetBool())
 		{
 			pipe_preysplit = CreateNamedPipe(
 				"\\\\.\\pipe\\" PREYSPLIT_PIPE_NAME,
@@ -33,7 +33,7 @@ namespace pr
 			}
 
 			pr::Log("Opened the PreySplit pipe.");
-			pr_preysplit_pipeopen = true;
+			pr::preysplit_pipeopen = true;
 
 			std::memset(&overlapped, 0, sizeof(overlapped));
 			overlapped.hEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
@@ -45,7 +45,7 @@ namespace pr
 				pr::Warning("PreySplit integration is not available!");
 				CloseHandle(pipe_preysplit);
 				pipe_preysplit = INVALID_HANDLE_VALUE;
-				pr_preysplit_pipeopen = false;
+				pr::preysplit_pipeopen = false;
 			}
 		}
 #ifdef PR_DEBUG
@@ -65,7 +65,7 @@ namespace pr
 		}
 
 		pipe_preysplit = INVALID_HANDLE_VALUE;
-		pr_preysplit_pipeopen = false;
+		pr::preysplit_pipeopen = false;
 
 		CloseHandle(overlapped.hEvent);
 		std::memset(&overlapped, 0, sizeof(overlapped));
@@ -165,13 +165,13 @@ namespace pr
 		buf[1] = static_cast<char>(MessageType::TIME);
 		AddTimeToBuffer(buf.data() + 2, time);
 
-		if (pr_preysplit_update.GetFloat() > 0.0f)
+		if (pr::Cvar::preysplit_update.GetFloat() > 0.0f)
 		{
-			static auto last_time = std::chrono::steady_clock::now() - std::chrono::milliseconds(static_cast<long long>(pr_preysplit_update.GetFloat()) + 1);
+			static auto last_time = std::chrono::steady_clock::now() - std::chrono::milliseconds(static_cast<long long>(pr::Cvar::preysplit_update.GetFloat()) + 1);
 
 			auto now = std::chrono::steady_clock::now();
 
-			if (now >= last_time + std::chrono::milliseconds(static_cast<long long>(pr_preysplit_update.GetFloat())))
+			if (now >= last_time + std::chrono::milliseconds(static_cast<long long>(pr::Cvar::preysplit_update.GetFloat())))
 			{
 				WritePreySplit(buf);
 				last_time = now;
@@ -275,7 +275,7 @@ namespace pr
 
 	Time GetTime()
 	{
-		auto times = PR_ms2time(pr_gametimer.Milliseconds());
+		auto times = PR_ms2time(pr::Timer::inGame.Milliseconds());
 
 		return Time { times.hours, times.minutes, times.seconds, times.milliseconds };
 	}

@@ -7,118 +7,148 @@
 // PreyRun BEGIN
 #include "../../PreyRun/GameTimer.hpp"
 
-extern idCVar pr_autojump;
-#ifdef PR_DEVELOP
-extern idCVar pr_autostrafe;
-extern bool pr_autostrafe_right;
-extern int pr_autostrafe_count;
-#endif // PR_DEVELOP
-extern idCVar pr_autopause;
-extern idCVar pr_preysplit;
-extern idCVar pr_preysplit_update;
-extern idCVar pr_disablejukeboxes;
-extern bool pr_preysplit_pipeopen;
-extern bool pr_preysplit_mapchanged;
-#ifdef PR_DEVELOP
-extern idCVar pr_fixedseed;
-extern idCVar pr_fixedseed_value;
-#endif // PR_DEVELOP
-extern idStr pr_reload_latestsave;
-extern bool pr_reload_ready;
-extern idCVar pr_freeze;
-extern idCVar pr_log;
-extern idFile* pr_logfile;
-// Hud
-extern idCVar pr_hud;
-// Speedometer
-extern idCVar pr_hud_speedometer;
-extern idCVar pr_hud_speedometer_r;
-extern idCVar pr_hud_speedometer_g;
-extern idCVar pr_hud_speedometer_b;
-extern idCVar pr_hud_speedometer_precision;
-extern idCVar pr_hud_speedometer_x;
-extern idCVar pr_hud_speedometer_y;
-extern idCVar pr_autocmd_show;
-// Timer
-extern prTimer pr_gametimer;
-extern prTimer pr_rtatimer;
-extern bool pr_gametimer_running;
-extern bool pr_timedemo;
+namespace pr
+{
+	extern bool preysplit_pipeopen;
+	extern bool preysplit_mapchanged;
 
-extern idCVar pr_timer_autostart;
-extern idCVar pr_timer_autostop;
-extern idCVar pr_timer_methode;
-extern idCVar pr_timer_backup;
-extern idCVar pr_timer_backup_interval;
+	extern idStr reload_latestsave;
+	extern bool reload_ready;
 
-extern idCVar pr_hud_timer;
-extern idCVar pr_hud_timer_x;
-extern idCVar pr_hud_timer_y;
-extern idCVar pr_hud_timer_r;
-extern idCVar pr_hud_timer_g;
-extern idCVar pr_hud_timer_b;
-extern idCVar pr_hud_timer_precision;
-extern idCVar pr_hud_timer_alldigits;
-// RTA Timer
-extern idCVar pr_hud_rtatimer;
-extern idCVar pr_hud_rtatimer_x;
-extern idCVar pr_hud_rtatimer_y;
-extern idCVar pr_hud_rtatimer_r;
-extern idCVar pr_hud_rtatimer_g;
-extern idCVar pr_hud_rtatimer_b;
-extern idCVar pr_hud_rtatimer_precision;
-extern idCVar pr_hud_rtatimer_alldigits;
-// JumpSpeed
-extern idCVar pr_hud_jumpspeed;
-extern idCVar pr_hud_jumpspeed_x;
-extern idCVar pr_hud_jumpspeed_y;
-extern idCVar pr_hud_jumpspeed_r;
-extern idCVar pr_hud_jumpspeed_g;
-extern idCVar pr_hud_jumpspeed_b;
-extern idCVar pr_hud_jumpspeed_precision;
-extern idCVar pr_hud_jumpspeed_style;
-// Viewangles
-extern idCVar pr_hud_viewangles;
-// Velocity
-extern idCVar pr_hud_velocity;
-// Location
-extern idCVar pr_hud_location;
-extern idCVar pr_hud_location_methode;
-// Entity Info
-extern idCVar pr_hud_entityinfo;
-extern idCVar pr_hud_entityinfo_health;
-extern idCVar pr_hud_entityinfo_name;
-extern idCVar pr_hud_entityinfo_type;
-// Ammo
-extern idCVar pr_hud_ammo;
-// Health
-extern idCVar pr_hud_health;
-// Damage
-extern idCVar pr_hud_damage;
-extern idCVar pr_hud_damage_style;
-// SpiritPower
-extern idCVar pr_hud_spiritpower;
-// Distance
-extern idCVar pr_hud_distance;
-// Custom Hud Element
-extern idCVar pr_hud_custom;
-extern idCVar pr_hud_custom_text;
-extern idCVar pr_hud_custom_x;
-extern idCVar pr_hud_custom_y;
-extern idCVar pr_hud_custom_r;
-extern idCVar pr_hud_custom_g;
-extern idCVar pr_hud_custom_b;
-// Keys
-extern idCVar pr_hud_keys;
-extern idCVar pr_hud_keys_methode;
+	extern idFile* logfile;
+
+	namespace Timer
+	{
+		extern prTimer inGame;
+		extern bool running;
+		extern prTimer RTA;
+
+		extern idTimer demo;
+		extern bool timedemo;
+	}
 
 #ifdef PR_DEBUG
-extern idCVar pr_dbg_hud_drawtime;
-extern idCVar pr_dbg_hud_frametime;
-extern idTimer pr_dbg_timer;
-extern idTimer pr_dbg_frametimer;
-extern double pr_dbg_frametimer_value;
+	namespace dbg
+	{
+		extern idTimer timer;
+		extern idTimer frametimer;
+		extern double frametimer_value;
+	}
 #endif // PR_DEBUG
+
+	namespace Cvar
+	{
+		extern idCVar autojump;
+		extern idCVar autopause;
+		extern idCVar preysplit;
+		extern idCVar preysplit_update;
+		extern idCVar disablejukeboxes;
+		extern idCVar freeze;
+		extern idCVar autocmd_show;
+		extern idCVar log;
+
+		extern idCVar timer_autostart;
+		extern idCVar timer_autostop;
+		extern idCVar timer_methode;
+		extern idCVar timer_backup;
+		extern idCVar timer_backup_interval;
+
+#ifdef PR_DEVELOP
+		extern idCVar autostrafe;
+		extern bool autostrafe_right;
+		extern int autostrafe_count;
+
+		extern idCVar fixedseed;
+		extern idCVar fixedseed_value;
+#endif // PR_DEVELOP
+
+#ifdef PR_DEBUG
+		namespace dbg
+		{
+			namespace Hud
+			{
+				extern idCVar drawtime;
+				extern idCVar frametime;
+			} // namespace: Hud
+		} // namespace: dbg
+#endif // PR_DEBUG
+
+		namespace Hud
+		{
+			extern idCVar hud;
+			// Speedometer
+			extern idCVar  speedometer;
+			extern idCVar  speedometer_r;
+			extern idCVar speedometer_g;
+			extern idCVar speedometer_b;
+			extern idCVar speedometer_precision;
+			extern idCVar speedometer_x;
+			extern idCVar speedometer_y;
+			// Timer
+			extern idCVar timer;
+			extern idCVar timer_x;
+			extern idCVar timer_y;
+			extern idCVar timer_r;
+			extern idCVar timer_g;
+			extern idCVar timer_b;
+			extern idCVar timer_precision;
+			extern idCVar timer_alldigits;
+			// RTA Timer
+			extern idCVar rtatimer;
+			extern idCVar rtatimer_x;
+			extern idCVar rtatimer_y;
+			extern idCVar rtatimer_r;
+			extern idCVar rtatimer_g;
+			extern idCVar rtatimer_b;
+			extern idCVar rtatimer_precision;
+			extern idCVar rtatimer_alldigits;
+			// JumpSpeed
+			extern idCVar jumpspeed;
+			extern idCVar jumpspeed_x;
+			extern idCVar jumpspeed_y;
+			extern idCVar jumpspeed_r;
+			extern idCVar jumpspeed_g;
+			extern idCVar jumpspeed_b;
+			extern idCVar jumpspeed_precision;
+			extern idCVar jumpspeed_style;
+			// Viewangles
+			extern idCVar viewangles;
+			// Velocity
+			extern idCVar velocity;
+			// Location
+			extern idCVar location;
+			extern idCVar location_methode;
+			// Entity Info
+			extern idCVar entityinfo;
+			extern idCVar entityinfo_health;
+			extern idCVar entityinfo_name;
+			extern idCVar entityinfo_type;
+			// Ammo
+			extern idCVar ammo;
+			// Health
+			extern idCVar health;
+			// Damage
+			extern idCVar damage;
+			extern idCVar damage_style;
+			// SpiritPower
+			extern idCVar spiritpower;
+			// Distance
+			extern idCVar distance;
+			// Custom Hud Element
+			extern idCVar custom;
+			extern idCVar custom_text;
+			extern idCVar custom_x;
+			extern idCVar custom_y;
+			extern idCVar custom_r;
+			extern idCVar custom_g;
+			extern idCVar custom_b;
+			// Keys
+			extern idCVar keys;
+			extern idCVar keys_methode;
+		} // namespace: Hud
+	} // namespace: Cvar
+} // namespace: pr
+
 // PreyRun END
 
 // HUMANHEAD

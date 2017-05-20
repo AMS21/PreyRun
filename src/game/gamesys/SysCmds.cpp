@@ -26,7 +26,7 @@ void Cmd_PR_timedemo_f(const idCmdArgs &args)
 
 	cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("playDemo %s\n", args.Argv(1)));
 
-	pr_timedemo = true;
+	pr::Timer::demo = true;
 }
 
 /*
@@ -36,11 +36,11 @@ Cmd_PR_reload_f
 */
 void Cmd_PR_reload_f(const idCmdArgs &args)
 {
-	if (pr_reload_ready)
+	if (pr::reload_ready)
 	{
-		cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("loadgame %s\n", pr_reload_latestsave.Mid(10, pr_reload_latestsave.Length()).c_str()));
+		cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("loadgame %s\n", pr::reload_latestsave.Mid(10, pr::reload_latestsave.Length()).c_str()));
 
-		pr::ConsoleWrite("Loading save %s", pr_reload_latestsave.c_str());
+		pr::ConsoleWrite("Loading save %s", pr::reload_latestsave.c_str());
 	}
 	else
 	{
@@ -55,7 +55,7 @@ Cmd_PR_preysplit_split_f
 */
 void Cmd_PR_preysplit_split_f(const idCmdArgs &args)
 {
-	if (pr_preysplit.GetBool() && pr_gametimer.IsRunning())
+	if (pr::Cvar::preysplit.GetBool() && pr::Timer::inGame.IsRunning())
 	{
 		pr::WriteCustomSplit(pr::GetTime());
 
@@ -156,13 +156,13 @@ Cmd_PR_timer_start_f
 */
 void Cmd_PR_timer_start_f(const idCmdArgs &args)
 {
-	if (!pr_freeze.GetBool() && !pr_gametimer.IsRunning())
+	if (!pr::Cvar::freeze.GetBool() && !pr::Timer::inGame.IsRunning())
 	{
-		pr_gametimer.Start();
-		pr_rtatimer.Start();
+		pr::Timer::inGame.Start();
+		pr::Timer::RTA.Start();
 	}
 
-	pr_gametimer_running = true;
+	pr::Timer::running = true;
 
 	pr::ConsoleWrite("Starting in-game and RTA timer");
 }
@@ -174,12 +174,12 @@ Cmd_PR_timer_stop_f
 */
 void Cmd_PR_timer_stop_f(const idCmdArgs &args)
 {
-	if (pr_gametimer.IsRunning() || (pr_freeze.GetBool() && pr_gametimer_running))
+	if (pr::Timer::inGame.IsRunning() || (pr::Cvar::freeze.GetBool() && pr::Timer::running))
 	{
-		pr_gametimer.Stop();
-		pr_rtatimer.Stop();
+		pr::Timer::inGame.Stop();
+		pr::Timer::RTA.Stop();
 
-		pr_gametimer_running = false;
+		pr::Timer::running = false;
 
 		pr::ConsoleWrite("Stopping in-game and RTA timer");
 	}
@@ -192,13 +192,13 @@ Cmd_PR_timer_reset_f
 */
 void Cmd_PR_timer_reset_f(const idCmdArgs &args)
 {
-	pr_gametimer.Stop();
-	pr_rtatimer.Stop();
+	pr::Timer::inGame.Stop();
+	pr::Timer::RTA.Stop();
 
-	pr_gametimer.Clear();
-	pr_rtatimer.Clear();
+	pr::Timer::inGame.Clear();
+	pr::Timer::RTA.Clear();
 
-	pr_gametimer_running = false;
+	pr::Timer::running = false;
 
 	pr::WriteTimerReset(pr::GetTime());
 
@@ -212,8 +212,8 @@ Cmd_PR_timer_now_f
 */
 void Cmd_PR_timer_now_f(const idCmdArgs &args)
 {
-	auto times = PR_ms2time(pr_gametimer.Milliseconds());
-	auto rtatimes = PR_ms2time(pr_rtatimer.Milliseconds());
+	auto times = PR_ms2time(pr::Timer::inGame.Milliseconds());
+	auto rtatimes = PR_ms2time(pr::Timer::RTA.Milliseconds());
 
 	pr::ConsoleWrite("In-game timer: %02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
 	pr::ConsoleWrite("RTA timer: %02d:%02d:%02d.%03d", rtatimes.hours, rtatimes.minutes, rtatimes.seconds, rtatimes.milliseconds);
@@ -380,10 +380,10 @@ void Cmd_PR_crash_f(const idCmdArgs &args)
 
 void Cmd_PR_dbg_timer_f(const idCmdArgs &args)
 {
-	auto time = PR_ms2time(pr_gametimer.Milliseconds());
-	auto rtatime = PR_ms2time(pr_gametimer.Milliseconds());
+	auto time = PR_ms2time(pr::Timer::inGame.Milliseconds());
+	auto rtatime = PR_ms2time(pr::Timer::inGame.Milliseconds());
 
-	pr::ConsoleWrite("Timer is running: %s\nTimer shoud be on: %s\nIn-game timer:\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s\nRTA timer:\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s", pr_gametimer.IsRunning() ? "True" : "False", pr_gametimer_running ? "True" : "False", time.hours, time.minutes, time.seconds, time.milliseconds, pr_gametimer.Milliseconds(), pr_gametimer.ClockTicks(), pr::timer::pr_gametimer_clocktick_postfix, rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds, pr_rtatimer.Milliseconds(), pr_rtatimer.ClockTicks(), pr::timer::pr_gametimer_clocktick_postfix);
+	pr::ConsoleWrite("Timer is running: %s\nTimer shoud be on: %s\nIn-game timer:\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s\nRTA timer:\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s", pr::Timer::inGame.IsRunning() ? "True" : "False", pr::Timer::running ? "True" : "False", time.hours, time.minutes, time.seconds, time.milliseconds, pr::Timer::inGame.Milliseconds(), pr::Timer::inGame.ClockTicks(), pr::Timer::pr_gametimer_clocktick_postfix, rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds, pr::Timer::RTA.Milliseconds(), pr::Timer::RTA.ClockTicks(), pr::Timer::pr_gametimer_clocktick_postfix);
 }
 
 void Cmd_PR_dbg_timer_set_f(const idCmdArgs &args)
@@ -394,15 +394,15 @@ void Cmd_PR_dbg_timer_set_f(const idCmdArgs &args)
 		return;
 	}
 
-	pr_gametimer.SetCT(atof(args.Argv(1)));
-	pr_rtatimer.SetCT(atof(args.Argv(1)));
+	pr::Timer::inGame.SetCT(atof(args.Argv(1)));
+	pr::Timer::RTA.SetCT(atof(args.Argv(1)));
 }
 
 void Cmd_PR_dbg_reload_f(const idCmdArgs &args)
 {
-	if (pr_reload_ready)
+	if (pr::reload_ready)
 	{
-		pr::ConsoleWrite("ready: %s, filename: %s", pr_reload_ready ? "True" : "False", pr_reload_latestsave.c_str());
+		pr::ConsoleWrite("ready: %s, filename: %s", pr::reload_ready ? "True" : "False", pr::reload_latestsave.c_str());
 	}
 	else
 	{

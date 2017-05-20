@@ -497,7 +497,7 @@ void hhMonsterAI::Killed(idEntity *inflictor, idEntity *attacker,
 		// PreyRun BEGIN
 		pr::DebugLog("HP Boss died: %s", GetName());
 		
-		if (pr_gametimer_running && pr_preysplit.GetBool())
+		if (pr::Timer::running && pr::Cvar::preysplit.GetBool())
 		{
 			// game/salvageboss.map / Sacrifices / Centurion
 			if (static_cast<idStr>(this->GetName()) == idStr("svgBossCenturion"))
