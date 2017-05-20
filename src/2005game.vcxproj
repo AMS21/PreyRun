@@ -269,7 +269,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/FIXED:no %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;dbghelp.lib;./DebugDLL/idLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;..\build\$(Configuration)\idLib.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\build\$(Configuration)\gamex86.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\game\game.def</ModuleDefinitionFile>
@@ -320,7 +320,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 /fixed:no %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;./ReleaseDLL/idLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;..\build\$(Configuration)\idLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\build\$(Configuration)\gamex86.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\game\game.def</ModuleDefinitionFile>
@@ -378,7 +378,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 /fixed:no %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;./ReleaseDLL/idLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;..\build\$(Configuration)\idLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\build\$(Configuration)\gamex86.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\game\game.def</ModuleDefinitionFile>
@@ -400,7 +400,7 @@
     <PostBuildEvent>
       <Message>
       </Message>
-      <Command>copy "$(ProjectDir)ReleaseDLL\gamex86.dll" "D:\Prey\base\gamex86.dll"</Command>
+      <Command>copy "$(ProjectDir)..\build\$(Configuration)\gamex86.dll" "D:\Prey\base\gamex86.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug with inlines|Win32'">
@@ -433,7 +433,7 @@
       <ShowProgress>true</ShowProgress>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;dbghelp.lib;./InlineDebugDLL/idLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;..\build\$(Configuration)\idLib.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\build\$(Configuration)\gamex86.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\game\game.def</ModuleDefinitionFile>
@@ -485,7 +485,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/FORCE:MULTIPLE %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;dbghelp.lib;./InlineDebugMemoryDLL/idLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;..\build\$(Configuration)\idLib.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\build\$(Configuration)\gamex86.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\game\game.def</ModuleDefinitionFile>
@@ -538,7 +538,7 @@
       <ShowProgress>true</ShowProgress>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;dbghelp.lib;./DedicatedInlineDebugDLL/idLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;..\build\$(Configuration)\idLib.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\build\$(Configuration)\gamex86.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\game\game.def</ModuleDefinitionFile>
@@ -589,7 +589,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 /fixed:no %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;./DedicatedReleaseDLL/idLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;..\build\$(Configuration)\idLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\build\$(Configuration)\gamex86.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\game\game.def</ModuleDefinitionFile>
