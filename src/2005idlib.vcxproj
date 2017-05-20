@@ -63,6 +63,7 @@
     <ProjectGuid>{49BEC5C6-B964-417A-851E-808886B57400}</ProjectGuid>
     <RootNamespace>idLib</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dedicated Debug with Inlines|Win32'" Label="Configuration">
@@ -199,33 +200,60 @@
     <_ProjectFileVersion>14.0.25420.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>./DebugDLL\</OutDir>
-    <IntDir>idLib/DebugDLL\</IntDir>
+    <OutDir>idLib\build\$(Configuration)\</OutDir>
+    <IntDir>idLib\build\$(Configuration)\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>idLib\build\$(Configuration)\x64</OutDir>
+    <IntDir>idLib\build\$(Configuration)\x64</IntDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>./ReleaseDLL\</OutDir>
-    <IntDir>idLib/ReleaseDLL\</IntDir>
+    <OutDir>idLib\build\$(Configuration)\</OutDir>
+    <IntDir>idLib\build\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Release|Win32'">
-    <OutDir>./ReleaseDLL\</OutDir>
-    <IntDir>idLib/ReleaseDLL\</IntDir>
+    <OutDir>idLib\build\$(Configuration)\</OutDir>
+    <IntDir>idLib\build\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug with inlines|Win32'">
-    <OutDir>./InlineDebugDLL\</OutDir>
-    <IntDir>idLib/InlineDebugDLL\</IntDir>
+    <OutDir>idLib\build\$(Configuration)\</OutDir>
+    <IntDir>idLib\build\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug with inlines and memory log|Win32'">
-    <OutDir>./InlineDebugMemoryDLL\</OutDir>
-    <IntDir>idLib/InlineDebugMemoryDLL\</IntDir>
+    <OutDir>idLib\build\$(Configuration)\</OutDir>
+    <IntDir>idLib\build\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dedicated Release|Win32'">
-    <OutDir>idLib/DedicatedReleaseDLL\</OutDir>
-    <IntDir>idLib/DedicatedReleaseDLL\</IntDir>
+    <OutDir>idLib\build\$(Configuration)\</OutDir>
+    <IntDir>idLib\build\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dedicated Debug with Inlines|Win32'">
-    <OutDir>idLib/DedicatedInlineDebugDLL\</OutDir>
-    <IntDir>idLib/DedicatedInlineDebugDLL\</IntDir>
+    <OutDir>idLib\build\$(Configuration)\</OutDir>
+    <IntDir>idLib\build\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Release|x64'">
+    <OutDir>idLib\build\$(Configuration)\x64</OutDir>
+    <IntDir>idLib\build\$(Configuration)\x64</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug with inlines|x64'">
+    <OutDir>idLib\build\$(Configuration)\x64</OutDir>
+    <IntDir>idLib\build\$(Configuration)\x64</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug with inlines and memory log|x64'">
+    <OutDir>idLib\build\$(Configuration)\x64</OutDir>
+    <IntDir>idLib\build\$(Configuration)\x64</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dedicated Debug with Inlines|x64'">
+    <OutDir>idLib\build\$(Configuration)\x64</OutDir>
+    <IntDir>idLib\build\$(Configuration)\x64</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dedicated Release|x64'">
+    <OutDir>idLib\build\$(Configuration)\x64</OutDir>
+    <IntDir>idLib\build\$(Configuration)\x64</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>idLib\build\$(Configuration)\x64</OutDir>
+    <IntDir>idLib\build\$(Configuration)\x64</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -248,7 +276,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>$(OutDir)idLib.lib</OutputFile>
+      <OutputFile>..\build\$(Configuration)\idLib.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -273,7 +301,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>$(OutDir)idLib.lib</OutputFile>
+      <OutputFile>..\build\$(Configuration)\x64\idLib.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -303,7 +331,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>$(OutDir)idLib.lib</OutputFile>
+      <OutputFile>..\build\$(Configuration)\idLib.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -335,7 +363,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>$(OutDir)idLib.lib</OutputFile>
+      <OutputFile>..\build\$(Configuration)\x64\idLib.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Release|Win32'">
@@ -368,7 +396,7 @@
       <UndefinePreprocessorDefinitions>NDEBUG;%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Lib>
-      <OutputFile>$(OutDir)idLib.lib</OutputFile>
+      <OutputFile>..\build\$(Configuration)\idLib.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Release|x64'">
@@ -401,7 +429,7 @@
       <UndefinePreprocessorDefinitions>NDEBUG;%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Lib>
-      <OutputFile>$(OutDir)idLib.lib</OutputFile>
+      <OutputFile>..\build\$(Configuration)\x64\idLib.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug with inlines|Win32'">
@@ -431,7 +459,7 @@
       <ShowProgress>true</ShowProgress>
     </ResourceCompile>
     <Lib>
-      <OutputFile>$(OutDir)idLib.lib</OutputFile>
+      <OutputFile>..\build\$(Configuration)\idLib.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug with inlines|x64'">
@@ -462,7 +490,7 @@
       <ShowProgress>true</ShowProgress>
     </ResourceCompile>
     <Lib>
-      <OutputFile>$(OutDir)idLib.lib</OutputFile>
+      <OutputFile>..\build\$(Configuration)\x64\idLib.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug with inlines and memory log|Win32'">
@@ -489,7 +517,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>$(OutDir)idLib.lib</OutputFile>
+      <OutputFile>..\build\$(Configuration)\idLib.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug with inlines and memory log|x64'">
@@ -517,7 +545,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>$(OutDir)idLib.lib</OutputFile>
+      <OutputFile>..\build\$(Configuration)\x64\idLib.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dedicated Release|Win32'">
@@ -547,7 +575,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>./DedicatedReleaseDLL/idLib.lib</OutputFile>
+      <OutputFile>..\build\$(Configuration)\idLib.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dedicated Release|x64'">
@@ -579,7 +607,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>./DedicatedReleaseDLL/idLib.lib</OutputFile>
+      <OutputFile>..\build\$(Configuration)\x64\idLib.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dedicated Debug with Inlines|Win32'">
@@ -609,7 +637,7 @@
       <ShowProgress>true</ShowProgress>
     </ResourceCompile>
     <Lib>
-      <OutputFile>./DedicatedInlineDebugDLL/idLib.lib</OutputFile>
+      <OutputFile>..\build\$(Configuration)\idLib.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dedicated Debug with Inlines|x64'">
@@ -640,7 +668,7 @@
       <ShowProgress>true</ShowProgress>
     </ResourceCompile>
     <Lib>
-      <OutputFile>./DedicatedInlineDebugDLL/idLib.lib</OutputFile>
+      <OutputFile>..\build\$(Configuration)\x64\idLib.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
