@@ -3,7 +3,7 @@
   <PropertyGroup>
     <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug PreyRun|Win32'">
     <LocalDebuggerCommand>D:\Prey\Prey.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>D:\Prey</LocalDebuggerWorkingDirectory>

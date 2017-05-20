@@ -15,8 +15,8 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{49BEC5C6-B964-417A-851E-808886B57430}.Debug PreyRun|Win32.ActiveCfg = Debug Release|Win32
-		{49BEC5C6-B964-417A-851E-808886B57430}.Debug PreyRun|Win32.Build.0 = Debug Release|Win32
+		{49BEC5C6-B964-417A-851E-808886B57430}.Debug PreyRun|Win32.ActiveCfg = Debug PreyRun|Win32
+		{49BEC5C6-B964-417A-851E-808886B57430}.Debug PreyRun|Win32.Build.0 = Debug PreyRun|Win32
 		{49BEC5C6-B964-417A-851E-808886B57430}.Debug with inlines and memory log|Win32.ActiveCfg = Debug|Win32
 		{49BEC5C6-B964-417A-851E-808886B57430}.Debug with inlines and memory log|Win32.Build.0 = Debug|Win32
 		{49BEC5C6-B964-417A-851E-808886B57430}.Debug with inlines|Win32.ActiveCfg = Debug with inlines|Win32
@@ -25,8 +25,8 @@ Global
 		{49BEC5C6-B964-417A-851E-808886B57430}.Debug|Win32.Build.0 = Debug|Win32
 		{49BEC5C6-B964-417A-851E-808886B57430}.Release|Win32.ActiveCfg = Release|Win32
 		{49BEC5C6-B964-417A-851E-808886B57430}.Release|Win32.Build.0 = Release|Win32
-		{49BEC5C6-B964-417A-851E-808886B57400}.Debug PreyRun|Win32.ActiveCfg = Debug Release|Win32
-		{49BEC5C6-B964-417A-851E-808886B57400}.Debug PreyRun|Win32.Build.0 = Debug Release|Win32
+		{49BEC5C6-B964-417A-851E-808886B57400}.Debug PreyRun|Win32.ActiveCfg = Debug PreyRun|Win32
+		{49BEC5C6-B964-417A-851E-808886B57400}.Debug PreyRun|Win32.Build.0 = Debug PreyRun|Win32
 		{49BEC5C6-B964-417A-851E-808886B57400}.Debug with inlines and memory log|Win32.ActiveCfg = Debug|Win32
 		{49BEC5C6-B964-417A-851E-808886B57400}.Debug with inlines and memory log|Win32.Build.0 = Debug|Win32
 		{49BEC5C6-B964-417A-851E-808886B57400}.Debug with inlines|Win32.ActiveCfg = Debug with inlines|Win32
