@@ -1,7 +1,6 @@
 *.db
 *.def
 *.dll
-*.filters
 *.ipch
 *.lib
 *.log
@@ -9,9 +8,6 @@
 *.obj
 *.opendb
 *.tlog
-*.user
-*.vcproj
-*.vcxproj
 examples/
 ReadMe.rtf
 src/.vs/
