@@ -8,19 +8,16 @@
 *.obj
 *.opendb
 *.tlog
+*.rtf#
 examples/
-ReadMe.rtf
 src/.vs/
-src/Backup/
-src/DebugDLL/
-src/game/DebugDLL/
-src/game/ReleaseDLL/
+src/game/build/
 src/idLib/DebugDLL/
 src/idLib/ReleaseDLL/
 src/ipch/
 src/ReleaseDLL/
-src/UpgradeLog.htm
-*.rtf#
+build/
 Prey.exe Hooking.txt
 DevNotes.txt
 Changelog.txt
+ReadMe.rtf
