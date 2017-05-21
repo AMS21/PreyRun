@@ -17,6 +17,8 @@ namespace pr
 
 	extern idFile* logfile;
 
+	extern bool oneClickLoad;
+
 	namespace Timer
 	{
 		extern prTimer inGame;
@@ -52,6 +54,8 @@ namespace pr
 		extern idCVar timer_methode;
 		extern idCVar timer_backup;
 		extern idCVar timer_backup_interval;
+
+		extern idCVar oneclickload;
 
 #ifdef PR_DEVELOP
 		extern idCVar autostrafe;

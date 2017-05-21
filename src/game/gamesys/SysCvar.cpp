@@ -34,6 +34,8 @@ namespace pr
 
 	idFile* logfile;
 
+	bool oneClickLoad { false };
+
 	namespace Timer
 	{
 		prTimer inGame; // The actual in-game timer
@@ -69,6 +71,8 @@ namespace pr
 		idCVar timer_methode("PR_Timer_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Switch the diffrent timing methodes\n0 - RTA - Real Time Attack, the whole game from start (the first frame you can control Tommy) to finish (when the sphere boss is killed) with game time (default)\n1 - Individual Level, Starts when a map or savegame, is loaded and stops when the map has been completed", 0, 1);
 		idCVar timer_backup("PR_Timer_Backup", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle support for backing up the game time to resume it after the game crashed");
 		idCVar timer_backup_interval("PR_Timer_Backup_Interval", "250", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The interval for updating the backup timer");
+
+		idCVar oneclickload("PR_OneClickLoad", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "If set to 1 you only need to press your load quicksave button once not twice");
 
 #ifdef PR_DEVELOP
 		idCVar autostrafe("PR_AutoStrafe", "1", CVAR_GAME | CVAR_BOOL, "Automaticly strafe when running");

@@ -1114,6 +1114,16 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud)
 	{
 		pr::ShutdownPreySplitPipe();
 	}
+
+	// OneClickLoad should be enabled but isnt
+	if (pr::Cvar::oneclickload.GetBool() && !pr::oneClickLoad)
+	{
+		pr::enableOneClickLoad();
+	}
+	else if (!pr::Cvar::oneclickload.GetBool() && pr::oneClickLoad)
+	{
+		pr::disableOneClickLoad();
+	}
 	// PreyRun END
 
 	_hud->SetStateBool("invehicle", InVehicle());

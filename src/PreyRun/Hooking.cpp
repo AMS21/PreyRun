@@ -16,6 +16,10 @@ namespace pr
 	constexpr char DisplayTimeDemoStringOn[] = "%i frames rendered in %3.3f seconds = %3.3f fps\n";
 	constexpr char DisplayTimeDemoStringOff[] = "%i frames rendered in %3.1f seconds = %3.1f fps\n";
 
+	constexpr DWORD OneClickLoad = 0x45C47A;
+	constexpr char OneClickLoadOn[] { '\x90','\x90' };
+	constexpr char OneClickLoadOff[] { '\x74','\x12' };
+
 	constexpr DWORD PreyVersionString = 0x7AC500;
 	constexpr char PreyVersionStringNew[] = ENGINE_VERSION;
 
@@ -57,6 +61,22 @@ namespace pr
 		WriteToMemory(DisplayTimeDemoString, DisplayTimeDemoStringOff, sizeof(DisplayTimeDemoStringOff));
 
 		pr::DebugLog("Unhooked timeDemo");
+	}
+
+	void enableOneClickLoad()
+	{
+		WriteToMemory(OneClickLoad, OneClickLoadOn, sizeof(OneClickLoadOn));
+		oneClickLoad = true;
+
+		pr::DebugLog("OneClickLoad Enabled");
+	}
+
+	void disableOneClickLoad()
+	{
+		WriteToMemory(OneClickLoad, OneClickLoadOff, sizeof(OneClickLoadOff));
+		oneClickLoad = false;
+
+		pr::DebugLog("OneClickLoad Disabled");
 	}
 
 	void hookVersionDisplay()
