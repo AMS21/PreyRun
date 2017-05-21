@@ -1247,7 +1247,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 			pr::Timer::RTA.Start();
 		}
 
-		pr::Log("Timer: Resuming, Map load");
+		pr::Log("Timer: Resuming, Map loaded");
 
 #ifdef PR_DEBUG
 		auto time = PR_ms2time(pr::Timer::inGame.Milliseconds());

@@ -416,7 +416,7 @@ void idGameLocal::Shutdown(void) {
 	Printf("------------ Game Shutdown -----------\n");
 
 	// PreyRun BEGIN
-	pr::Log("Game shutdown");
+	pr::Log("Shutdown");
 
 	pr::ShutdownPreySplitPipe();
 	pr::ClearBackupTimer();
