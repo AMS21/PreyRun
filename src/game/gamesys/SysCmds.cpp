@@ -383,7 +383,7 @@ void Cmd_PR_dbg_timer_f(const idCmdArgs &args)
 	auto time = PR_ms2time(pr::Timer::inGame.Milliseconds());
 	auto rtatime = PR_ms2time(pr::Timer::inGame.Milliseconds());
 
-	pr::ConsoleWrite("Timer is running: %s\nTimer shoud be on: %s\nIn-game timer:\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s\nRTA timer:\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s", pr::Timer::inGame.IsRunning() ? "True" : "False", pr::Timer::running ? "True" : "False", time.hours, time.minutes, time.seconds, time.milliseconds, pr::Timer::inGame.Milliseconds(), pr::Timer::inGame.ClockTicks(), pr::Timer::pr_gametimer_clocktick_postfix, rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds, pr::Timer::RTA.Milliseconds(), pr::Timer::RTA.ClockTicks(), pr::Timer::pr_gametimer_clocktick_postfix);
+	pr::ConsoleWrite("Timer is running: %s\nTimer should be on: %s\nIn-game timer:\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s\nRTA timer:\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s", pr::Timer::inGame.IsRunning() ? "True" : "False", pr::Timer::running ? "True" : "False", time.hours, time.minutes, time.seconds, time.milliseconds, pr::Timer::inGame.Milliseconds(), pr::Timer::inGame.ClockTicks(), pr::Timer::pr_gametimer_clocktick_postfix, rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds, pr::Timer::RTA.Milliseconds(), pr::Timer::RTA.ClockTicks(), pr::Timer::pr_gametimer_clocktick_postfix);
 }
 
 void Cmd_PR_dbg_timer_set_f(const idCmdArgs &args)

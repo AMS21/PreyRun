@@ -1103,13 +1103,13 @@ void hhPlayer::UpdateHudStats(idUserInterface *_hud)
 	}
 
 	// PreyRun BEGIN
-	// PreySplit pipe shoud be open but isnt
+	// PreySplit pipe should be open but isnt
 	if (pr::Cvar::preysplit.GetBool() && !pr::preysplit_pipeopen)
 	{
 		pr::InitPreySplitPipe();
 	}
 
-	// PreySplit pipe shoudnt be open but is
+	// PreySplit pipe shouldn't be open but is
 	else if (!pr::Cvar::preysplit.GetBool() && pr::preysplit_pipeopen)
 	{
 		pr::ShutdownPreySplitPipe();

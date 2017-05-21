@@ -60,7 +60,7 @@ namespace pr
 		idCVar autojump("PR_AutoJump", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly jumps when holding your jumpkey (_moveUp)");
 		idCVar autopause("PR_AutoPause", "0", CVAR_GAME | CVAR_BOOL, "Automaticly pauses the game after map load, set PR_Freeze to 0 to continue");
 		idCVar preysplit("PR_PreySplit", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle support for interaction with PreySplit a LiveSplit component");
-		idCVar preysplit_update("PR_PreySplit_update", "41", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The time in milliseconds PreyRun shoud wait before update the game timer of PreySplit again, note that this is only for displaying the current game time the splits will always be acurate", 0, 1000, idCmdSystem::ArgCompletion_Integer<0, 1000>);
+		idCVar preysplit_update("PR_PreySplit_update", "41", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The time in milliseconds PreyRun should wait before update the game timer of PreySplit again, note that this is only for displaying the current game time the splits will always be acurate", 0, 1000, idCmdSystem::ArgCompletion_Integer<0, 1000>);
 		idCVar disablejukeboxes("PR_DisableJukeBoxes", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Disable all jukeboxes which play copyrighted music. This should make it easier to upload your runs direcly to Youtube without changing the music in the bar.");
 		idCVar freeze("PR_Freeze", "0", CVAR_GAME | CVAR_BOOL, "Completley freezes the game until pr_Freeze is set back to 0");
 		idCVar autocmd_show("PR_AutoCmd_Show", "0", CVAR_GAME | CVAR_INTEGER, "Display autocmd zones, Note that developer must be set to 1");
@@ -80,7 +80,7 @@ namespace pr
 		int autostrafe_count { 0 };
 
 		idCVar fixedseed("PR_FixedSeed", "0", CVAR_GAME | CVAR_BOOL, "Forces the RNG seed to PR_FixedSeed_Value");
-		idCVar fixedseed_value("PR_FixedSeed_Value", "0", CVAR_GAME | CVAR_INTEGER, "The Value the RNG seed shoud be set to if pr_fixedseed is set to 1");
+		idCVar fixedseed_value("PR_FixedSeed_Value", "0", CVAR_GAME | CVAR_INTEGER, "The Value the RNG seed should be set to if pr_fixedseed is set to 1");
 #endif // PR_DEVELOP
 
 #ifdef PR_DEBUG

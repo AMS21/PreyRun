@@ -105,7 +105,7 @@ namespace pr
 
 	AutocmdzoneHandler::AutocmdzoneHandler() {}
 
-	// Checks if any of the autocommandzones shoud be triggerd and triggers them
+	// Checks if any of the autocommandzones should be triggerd and triggers them
 	void AutocmdzoneHandler::CheckForTriggering()
 	{
 		if (gameLocal.GetLocalPlayer())
