@@ -214,6 +214,7 @@ void hhSphereBoss::Killed(idEntity *inflictor, idEntity *attacker, int damage, c
 		pr::Timer::inGame.Stop();
 		pr::Timer::RTA.Stop();
 		pr::Timer::running = false;
+		pr::runFinished = true;
 
 		if (pr::Cvar::preysplit.GetBool())
 		{

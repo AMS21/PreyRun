@@ -1024,6 +1024,7 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 					if (pr::Cvar::preysplit.GetBool())
 					{
 						pr::WriteGameEnd(pr::GetTime());
+						pr::runFinished = true;
 					}
 
 					auto times = PR_ms2time(pr::Timer::inGame.Milliseconds());

@@ -1760,8 +1760,7 @@ void idPhysics_Player::SetMovementType(const pmtype_t type) {
 		pr::Timer::RTA.Start();
 
 		pr::Timer::running = true;
-
-		pr::Log("Timer: Auto starting");
+		pr::runFinished = false;
 
 		if (pr::Cvar::preysplit.GetBool())
 		{
@@ -1776,6 +1775,8 @@ void idPhysics_Player::SetMovementType(const pmtype_t type) {
 		{
 			cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec ILRun.cfg\n");
 		}
+
+		pr::Log("Timer: Auto starting");
 	}
 	// PreyRun END
 

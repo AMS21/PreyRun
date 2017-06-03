@@ -1228,7 +1228,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		pr::Timer::inGame.Start();
 		pr::Timer::RTA.Start();
 
-		pr::Log("Timer: Individual Level Auto starting");
+		pr::runFinished = false;
 
 		if (pr::Cvar::preysplit.GetBool())
 		{
@@ -1236,6 +1236,8 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		}
 
 		cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec ILRun.cfg\n");
+
+		pr::Log("Timer: Individual Level Auto starting");
 	}
 
 	// Might not be the optimal solution because when the game decides to not draw the hud the timer cant resume but it gives better times then hooking InitFromMap()
@@ -1281,17 +1283,35 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		// Timer
 		if (pr::Cvar::Hud::timer.GetBool())
 		{
-			auto strTime = PR_formatTimeString(PR_ms2time(pr::Timer::inGame.Milliseconds()), pr::Cvar::Hud::timer_alldigits.GetBool(), pr::Cvar::Hud::timer_precision.GetInteger());
+			if (pr::runFinished)
+			{
+				auto strTime = PR_formatTimeString(PR_ms2time(pr::Timer::inGame.Milliseconds()), false, 3);
 
-			renderSystem->DrawSmallStringExt(pr::Cvar::Hud::timer_x.GetInteger(), pr::Cvar::Hud::timer_y.GetInteger(), strTime.c_str(), idVec4(PR_toPreyColour(pr::Cvar::Hud::timer_r.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::timer_g.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::timer_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(pr::Cvar::Hud::timer_x.GetInteger(), pr::Cvar::Hud::timer_y.GetInteger(), strTime.c_str(), idVec4(PR_toPreyColour(50), PR_toPreyColour(150), PR_toPreyColour(180), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
+			}
+			else
+			{
+				auto strTime = PR_formatTimeString(PR_ms2time(pr::Timer::inGame.Milliseconds()), pr::Cvar::Hud::timer_alldigits.GetBool(), pr::Cvar::Hud::timer_precision.GetInteger());
+
+				renderSystem->DrawSmallStringExt(pr::Cvar::Hud::timer_x.GetInteger(), pr::Cvar::Hud::timer_y.GetInteger(), strTime.c_str(), idVec4(PR_toPreyColour(pr::Cvar::Hud::timer_r.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::timer_g.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::timer_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
+			}
 		}
 
 		// RTA-Timer
 		if (pr::Cvar::Hud::rtatimer.GetBool())
 		{
-			auto strTime = PR_formatTimeString(PR_ms2time(pr::Timer::RTA.Milliseconds()), pr::Cvar::Hud::rtatimer_alldigits.GetBool(), pr::Cvar::Hud::rtatimer_precision.GetInteger());
+			if (pr::runFinished)
+			{
+				auto strTime = PR_formatTimeString(PR_ms2time(pr::Timer::RTA.Milliseconds()), false, 3);
 
-			renderSystem->DrawSmallStringExt(pr::Cvar::Hud::rtatimer_x.GetInteger(), pr::Cvar::Hud::rtatimer_y.GetInteger(), strTime.c_str(), idVec4(PR_toPreyColour(pr::Cvar::Hud::rtatimer_r.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::rtatimer_g.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::rtatimer_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(pr::Cvar::Hud::rtatimer_x.GetInteger(), pr::Cvar::Hud::rtatimer_y.GetInteger(), strTime.c_str(), idVec4(PR_toPreyColour(50), PR_toPreyColour(150), PR_toPreyColour(180), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
+			}
+			else
+			{	
+				auto strTime = PR_formatTimeString(PR_ms2time(pr::Timer::RTA.Milliseconds()), pr::Cvar::Hud::rtatimer_alldigits.GetBool(), pr::Cvar::Hud::rtatimer_precision.GetInteger());
+
+				renderSystem->DrawSmallStringExt(pr::Cvar::Hud::rtatimer_x.GetInteger(), pr::Cvar::Hud::rtatimer_y.GetInteger(), strTime.c_str(), idVec4(PR_toPreyColour(pr::Cvar::Hud::rtatimer_r.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::rtatimer_g.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::rtatimer_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
+			}
 		}
 
 		// Speedometer

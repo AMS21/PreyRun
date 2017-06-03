@@ -36,11 +36,13 @@ namespace pr
 
 	bool oneClickLoad { false };
 
+	bool runFinished { false };
+
 	namespace Timer
 	{
 		prTimer inGame; // The actual in-game timer
-		bool running { false };
 		prTimer RTA; // The RTA timer
+		bool running { false };
 
 		idTimer demo;
 		bool timedemo { false };

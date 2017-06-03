@@ -19,6 +19,8 @@ namespace pr
 
 	extern bool oneClickLoad;
 
+	extern bool runFinished;
+
 	namespace Timer
 	{
 		extern prTimer inGame;
@@ -81,8 +83,8 @@ namespace pr
 		{
 			extern idCVar hud;
 			// Speedometer
-			extern idCVar  speedometer;
-			extern idCVar  speedometer_r;
+			extern idCVar speedometer;
+			extern idCVar speedometer_r;
 			extern idCVar speedometer_g;
 			extern idCVar speedometer_b;
 			extern idCVar speedometer_precision;

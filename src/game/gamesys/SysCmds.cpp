@@ -164,6 +164,8 @@ void Cmd_PR_timer_start_f(const idCmdArgs &args)
 
 	pr::Timer::running = true;
 
+	pr::runFinished = false;
+
 	pr::ConsoleWrite("Starting in-game and RTA timer");
 }
 
@@ -509,6 +511,26 @@ void Cmd_PR_dbg_autocmd_trigger_f(const idCmdArgs &args)
 
 	acz.Run();
 }
+
+void Cmd_PR_dbg_runfinsished_f(const idCmdArgs &args)
+{
+	if (args.Argc() > 1)
+	{
+		if (atoi(args.Argv(1)))
+		{
+			pr::runFinished = true;
+		}
+		else
+		{
+			pr::runFinished = false;
+		}
+	}
+	else
+	{
+		pr::runFinished = true;
+	}
+}
+
 #endif // PR_DEBUG
 
 /////////////////
@@ -956,7 +978,7 @@ void Cmd_Give_f(const idCmdArgs &args)
 	//HUMANHEAD PCF rww 05/16/06
 	declManager->SetInsideLevelLoad(wasInside);
 	//HUMANHEAD END
-}
+		}
 
 /*
 ==================
@@ -1490,8 +1512,8 @@ void Cmd_PlayerShadowToggle_f(const idCmdArgs &args)
 		{
 			gameLocal.entities[i]->GetRenderEntity()->noShadow = setShadows;
 		}
-	}
 }
+	}
 #endif
 //HUMANHEAD END
 
@@ -2944,7 +2966,7 @@ static void Cmd_EraseViewNote_f(const idCmdArgs &args)
 	if (removeFile)
 	{
 		remove(str);
-}
+	}
 #endif
 }
 // HUMANHEAD END
@@ -3209,7 +3231,7 @@ void Cmd_PrintTypeName_f(const idCmdArgs &args)
 	if (type)
 	{
 		common->Printf("Type '%i' is '%s'\n", typeNum, type->classname);
-	}
+}
 	else
 	{
 		common->Printf("Invalid typenum.\n");
@@ -3290,6 +3312,8 @@ void idGameLocal::InitConsoleCommands(void)
 	// Autocmdzones
 	cmdSystem->AddCommand("PR_dbg_autocmd", Cmd_PR_dbg_autocmd_f, CMD_FL_GAME, "PreyRun Debug cmd: Prints debug info about an indexed autocmdzone");
 	cmdSystem->AddCommand("PR_dbg_autocmd_trigger", Cmd_PR_dbg_autocmd_trigger_f, CMD_FL_GAME, "PreyRun Debug cmd: Triggers an autocmdzone");
+
+	cmdSystem->AddCommand("PR_dbg_runfinished", Cmd_PR_dbg_runfinsished_f, CMD_FL_GAME, "PreyRun Debug cmd: Simulates a finished run");
 #endif // PR_DEBUG
 
 	// PreyRun END
