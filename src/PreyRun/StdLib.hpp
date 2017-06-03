@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // Really hacky way to use stdlib functions
 #undef strcmp
@@ -27,6 +27,12 @@
 #include <algorithm>
 #include <utility>
 #include <stdint.h>
+#include <thread>
+#include <mutex>
+#include <functional>
+#include <utility>
+#include <atomic>
+#include <future>
 // No-Includes
 
 

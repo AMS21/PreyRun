@@ -1445,6 +1445,12 @@
     <ClInclude Include="PreyRun\Logging.hpp">
       <Filter>PreyRun</Filter>
     </ClInclude>
+    <ClInclude Include="PreyRun\Monitor.hpp">
+      <Filter>PreyRun</Filter>
+    </ClInclude>
+    <ClInclude Include="PreyRun\Thread.hpp">
+      <Filter>PreyRun</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="game\Game.def" />

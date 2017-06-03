@@ -26,7 +26,7 @@ All game cvars should be defined here.
 // PreyRun BEGIN
 namespace pr
 {
-	bool preysplit_pipeopen { false };
+	std::atomic<bool> preysplit_pipeopen { false };
 	bool preysplit_mapchanged { false };
 
 	idStr reload_latestsave {};
@@ -40,14 +40,14 @@ namespace pr
 
 	namespace Timer
 	{
-		prTimer inGame; // The actual in-game timer
+		prTimerMonitor inGame {}; // The actual in-game timer in a thread safe monitor
 		prTimer RTA; // The RTA timer
-		bool running { false };
+		std::atomic<bool> running { false }; // This variable is set to true when we are timing a run
 
 		idTimer demo;
 		bool timedemo { false };
 	}
-	
+
 #ifdef PR_DEBUG
 	namespace dbg
 	{

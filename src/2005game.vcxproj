@@ -2580,10 +2580,12 @@
     <ClInclude Include="PreyRun\Hooking.hpp" />
     <ClInclude Include="PreyRun\interprocess.hpp" />
     <ClInclude Include="PreyRun\Logging.hpp" />
+    <ClInclude Include="PreyRun\Monitor.hpp" />
     <ClInclude Include="PreyRun\PreyRun.hpp" />
     <ClInclude Include="PreyRun\Random.hpp" />
     <ClInclude Include="PreyRun\StdLib.hpp" />
     <ClInclude Include="PreyRun\GameTimer.hpp" />
+    <ClInclude Include="PreyRun\Thread.hpp" />
     <ClInclude Include="Prey\ai_centurion.h" />
     <ClInclude Include="Prey\ai_crawler.h" />
     <ClInclude Include="Prey\ai_creaturex.h" />

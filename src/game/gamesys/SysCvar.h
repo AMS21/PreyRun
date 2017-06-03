@@ -5,11 +5,12 @@
 #define __SYS_CVAR_H__
 
 // PreyRun BEGIN
+#include "../../PreyRun/Monitor.hpp"
 #include "../../PreyRun/GameTimer.hpp"
 
 namespace pr
 {
-	extern bool preysplit_pipeopen;
+	extern std::atomic<bool> preysplit_pipeopen;
 	extern bool preysplit_mapchanged;
 
 	extern idStr reload_latestsave;
@@ -23,9 +24,9 @@ namespace pr
 
 	namespace Timer
 	{
-		extern prTimer inGame;
-		extern bool running;
+		extern prTimerMonitor inGame;
 		extern prTimer RTA;
+		extern std::atomic<bool> running;
 
 		extern idTimer demo;
 		extern bool timedemo;

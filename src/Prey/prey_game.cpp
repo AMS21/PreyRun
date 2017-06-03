@@ -812,12 +812,6 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 		timeRandom = time; //HUMANHEAD rww
 
 		// PreyRun BEGIN
-		// only update the timer when PreySplit is eneabled and the timer is running
-		if (pr::Cvar::preysplit.GetBool() && pr::Timer::running)
-		{
-			pr::WriteTime(pr::GetTime());
-		}
-
 		if (pr::Cvar::timer_backup.GetBool() && pr::Timer::running && pr::Timer::inGame.IsRunning())
 		{
 			pr::WriteBackupTime(GetMapName());

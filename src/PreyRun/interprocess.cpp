@@ -5,12 +5,14 @@
 
 #include "PreyRun.hpp"
 #include "interprocess.hpp"
+#include "Thread.hpp"
 
 namespace pr
 {
 	static HANDLE pipe_preysplit = INVALID_HANDLE_VALUE;
 	static OVERLAPPED overlapped;
-	static bool writing_to_pipe;
+	std::atomic<bool> writing_to_pipe;
+	//static bool writing_to_pipe;
 
 	void InitPreySplitPipe()
 	{
@@ -47,6 +49,8 @@ namespace pr
 				pipe_preysplit = INVALID_HANDLE_VALUE;
 				pr::preysplit_pipeopen = false;
 			}
+
+			prThread::launch(PreySplitMain);
 		}
 #ifdef PR_DEBUG
 		else
@@ -69,6 +73,21 @@ namespace pr
 
 		CloseHandle(overlapped.hEvent);
 		std::memset(&overlapped, 0, sizeof(overlapped));
+	}
+
+	void PreySplitMain()
+	{
+		while (pr::preysplit_pipeopen)
+		{
+			if (pr::Timer::running)
+			{
+				WriteTime(pr::GetTime());
+			}
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(16)); // about every frame
+
+			//std::this_thread::sleep_for(std::chrono::milliseconds(pr::Cvar::preysplit_update.GetInteger())); // pr::Cvar::preysplit_update is not thread safe, but woud be better
+		}
 	}
 
 	static void WritePreySplit(const std::vector<char>& data)

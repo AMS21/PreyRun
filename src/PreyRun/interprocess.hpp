@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 #include "../game/game_local.h"
-#include "StdLib.hpp"
 #include "GameTimer.hpp"
+#include "StdLib.hpp"
 
 // Credits to Ivan Molodetskikh (Yalter) and Chong Jiang Wei (Matherunner) for their interprocess.cpp from BunnymodXT (https://github.com/YaLTeR/BunnymodXT/blob/master/BunnymodXT/Windows/interprocess.cpp)
 
@@ -35,6 +35,8 @@ namespace pr
 
 	void InitPreySplitPipe();
 	void ShutdownPreySplitPipe();
+
+	void PreySplitMain();
 
 	void WriteTime(const Time& time);
 
