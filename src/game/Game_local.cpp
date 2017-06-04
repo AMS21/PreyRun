@@ -375,12 +375,6 @@ void idGameLocal::Init(void) {
 	Printf("--------------------------------------\n");
 
 	// PreyRun BEGIN
-#ifdef PR_DEBUG
-	// Enable console logging
-	cvarSystem->SetCVarString("logFileName", "Console.log");
-	cvarSystem->SetCVarInteger("logFile", 1);
-#endif // PR_DEBUG
-
 	pr::ConsoleWrite("Running %s", ENGINE_VERSION);
 
 #ifdef PR_DEBUG
@@ -394,6 +388,12 @@ void idGameLocal::Init(void) {
 
 	// Load PreyRun.cfg
 	cmdSystem->BufferCommandText(CMD_EXEC_NOW, "exec preyrun.cfg\n");
+
+#ifdef PR_DEBUG
+	// Enable console logging
+	cvarSystem->SetCVarString("logFileName", "Console.log");
+	cvarSystem->SetCVarInteger("logFile", 1);
+#endif // PR_DEBUG
 	// PreyRun END
 }
 
