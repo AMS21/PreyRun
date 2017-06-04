@@ -16,8 +16,6 @@ namespace pr
 	extern idStr reload_latestsave;
 	extern bool reload_ready;
 
-	extern idFile* logfile;
-
 	extern bool oneClickLoad;
 
 	extern bool runFinished;

@@ -381,9 +381,6 @@ void idGameLocal::Init(void) {
 	cvarSystem->SetCVarInteger("logFile", 1);
 #endif // PR_DEBUG
 
-	// Open log file
-	pr::logfile = fileSystem->OpenFileWrite(pr::LogFilePath, "fs_savepath");
-
 	pr::ConsoleWrite("Running %s", ENGINE_VERSION);
 
 #ifdef PR_DEBUG
@@ -409,7 +406,8 @@ idGameLocal::Shutdown
 */
 void idGameLocal::Shutdown(void) {
 
-	if (!common) {
+	if (!common)
+	{
 		return;
 	}
 
@@ -420,9 +418,6 @@ void idGameLocal::Shutdown(void) {
 
 	pr::ShutdownPreySplitPipe();
 	pr::ClearBackupTimer();
-
-	// Close log file and save to disk
-	fileSystem->CloseFile(pr::logfile);
 	// PreyRun END
 
 	mpGame.Shutdown();

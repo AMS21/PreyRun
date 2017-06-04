@@ -125,7 +125,9 @@ namespace pr
 				sprintf(str, "%s\n", string);
 			}
 
-			pr::logfile->Write(str.c_str(),strlen(str.c_str()));
+			auto logFile = fileSystem->OpenFileWrite(pr::LogFilePath, "fs_savepath");
+			logFile->Write(str.c_str(),strlen(str.c_str()));
+			fileSystem->CloseFile(logFile);
 		}
 	}
 }

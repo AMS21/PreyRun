@@ -32,8 +32,6 @@ namespace pr
 	idStr reload_latestsave {};
 	bool reload_ready { false };
 
-	idFile* logfile;
-
 	bool oneClickLoad { false };
 
 	bool runFinished { false };
