@@ -103,7 +103,7 @@ namespace pr
 			idCVar speedometer_r("PR_hud_Speedometer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the red value of the speedometer", 0, 255);
 			idCVar speedometer_g("PR_hud_Speedometer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the green value of the speedometer", 0, 255);
 			idCVar speedometer_b("PR_hud_Speedometer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the blue value of the speedometer", 0, 255);
-			idCVar speedometer_precision("PR_hud_Speedometer_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "the amount of numbers shown after the comma", 0, 6);
+			idCVar speedometer_precision("PR_hud_Speedometer_Precision", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "the amount of numbers shown after the comma", 0, 6);
 			idCVar speedometer_x("PR_hud_Speedometer_X", "310", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer x coordinate", 0, 639);
 			idCVar speedometer_y("PR_hud_Speedometer_Y", "460", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer y coordinate", 0, 479);
 
@@ -133,7 +133,7 @@ namespace pr
 			idCVar jumpspeed_r("PR_hud_JumpSpeed_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0, 255);
 			idCVar jumpspeed_g("PR_hud_JumpSpeed_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0, 255);
 			idCVar jumpspeed_b("PR_hud_JumpSpeed_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0, 255);
-			idCVar jumpspeed_precision("PR_hud_JumpSpeed_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed precision", 0, 6);
+			idCVar jumpspeed_precision("PR_hud_JumpSpeed_Precision", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed precision", 0, 6);
 			idCVar jumpspeed_style("PR_hud_JumpSpeed_Style", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "0 - Always display your jumpspeed\n1 - jumspeed fades out when on the ground\n2 - jumpspeed only visible while in the air", 0, 2, idCmdSystem::ArgCompletion_Integer<0, 2>);
 
 			// Viewangles
