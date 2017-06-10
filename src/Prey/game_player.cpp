@@ -1315,7 +1315,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		}
 
 		// Speedometer
-		if (pr::Cvar::Hud::speedometer.GetBool())
+		if (pr::Cvar::Hud::speedometer.GetBool() && !bInCinematic)
 		{
 			auto vel = physicsObj.GetLinearVelocity();
 
@@ -1331,6 +1331,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 				sprintf(strSpeedoMeter, "%.*f", pr::Cvar::Hud::speedometer_precision.GetInteger(), static_cast<float>(idMath::Sqrt(vel.x * vel.x + vel.y * vel.y)));
 
 			}
+
 			renderSystem->DrawSmallStringExt(pr::Cvar::Hud::speedometer_x.GetInteger(), pr::Cvar::Hud::speedometer_y.GetInteger(), strSpeedoMeter.c_str(), idVec4(PR_toPreyColour(pr::Cvar::Hud::speedometer_r.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::speedometer_g.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::speedometer_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
 		}
 
@@ -1378,7 +1379,11 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 				sprintf(strJumpSpeed, "%.*f", pr::Cvar::Hud::jumpspeed_precision.GetInteger(), _hud->GetStateFloat("pr_hud_jumpspeed_val", "0"));
 			}
 
-			renderSystem->DrawSmallStringExt(pr::Cvar::Hud::jumpspeed_x.GetInteger(), pr::Cvar::Hud::jumpspeed_y.GetInteger(), strJumpSpeed.c_str(), idVec4(PR_toPreyColour(pr::Cvar::Hud::jumpspeed_r.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::jumpspeed_g.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::jumpspeed_b.GetInteger()), pr_js_alpha), true, declManager->FindMaterial("textures/bigchars"));
+			// Only draw while the player is not in a cinematic/cutscene
+			if (!bInCinematic)
+			{
+				renderSystem->DrawSmallStringExt(pr::Cvar::Hud::jumpspeed_x.GetInteger(), pr::Cvar::Hud::jumpspeed_y.GetInteger(), strJumpSpeed.c_str(), idVec4(PR_toPreyColour(pr::Cvar::Hud::jumpspeed_r.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::jumpspeed_g.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::jumpspeed_b.GetInteger()), pr_js_alpha), true, declManager->FindMaterial("textures/bigchars"));
+			}
 		}
 
 		// Viewangles
@@ -1771,7 +1776,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		// Custom Hud Element
 		if (pr::Cvar::Hud::custom.GetBool())
 		{
-			renderSystem->DrawSmallStringExt(pr::Cvar::Hud::custom_x.GetInteger() , pr::Cvar::Hud::custom_y.GetInteger(), pr::Cvar::Hud::custom_text.GetString(), idVec4(PR_toPreyColour(pr::Cvar::Hud::custom_r.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::custom_g.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::custom_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
+			renderSystem->DrawSmallStringExt(pr::Cvar::Hud::custom_x.GetInteger(), pr::Cvar::Hud::custom_y.GetInteger(), pr::Cvar::Hud::custom_text.GetString(), idVec4(PR_toPreyColour(pr::Cvar::Hud::custom_r.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::custom_g.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::custom_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
 		}
 
 		// Keys

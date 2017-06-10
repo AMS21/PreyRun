@@ -1,4 +1,4 @@
-// Copyright (C) 2004 Id Software, Inc.
+﻿// Copyright (C) 2004 Id Software, Inc.
 //
 
 #ifndef __PHYSICS_PLAYER_H__
@@ -101,6 +101,9 @@ public:
 	float					GetMaxStepHeight( void ) const;
 	void					SetMaxJumpHeight( const float newMaxJumpHeight );
 	void					SetMovementType( const pmtype_t type );
+	// PreyRun BEGIN
+	pmtype_t				GetMovementType() { return static_cast<pmtype_t>(current.movementType); };
+	// PreyRun END
 	void					SetPlayerInput( const usercmd_t &cmd, const idAngles &newViewAngles );
 	virtual	//HUMANHEAD: Made virtual
 	void					SetKnockBack( const int knockBackTime );
