@@ -117,7 +117,7 @@ constexpr double PR_dbg_frametime_red { 2.00f };
 #endif // PR_DEBUG
 
 // The draw function from Prey takes floats in the range from 0.0 to 1.0 but usualy colours are represented from 0 to 255 (hex)
-ID_INLINE float PR_toPreyColour(float f);
+ID_INLINE float PR_toPreyColour(const float& f);
 // PreyRun END
 
 #define MAX_HEALTH_NORMAL_MP		100 //rww - a probably temporary hack for trying out the pipe-as-armor concept

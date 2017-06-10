@@ -6,7 +6,7 @@
 #define DAMAGE_INDICATOR_TIME		1100		// Update this in hud_damageindicator.guifragment too
 
 // PreyRun BEGIN
-ID_INLINE float PR_toPreyColour(float f)
+ID_INLINE float PR_toPreyColour(const float& f)
 {
 	return f / 255.F;
 }
