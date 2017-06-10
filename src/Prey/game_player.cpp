@@ -1692,7 +1692,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 			_hud->SetStateFloat("pr_hud_damage_a", alpha);
 
 			idStr strDamage;
-			sprintf(strDamage, "-%d", _hud->GetStateInt("pr_hud_damage_val"), strDamage);
+			sprintf(strDamage, "-%d", _hud->GetStateInt("pr_hud_damage_val"));
 
 			renderSystem->DrawSmallStringExt(pr::Cvar::Hud::health.GetBool() ? (PR_health_x + 75) : PR_health_x, PR_health_y, strDamage, idVec4(1.00f, 0.00f, 0.00f, alpha), false, declManager->FindMaterial("textures/bigchars"));
 		}
