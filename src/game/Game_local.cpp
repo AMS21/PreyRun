@@ -940,6 +940,10 @@ void idGameLocal::LoadMap(const char *mapName, int randseed) {
 	int i;
 	bool sameMap = (mapFile && idStr::Icmp(mapFileName, mapName) == 0);
 
+	// PreyRun BEGIN
+	pr::DebugLog("LoadMap: %s, $i", mapName, randseed);
+	// PreyRun END
+
 	// clear the sound system
 	gameSoundWorld->ClearAllSoundEmitters();
 
