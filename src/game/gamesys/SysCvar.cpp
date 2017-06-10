@@ -60,7 +60,7 @@ namespace pr
 		idCVar autojump("PR_AutoJump", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly jumps when holding your jumpkey (_moveUp)");
 		idCVar autopause("PR_AutoPause", "0", CVAR_GAME | CVAR_BOOL, "Automaticly pauses the game after map load, set PR_Freeze to 0 to continue");
 		idCVar preysplit("PR_PreySplit", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle support for interaction with PreySplit a LiveSplit component");
-		idCVar preysplit_update("PR_PreySplit_update", "41", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The time in milliseconds PreyRun should wait before update the game timer of PreySplit again, note that this is only for displaying the current game time the splits will always be acurate", 0, 1000, idCmdSystem::ArgCompletion_Integer<0, 1000>);
+		idCVar preysplit_update("PR_PreySplit_update", "41", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The time in milliseconds PreyRun should wait before update the game timer of PreySplit again, note that this is only for displaying the current game time the splits will always be acurate", 0.f, 1000.f, idCmdSystem::ArgCompletion_Integer<0, 1000>);
 		idCVar disablejukeboxes("PR_DisableJukeBoxes", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Disable all jukeboxes which play copyrighted music. This should make it easier to upload your runs direcly to Youtube without changing the music in the bar.");
 		idCVar freeze("PR_Freeze", "0", CVAR_GAME | CVAR_BOOL, "Completley freezes the game until pr_Freeze is set back to 0");
 		idCVar autocmd_show("PR_AutoCmd_Show", "0", CVAR_GAME | CVAR_INTEGER, "Display autocmd zones, Note that developer must be set to 1");
@@ -68,7 +68,7 @@ namespace pr
 
 		idCVar timer_autostart("PR_Timer_AutoStart", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly start the hud timer at run begin check PR_Timer_Methode for information when this might be");
 		idCVar timer_autostop("PR_Timer_AutoStop", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly stop the hud timer check PR_Timer_Methode for information when this might be");
-		idCVar timer_methode("PR_Timer_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Switch the diffrent timing methodes\n0 - RTA - Real Time Attack, the whole game from start (the first frame you can control Tommy) to finish (when the sphere boss is killed) with game time (default)\n1 - Individual Level, Starts when a map or savegame, is loaded and stops when the map has been completed", 0, 1);
+		idCVar timer_methode("PR_Timer_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Switch the diffrent timing methodes\n0 - RTA - Real Time Attack, the whole game from start (the first frame you can control Tommy) to finish (when the sphere boss is killed) with game time (default)\n1 - Individual Level, Starts when a map or savegame, is loaded and stops when the map has been completed", 0.f, 1.f);
 		idCVar timer_backup("PR_Timer_Backup", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle support for backing up the game time to resume it after the game crashed");
 		idCVar timer_backup_interval("PR_Timer_Backup_Interval", "250", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The interval for updating the backup timer");
 
@@ -100,41 +100,47 @@ namespace pr
 
 			// Speedometer
 			idCVar speedometer("PR_hud_Speedometer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of the speedometer which displays your velocity");
-			idCVar speedometer_r("PR_hud_Speedometer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the red value of the speedometer", 0, 255);
-			idCVar speedometer_g("PR_hud_Speedometer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the green value of the speedometer", 0, 255);
-			idCVar speedometer_b("PR_hud_Speedometer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the blue value of the speedometer", 0, 255);
-			idCVar speedometer_precision("PR_hud_Speedometer_Precision", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "the amount of numbers shown after the comma", 0, 6);
-			idCVar speedometer_x("PR_hud_Speedometer_X", "310", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer x coordinate", 0, 639);
-			idCVar speedometer_y("PR_hud_Speedometer_Y", "460", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer y coordinate", 0, 479);
+			idCVar speedometer_r("PR_hud_Speedometer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the red value of the speedometer", 0.f, 255.f);
+			idCVar speedometer_g("PR_hud_Speedometer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the green value of the speedometer", 0.f, 255.f);
+			idCVar speedometer_b("PR_hud_Speedometer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Defines the blue value of the speedometer", 0.f, 255.f);
+			idCVar speedometer_precision("PR_hud_Speedometer_Precision", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "the amount of numbers shown after the comma", 0.f, 6.f);
+			idCVar speedometer_x("PR_hud_Speedometer_X", "310", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer x coordinate", 0.f, 639.f);
+			idCVar speedometer_y("PR_hud_Speedometer_Y", "460", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer y coordinate", 0.f, 479.f);
 
 			idCVar timer("PR_hud_Timer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of the hud timer, note that the timer will still works even if hidden");
-			idCVar timer_x("PR_hud_Timer_X", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 639);
-			idCVar timer_y("PR_hud_Timer_Y", "235", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 479);
-			idCVar timer_r("PR_hud_Timer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
-			idCVar timer_g("PR_hud_Timer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
-			idCVar timer_b("PR_hud_Timer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
-			idCVar timer_precision("PR_hud_Timer_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer precision", 0, 3);
+			idCVar timer_x("PR_hud_Timer_X", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0.f, 639.f);
+			idCVar timer_y("PR_hud_Timer_Y", "235", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0.f, 479.f);
+			idCVar timer_r("PR_hud_Timer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0.f, 255.f);
+			idCVar timer_g("PR_hud_Timer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0.f, 255.f);
+			idCVar timer_b("PR_hud_Timer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0.f, 255.f);
+			idCVar timer_precision("PR_hud_Timer_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer precision", 0.f, 3.f);
 			idCVar timer_alldigits("PR_hud_Timer_AllDigits", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display all digits or only the non zero ones");
 
 			// RTA Timer
 			idCVar rtatimer("PR_hud_RTATimer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of the RTA hud timer, note that the timer will still works even if hidden");
-			idCVar rtatimer_x("PR_hud_RTATimer_X", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 639);
-			idCVar rtatimer_y("PR_hud_RTATimer_Y", "220", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0, 479);
-			idCVar rtatimer_r("PR_hud_RTATimer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
-			idCVar rtatimer_g("PR_hud_RTATimer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
-			idCVar rtatimer_b("PR_hud_RTATimer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0, 255);
-			idCVar rtatimer_precision("PR_hud_RTATimer_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer precision", 0, 3);
+			idCVar rtatimer_x("PR_hud_RTATimer_X", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0.f, 639.f);
+			idCVar rtatimer_y("PR_hud_RTATimer_Y", "220", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0.f, 479.f);
+			idCVar rtatimer_r("PR_hud_RTATimer_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0.f, 255.f);
+			idCVar rtatimer_g("PR_hud_RTATimer_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0.f, 255.f);
+			idCVar rtatimer_b("PR_hud_RTATimer_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Hud timer colour", 0.f, 255.f);
+			idCVar rtatimer_precision("PR_hud_RTATimer_Precision", "2", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer precision", 0.f, 3.f);
 			idCVar rtatimer_alldigits("PR_hud_RTATimer_AllDigits", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display all digits or only the non zero ones");
+
+			// Run Finished
+			idCVar runfinished("PR_hud_RunFinished", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "If enabled timers will display in a diffrent colour and displays will display full precision");
+			idCVar runfinished_r("PR_hud_RunFinished_r", "50", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Colour to for the timers when you finished a run", 0.f, 255.f);
+			idCVar runfinished_g("PR_hud_RunFinished_g", "150", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Colour to for the timers when you finished a run", 0.f, 255.f);
+			idCVar runfinished_b("PR_hud_RunFinished_b", "180", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Colour to for the timers when you finished a run", 0.f, 255.f);
 
 			// JumpSpeed
 			idCVar jumpspeed("PR_hud_JumpSpeed", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your jumpspeed, the speed you had before you jumped");
-			idCVar jumpspeed_x("PR_hud_JumpSpeed_X", "310", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed position", 0, 639);
-			idCVar jumpspeed_y("PR_hud_JumpSpeed_Y", "445", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed position", 0, 479);
-			idCVar jumpspeed_r("PR_hud_JumpSpeed_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0, 255);
-			idCVar jumpspeed_g("PR_hud_JumpSpeed_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0, 255);
-			idCVar jumpspeed_b("PR_hud_JumpSpeed_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0, 255);
-			idCVar jumpspeed_precision("PR_hud_JumpSpeed_Precision", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed precision", 0, 6);
-			idCVar jumpspeed_style("PR_hud_JumpSpeed_Style", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "0 - Always display your jumpspeed\n1 - jumspeed fades out when on the ground\n2 - jumpspeed only visible while in the air", 0, 2, idCmdSystem::ArgCompletion_Integer<0, 2>);
+			idCVar jumpspeed_x("PR_hud_JumpSpeed_X", "310", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed position", 0.f, 639.f);
+			idCVar jumpspeed_y("PR_hud_JumpSpeed_Y", "445", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed position", 0.f, 479.f);
+			idCVar jumpspeed_r("PR_hud_JumpSpeed_R", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0.f, 255.f);
+			idCVar jumpspeed_g("PR_hud_JumpSpeed_G", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0.f, 255.f);
+			idCVar jumpspeed_b("PR_hud_JumpSpeed_B", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Jumpspeed colour", 0.f, 255.f);
+			idCVar jumpspeed_precision("PR_hud_JumpSpeed_Precision", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Jumpspeed precision", 0.f, 6.f, idCmdSystem::ArgCompletion_Integer<0, 6>);
+			idCVar jumpspeed_style("PR_hud_JumpSpeed_Style", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "0 - Always display your jumpspeed\n1 - jumspeed fades out when on the ground\n2 - jumpspeed only visible while in the air", 0.f, 2.f, idCmdSystem::ArgCompletion_Integer<0, 2>);
 
 			// Viewangles
 			idCVar viewangles("PR_hud_ViewAngles", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of your current viewangles");
@@ -170,16 +176,16 @@ namespace pr
 
 			// Custom hud element
 			idCVar custom("PR_hud_Custom", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of the custom hud element, this will display any text given to PR_hud_Custom_Text");
-			idCVar custom_x("PR_hud_Custom_x", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "X position of the custom hud element", 0, 639);
-			idCVar custom_y("PR_hud_Custom_y", "250", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Y position of the custom hud element", 0, 479);
-			idCVar custom_r("PR_hud_Custom_r", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Custom hud element color", 0, 255);
-			idCVar custom_g("PR_hud_Custom_g", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Custom hud element color", 0, 255);
-			idCVar custom_b("PR_hud_Custom_b", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Custom hud element color", 0, 255);
+			idCVar custom_x("PR_hud_Custom_x", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "X position of the custom hud element", 0.f, 639.f);
+			idCVar custom_y("PR_hud_Custom_y", "250", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Y position of the custom hud element", 0.f, 479.f);
+			idCVar custom_r("PR_hud_Custom_r", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Custom hud element color", 0.f, 255.f);
+			idCVar custom_g("PR_hud_Custom_g", "255", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Custom hud element color", 0.f, 255.f);
+			idCVar custom_b("PR_hud_Custom_b", "63.75", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Custom hud element color", 0.f, 255.f);
 			idCVar custom_text("PR_hud_Custom_text", "", CVAR_GAME, "The text to display");
 
 			// Keys
 			idCVar keys("PR_hud_Keys", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of showing the pressed movement keys");
-			idCVar keys_methode("PR_hud_Keys_Style", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Select the style in which the pressed movement keys are displayed\n0 - Under the crosshair, only pressed keys are shown\n1 - Under the crosshair, pressed keys are white and not pressed keys are grey\n2 - Around the crosshair, only pressed keys are shown\n3 - Around the corsshair, pressed keys are white and not pressed keys are grey\n4 - At the right side of the screen, only pressed keys are displayed\n5 - At the right side of the screen, pressed keys are white and not not pressed keys are grey", 0, 5);
+			idCVar keys_methode("PR_hud_Keys_Style", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Select the style in which the pressed movement keys are displayed\n0 - Under the crosshair, only pressed keys are shown\n1 - Under the crosshair, pressed keys are white and not pressed keys are grey\n2 - Around the crosshair, only pressed keys are shown\n3 - Around the corsshair, pressed keys are white and not pressed keys are grey\n4 - At the right side of the screen, only pressed keys are displayed\n5 - At the right side of the screen, pressed keys are white and not not pressed keys are grey", 0.f, 5.f, idCmdSystem::ArgCompletion_Integer<0, 5>);
 		} // namespace: Hud
 	} // namespace: Cvar
 } // namespace: pr

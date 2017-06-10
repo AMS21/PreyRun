@@ -11,7 +11,7 @@ ID_INLINE float PR_toPreyColour(float f)
 	return f / 255.F;
 }
 
-idStr PR_formatTimeString(PR_time_t time, bool allDigits, int msPrecision)
+idStr PR_formatTimeString(const PR_time_t& time, const bool& allDigits, const uint8_t& msPrecision)
 {
 	idStr retStr;
 
@@ -1283,11 +1283,11 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		// Timer
 		if (pr::Cvar::Hud::timer.GetBool())
 		{
-			if (pr::runFinished)
+			if (pr::runFinished && pr::Cvar::Hud::runfinished.GetBool())
 			{
 				auto strTime = PR_formatTimeString(PR_ms2time(pr::Timer::inGame.Milliseconds()), false, 3);
 
-				renderSystem->DrawSmallStringExt(pr::Cvar::Hud::timer_x.GetInteger(), pr::Cvar::Hud::timer_y.GetInteger(), strTime.c_str(), idVec4(PR_toPreyColour(50), PR_toPreyColour(150), PR_toPreyColour(180), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(pr::Cvar::Hud::timer_x.GetInteger(), pr::Cvar::Hud::timer_y.GetInteger(), strTime.c_str(), idVec4(PR_toPreyColour(pr::Cvar::Hud::runfinished_r.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::runfinished_g.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::runfinished_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
 			}
 			else
 			{
@@ -1300,14 +1300,14 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 		// RTA-Timer
 		if (pr::Cvar::Hud::rtatimer.GetBool())
 		{
-			if (pr::runFinished)
+			if (pr::runFinished && pr::Cvar::Hud::runfinished.GetBool())
 			{
 				auto strTime = PR_formatTimeString(PR_ms2time(pr::Timer::RTA.Milliseconds()), false, 3);
 
-				renderSystem->DrawSmallStringExt(pr::Cvar::Hud::rtatimer_x.GetInteger(), pr::Cvar::Hud::rtatimer_y.GetInteger(), strTime.c_str(), idVec4(PR_toPreyColour(50), PR_toPreyColour(150), PR_toPreyColour(180), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
+				renderSystem->DrawSmallStringExt(pr::Cvar::Hud::rtatimer_x.GetInteger(), pr::Cvar::Hud::rtatimer_y.GetInteger(), strTime.c_str(), idVec4(PR_toPreyColour(pr::Cvar::Hud::runfinished_r.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::runfinished_g.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::runfinished_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));
 			}
 			else
-			{	
+			{
 				auto strTime = PR_formatTimeString(PR_ms2time(pr::Timer::RTA.Milliseconds()), pr::Cvar::Hud::rtatimer_alldigits.GetBool(), pr::Cvar::Hud::rtatimer_precision.GetInteger());
 
 				renderSystem->DrawSmallStringExt(pr::Cvar::Hud::rtatimer_x.GetInteger(), pr::Cvar::Hud::rtatimer_y.GetInteger(), strTime.c_str(), idVec4(PR_toPreyColour(pr::Cvar::Hud::rtatimer_r.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::rtatimer_g.GetInteger()), PR_toPreyColour(pr::Cvar::Hud::rtatimer_b.GetInteger()), 1.00f), false, declManager->FindMaterial("textures/bigchars"));

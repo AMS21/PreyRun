@@ -107,6 +107,11 @@ namespace pr
 			extern idCVar rtatimer_b;
 			extern idCVar rtatimer_precision;
 			extern idCVar rtatimer_alldigits;
+			// Run Finished
+			extern idCVar runfinished;
+			extern idCVar runfinished_r;
+			extern idCVar runfinished_g;
+			extern idCVar runfinished_b;
 			// JumpSpeed
 			extern idCVar jumpspeed;
 			extern idCVar jumpspeed_x;
