@@ -1011,15 +1011,16 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 
 				if (static_cast<pr::TimerMethode>(pr::Cvar::timer_methode.GetInteger()) == pr::TimerMethode::IndividualLevel && pr::Timer::running && pr::Timer::inGame.IsRunning() && pr::Cvar::timer_autostop.GetBool())
 				{
-					pr::Timer::running = false;
 					pr::Timer::inGame.Stop();
 					pr::Timer::RTA.Stop();
 
 					if (pr::Cvar::preysplit.GetBool())
 					{
 						pr::WriteGameEnd(pr::GetTime());
-						pr::runFinished = true;
 					}
+
+					pr::Timer::running = false;
+					pr::runFinished = true;
 
 					auto times = PR_ms2time(pr::Timer::inGame.Milliseconds());
 					auto rtatime = PR_ms2time(pr::Timer::RTA.Milliseconds());
