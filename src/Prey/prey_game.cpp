@@ -1004,7 +1004,7 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 			// PreyRun BEGIN
 			pr::DebugLog("Session command: %s", sessionCommand.c_str());
 
-			if (sessionCommand.Find("map ", false, 4))
+			if (sessionCommand.Mid(0, 3) == "map")
 			{
 				// The command to execute is map
 				pr::preysplit_mapchanged = true;
