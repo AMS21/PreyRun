@@ -66,9 +66,9 @@ namespace pr
 			{
 				for (auto const &str : vec)
 				{
-#ifdef PR_DBG_AUTOCMD
+				#ifdef PR_DBG_AUTOCMD
 					pr::FunctionLog(__FUNCTION__, "Executing '%s'", str.c_str());
-#endif // PR_DBG_AUTOCMD
+				#endif // PR_DBG_AUTOCMD
 					cmdSystem->BufferCommandText(CMD_EXEC_NOW, str.c_str());
 				}
 			}
@@ -105,7 +105,7 @@ namespace pr
 
 	AutocmdzoneHandler::AutocmdzoneHandler() {}
 
-	// Checks if any of the autocommandzones should be triggerd and triggers them
+	// Checks if any of the autocommandzones should be triggered and triggers them
 	void AutocmdzoneHandler::CheckForTriggering()
 	{
 		if (gameLocal.GetLocalPlayer())
@@ -133,18 +133,18 @@ namespace pr
 
 	void AutocmdzoneHandler::Add(const idVec3 &pos1_, const idVec3 &pos2_, const cmdType &cmds_)
 	{
-#ifdef PR_DBG_AUTOCMD
+	#ifdef PR_DBG_AUTOCMD
 		pr::FunctionLog(__FUNCTION__, "Adding autocmdzone: %f %f %f %f %f %f %s", pos1_.x, pos1_.y, pos1_.z, pos2_.x, pos2_.y, pos2_.z, cmds_.c_str());
-#endif // PR_DBG_AUTOCMD
+	#endif // PR_DBG_AUTOCMD
 		this->acz.emplace_back(pos1_, pos2_, cmds_);
 	}
 
 	// !Under the premise that const int ´num´ will always be > 0 and < acz.size()!
 	void AutocmdzoneHandler::Edit(const int &num, const idVec3 &pos1_, const idVec3 &pos2_, const cmdType &cmds_)
 	{
-#ifdef PR_DBG_AUTOCMD
+	#ifdef PR_DBG_AUTOCMD
 		pr::FunctionLog(__FUNCTION__, "Editing number: %d", num);
-#endif // PR_DBG_AUTOCMD
+	#endif // PR_DBG_AUTOCMD
 		acz[num].SetPos1(pos1_);
 		acz[num].SetPos2(pos2_);
 		acz[num].SetCmds(cmds_);
