@@ -9,7 +9,7 @@ namespace pr
 {
 	prTimer::prTimer() : isRunning(false), acuTime(std::chrono::duration<pr::Timer::storageType, pr::Timer::periodType>(0)), lastStarted(timer.now()) {}
 
-	prTimer::prTimer(pr::Timer::storageType ct) : isRunning(false), acuTime(std::chrono::duration <pr::Timer::storageType, pr::Timer::periodType>(ct)), lastStarted(timer.now()) {}
+	prTimer::prTimer(const pr::Timer::storageType& ct) : isRunning(false), acuTime(std::chrono::duration <pr::Timer::storageType, pr::Timer::periodType>(ct)), lastStarted(timer.now()) {}
 
 	prTimer::~prTimer() {}
 
@@ -131,7 +131,7 @@ namespace pr
 		return std::chrono::duration_cast<pr::Timer::timeType>(acuTime).count();
 	}
 
-	void prTimer::SetCT(pr::Timer::storageType clockTicks)
+	void prTimer::SetCT(const pr::Timer::storageType& clockTicks)
 	{
 #ifdef PR_DBG_GAMETIMER
 		pr::FunctionLog(__FUNCTION__, "ct: %f", clockTicks);

@@ -21,7 +21,7 @@ namespace pr
 	{
 	public:
 		prTimer();
-		explicit prTimer(pr::Timer::storageType ct);
+		explicit prTimer(const pr::Timer::storageType& ct);
 		~prTimer();
 
 		void Start();
@@ -36,7 +36,7 @@ namespace pr
 		pr::Timer::storageType ClockTicks() const;
 
 		bool IsRunning() const { return isRunning; }
-		void SetCT(pr::Timer::storageType clockTicks);
+		void SetCT(const pr::Timer::storageType& clockTicks);
 
 	private:
 		bool isRunning;
