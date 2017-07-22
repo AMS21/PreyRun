@@ -42,7 +42,7 @@ namespace pr
 		bool isRunning;
 		std::chrono::duration <pr::Timer::storageType, pr::Timer::periodType> acuTime;
 
-		std::chrono::time_point<std::chrono::steady_clock> lastStarted;
-		std::chrono::steady_clock timer;
+		std::chrono::time_point<std::chrono::high_resolution_clock> lastStarted;
+		std::chrono::high_resolution_clock timer;
 	};
 }
