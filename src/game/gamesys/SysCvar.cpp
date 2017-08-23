@@ -57,33 +57,33 @@ namespace pr
 
 	namespace Cvar
 	{
-		idCVar autojump("PR_AutoJump", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly jumps when holding your jumpkey (_moveUp)");
-		idCVar autopause("PR_AutoPause", "0", CVAR_GAME | CVAR_BOOL, "Automaticly pauses the game after map load, set PR_Freeze to 0 to continue");
+		idCVar autojump("PR_AutoJump", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automatically jumps when holding your 'jump' key (_moveUp)");
+		idCVar autopause("PR_AutoPause", "0", CVAR_GAME | CVAR_BOOL, "Automatically pauses the game after map load, set PR_Freeze to 0 to continue");
 		idCVar preysplit("PR_PreySplit", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle support for interaction with PreySplit a LiveSplit component");
-		idCVar preysplit_update("PR_PreySplit_update", "41", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The time in milliseconds PreyRun should wait before update the game timer of PreySplit again, note that this is only for displaying the current game time the splits will always be acurate", 0.f, 1000.f, idCmdSystem::ArgCompletion_Integer<0, 1000>);
-		idCVar disablejukeboxes("PR_DisableJukeBoxes", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Disable all jukeboxes which play copyrighted music. This should make it easier to upload your runs direcly to Youtube without changing the music in the bar.");
-		idCVar freeze("PR_Freeze", "0", CVAR_GAME | CVAR_BOOL, "Completley freezes the game until pr_Freeze is set back to 0");
-		idCVar autocmd_show("PR_AutoCmd_Show", "0", CVAR_GAME | CVAR_INTEGER, "Display autocmd zones, Note that developer must be set to 1");
+		idCVar preysplit_update("PR_PreySplit_update", "41", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The time in milliseconds PreyRun should wait before update the game timer of PreySplit again, note that this is only for displaying the current game time the splits will always be accurate", 0.f, 1000.f, idCmdSystem::ArgCompletion_Integer<0, 1000>);
+		idCVar disablejukeboxes("PR_DisableJukeBoxes", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Disable all jukeboxes which play copyrighted music. This should make it easier to upload your runs directly to YouTube without changing the music in the bar.");
+		idCVar freeze("PR_Freeze", "0", CVAR_GAME | CVAR_BOOL, "Completely freezes the game until pr_Freeze is set back to 0");
+		idCVar autocmd_show("PR_AutoCmd_Show", "0", CVAR_GAME | CVAR_INTEGER, "Display auto command zones, Note that developer must be set to 1");
 		idCVar log("PR_Log", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Log PreyRun output to file");
 
-		idCVar timer_autostart("PR_Timer_AutoStart", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly start the hud timer at run begin check PR_Timer_Methode for information when this might be");
-		idCVar timer_autostop("PR_Timer_AutoStop", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automaticly stop the hud timer check PR_Timer_Methode for information when this might be");
-		idCVar timer_methode("PR_Timer_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Switch the diffrent timing methodes\n0 - RTA - Real Time Attack, the whole game from start (the first frame you can control Tommy) to finish (when the sphere boss is killed) with game time (default)\n1 - Individual Level, Starts when a map or savegame, is loaded and stops when the map has been completed", 0.f, 1.f);
+		idCVar timer_autostart("PR_Timer_AutoStart", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automatically start the hud timer at run begin check PR_Timer_Methode for information when this might be");
+		idCVar timer_autostop("PR_Timer_AutoStop", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Automatically stop the hud timer check PR_Timer_Methode for information when this might be");
+		idCVar timer_methode("PR_Timer_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Switch the different timing methods\n0 - RTA - Real Time Attack, the whole game from start (the first frame you can control Tommy) to finish (when the sphere boss is killed) with game time (default)\n1 - Individual Level, Starts when a map or save game, is loaded and stops when the map has been completed", 0.f, 1.f);
 		idCVar timer_backup("PR_Timer_Backup", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle support for backing up the game time to resume it after the game crashed");
 		idCVar timer_backup_interval("PR_Timer_Backup_Interval", "250", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "The interval for updating the backup timer");
 
-		idCVar oneclickload("PR_OneClickLoad", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "If set to 1 you only need to press your load quicksave button once not twice");
+		idCVar oneclickload("PR_OneClickLoad", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "If set to 1 you only need to press your load quick save button once not twice");
 
-#ifdef PR_DEVELOP
+	#ifdef PR_DEVELOP
 		idCVar autostrafe("PR_AutoStrafe", "1", CVAR_GAME | CVAR_BOOL, "Automaticly strafe when running");
 		bool autostrafe_right { false };
 		int autostrafe_count { 0 };
 
 		idCVar fixedseed("PR_FixedSeed", "0", CVAR_GAME | CVAR_BOOL, "Forces the RNG seed to PR_FixedSeed_Value");
 		idCVar fixedseed_value("PR_FixedSeed_Value", "0", CVAR_GAME | CVAR_INTEGER, "The Value the RNG seed should be set to if pr_fixedseed is set to 1");
-#endif // PR_DEVELOP
+	#endif // PR_DEVELOP
 
-#ifdef PR_DEBUG
+	#ifdef PR_DEBUG
 		namespace dbg
 		{
 			namespace Hud
@@ -92,7 +92,7 @@ namespace pr
 				idCVar frametime("pr_dbg_hud_frametime", "0", CVAR_GAME | CVAR_BOOL, "*Debug*: Shows the time in milliseconds it took to render this frame");
 			} // namespace: Hud
 		} // namespace: dbg
-#endif // PR_DEBUG
+	#endif // PR_DEBUG
 
 		namespace Hud
 		{
@@ -107,6 +107,7 @@ namespace pr
 			idCVar speedometer_x("PR_hud_Speedometer_X", "310", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer x coordinate", 0.f, 639.f);
 			idCVar speedometer_y("PR_hud_Speedometer_Y", "460", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "position of the speedometer y coordinate", 0.f, 479.f);
 
+			// Timer
 			idCVar timer("PR_hud_Timer", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of the hud timer, note that the timer will still works even if hidden");
 			idCVar timer_x("PR_hud_Timer_X", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0.f, 639.f);
 			idCVar timer_y("PR_hud_Timer_Y", "235", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Hud timer position", 0.f, 479.f);
@@ -127,7 +128,7 @@ namespace pr
 			idCVar rtatimer_alldigits("PR_hud_RTATimer_AllDigits", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display all digits or only the non zero ones");
 
 			// Run Finished
-			idCVar runfinished("PR_hud_RunFinished", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "If enabled timers will display in a diffrent colour and displays will display full precision");
+			idCVar runfinished("PR_hud_RunFinished", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "If enabled timers will be displayed in a different colour and displays will display full precision");
 			idCVar runfinished_r("PR_hud_RunFinished_r", "50", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Colour to for the timers when you finished a run", 0.f, 255.f);
 			idCVar runfinished_g("PR_hud_RunFinished_g", "150", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Colour to for the timers when you finished a run", 0.f, 255.f);
 			idCVar runfinished_b("PR_hud_RunFinished_b", "180", CVAR_GAME | CVAR_FLOAT | CVAR_ARCHIVE, "Colour to for the timers when you finished a run", 0.f, 255.f);
@@ -143,33 +144,33 @@ namespace pr
 			idCVar jumpspeed_style("PR_hud_JumpSpeed_Style", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "0 - Always display your jumpspeed\n1 - jumspeed fades out when on the ground\n2 - jumpspeed only visible while in the air", 0.f, 2.f, idCmdSystem::ArgCompletion_Integer<0, 2>);
 
 			// Viewangles
-			idCVar viewangles("PR_hud_ViewAngles", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of your current viewangles");
+			idCVar viewangles("PR_hud_ViewAngles", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of your current view angles");
 
 			// Velocity
-			idCVar velocity("PR_hud_Velocity", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of detailed information about your current verlocity");
+			idCVar velocity("PR_hud_Velocity", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of detailed information about your current velocity");
 
 			// Location
 			idCVar location("PR_hud_Location", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of your current position in the level");
-			idCVar location_methode("PR_hud_Location_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Switch the different location methodes.\n0 - Display eye (viewpoint / camera) position (default)\n1 - Display feet position", 0, 1);
+			idCVar location_methode("PR_hud_Location_Methode", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Switch the different location methods.\n0 - Display eye (viewpoint / camera) position (default)\n1 - Display feet position", 0, 1);
 
 			// Entity Info
 			idCVar entityinfo("PR_hud_EntityInfo", "0", CVAR_GAME | CVAR_BOOL, "Shows infos about the entity aimed at. Which info will be displayed can be selected with entityinfo_*");
-			idCVar entityinfo_health("PR_hud_EntityInfo_Health", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entitys health when pr_hud_entityinfo is enabled");
-			idCVar entityinfo_name("PR_hud_EntityInfo_Name", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entitys name when pr_hud_entityinfo is enabled");
-			idCVar entityinfo_type("PR_hud_EntityInfo_Type", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entitys type when pr_hud_entityinfo is enabled");
+			idCVar entityinfo_health("PR_hud_EntityInfo_Health", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entities health when pr_hud_entityinfo is enabled");
+			idCVar entityinfo_name("PR_hud_EntityInfo_Name", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entities name when pr_hud_entityinfo is enabled");
+			idCVar entityinfo_type("PR_hud_EntityInfo_Type", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Display the entities type when pr_hud_entityinfo is enabled");
 
 			// Ammo
 			idCVar ammo("PR_hud_Ammo", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current ammo (White = loaded magazine, Yellow = empty magazine, Red = no ammo left)");
 
 			// Health
-			idCVar health("PR_hud_Health", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current health and maximum health, will be greyed out if god mode is enabled");
+			idCVar health("PR_hud_Health", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current health and maximum health, will be grayed out if god mode is enabled");
 
 			// Damage
 			idCVar damage("PR_hud_Damage", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, " Toggle display of the damage you receive");
 			idCVar damage_style("PR_hud_Damage_Style", "1", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "0 - Display the last amount of damage you received\n1 - Display the amount of damage you received in the last time", 0, 1, idCmdSystem::ArgCompletion_Integer<0, 1>);
 
 			// SpiritPower
-			idCVar spiritpower("PR_hud_SpiritPower", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current spirit power / mana, will be greyed out when not having the ability to spirit walk");
+			idCVar spiritpower("PR_hud_SpiritPower", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of your current spirit power / mana, will be grayed out when not having the ability to spirit walk");
 
 			// Distance
 			idCVar distance("PR_hud_Distance", "0", CVAR_GAME | CVAR_BOOL, "Toggle display of the distance between your eyes position (view position / camera) and the object or entity aimed at");
@@ -185,7 +186,7 @@ namespace pr
 
 			// Keys
 			idCVar keys("PR_hud_Keys", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Toggle display of showing the pressed movement keys");
-			idCVar keys_methode("PR_hud_Keys_Style", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Select the style in which the pressed movement keys are displayed\n0 - Under the crosshair, only pressed keys are shown\n1 - Under the crosshair, pressed keys are white and not pressed keys are grey\n2 - Around the crosshair, only pressed keys are shown\n3 - Around the corsshair, pressed keys are white and not pressed keys are grey\n4 - At the right side of the screen, only pressed keys are displayed\n5 - At the right side of the screen, pressed keys are white and not not pressed keys are grey", 0.f, 5.f, idCmdSystem::ArgCompletion_Integer<0, 5>);
+			idCVar keys_methode("PR_hud_Keys_Style", "0", CVAR_GAME | CVAR_INTEGER | CVAR_ARCHIVE, "Select the style in which the pressed movement keys are displayed\n0 - Under the crosshair, only pressed keys are shown\n1 - Under the crosshair, pressed keys are white and not pressed keys are gray\n2 - Around the crosshair, only pressed keys are shown\n3 - Around the crosshair, pressed keys are white and not pressed keys are gray\n4 - At the right side of the screen, only pressed keys are displayed\n5 - At the right side of the screen, pressed keys are white and not pressed keys are gray", 0.f, 5.f, idCmdSystem::ArgCompletion_Integer<0, 5>);
 		} // namespace: Hud
 	} // namespace: Cvar
 } // namespace: pr
@@ -399,13 +400,13 @@ idCVar g_blobSize("g_blobSize", "1", CVAR_GAME | CVAR_FLOAT, "");
 
 idCVar g_testHealthVision("g_testHealthVision", "0", CVAR_GAME | CVAR_FLOAT, "");
 idCVar g_editEntityMode("g_editEntityMode", "0", CVAR_GAME | CVAR_INTEGER, "0 = off\n"
-	"1 = lights\n"
-	"2 = sounds\n"
-	"3 = articulated figures\n"
-	"4 = particle systems\n"
-	"5 = monsters\n"
-	"6 = entity names\n"
-	"7 = entity models", 0, 7, idCmdSystem::ArgCompletion_Integer<0, 7>);
+						"1 = lights\n"
+						"2 = sounds\n"
+						"3 = articulated figures\n"
+						"4 = particle systems\n"
+						"5 = monsters\n"
+						"6 = entity names\n"
+						"7 = entity models", 0, 7, idCmdSystem::ArgCompletion_Integer<0, 7>);
 idCVar g_dragEntity("g_dragEntity", "0", CVAR_GAME | CVAR_BOOL, "allows dragging physics objects around by placing the crosshair over them and holding the fire button");
 idCVar g_dragDamping("g_dragDamping", "0.5", CVAR_GAME | CVAR_FLOAT, "");
 idCVar g_dragShowSelection("g_dragShowSelection", "0", CVAR_GAME | CVAR_BOOL, "");
@@ -531,11 +532,11 @@ idCVar g_testParticleName("g_testParticleName", "", CVAR_GAME, "name of the part
 idCVar g_testModelRotate("g_testModelRotate", "0", CVAR_GAME, "test model rotation speed");
 idCVar g_testPostProcess("g_testPostProcess", "", CVAR_GAME, "name of material to draw over screen");
 idCVar g_testModelAnimate("g_testModelAnimate", "0", CVAR_GAME | CVAR_INTEGER, "test model animation,\n"
-	"0 = cycle anim with origin reset\n"
-	"1 = cycle anim with fixed origin\n"
-	"2 = cycle anim with continuous origin\n"
-	"3 = frame by frame with continuous origin\n"
-	"4 = play anim once", 0, 4, idCmdSystem::ArgCompletion_Integer<0, 4>);
+						  "0 = cycle anim with origin reset\n"
+						  "1 = cycle anim with fixed origin\n"
+						  "2 = cycle anim with continuous origin\n"
+						  "3 = frame by frame with continuous origin\n"
+						  "4 = play anim once", 0, 4, idCmdSystem::ArgCompletion_Integer<0, 4>);
 idCVar g_testModelBlend("g_testModelBlend", "0", CVAR_GAME | CVAR_INTEGER, "number of frames to blend");
 idCVar g_testDeath("g_testDeath", "0", CVAR_GAME | CVAR_BOOL, "");
 idCVar g_exportMask("g_exportMask", "", CVAR_GAME | CVAR_ARCHIVE, "");	// HUMANHEAD: made archive
@@ -563,14 +564,14 @@ idCVar g_balanceTDM("g_balanceTDM", "1", CVAR_GAME | CVAR_BOOL, "maintain even t
 idCVar net_clientPredictGUI("net_clientPredictGUI", "1", CVAR_GAME | CVAR_BOOL, "test guis in networking without prediction");
 
 idCVar g_voteFlags("g_voteFlags", "0", CVAR_GAME | CVAR_NETWORKSYNC | CVAR_INTEGER | CVAR_ARCHIVE, "vote flags. bit mask of votes not allowed on this server\n"
-	"bit 0 (+1)   restart now\n"
-	"bit 1 (+2)   time limit\n"
-	"bit 2 (+4)   frag limit\n"
-	"bit 3 (+8)   game type\n"
-	"bit 4 (+16)  kick player\n"
-	"bit 5 (+32)  change map\n"
-	"bit 6 (+64)  spectators\n"
-	"bit 7 (+128) next map");
+				   "bit 0 (+1)   restart now\n"
+				   "bit 1 (+2)   time limit\n"
+				   "bit 2 (+4)   frag limit\n"
+				   "bit 3 (+8)   game type\n"
+				   "bit 4 (+16)  kick player\n"
+				   "bit 5 (+32)  change map\n"
+				   "bit 6 (+64)  spectators\n"
+				   "bit 7 (+128) next map");
 idCVar g_mapCycle("g_mapCycle", "mapcycle", CVAR_GAME | CVAR_ARCHIVE, "map cycling script for multiplayer games - see mapcycle.scriptcfg");
 
 // HUMANHEAD pdm: removed
