@@ -21,7 +21,7 @@ public:
 	* \brief Creates a Monitor.
 	* \param sharedData the data to be protected by the Monitor.
 	**/
-	Monitor(element_type sharedData)
+	explicit Monitor(element_type sharedData)
 		: m_sharedData { std::move(sharedData) },
 		m_mutex {}
 	{}
@@ -70,7 +70,7 @@ public:
 	bool IsRunning() { return m_monitor(&pr::prTimer::IsRunning); }
 	void SetCT(int clockTicks)
 	{
-		m_monitor([&clockTicks] (pr::prTimer &myType) { myType.SetCT(clockTicks); });
+		m_monitor([&clockTicks](pr::prTimer &myType) { myType.SetCT(clockTicks); });
 	}
 
 	Monitor<pr::prTimer> m_monitor;

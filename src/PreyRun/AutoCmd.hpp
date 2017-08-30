@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "../game/game_local.h"
 #include "StdLib.hpp" // std::vector
 #include <regex>
@@ -44,7 +44,7 @@ namespace pr
 		{
 		public:
 			Autocmdzone() : pos1(idVec3(0, 0, 0)), pos2(idVec3(0, 0, 0)), cmds(""), activated(false) {};
-			Autocmdzone(idVec3 pos1_, idVec3 pos2_, cmdType cmds_)
+			Autocmdzone(const idVec3& pos1_,const idVec3& pos2_, const cmdType& cmds_)
 				: pos1 { pos1_ }, pos2 { pos2_ }, cmds { cmds_ }, activated(false) {}
 
 			// Actually run the cmd
@@ -58,9 +58,9 @@ namespace pr
 			cmdType GetCmds() const { return cmds; };
 			bool GetActivated() const { return activated; };
 
-			void SetPos1(idVec3 val) { this->pos1 = val; };
-			void SetPos2(idVec3 val) { this->pos2 = val; };
-			void SetCmds(cmdType val) { this->cmds = val; };
+			void SetPos1(const idVec3& val) { this->pos1 = val; };
+			void SetPos2(const idVec3& val) { this->pos2 = val; };
+			void SetCmds(const cmdType& val) { this->cmds = val; };
 			void SetActivated(bool val = true) { this->activated = val; };
 
 		private:

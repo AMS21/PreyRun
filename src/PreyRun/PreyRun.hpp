@@ -28,6 +28,9 @@
 /* interprocess.cpp // interprocess.hpp */
 #define PR_DBG_INTERPROCESS
 
+/* Hooking.cpp // Hooking.hpp */
+#define PR_DBG_HOOKING
+
 #endif // PR_DEBUG
 
 namespace pr

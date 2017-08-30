@@ -58,16 +58,16 @@ namespace pr
 
 		extern idCVar oneclickload;
 
-#ifdef PR_DEVELOP
+	#ifdef PR_DEVELOP
 		extern idCVar autostrafe;
 		extern bool autostrafe_right;
 		extern int autostrafe_count;
 
 		extern idCVar fixedseed;
 		extern idCVar fixedseed_value;
-#endif // PR_DEVELOP
+	#endif // PR_DEVELOP
 
-#ifdef PR_DEBUG
+	#ifdef PR_DEBUG
 		namespace dbg
 		{
 			namespace Hud
@@ -76,7 +76,7 @@ namespace pr
 				extern idCVar frametime;
 			} // namespace: Hud
 		} // namespace: dbg
-#endif // PR_DEBUG
+	#endif // PR_DEBUG
 
 		namespace Hud
 		{

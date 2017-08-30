@@ -52,12 +52,12 @@ namespace pr
 
 			prThread::launch(PreySplitMain);
 		}
-#ifdef PR_DEBUG
+	#ifdef PR_DEBUG
 		else
 		{
 			pr::Log("Skipping PreySplit initialization");
 		}
-#endif // PR_DEBUG
+	#endif // PR_DEBUG
 	}
 
 	void ShutdownPreySplitPipe()
@@ -170,9 +170,9 @@ namespace pr
 		buf[2] = static_cast<char>(EventType::GAMEEND);
 		AddTimeToBuffer(buf.data() + 3, time);
 
-#ifdef PR_DBG_INTERPROCESS
+	#ifdef PR_DBG_INTERPROCESS
 		pr::DebugLog("WriteGameEnd: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
-#endif // PR_DBG_INTERPROCESS
+	#endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);
 	}
@@ -205,13 +205,13 @@ namespace pr
 	void WriteMapChange(const Time& time, idStr& map)
 	{
 		// normal map path    : maps/game/roadhouse.map
-		// gets turneded into : roadhouse.map
+		// gets turned into   : roadhouse.map
 		auto Map = map.Mid(10, map.Length() - 10);
 
-#ifdef PR_DBG_INTERPROCESS
+	#ifdef PR_DBG_INTERPROCESS
 		pr::DebugLog("WriteMapChange: Map exited: %s", Map.c_str());
 		pr::DebugLog("WriteMapChange: Time %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
-#endif // PR_DBG_INTERPROCESS
+	#endif // PR_DBG_INTERPROCESS
 
 		auto size = static_cast<int32_t>(Map.Size());
 
@@ -235,9 +235,9 @@ namespace pr
 		buf[2] = static_cast<char>(EventType::TIMER_RESET);
 		AddTimeToBuffer(buf.data() + 3, time);
 
-#ifdef PR_DBG_INTERPROCESS
+	#ifdef PR_DBG_INTERPROCESS
 		pr::DebugLog("WriteTimerReset: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
-#endif // PR_DBG_INTERPROCESS
+	#endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);
 	}
@@ -250,9 +250,9 @@ namespace pr
 		buf[2] = static_cast<char>(EventType::TIMER_START);
 		AddTimeToBuffer(buf.data() + 3, time);
 
-#ifdef PR_DBG_INTERPROCESS
+	#ifdef PR_DBG_INTERPROCESS
 		pr::DebugLog("WriteTimerStart: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
-#endif // PR_DBG_INTERPROCESS
+	#endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);
 	}
@@ -270,9 +270,9 @@ namespace pr
 		std::memcpy(buf.data() + 3 + time_size, &size, sizeof(size));
 		std::memcpy(buf.data() + 3 + time_size + 4, boss.c_str(), size);
 
-#ifdef PR_DBG_INTERPROCESS
+	#ifdef PR_DBG_INTERPROCESS
 		pr::DebugLog("WriteBossKill: Boss: %s Time: %02d:%02d:%02d.%03d", boss.c_str(), time.hours, time.minutes, time.seconds, time.milliseconds);
-#endif // PR_DBG_INTERPROCESS
+	#endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);
 	}
@@ -285,9 +285,9 @@ namespace pr
 		buf[2] = static_cast<char>(EventType::CUSTOM_SPLIT);
 		AddTimeToBuffer(buf.data() + 3, time);
 
-#ifdef PR_DBG_INTERPROCESS
+	#ifdef PR_DBG_INTERPROCESS
 		pr::DebugLog("CustomSplit: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
-#endif // PR_DBG_INTERPROCESS
+	#endif // PR_DBG_INTERPROCESS
 
 		WritePreySplit(buf);
 	}

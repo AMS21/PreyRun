@@ -8,7 +8,7 @@ namespace pr
 {
 	template <class CharType>
 	auto split(std::basic_string<CharType> const &str,
-		std::basic_string<CharType> const &delims)
+			   std::basic_string<CharType> const &delims)
 		/*-> std::vector<std::basic_string<CharType>> */
 	{
 		using StringType = std::basic_string<CharType>;
@@ -19,7 +19,7 @@ namespace pr
 		{
 			[&](auto c)
 		{
-			return std::any_of(std::begin(delims), std::end(delims), [c] (auto ch)
+			return std::any_of(std::begin(delims), std::end(delims), [c](auto ch)
 			{
 				return ch == c;
 			});
@@ -38,7 +38,7 @@ namespace pr
 		}
 
 		result.erase(std::remove_if(std::begin(result), std::end(result),
-			[] (auto &&e)
+									[](auto &&e)
 		{
 			return e.empty();
 		}), std::end(result));
@@ -54,7 +54,7 @@ namespace pr
 		{
 			static std::string const delims { ";" };
 
-			auto f = [] (auto &&e)
+			auto f = [](auto &&e)
 			{
 				return split(std::forward<decltype(e)>(e), delims);
 			};

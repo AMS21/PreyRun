@@ -18,9 +18,9 @@ namespace pr
 
 		if (file == nullptr)
 		{
-#ifdef PR_DEBUG
+		#ifdef PR_DEBUG
 			pr::FunctionLog(__FUNCTION__, "Couldn't open %s", pr_backuptmr_path);
-#endif // PR_DEBUG
+		#endif // PR_DEBUG
 			return;
 		}
 
@@ -60,9 +60,9 @@ namespace pr
 
 		if (file == nullptr)
 		{
-#ifdef PR_DEBUG
+		#ifdef PR_DEBUG
 			pr::FunctionLog(__FUNCTION__, "Couldn't open %s", pr_backuptmr_path);
-#endif // PR_DEBUG
+		#endif // PR_DEBUG
 			return;
 		}
 
@@ -74,9 +74,9 @@ namespace pr
 		file->ReadBool(isValid);
 		if (!isValid)
 		{
-#ifdef PR_DBG_BACKUP
+		#ifdef PR_DBG_BACKUP
 			pr::FunctionLog(__FUNCTION__, "backuptimer is invalid");
-#endif // PR_DBG_BACKUP
+		#endif // PR_DBG_BACKUP
 			return;
 		}
 
@@ -84,9 +84,9 @@ namespace pr
 		file->ReadFloat(rtaTimer);
 		file->ReadString(mapName);
 
-#ifdef PR_DBG_BACKUP
+	#ifdef PR_DBG_BACKUP
 		pr::FunctionLog(__FUNCTION__, "ingameTimer = %f, rtaTimer = %f, mapName = %s", ingameTimer, rtaTimer, mapName.c_str());
-#endif // PR_DBG_BACKUP
+	#endif // PR_DBG_BACKUP
 
 		// Are we on the correct map to recover our time?
 		if (static_cast<idStr>(cMap) == mapName)
@@ -94,20 +94,21 @@ namespace pr
 			// Set the timers
 			pr::Timer::inGame.SetCT(ingameTimer);
 			pr::Timer::RTA.SetCT(rtaTimer);
+
 			// Let the timer continue
 			pr::Timer::running = true;
 
-#ifdef PR_DEBUG
+		#ifdef PR_DEBUG
 			pr::FunctionLog(__FUNCTION__, "Successfully recoverd backup time: %f", ingameTimer);
 			pr::FunctionLog(__FUNCTION__, "Successfully recoverd backup RTA time: %f", rtaTimer);
-#endif // PR_DEBUG
+		#endif // PR_DEBUG
 		}
-#ifdef PR_DBG_BACKUP
+	#ifdef PR_DBG_BACKUP
 		else
 		{
 			pr::FunctionLog(__FUNCTION__, "Wrong map to recover time. CurrentMap=%s mapName=%s", cMap, mapName.c_str());
 		}
-#endif // PR_DBG_BACKUP
+	#endif // PR_DBG_BACKUP
 
 		// Close the opened file
 		fileSystem->CloseFile(file);
@@ -120,9 +121,9 @@ namespace pr
 
 		if (file == nullptr)
 		{
-#ifdef PR_DBG_BACKUP
+		#ifdef PR_DBG_BACKUP
 			pr::FunctionLog(__FUNCTION__, "Couldn't open file: %s", pr_backuptmr_path);
-#endif // PR_DBG_BACKUP
+		#endif // PR_DBG_BACKUP
 			return;
 		}
 
@@ -131,24 +132,24 @@ namespace pr
 
 		fileSystem->CloseFile(file);
 
-#ifdef PR_DBG_BACKUP
+	#ifdef PR_DBG_BACKUP
 		pr::FunctionLog(__FUNCTION__, "Successfully, cleared backup timer");
-#endif // PR_DBG_BACKUP
+	#endif // PR_DBG_BACKUP
 	}
 
 	PR_FINLINE double GetBackupTime()
 	{
-#ifdef PR_DBG_BACKUP_GETTIME
+	#ifdef PR_DBG_BACKUP_GETTIME
 		pr::FunctionLog(__FUNCTION__, "%f", pr_gametimer.ClockTicks());
-#endif // PR_DBG_BACKUP_GETTIME
+	#endif // PR_DBG_BACKUP_GETTIME
 		return pr::Timer::inGame.ClockTicks();
 	}
 
 	PR_FINLINE double GetBackupRTATime()
 	{
-#ifdef PR_DBG_BACKUP_GETTIME
+	#ifdef PR_DBG_BACKUP_GETTIME
 		pr::FunctionLog(__FUNCTION__, "%f", pr_rtatimer.ClockTicks());
-#endif // PR_DBG_BACKUP_GETTIME
+	#endif // PR_DBG_BACKUP_GETTIME
 		return pr::Timer::RTA.ClockTicks();
 	}
 }
