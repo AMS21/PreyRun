@@ -1,20 +1,24 @@
-﻿#include "../idLib/precompiled.h"
+#include "../idLib/precompiled.h"
 #pragma hdrstop
 
 #include "PreyRun.hpp"
 #include "Hooking.hpp"
 #include "../framework/licensee.h"
+#include <detours.h>
 
 namespace pr
 {
-	// Const stuff to avoid magic numbers
-	constexpr DWORD DisplayTimeDemo = 0x4576dd;
-	constexpr char DisplayTimeDemoOn[] = "\x90\x90\x90\x90\x90\x90";
-	constexpr char DisplayTimeDemoOff[] = "\x0F\x84\x34\x01\x00\x00";
+	constexpr DWORD StopRecordingRenderDemo = 0x454010;
+	void(__cdecl* StopRecordingRenderDemoOriginal)(void* this_ptr);
 
-	constexpr DWORD DisplayTimeDemoString = 0x7B59E4;
-	constexpr char DisplayTimeDemoStringOn[] = "%i frames rendered in %3.3f seconds = %3.3f fps\n";
-	constexpr char DisplayTimeDemoStringOff[] = "%i frames rendered in %3.1f seconds = %3.1f fps\n";
+	constexpr DWORD StartRecordingRenderDemo = 0x4554F0;
+	void(__cdecl* StartRecordingRenderDemoOriginal)(void* this_ptr, const char* demoName);
+
+	constexpr DWORD StopPlayingRenderDemo = 0x457610;
+	void(__cdecl* StopPlayingRenderDemoOriginal)(void* this_ptr);
+
+	constexpr DWORD StartPlayingRenderDemo = 0x457830;
+	int(__cdecl* StartPlayingRenderDemoOriginal)(void* this_ptr, const char* demoName, char a1, BYTE* a2, int* a3, int* a4, int* a5, int* a6, int* a7, int a8);
 
 	constexpr DWORD OneClickLoad = 0x45C47A;
 	constexpr char OneClickLoadOn[] { '\x90','\x90' };
@@ -54,20 +58,116 @@ namespace pr
 		VirtualProtect(reinterpret_cast<LPVOID>(addressToWrite), byteNum, OldProtection, NULL);
 	}
 
-	void timeDemoInit()
+	bool static HookJMP(void* pAddress, void* dwJumpTo, unsigned dwLen)
 	{
-		WriteToMemory(DisplayTimeDemo, DisplayTimeDemoOn, sizeof(DisplayTimeDemoOn));
-		WriteToMemory(DisplayTimeDemoString, DisplayTimeDemoStringOn, sizeof(DisplayTimeDemoStringOn));
+		if (dwLen < 5) { return false; }
 
-		pr::DebugLog("Hooked timeDemo");
+		DWORD dwOldProtect;
+
+		// give the paged memory read/write permissions
+
+		VirtualProtect(pAddress, dwLen, PAGE_EXECUTE_READWRITE, &dwOldProtect);
+
+		// calculate the distance between our address and our target location
+		// and subtract the 5bytes, which is the size of the jmp
+		// (0xE9 0xAA 0xBB 0xCC 0xDD) = 5 bytes
+
+		DWORD dwRelAddr = ((DWORD) dwJumpTo - (DWORD) pAddress) - 5;
+
+		// overwrite the byte at pAddress with the jmp opcode (0xE9)
+
+		*(BYTE*) pAddress = 0xE9;
+
+		// overwrite the next 4 bytes (which is the size of a DWORD)
+		// with the dwRelAddr
+
+		*((DWORD *) ((DWORD) pAddress + 0x1)) = dwRelAddr;
+
+		// overwrite the remaining bytes with the NOP opcode (0x90)
+		// NOP opcode = No OPeration
+
+		for (DWORD x = 0x5; x < dwLen; x++)
+		{
+			*((DWORD*) ((DWORD) pAddress + x)) = 0x90;
+		}
+
+		// restore the paged memory permissions saved in dwOldProtect
+
+		DWORD dwBkup;
+		VirtualProtect(pAddress, dwLen, dwOldProtect, &dwBkup);
+
+		return true;
 	}
 
-	void timeDemoShutdown()
+	void __stdcall PrintDemoTime()
 	{
-		WriteToMemory(DisplayTimeDemo, DisplayTimeDemoOff, sizeof(DisplayTimeDemoOff));
-		WriteToMemory(DisplayTimeDemoString, DisplayTimeDemoStringOff, sizeof(DisplayTimeDemoStringOff));
+		auto time = PR_ms2time(pr::Timer::demo.Milliseconds());
 
-		pr::DebugLog("Unhooked timeDemo");
+		pr::Log("Time: %02d:%02d:%02d.%02d", time.hours, time.minutes, time.seconds, time.milliseconds);
+	}
+
+	void StopRecordingRenderDemoHook(void* this_ptr)
+	{
+		//pr::DebugLog("StopRecordingRenderDemoHook");
+
+		pr::Timer::demo.Stop();
+
+		PrintDemoTime();
+
+		StopRecordingRenderDemoOriginal(this_ptr);
+	}
+
+	void StartRecordingRenderDemoHook(void* this_ptr, const char* demoName)
+	{
+		//pr::DebugLog("StartRecordingRenderDemoHook");
+
+		pr::Timer::demo.Start();
+
+		StartRecordingRenderDemoOriginal(this_ptr, demoName);
+	}
+
+	void StopPlayingRenderDemoHook(void* this_ptr)
+	{
+		//pr::DebugLog("StopPlayingRenderDemoHook");
+
+		if (pr::Timer::timedemo)
+		{
+			pr::Timer::demo.Stop();
+
+			pr::Timer::timedemo = false;
+
+			PrintDemoTime();
+		}
+
+		StopPlayingRenderDemoOriginal(this_ptr);
+	}
+
+	int StartPlayingRenderDemoHook(void* this_ptr, const char* demoName, char a1, BYTE* a2, int* a3, int* a4, int* a5, int* a6, int* a7, int a8)
+	{
+		//pr::DebugLog("StartPlayingRenderDemoHook");
+
+		if (!pr::Timer::timedemo)
+		{
+			pr::Timer::demo.Clear();
+			pr::Timer::demo.Start();
+
+			pr::Timer::timedemo = true;
+		}
+
+		return StartPlayingRenderDemoOriginal(this_ptr, demoName, a1, a2, a3, a4, a5, a6, a7, a8);
+	}
+
+	void hookDemoRecording()
+	{
+		StopRecordingRenderDemoOriginal = (void(__cdecl*)(void* this_ptr))DetourFunction((PBYTE) StopRecordingRenderDemo, (PBYTE) StopRecordingRenderDemoHook);
+		StartRecordingRenderDemoOriginal = (void(__cdecl*)(void* this_ptr, const char* demoName))DetourFunction((PBYTE) StartRecordingRenderDemo, (PBYTE) StartRecordingRenderDemoHook);
+
+		StopPlayingRenderDemoOriginal = (void(__cdecl*)(void* this_ptr))DetourFunction((PBYTE) StopPlayingRenderDemo, (PBYTE) StopPlayingRenderDemoHook);
+		StartPlayingRenderDemoOriginal = (int(__cdecl*)(void* this_ptr, const char* demoName, char a1, BYTE* a2, int* a3, int* a4, int* a5, int* a6, int* a7, int a8))DetourFunction((PBYTE) StartPlayingRenderDemo, (PBYTE) StartPlayingRenderDemoHook);
+
+	#ifdef PR_DBG_HOOKING
+		pr::DebugLog("Successfully hooked demo recording and playback");
+	#endif // PR_DBG_HOOKING
 	}
 
 	void enableOneClickLoad()

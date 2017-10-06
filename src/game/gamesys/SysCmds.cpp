@@ -22,11 +22,7 @@ Cmd_PR_timedemo_f
 */
 void Cmd_PR_timedemo_f(const idCmdArgs &args)
 {
-	pr::timeDemoInit();
-
 	cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("playDemo %s\n", args.Argv(1)));
-
-	pr::Timer::demo = true;
 }
 
 /*

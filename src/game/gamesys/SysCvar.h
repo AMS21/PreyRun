@@ -26,7 +26,7 @@ namespace pr
 		extern prTimer RTA;
 		extern std::atomic<bool> running;
 
-		extern idTimer demo;
+		extern prTimer demo;
 		extern bool timedemo;
 	}
 

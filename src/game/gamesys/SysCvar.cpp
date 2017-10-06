@@ -42,7 +42,7 @@ namespace pr
 		prTimer RTA; // The RTA timer
 		std::atomic<bool> running { false }; // This variable is set to true when we are timing a run
 
-		idTimer demo;
+		prTimer demo;
 		bool timedemo { false };
 	}
 

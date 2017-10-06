@@ -109,12 +109,6 @@ void hhGameLocal::MapShutdown(void) {
 #endif // PR_DEBUG
 	}
 
-	if (pr::Timer::timedemo)
-	{
-		pr::Timer::timedemo = false;
-		pr::timeDemoShutdown();
-	}
-
 	if (gamestate != GAMESTATE_NOMAP)
 	{
 		pr::ClearBackupTimer();

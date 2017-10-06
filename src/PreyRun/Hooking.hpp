@@ -4,11 +4,10 @@
 
 namespace pr
 {
-	void timeDemoInit();
-	void timeDemoShutdown();
-
 	void enableOneClickLoad();
 	void disableOneClickLoad();
+
+	void hookDemoRecording();
 
 	void hookVersionDisplay();
 
