@@ -11,4 +11,7 @@ namespace pr
 	void disableOneClickLoad();
 
 	void hookVersionDisplay();
+
+	void suppressMasterServerWarning();
+	void unsuppressMasterServerWarning();
 }
