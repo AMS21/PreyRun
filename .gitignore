@@ -9,15 +9,14 @@
 *.opendb
 *.tlog
 *.rtf#
+
 examples/
 src/.vs/
-src/game/build/
-src/idLib/DebugDLL/
-src/idLib/ReleaseDLL/
 src/ipch/
-src/ReleaseDLL/
 build/
-Prey.exe Hooking.txt
-DevNotes.txt
+
 Changelog.txt
+DevNotes.txt
+PreyRun.cppcheck
 ReadMe.rtf
+src/CodeMaid.config
