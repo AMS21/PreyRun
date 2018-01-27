@@ -1,9 +1,12 @@
-﻿
-
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
 #include "prey_local.h"
+
+// PreyRun BEGIN
+#include "../PreyRun/Cvar.hpp"
+#include "../PreyRun/Ghosting/GhostRecord.hpp"
+// PreyRun END
 
 const idEventDef EV_UpdateTarget("<updateTarget>");
 const idEventDef EV_DirectMoveToPosition("directMoveToPosition", "v");
@@ -211,25 +214,12 @@ void hhSphereBoss::Killed(idEntity *inflictor, idEntity *attacker, int damage, c
 	// PreyRun BEGIN
 	if (pr::Timer::running && pr::Cvar::timer_autostop.GetBool())
 	{
-		pr::Timer::inGame.Stop();
-		pr::Timer::RTA.Stop();
-		pr::Timer::running = false;
-		pr::runFinished = true;
+		pr::AutoStopTimers();
+	}
 
-		if (pr::Cvar::preysplit.GetBool())
-		{
-			pr::WriteGameEnd(pr::GetTime());
-		}
-
-		auto times = PR_ms2time(pr::Timer::inGame.Milliseconds());
-		auto rtatime = PR_ms2time(pr::Timer::RTA.Milliseconds());
-
-		pr::Log("Timer: End game, game time: %02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
-		pr::Log("Timer: End game, RTA time: %02d:%02d:%02d.%03d", rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds);
-
-		times = PR_ms2time(gameLocal.GetTimePlayed());
-
-		pr::Log("Playtime: %02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
+	if (pr::gh_isRecording)
+	{
+		pr::StopRecordingGhost();
 	}
 	// PreyRun END
 

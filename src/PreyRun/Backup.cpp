@@ -1,15 +1,34 @@
-﻿#include "../idLib/precompiled.h"
+#include "../idLib/precompiled.h"
 #pragma hdrstop
 
-#include "PreyRun.hpp"
 #include "Backup.hpp"
+
+#include "Cvar.hpp"
+#include "GameTimer.hpp"
+#include "Logging.hpp"
+#include "PreyRun.hpp"
+
+#include "../idLib/Str.h"
 
 namespace pr
 {
 	constexpr char pr_backuptmr_path[] { "backuptmr" };
 
-	PR_FINLINE double GetBackupTime();
-	PR_FINLINE double GetBackupRTATime();
+	PR_FINLINE double GetBackupTime()
+	{
+	#ifdef PR_DBG_BACKUP_GETTIME
+		pr::FunctionLog(__FUNCTION__, "%f", pr_gametimer.ClockTicks());
+	#endif // PR_DBG_BACKUP_GETTIME
+		return pr::Timer::inGame.ClockTicks();
+	}
+
+	PR_FINLINE double GetBackupRTATime() noexcept
+	{
+	#ifdef PR_DBG_BACKUP_GETTIME
+		pr::FunctionLog(__FUNCTION__, "%f", pr_rtatimer.ClockTicks());
+	#endif // PR_DBG_BACKUP_GETTIME
+		return pr::Timer::RTA.ClockTicks();
+	}
 
 	static void WriteToFile(const char* mapName)
 	{
@@ -18,9 +37,7 @@ namespace pr
 
 		if (file == nullptr)
 		{
-		#ifdef PR_DEBUG
-			pr::FunctionLog(__FUNCTION__, "Couldn't open %s", pr_backuptmr_path);
-		#endif // PR_DEBUG
+			pr::DebugFunctionLog(__FUNCTION__, "Couldn't open %s", pr_backuptmr_path);
 			return;
 		}
 
@@ -39,7 +56,7 @@ namespace pr
 		{
 			static auto last_time = std::chrono::steady_clock::now() - std::chrono::milliseconds(static_cast<long long>(pr::Cvar::timer_backup_interval.GetFloat()) + 1);
 
-			auto now = std::chrono::steady_clock::now();
+			const auto now = std::chrono::steady_clock::now();
 
 			if (now >= last_time + std::chrono::milliseconds(static_cast<long long>(pr::Cvar::timer_backup_interval.GetFloat())))
 			{
@@ -60,16 +77,14 @@ namespace pr
 
 		if (file == nullptr)
 		{
-		#ifdef PR_DEBUG
-			pr::FunctionLog(__FUNCTION__, "Couldn't open %s", pr_backuptmr_path);
-		#endif // PR_DEBUG
+			pr::DebugWarning("Couldn't open %s", pr_backuptmr_path);
 			return;
 		}
 
 		bool isValid { false };
-		float ingameTimer;
-		float rtaTimer;
-		idStr mapName;
+		float ingameTimer { 0.0f };
+		float rtaTimer { 0.0f };
+		idStr mapName {};
 
 		file->ReadBool(isValid);
 		if (!isValid)
@@ -98,10 +113,8 @@ namespace pr
 			// Let the timer continue
 			pr::Timer::running = true;
 
-		#ifdef PR_DEBUG
-			pr::FunctionLog(__FUNCTION__, "Successfully recoverd backup time: %f", ingameTimer);
-			pr::FunctionLog(__FUNCTION__, "Successfully recoverd backup RTA time: %f", rtaTimer);
-		#endif // PR_DEBUG
+			pr::DebugFunctionLog(__FUNCTION__, "Successfully recovered backup time: %f", ingameTimer);
+			pr::DebugFunctionLog(__FUNCTION__, "Successfully recovered backup RTA time: %f", rtaTimer);
 		}
 	#ifdef PR_DBG_BACKUP
 		else
@@ -136,20 +149,4 @@ namespace pr
 		pr::FunctionLog(__FUNCTION__, "Successfully, cleared backup timer");
 	#endif // PR_DBG_BACKUP
 	}
-
-	PR_FINLINE double GetBackupTime()
-	{
-	#ifdef PR_DBG_BACKUP_GETTIME
-		pr::FunctionLog(__FUNCTION__, "%f", pr_gametimer.ClockTicks());
-	#endif // PR_DBG_BACKUP_GETTIME
-		return pr::Timer::inGame.ClockTicks();
-	}
-
-	PR_FINLINE double GetBackupRTATime()
-	{
-	#ifdef PR_DBG_BACKUP_GETTIME
-		pr::FunctionLog(__FUNCTION__, "%f", pr_rtatimer.ClockTicks());
-	#endif // PR_DBG_BACKUP_GETTIME
-		return pr::Timer::RTA.ClockTicks();
-	}
-}
+} // End of namespace: pr

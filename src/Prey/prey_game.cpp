@@ -1,12 +1,20 @@
-﻿#include "../idlib/precompiled.h"
+#include "../idlib/precompiled.h"
 #pragma hdrstop
 
 #include "prey_local.h"
 //#include "../prey/win32/fxdlg.h"
 
 // PreyRun BEGIN
-#include "../PreyRun/Hooking.hpp"
+#include "../PreyRun/AutoCmd.hpp"
+#include "../PreyRun/Backup.hpp"
 #include "../PreyRun/Constants.hpp"
+#include "../PreyRun/Cvar.hpp"
+#include "../PreyRun/Ghosting/GhostManager.hpp"
+#include "../PreyRun/Ghosting/GhostRecord.hpp"
+#include "../PreyRun/Hooking.hpp"
+#include "../PreyRun/Interprocess.hpp"
+#include "../PreyRun/Logging.hpp"
+#include "../PreyRun/Utility.hpp"
 // PreyRun END
 
 extern idCVar com_forceGenericSIMD;
@@ -104,7 +112,7 @@ void hhGameLocal::MapShutdown(void) {
 		}
 
 #ifdef PR_DEBUG
-		auto time = PR_ms2time(pr::Timer::inGame.Milliseconds());
+		auto time = pr::ms2time(pr::Timer::inGame.Milliseconds());
 		pr::DebugLog("Time: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DEBUG
 	}
@@ -114,6 +122,8 @@ void hhGameLocal::MapShutdown(void) {
 		pr::ClearBackupTimer();
 
 		pr::DebugLog("Leaving map: %s", GetMapName());
+
+		pr::ghostManager.ClearLines();
 	}
 	// PreyRun END
 
@@ -752,7 +762,7 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 	{
 		if (pr::Timer::inGame.IsRunning())
 		{
-			pr::Timer::inGame.Stop(); 
+			pr::Timer::inGame.Stop();
 			pr::Timer::RTA.Stop();
 		}
 
@@ -812,7 +822,15 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 		}
 
 		// Call the function which handles the triggering of autocmdzones
-		pr::AutocmdzoneHandler::getInstance().CheckForTriggering();
+		pr::AutocmdzoneHandler::getInstance().UpdateZones();
+
+		// Ghosting
+		if (pr::gh_isRecording)
+		{
+			pr::GhostingDemoTick(msec);
+		}
+
+		pr::ghostManager.Update(msec);
 		// PreyRun END
 
 #ifdef GAME_DLL
@@ -994,7 +1012,8 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 		}
 
 		// see if a target_sessionCommand has forced a changelevel
-		if (sessionCommand.Length()) {
+		if (sessionCommand.Length())
+		{
 			// PreyRun BEGIN
 			pr::DebugLog("Session command: %s", sessionCommand.c_str());
 
@@ -1003,24 +1022,14 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 				// The command to execute is map
 				pr::preysplit_mapchanged = true;
 
+				if (pr::gh_isRecording && static_cast<pr::TimerMethode>(pr::Cvar::timer_methode.GetInteger()) == pr::TimerMethode::IndividualLevel)
+				{
+					pr::StopRecordingGhost();
+				}
+
 				if (static_cast<pr::TimerMethode>(pr::Cvar::timer_methode.GetInteger()) == pr::TimerMethode::IndividualLevel && pr::Timer::running && pr::Timer::inGame.IsRunning() && pr::Cvar::timer_autostop.GetBool())
 				{
-					pr::Timer::inGame.Stop();
-					pr::Timer::RTA.Stop();
-
-					if (pr::Cvar::preysplit.GetBool())
-					{
-						pr::WriteGameEnd(pr::GetTime());
-					}
-
-					pr::Timer::running = false;
-					pr::runFinished = true;
-
-					auto times = PR_ms2time(pr::Timer::inGame.Milliseconds());
-					auto rtatime = PR_ms2time(pr::Timer::RTA.Milliseconds());
-
-					pr::Log("Timer: Individual Level end, game time: %02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
-					pr::Log("Timer: Individual Level end, RTA time: %02d:%02d:%02d.%03d", rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds);
+					pr::AutoStopTimers();
 
 					// Prevent the map change so the player can see his time
 					sessionCommand.Clear();
@@ -1050,6 +1059,15 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 	RunDebugInfo();
 	D_DrawDebugLines();
 
+	// PreyRun BEGIN
+	pr::ghostManager.Render();
+
+	if (pr::Cvar::autocmd_show.GetBool())
+	{
+		pr::AutocmdzoneHandler::getInstance().Draw();
+	}
+	// PreyRun END
+
 	//HUMANHEAD rww
 	if (logitechLCDEnabled) {
 		PROFILE_START("LogitechLCDUpdate", PROFMASK_NORMAL);
@@ -1061,7 +1079,7 @@ gameReturn_t hhGameLocal::RunFrame(const usercmd_t *clientCmds) {
 	// PreyRun BEGIN
 #ifdef PR_DEBUG
 	pr::dbg::frametimer.Stop();
-	pr::dbg::frametimer_value = pr::dbg::frametimer.Milliseconds();
+	pr::dbg::frametimer_value += pr::dbg::frametimer.Milliseconds();
 	pr::dbg::frametimer.Clear();
 #endif // PR_DEBUG
 	// PreyRun END

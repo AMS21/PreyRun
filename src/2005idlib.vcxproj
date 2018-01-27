@@ -276,8 +276,15 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>..\build\$(Configuration)\idLib.lib</OutputFile>
+      <OutputFile>$(TargetPath)</OutputFile>
     </Lib>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "$(ProjectDir)..\build\$(Configuration)\idLib.lib"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -331,8 +338,15 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>..\build\$(Configuration)\idLib.lib</OutputFile>
+      <OutputFile>$(TargetPath)</OutputFile>
     </Lib>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "$(ProjectDir)..\build\$(Configuration)\idLib.lib"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -396,8 +410,15 @@
       <UndefinePreprocessorDefinitions>NDEBUG;%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Lib>
-      <OutputFile>..\build\$(Configuration)\idLib.lib</OutputFile>
+      <OutputFile>$(TargetPath)</OutputFile>
     </Lib>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "$(ProjectDir)..\build\$(Configuration)\idLib.lib"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug PreyRun|x64'">
     <ClCompile>
@@ -459,8 +480,15 @@
       <ShowProgress>true</ShowProgress>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\build\$(Configuration)\idLib.lib</OutputFile>
+      <OutputFile>$(TargetPath)</OutputFile>
     </Lib>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "$(ProjectDir)..\build\$(Configuration)\idLib.lib"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug with inlines|x64'">
     <ClCompile>
@@ -517,8 +545,15 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>..\build\$(Configuration)\idLib.lib</OutputFile>
+      <OutputFile>$(TargetPath)</OutputFile>
     </Lib>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "$(ProjectDir)..\build\$(Configuration)\idLib.lib"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug with inlines and memory log|x64'">
     <ClCompile>
@@ -575,8 +610,15 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>..\build\$(Configuration)\idLib.lib</OutputFile>
+      <OutputFile>$(TargetPath)</OutputFile>
     </Lib>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "$(ProjectDir)..\build\$(Configuration)\idLib.lib"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dedicated Release|x64'">
     <ClCompile>
@@ -637,8 +679,15 @@
       <ShowProgress>true</ShowProgress>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\build\$(Configuration)\idLib.lib</OutputFile>
+      <OutputFile>$(TargetPath)</OutputFile>
     </Lib>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "$(ProjectDir)..\build\$(Configuration)\idLib.lib"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dedicated Debug with Inlines|x64'">
     <ClCompile>

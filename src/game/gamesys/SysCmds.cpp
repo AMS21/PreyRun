@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2004 Id Software, Inc.
+// Copyright (C) 2004 Id Software, Inc.
 //
 
 #include "../../idlib/precompiled.h"
@@ -12,8 +12,15 @@
 ///////////////////
 
 // Includes
-#include "../../PreyRun/Hooking.hpp"
+#include "../../PreyRun/AutoCmd.hpp"
+#include "../../PreyRun/Cvar.hpp"
 #include "../../PreyRun/GameTimer.hpp"
+#include "../../PreyRun/Ghosting/GhostManager.hpp"
+#include "../../PreyRun/Ghosting/GhostRecord.hpp"
+#include "../../PreyRun/Hooking.hpp"
+#include "../../PreyRun/Interprocess.hpp"
+#include "../../PreyRun/Logging.hpp"
+#include "../../PreyRun/Utility.hpp"
 
 /*
 ==================
@@ -197,6 +204,7 @@ void Cmd_PR_timer_reset_f(const idCmdArgs &args)
 	pr::Timer::RTA.Clear();
 
 	pr::Timer::running = false;
+	pr::runFinished = false;
 
 	pr::WriteTimerReset(pr::GetTime());
 
@@ -210,8 +218,8 @@ Cmd_PR_timer_now_f
 */
 void Cmd_PR_timer_now_f(const idCmdArgs &args)
 {
-	auto times = PR_ms2time(pr::Timer::inGame.Milliseconds());
-	auto rtatimes = PR_ms2time(pr::Timer::RTA.Milliseconds());
+	auto times = pr::ms2time(pr::Timer::inGame.Milliseconds());
+	auto rtatimes = pr::ms2time(pr::Timer::RTA.Milliseconds());
 
 	pr::ConsoleWrite("In-game timer: %02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
 	pr::ConsoleWrite("RTA timer: %02d:%02d:%02d.%03d", rtatimes.hours, rtatimes.minutes, rtatimes.seconds, rtatimes.milliseconds);
@@ -226,17 +234,28 @@ Cmd_PR_autocmd_add_f
 */
 void Cmd_PR_autocmd_add_f(const idCmdArgs &args)
 {
-	if (args.Argc() != 8)
+	if (args.Argc() != 8 && args.Argc() != 5)
 	{
 		pr::ConsoleWrite("Usage: Pr_AutoCmd_Add <Start X (Float)> <Start Y (Float)> <Start 1 Z (Float)> <End 2 X (Float)> <End 2 Y (Float)> <End 2 Z (Float)> <Command (String)>");
 		return;
 	}
 
-	pr::AutocmdzoneHandler::getInstance().Add(
-		idVec3(atof(args.Argv(1)), atof(args.Argv(2)), atof(args.Argv(3))) // Starting Point
-		, idVec3(atof(args.Argv(4)), atof(args.Argv(5)), atof(args.Argv(6))) // End Points
-		, static_cast<idStr>(args.Argv(7)) // commands
-	);
+	if (args.Argc() == 5)
+	{
+		pr::AutocmdzoneHandler::getInstance().Add(
+			gameLocal.GetLocalPlayer()->GetOrigin() // Starting Point
+			, idVec3(atof(args.Argv(1)), atof(args.Argv(2)), atof(args.Argv(3))) // End Point
+			, static_cast<idStr>(args.Argv(4)) // Commands
+		);
+	}
+	else
+	{
+		pr::AutocmdzoneHandler::getInstance().Add(
+			idVec3(atof(args.Argv(1)), atof(args.Argv(2)), atof(args.Argv(3))) // Starting Point
+			, idVec3(atof(args.Argv(4)), atof(args.Argv(5)), atof(args.Argv(6))) // End Point
+			, static_cast<idStr>(args.Argv(7)) // Commands
+		);
+	}
 
 	pr::ConsoleWrite("Successfully added autocmdzone number %d", pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1);
 }
@@ -274,12 +293,12 @@ void Cmd_PR_autocmd_edit_f(const idCmdArgs &args)
 		return;
 	}
 
-	// The index must be between 0 < Index > and NumOfZones
+	// The index must be between 0 and NumOfZones
 	if (atoi(args.Argv(1)) > pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1 || atoi(args.Argv(1)) < 0)
 	{
 		if (pr::AutocmdzoneHandler::getInstance().NumOfZones() == 0)
 		{
-			pr::ConsoleWrite("There are no autocmds you need to create one first using PR_AutoCmd_Add");
+			pr::ConsoleWrite("There are no autocmdzones. You need to create one first using PR_AutoCmd_Add");
 		}
 		else
 		{
@@ -310,9 +329,9 @@ void Cmd_PR_autocmd_list_f(const idCmdArgs &args)
 
 	for (auto && e : aczHandler)
 	{
-		idVec3 pos1 = e.GetPos1();
-		idVec3 pos2 = e.GetPos2();
-		auto cmds = e.GetCmds();
+		idVec3 pos1 = e.GetBeginPoint();
+		idVec3 pos2 = e.GetEndPoint();
+		auto cmds = e.GetCommands();
 
 		pr::ConsoleWrite("%d: %.2f %.2f %.2f %.2f %.2f %.2f %s", num, pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z, cmds.c_str());
 
@@ -342,7 +361,7 @@ void Cmd_PR_autocmd_remove_f(const idCmdArgs &args)
 		return;
 	}
 
-	// The index must be between 0 < Index > and NumOfZones
+	// The index must be between 0 and NumOfZones
 	if (atoi(args.Argv(1)) > pr::AutocmdzoneHandler::getInstance().NumOfZones() - 1 || atoi(args.Argv(1)) < 0)
 	{
 		if (pr::AutocmdzoneHandler::getInstance().NumOfZones() == 0)
@@ -359,7 +378,87 @@ void Cmd_PR_autocmd_remove_f(const idCmdArgs &args)
 
 	pr::AutocmdzoneHandler::getInstance().Remove(atoi(args.Argv(1)));
 
-	pr::ConsoleWrite("Succesfully removed autocmdzone number %d", atoi(args.Argv(1)));
+	pr::ConsoleWrite("Successfully removed autocmdzone number %d", atoi(args.Argv(1)));
+}
+
+//////////////
+// Ghosting //
+//////////////
+
+/*
+==================
+Cmd_PR_gh_record_f
+==================
+*/
+void Cmd_PR_gh_record_f(const idCmdArgs &args)
+{
+	if (pr::gh_isRecording)
+	{
+		pr::ConsoleWrite("Already recording!");
+	}
+
+	idStr path { "Ghosts/" };
+
+	if (args.Argc() >= 2)
+	{
+		path.Append(args.Args(1));
+	}
+	else
+	{
+		// If no name provided simply use auto record file name
+		path.Append(pr::GetAutoRecordFileName());
+	}
+
+	path.SetFileExtension(pr::GhostingDemoPostfix);
+
+	pr::StartRecordingGhost(path.c_str());
+}
+
+/*
+==================
+Cmd_PR_gh_stop_f
+==================
+*/
+void Cmd_PR_gh_stop_f(const idCmdArgs &args)
+{
+	if (pr::gh_isRecording)
+	{
+		pr::StopRecordingGhost();
+	}
+	else
+	{
+		pr::ConsoleWrite("Not recording!");
+	}
+}
+
+/*
+==================
+Cmd_PR_gh_load_f
+==================
+*/
+void Cmd_PR_gh_load_f(const idCmdArgs &args)
+{
+	if (args.Argc() == 2)
+	{
+		idStr path { "Ghosts/" };
+
+		path.Append(args.Argv(1));
+		path.SetFileExtension(pr::GhostingDemoPostfix);
+
+		pr::ghostManager.LoadGhostFile(path);
+	}
+}
+
+/*
+==================
+Cmd_PR_gh_stopallinstances_f
+==================
+*/
+void Cmd_PR_gh_stopallinstances_f(const idCmdArgs &args)
+{
+	pr::ghostManager.ClearAllGhosts();
+
+	pr::ConsoleWrite("Stopped all ghosts");
 }
 
 #ifdef PR_DEBUG
@@ -378,8 +477,8 @@ void Cmd_PR_crash_f(const idCmdArgs &args)
 
 void Cmd_PR_dbg_timer_f(const idCmdArgs &args)
 {
-	auto time = PR_ms2time(pr::Timer::inGame.Milliseconds());
-	auto rtatime = PR_ms2time(pr::Timer::inGame.Milliseconds());
+	auto time = pr::ms2time(pr::Timer::inGame.Milliseconds());
+	auto rtatime = pr::ms2time(pr::Timer::inGame.Milliseconds());
 
 	pr::ConsoleWrite("Timer is running: %s\nTimer should be on: %s\nIn-game timer:\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s\nRTA timer:\nTime: %02d:%02d:%02d.%03d\nMilliseconds: %f ms\nClockTicks: %f %s", pr::Timer::inGame.IsRunning() ? "True" : "False", pr::Timer::running ? "True" : "False", time.hours, time.minutes, time.seconds, time.milliseconds, pr::Timer::inGame.Milliseconds(), pr::Timer::inGame.ClockTicks(), pr::Timer::pr_gametimer_clocktick_postfix, rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds, pr::Timer::RTA.Milliseconds(), pr::Timer::RTA.ClockTicks(), pr::Timer::pr_gametimer_clocktick_postfix);
 }
@@ -415,7 +514,7 @@ void Cmd_PR_dbg_backup_f(const idCmdArgs &args)
 
 	if (file == nullptr)
 	{
-		pr::ConsoleWrite("backuptmr can't be opend");
+		pr::ConsoleWrite("backuptmr can't be opened");
 		return;
 	}
 
@@ -523,7 +622,7 @@ void Cmd_PR_dbg_runfinsished_f(const idCmdArgs &args)
 	}
 	else
 	{
-		pr::runFinished = true;
+		pr::runFinished = !pr::runFinished;
 	}
 }
 
@@ -568,7 +667,7 @@ void Cmd_EntityList(const idStr &match)
 		if (!check->name.Filter(match, true)) { continue; }
 
 		gameLocal.Printf("%4i: %-20s %-20s %s\n", e,
-			check->GetEntityDefName(), check->GetClassname(), check->name.c_str());
+						 check->GetEntityDefName(), check->GetClassname(), check->name.c_str());
 
 		++count;
 		size += check->spawnArgs.Allocated();
@@ -974,7 +1073,7 @@ void Cmd_Give_f(const idCmdArgs &args)
 	//HUMANHEAD PCF rww 05/16/06
 	declManager->SetInsideLevelLoad(wasInside);
 	//HUMANHEAD END
-		}
+}
 
 /*
 ==================
@@ -1191,11 +1290,11 @@ static void Cmd_Say(bool team, const idCmdArgs &args)
 		if (player)
 		{
 			name = player->GetUserInfo()->GetString("ui_name", "player");
-#if HUMANHEAD	// HUMANHEAD pdm
+		#if HUMANHEAD	// HUMANHEAD pdm
 			// Doctor up name and text with appropriate colors
 			name.Insert(S_COLOR_YELLOW, 0);
 			text.Insert(S_COLOR_YELLOW, 0);
-#endif
+		#endif
 		}
 
 	}
@@ -1508,8 +1607,8 @@ void Cmd_PlayerShadowToggle_f(const idCmdArgs &args)
 		{
 			gameLocal.entities[i]->GetRenderEntity()->noShadow = setShadows;
 		}
-}
 	}
+}
 #endif
 //HUMANHEAD END
 
@@ -2107,7 +2206,7 @@ static void Cmd_CollisionModelInfo_f(const idCmdArgs &args)
 	if (args.Argc() < 2)
 	{
 		gameLocal.Printf("usage: collisionModelInfo <modelNum>\n"
-			"use 'all' instead of the model number for accumulated info\n");
+						 "use 'all' instead of the model number for accumulated info\n");
 		return;
 	}
 
@@ -2483,9 +2582,9 @@ static void Cmd_SaveMoveables_f(const idCmdArgs &args)
 
 		if (!m || !m->IsType(idMoveable::Type)) { continue; }
 
-#if HUMANHEAD	// HUMANHEAD pdm: skip all deathwalk entities
+	#if HUMANHEAD	// HUMANHEAD pdm: skip all deathwalk entities
 		if (!idStr::Icmpn(m->name, "dw_", 3)) { continue; }
-#endif
+	#endif
 
 		if (m->IsBound()) { continue; }
 
@@ -2546,9 +2645,9 @@ static void Cmd_SaveRagdolls_f(const idCmdArgs &args)
 
 		if (!af->IsType(idAFEntity_WithAttachedHead::Type) && !af->IsType(idAFEntity_Generic::Type)) { continue; }
 
-#if HUMANHEAD	// HUMANHEAD pdm: skip all deathwalk entities
+	#if HUMANHEAD	// HUMANHEAD pdm: skip all deathwalk entities
 		if (!idStr::Icmpn(af->name, "dw_", 3)) { continue; }
-#endif
+	#endif
 
 		if (af->IsBound()) { continue; }
 
@@ -2654,9 +2753,9 @@ static void Cmd_SaveLights_f(const idCmdArgs &args)
 
 		if (!light || !light->IsType(idLight::Type)) { continue; }
 
-#if HUMANHEAD	// HUMANHEAD pdm: skip all deathwalk entities
+	#if HUMANHEAD	// HUMANHEAD pdm: skip all deathwalk entities
 		if (!idStr::Icmpn(light->name, "dw_", 3)) { continue; }
-#endif
+	#endif
 
 		dict.Clear();
 		light->SaveState(&dict);
@@ -2716,12 +2815,12 @@ static void Cmd_SaveParticles_f(const idCmdArgs &args)
 
 		if (!ent) { continue; }
 
-#if HUMANHEAD	// HUMANHEAD pdm: skip all deathwalk entities
+	#if HUMANHEAD	// HUMANHEAD pdm: skip all deathwalk entities
 		if (!idStr::Icmpn(ent->name, "dw_", 3))
 		{
 			continue;
 		}
-#endif
+	#endif
 
 		strModel = ent->spawnArgs.GetString("model");
 		if (strModel.Length() && strModel.Find(".prt") > 0)
@@ -2933,7 +3032,7 @@ static void Cmd_EraseViewNote_f(const idCmdArgs &args)
 
 	bool found = false;
 	while (parser.ExpectTokenString("view") && parser.Parse1DMatrix(3, origin.ToFloatPtr()) &&
-		parser.Parse1DMatrix(9, axis.ToFloatPtr()) && parser.ExpectTokenString("comments") && parser.ReadToken(&token))
+		   parser.Parse1DMatrix(9, axis.ToFloatPtr()) && parser.ExpectTokenString("comments") && parser.ReadToken(&token))
 	{
 
 		if (idStr::Cmp(comment, token) == 0)
@@ -3227,7 +3326,7 @@ void Cmd_PrintTypeName_f(const idCmdArgs &args)
 	if (type)
 	{
 		common->Printf("Type '%i' is '%s'\n", typeNum, type->classname);
-}
+	}
 	else
 	{
 		common->Printf("Invalid typenum.\n");
@@ -3250,6 +3349,16 @@ void Cmd_PlayTime_f(const idCmdArgs &args)
 	common->Printf("%u:%.2u:%.2u\n", hours, minutes, seconds);
 }
 //HUMANHEAD END
+
+// PreyRun BEGIN
+namespace pr
+{
+	PR_FINLINE void ArgCompletion_GhostingDemo(const idCmdArgs &args, void(*callback)(const char *s))
+	{
+		cmdSystem->ArgCompletion_FolderExtension(args, callback, "Ghosts/", true, ".gh", NULL);
+	}
+}
+// PreyRun END
 
 /*
 =================
@@ -3281,6 +3390,12 @@ void idGameLocal::InitConsoleCommands(void)
 	cmdSystem->AddCommand("PR_AutoCmd_Edit", Cmd_PR_autocmd_edit_f, CMD_FL_GAME, "PreyRun cmd: Edit a autocmdzone by index retrieved from PR_AutoCmd_List");
 	cmdSystem->AddCommand("PR_AutoCmd_List", Cmd_PR_autocmd_list_f, CMD_FL_GAME, "PreyRun cmd: List all autocmdzones with Index");
 	cmdSystem->AddCommand("PR_AutoCmd_Remove", Cmd_PR_autocmd_remove_f, CMD_FL_GAME, "PreyRun cmd: Removes a autocmdzone by index retrieved from PR_AutoCmd_List");
+
+	// Ghosting Commands
+	cmdSystem->AddCommand("PR_GH_Record", Cmd_PR_gh_record_f, CMD_FL_GAME, "PreyRun cmd: Record ghosting demo file");
+	cmdSystem->AddCommand("PR_GH_Stop", Cmd_PR_gh_stop_f, CMD_FL_GAME, "PreyRun cmd: Stop recoding ghosting demo file");
+	cmdSystem->AddCommand("PR_GH_Load", Cmd_PR_gh_load_f, CMD_FL_GAME, "PreyRun cmd: Play a previously recorded ghost demo file", pr::ArgCompletion_GhostingDemo);
+	cmdSystem->AddCommand("PR_GH_StopAllInstances", Cmd_PR_gh_stopallinstances_f, CMD_FL_GAME, "PreyRun cmd: Stop all currently playing ghosts");
 
 	// Cheat Commands
 	cmdSystem->AddCommand("PR_CH_SetHealth", Cmd_PR_ch_sethealth_f, CMD_FL_GAME | CMD_FL_CHEAT, "*Cheat* PreyRun cmd: Set your health to the specified value");

@@ -1,16 +1,12 @@
-﻿#pragma once
-
-#include "../game/Game_local.h"
+#pragma once
 
 namespace pr
 {
 	void enableOneClickLoad();
 	void disableOneClickLoad();
 
-	void hookDemoRecording();
-
 	void hookVersionDisplay();
 
 	void suppressMasterServerWarning();
 	void unsuppressMasterServerWarning();
-}
+} // End of namespace: pr

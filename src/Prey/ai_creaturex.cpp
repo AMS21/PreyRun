@@ -1,8 +1,15 @@
-﻿
+
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
 #include "prey_local.h"
+
+// PreyRun BEING
+#include "../PreyRun/Cvar.hpp"
+#include "../PreyRun/GameTimer.hpp"
+#include "../PreyRun/Interprocess.hpp"
+#include "../PreyRun/Logging.hpp"
+// PreyRun END
 
 const idEventDef CX_LaserOn("sunBeamOn", NULL, 'd');
 const idEventDef CX_LaserOff("sunBeamOff");
@@ -984,7 +991,7 @@ bool hhCreatureX::UpdateAnimationControllers( void ) {
 
 	//		ang.yaw = (targetCurrent_R-bonePos).ToYaw() - viewAxis.ToAngles().yaw;
 	//		ang.yaw += gunShake.yaw;
-	//		GetJointWorldTransform( spawnArgs.GetString( "gun_bone_right" ), bonePos, boneAxis );				
+	//		GetJointWorldTransform( spawnArgs.GetString( "gun_bone_right" ), bonePos, boneAxis );
 	//		animator.SetJointAxis( animator.GetJointHandle( spawnArgs.GetString( "gun_bone_right" ) ), JOINTMOD_WORLD, idAngles( (bonePos - targetCurrent_R).ToPitch(), (targetCurrent_R-bonePos).ToYaw() - viewAxis.ToAngles().yaw, 0.0f ).ToMat3() );
 	//	} else {
 	//		animator.SetJointAxis( animator.GetJointHandle( spawnArgs.GetString( "gun_bone_left" ) ), JOINTMOD_WORLD, mat3_identity );

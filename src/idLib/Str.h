@@ -12,23 +12,29 @@
 ===============================================================================
 */
 
+// PreyRun EDIT BEGIN
+
 // these library functions should not be used for cross platform compatibility
-#define strcmp			idStr::Cmp		// use_idStr_Cmp
-#define strncmp			use_idStr_Cmpn
-#define StrCmpN			use_idStr_Cmpn
-#define strcmpi			use_idStr_Icmp
-#define StrCmpI			use_idStr_Icmp
-#define stricmp			idStr::Icmp		// use_idStr_Icmp
-#define _stricmp		use_idStr_Icmp
-#define strcasecmp		use_idStr_Icmp
-#define strnicmp		use_idStr_Icmpn
-#define _strnicmp		use_idStr_Icmpn
-#define _memicmp		use_idStr_Icmpn
-#define StrCmpNI		use_idStr_Icmpn
-#define snprintf		use_idStr_snPrintf
-#define _snprintf		use_idStr_snPrintf
-#define vsnprintf		use_idStr_vsnPrintf
-#define _vsnprintf		use_idStr_vsnPrintf
+// Well thats simply not true anymore, it might have been back then but nowadays its just annoying and prevents us from using the standard library (which is pretty cross platform compatible btw.)
+
+//#define strcmp			idStr::Cmp		// use_idStr_Cmp
+//#define strncmp			use_idStr_Cmpn
+//#define StrCmpN			use_idStr_Cmpn
+//#define strcmpi			use_idStr_Icmp
+//#define StrCmpI			use_idStr_Icmp
+//#define stricmp			idStr::Icmp		// use_idStr_Icmp
+//#define _stricmp		use_idStr_Icmp
+//#define strcasecmp		use_idStr_Icmp
+//#define strnicmp		use_idStr_Icmpn
+//#define _strnicmp		use_idStr_Icmpn
+//#define _memicmp		use_idStr_Icmpn
+//#define StrCmpNI		use_idStr_Icmpn
+//#define snprintf		use_idStr_snPrintf
+//#define _snprintf		use_idStr_snPrintf
+//#define vsnprintf		use_idStr_vsnPrintf
+//#define _vsnprintf		use_idStr_vsnPrintf
+
+// PreyRun EDIT END
 
 class idVec4;
 

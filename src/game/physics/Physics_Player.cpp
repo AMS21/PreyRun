@@ -1,10 +1,15 @@
-﻿// Copyright (C) 2004 Id Software, Inc.
+// Copyright (C) 2004 Id Software, Inc.
 //
 
 #include "../../idlib/precompiled.h"
 #pragma hdrstop
 
 #include "../Game_local.h"
+
+// PreyRun BEGIN
+#include "../../PreyRun/Cvar.hpp"
+#include "../../PreyRun/Ghosting/GhostRecord.hpp"
+// PreyRun END
 
 CLASS_DECLARATION(idPhysics_Actor, idPhysics_Player)
 END_CLASS
@@ -1748,35 +1753,20 @@ idPhysics_Player::SetMovementType
 */
 void idPhysics_Player::SetMovementType(const pmtype_t type) {
 	// PreyRun BEGIN
-	// Autostart the game IF autosplit is turend on we havent started yet, were on the correct map and the users movement type was set to freeze (cutscene) is now set to normal
+	// Autostart the game if autosplit is turned on we haven't started yet, were on the correct map and the users movement type was set to freeze (cutscene) and is now set to normal
 
 	// Casting GetMapName() to idStr might not be the optimal solution but you cant compare cstrings (you can but its a real pain in the ass)
-	if (!pr::Timer::running && pr::Cvar::timer_autostart.GetBool() && static_cast<idStr>(gameLocal.GetMapName()) == idStr("maps/game/roadhouse.map") && type == PM_NORMAL && current.movementType == PM_FREEZE)
+	if (static_cast<idStr>(gameLocal.GetMapName()) == idStr("maps/game/roadhouse.map") && type == PM_NORMAL && current.movementType == PM_FREEZE)
 	{
-		pr::Timer::inGame.Clear();
-		pr::Timer::RTA.Clear();
-
-		pr::Timer::inGame.Start();
-		pr::Timer::RTA.Start();
-
-		pr::Timer::running = true;
-		pr::runFinished = false;
-
-		if (pr::Cvar::preysplit.GetBool())
+		if (!pr::Timer::running && pr::Cvar::timer_autostart.GetBool())
 		{
-			pr::WriteTimerStart(pr::GetTime());
+			pr::AutoStartTimers();
 		}
 
-		if (static_cast<pr::TimerMethode>(pr::Cvar::timer_methode.GetInteger()) == pr::TimerMethode::RealTimeAttack)
+		if (pr::Cvar::gh_autorecord.GetBool() && !pr::gh_isRecording)
 		{
-			cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec RTARun.cfg\n");
+			pr::StartRecordingGhost(pr::GetAutoRecordFileName());
 		}
-		else if (static_cast<pr::TimerMethode>(pr::Cvar::timer_methode.GetInteger()) == pr::TimerMethode::IndividualLevel)
-		{
-			cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec ILRun.cfg\n");
-		}
-
-		pr::Log("Timer: Auto starting");
 	}
 	// PreyRun END
 

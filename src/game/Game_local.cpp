@@ -10,6 +10,13 @@
 #include "../framework/BuildVersion.h" // HUMANHEAD mdl
 //HUMANHEAD END
 
+// PreyRun BEGIN
+#include "../PreyRun/Backup.hpp"
+#include "../PreyRun/Hooking.hpp"
+#include "../PreyRun/Interprocess.hpp"
+#include "../PreyRun/Logging.hpp"
+// PreyRun END
+
 #ifdef GAME_DLL
 
 idSys *						sys = NULL;
@@ -394,21 +401,16 @@ void idGameLocal::Init(void)
 
 	pr::ConsoleWrite("Running %s", ENGINE_VERSION);
 
-#ifdef PR_DEBUG
-	pr::ConsoleWrite("Running extra PreyRun debug functionality!");
-	pr::ConsoleWrite("Compiled on %s %s", __DATE__, __TIME__);
-#endif // PR_DEBUG
+	pr::DebugConsoleWrite("Running extra PreyRun debug functionality!");
+	pr::DebugConsoleWrite("Compiled on %s", PR_CMPL_DATETIME);
 
 	pr::InitPreySplitPipe();
 
 	pr::hookVersionDisplay();
-#ifdef PR_DEVELOP
-	pr::hookDemoRecording();
-#endif // PR_DEVELOP
 	pr::suppressMasterServerWarning();
 
 	// Load PreyRun.cfg
-	cmdSystem->BufferCommandText(CMD_EXEC_NOW, "exec preyrun.cfg\n");
+	cmdSystem->BufferCommandText(CMD_EXEC_NOW, "exec PreyRun.cfg\n");
 	// PreyRun END
 }
 
@@ -430,7 +432,7 @@ void idGameLocal::Shutdown(void)
 	Printf("------------ Game Shutdown -----------\n");
 
 	// PreyRun BEGIN
-	pr::Log("Shutdown");
+	pr::DebugLog("Shutdown");
 
 	pr::ShutdownPreySplitPipe();
 	pr::ClearBackupTimer();
@@ -1008,7 +1010,7 @@ void idGameLocal::LoadMap(const char *mapName, int randseed)
 	bool sameMap = (mapFile && idStr::Icmp(mapFileName, mapName) == 0);
 
 	// PreyRun BEGIN
-	pr::DebugLog("LoadMap: %s, $i", mapName, randseed);
+	pr::DebugLog("LoadMap: %s, %i", mapName, randseed);
 	// PreyRun END
 
 	// clear the sound system
@@ -1817,10 +1819,6 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 	Printf("--------------------------------------\n");
 
 	// PreyRun BEGIN
-	if (static_cast<pr::TimerMethode> (pr::Cvar::timer_methode.GetInteger()) == pr::TimerMethode::IndividualLevel && !pr::Timer::inGame.IsRunning())
-	{
-		pr::Timer::running = true;
-	}
 
 	// Timer recovery
 	pr::LoadBackupTimer(mapName);
@@ -1897,20 +1895,6 @@ void idGameLocal::MapShutdown(void)
 	Printf("--------- Game Map Shutdown ----------\n");
 
 	gamestate = GAMESTATE_SHUTDOWN;
-
-	// PreyRun BEGIN
-	if (pr::Timer::timedemo)
-	{
-		pr::Timer::demo.Stop();
-
-		auto times = PR_ms2time(pr::Timer::demo.Milliseconds());
-
-		pr::ConsoleWrite("demotime: %02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
-		pr::ConsoleWrite("ClockTicks: ", pr::Timer::demo.ClockTicks());
-
-		pr::Timer::timedemo = false;
-	}
-	// PreyRun END
 
 	if (gameRenderWorld)
 	{
@@ -3843,13 +3827,6 @@ void idGameLocal::RunDebugInfo(void)
 
 	// collision map debug output
 	collisionModelManager->DebugOutput(player->GetEyePosition());
-
-	// PreyRun BEGIN
-	if (pr::Cvar::autocmd_show.GetBool())
-	{
-		pr::AutocmdzoneHandler::getInstance().Draw();
-	}
-	// PreyRun END
 }
 
 /*
@@ -6180,20 +6157,3 @@ void idGameLocal::ClearTimePlayed(void)
 	playTimeStart = -1;
 }
 // HUMANHEAD END
-
-// PreyRun BEGIN
-PR_time_t PR_ms2time(unsigned x)
-{
-	PR_time_t ts;
-
-	ts.hours = x / (60 * 60 * 1'000);
-	x = x - ts.hours * (60 * 60 * 1'000);
-	ts.minutes = x / (60 * 1'000);
-	x = x - ts.minutes * (60 * 1'000);
-	ts.seconds = x / 1'000;
-	ts.milliseconds = x - ts.seconds * 1'000;
-
-	return ts;
-}
-
-// PreyRun END

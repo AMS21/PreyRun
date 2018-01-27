@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2004 Id Software, Inc.
+// Copyright (C) 2004 Id Software, Inc.
 //
 
 #ifndef __GAME_LOCAL_H__
@@ -1110,25 +1110,5 @@ const int	CINEMATIC_SKIP_DELAY = SEC2MS(2.0f);
 //HUMANHEAD: aob - must be after Script_Thread.h
 #include "../prey/prey_script_thread.h"
 //HUMANHEAD END
-
-// PreyRun BEGIN
-#include "../PreyRun/interprocess.hpp"
-//#include "../PreyRun/Random.hpp"
-#include "../PreyRun/AutoCmd.hpp"
-#include "../PreyRun/Backup.hpp"
-#include "../PreyRun/Logging.hpp"
-
-#include <cstdint>
-
-struct PR_time_t
-{
-	uint32_t hours;
-	uint8_t minutes;
-	uint8_t seconds;
-	uint16_t milliseconds;
-};
-
-PR_time_t PR_ms2time(unsigned);
-// PreyRun END
 
 #endif	/* !__GAME_LOCAL_H__ */

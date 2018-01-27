@@ -1,11 +1,12 @@
-﻿#pragma once
-#include "../game/game_local.h"
-#include "GameTimer.hpp"
-#include "StdLib.hpp"
+#pragma once
 
 // Credits to Ivan Molodetskikh (Yalter) and Chong Jiang Wei (Matherunner) for their interprocess.cpp from BunnymodXT (https://github.com/YaLTeR/BunnymodXT/blob/master/BunnymodXT/Windows/interprocess.cpp)
 
+#include "Utility.hpp"
+
 #define PREYSPLIT_PIPE_NAME "PreyRun-PreySplit"
+
+class idStr;
 
 namespace pr
 {
@@ -25,14 +26,6 @@ namespace pr
 		CUSTOM_SPLIT = 0x05
 	};
 
-	struct Time
-	{
-		uint32_t hours;
-		uint8_t minutes;
-		uint8_t seconds;
-		uint16_t milliseconds;
-	};
-
 	void InitPreySplitPipe();
 	void ShutdownPreySplitPipe();
 
@@ -41,11 +34,11 @@ namespace pr
 	void WriteTime(const Time& time);
 
 	void WriteGameEnd(const Time& time);
-	void WriteMapChange(const Time& time, idStr& map);
+	void WriteMapChange(const Time& time, const idStr& map);
 	void WriteTimerReset(const Time& time);
 	void WriteTimerStart(const Time& time);
 	void WriteBossKill(const Time& time, const idStr& boss);
 	void WriteCustomSplit(const Time& time);
 
 	Time GetTime();
-}
+} // End of namespace: pr

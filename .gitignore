@@ -7,16 +7,18 @@
 *.map
 *.obj
 *.opendb
-*.tlog
 *.rtf#
+*.ruleset
+*.tlog
 
+build/
 examples/
 src/.vs/
+src/CMakeFiles/
 src/ipch/
-build/
 
-Changelog.txt
-DevNotes.txt
 PreyRun.cppcheck
 ReadMe.rtf
+src/CMakeCache.txt
+src/CMakeLists.txt
 src/CodeMaid.config

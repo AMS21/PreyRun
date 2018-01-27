@@ -1,4 +1,4 @@
-﻿
+
 #ifndef __PREY_GAME_PLAYER_H__
 #define __PREY_GAME_PLAYER_H__
 
@@ -37,22 +37,12 @@ class hhTalon;
 class hhPossessedTommy;
 
 // PreyRun BEGIN
-#include <cstdint>
-#include "../PreyRun/Constants.hpp"
-#include "../PreyRun/Hooking.hpp"
-#include "../PreyRun/GameTimer.hpp"
-#include "../game/Game_local.h"
-
 constexpr int PR_hud_std_y_offset { 15 };
-
-constexpr int PR_ammopos_x { 550 };
-constexpr int PR_ammopos_y { 448 };
-constexpr int PR_ammopos2_y { PR_ammopos_y + PR_hud_std_y_offset };
 
 constexpr int PR_ammo_vehicle_shot_cost { 3500 };
 
-constexpr double PR_fade_factor { 0.02f };
-constexpr double PR_fade_factor_slow { 0.01f };
+constexpr float PR_fade_factor { 0.02f };
+constexpr float PR_fade_factor_slow { 0.01f };
 
 constexpr int PR_location_x { 0 };
 constexpr int PR_location_y { 45 };
@@ -68,12 +58,6 @@ constexpr int PR_entinfo_x { 360 };
 constexpr int PR_entinfo_y { 235 };
 
 constexpr int PR_distance_y { 220 };
-
-constexpr int PR_health_x { 70 };
-constexpr int PR_health_y { 448 };
-
-constexpr int PR_spiritpower_x { 70 };
-constexpr int PR_spiritpower_y { PR_health_y - PR_hud_std_y_offset };
 
 constexpr int PR_keys_x { 300 };
 constexpr int PR_keys_y { 250 };
@@ -99,25 +83,22 @@ constexpr int PR_keys_momentum_d_y { PR_keys_momentum_f_y + 4 * PR_keys_momentum
 
 constexpr float PR_traceline_distance { 2048.00f };
 
-const idVec4 PR_colour_white { 1.00f, 1.00f, 1.00f, 1.00f };
-const idVec4 PR_colour_yellow { 1.00f, 1.00f, 0.25f, 1.00f };
-const idVec4 PR_colour_red { 1.00f, 0.00f, 0.00f, 1.00f };
-const idVec4 PR_colour_blue { 0.00f, 0.00f, 1.00f, 1.00f };
-const idVec4 PR_colour_grey { 0.65f, 0.65f, 0.65f, 0.65f };
+const idVec4 PR_color_white { 1.00f, 1.00f, 1.00f, 1.00f };
+const idVec4 PR_color_yellow { 1.00f, 1.00f, 0.25f, 1.00f };
+const idVec4 PR_color_red { 1.00f, 0.00f, 0.00f, 1.00f };
+const idVec4 PR_color_blue { 0.00f, 0.00f, 1.00f, 1.00f };
+const idVec4 PR_color_grey { 0.65f, 0.65f, 0.65f, 0.65f };
 
 #ifdef PR_DEBUG
 constexpr int PR_dbg_huddrawtime_x { 460 };
 constexpr int PR_dbg_huddrawtime_y { 0 };
 
-constexpr double PR_dbg_huddrawtime_yellow { 0.30f };
-constexpr double PR_dbg_huddrawtime_red { 0.40f };
+constexpr float PR_dbg_huddrawtime_yellow { 0.30f };
+constexpr float PR_dbg_huddrawtime_red { 0.40f };
 
-constexpr double PR_dbg_frametime_yellow { 1.50f };
-constexpr double PR_dbg_frametime_red { 2.00f };
+constexpr float PR_dbg_frametime_yellow { 1.50f };
+constexpr float PR_dbg_frametime_red { 2.00f };
 #endif // PR_DEBUG
-
-// The draw function from Prey takes floats in the range from 0.0 to 1.0 but usualy colours are represented from 0 to 255 (hex)
-ID_INLINE float PR_toPreyColour(const float& f);
 // PreyRun END
 
 #define MAX_HEALTH_NORMAL_MP		100 //rww - a probably temporary hack for trying out the pipe-as-armor concept
@@ -505,7 +486,7 @@ public:
 	virtual void		Show();
 
 protected:
-	idUserInterface *	guiOverlay;
+	idUserInterface * guiOverlay;
 	idClipModel			thirdPersonCameraClipBounds;
 	float				viewAnglesSensitivity;
 	int					lastResurrectTime;

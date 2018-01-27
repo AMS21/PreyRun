@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2004 Id Software, Inc.
+// Copyright (C) 2004 Id Software, Inc.
 //
 
 #include "../../idlib/precompiled.h"
@@ -8,6 +8,12 @@
 
 #include "TypeInfo.h"
 #include "../../framework/BuildVersion.h" // HUMANHEAD mdl
+
+// PreyRun BEGIN
+#include "../../PreyRun/Cvar.hpp"
+#include "../../PreyRun/Logging.hpp"
+#include "../../PreyRun/Utility.hpp"
+// PreyRun END
 
 /*
 Save game related helper classes.
@@ -50,7 +56,7 @@ idSaveGame::idSaveGame( idFile *savefile )
 		pr::Log("Timer: Paused, Game saved");
 
 #ifdef PR_DEBUG
-		auto time = PR_ms2time(pr::Timer::inGame.Milliseconds());
+		auto time = pr::ms2time(pr::Timer::inGame.Milliseconds());
 		pr::DebugLog("Time: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DEBUG
 	}
@@ -86,7 +92,7 @@ idSaveGame::~idSaveGame()
 		pr::Log("Timer, Resuming, Game saved");
 
 #ifdef PR_DEBUG
-		auto time = PR_ms2time(pr::Timer::inGame.Milliseconds());
+		auto time = pr::ms2time(pr::Timer::inGame.Milliseconds());
 		pr::DebugLog("Time: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
 #endif // PR_DEBUG
 	}

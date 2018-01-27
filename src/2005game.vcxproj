@@ -166,6 +166,7 @@
     <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <EnableCppCoreCheck>false</EnableCppCoreCheck>
+    <TargetName>gamex86</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>Game\build\$(Configuration)\</OutDir>
@@ -174,14 +175,16 @@
     <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <EnableCppCoreCheck>false</EnableCppCoreCheck>
+    <TargetName>gamex86</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug PreyRun|Win32'">
     <OutDir>Game\build\$(Configuration)\</OutDir>
     <IntDir>Game\build\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\CustomRuleSet.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <EnableCppCoreCheck>false</EnableCppCoreCheck>
+    <EnableCppCoreCheck>true</EnableCppCoreCheck>
+    <TargetName>gamex86</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug with inlines|Win32'">
     <OutDir>Game\build\$(Configuration)\</OutDir>
@@ -190,6 +193,7 @@
     <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <EnableCppCoreCheck>false</EnableCppCoreCheck>
+    <TargetName>gamex86</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug with inlines and memory log|Win32'">
     <OutDir>Game\build\$(Configuration)\</OutDir>
@@ -198,6 +202,7 @@
     <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <EnableCppCoreCheck>false</EnableCppCoreCheck>
+    <TargetName>gamex86</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dedicated Debug with Inlines|Win32'">
     <OutDir>Game\build\$(Configuration)\</OutDir>
@@ -206,6 +211,7 @@
     <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <EnableCppCoreCheck>false</EnableCppCoreCheck>
+    <TargetName>gamex86</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dedicated Release|Win32'">
     <OutDir>Game\build\$(Configuration)\</OutDir>
@@ -214,6 +220,7 @@
     <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <EnableCppCoreCheck>false</EnableCppCoreCheck>
+    <TargetName>gamex86</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug PreyRun|x64'">
     <OutDir>Game\build\$(Configuration)\x64\</OutDir>
@@ -266,11 +273,12 @@
       <UndefinePreprocessorDefinitions>NOMINMAX;%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\Andre\Desktop\Dokumente\C++\Libraries\boost 32 bit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalOptions>/FIXED:no %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;..\build\$(Configuration)\idLib.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\build\$(Configuration)\gamex86.dll</OutputFile>
+      <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\game\game.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -317,11 +325,12 @@
       <UndefinePreprocessorDefinitions>NOMINMAX;%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\Andre\Desktop\Dokumente\C++\Libraries\boost 32 bit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 /fixed:no %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;..\build\$(Configuration)\idLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\build\$(Configuration)\gamex86.dll</OutputFile>
+      <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\game\game.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -337,12 +346,12 @@
       <SupportUnloadOfDelayLoadedDLL>false</SupportUnloadOfDelayLoadedDLL>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalLibraryDirectories>C:\Users\Andre\Desktop\Dokumente\C++\Libraries\boost 32 bit\lib32-msvc-14.0;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
       <Message>
       </Message>
-      <Command>
-      </Command>
+      <Command>copy "$(TargetPath)" "$(ProjectDir)..\build\$(Configuration)\gamex86.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug PreyRun|Win32'">
@@ -355,7 +364,7 @@
       <PreprocessorDefinitions>_D3SDK;__DOOM__;GAME_DLL;WIN32;_WINDOWS;HUMANHEAD;_DOTNET_2005;PR_DEBUG;%(PreprocessorDefinitions);_XKEYCHECK_H</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -375,11 +384,20 @@
       <UndefinePreprocessorDefinitions>NOMINMAX;NDEBUG;%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\Andre\Desktop\Dokumente\C++\Libraries\boost 32 bit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>true</FloatingPointExceptions>
+      <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 /fixed:no %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;..\build\$(Configuration)\idLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\build\$(Configuration)\gamex86.dll</OutputFile>
+      <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\game\game.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -401,7 +419,8 @@
     <PostBuildEvent>
       <Message>
       </Message>
-      <Command>copy "$(ProjectDir)..\build\$(Configuration)\gamex86.dll" "D:\Prey\base\gamex86.dll"</Command>
+      <Command>copy "$(TargetPath)" "$(ProjectDir)..\build\$(Configuration)\gamex86.dll"
+copy "$(ProjectDir)..\build\$(Configuration)\gamex86.dll" "D:\Prey\base\gamex86.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug with inlines|Win32'">
@@ -429,13 +448,14 @@
       <UndefinePreprocessorDefinitions>NOMINMAX;%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\Andre\Desktop\Dokumente\C++\Libraries\boost 32 bit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;..\build\$(Configuration)\idLib.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\build\$(Configuration)\gamex86.dll</OutputFile>
+      <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\game\game.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -483,11 +503,12 @@
       <UndefinePreprocessorDefinitions>NOMINMAX;%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\Andre\Desktop\Dokumente\C++\Libraries\boost 32 bit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalOptions>/FORCE:MULTIPLE %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;..\build\$(Configuration)\idLib.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\build\$(Configuration)\gamex86.dll</OutputFile>
+      <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\game\game.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -534,13 +555,14 @@
       <UndefinePreprocessorDefinitions>NOMINMAX;%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\Andre\Desktop\Dokumente\C++\Libraries\boost 32 bit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;..\build\$(Configuration)\idLib.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\build\$(Configuration)\gamex86.dll</OutputFile>
+      <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\game\game.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -587,11 +609,12 @@
       <UndefinePreprocessorDefinitions>NOMINMAX;%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\Andre\Desktop\Dokumente\C++\Libraries\boost 32 bit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 /fixed:no %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;..\build\$(Configuration)\idLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\build\$(Configuration)\gamex86.dll</OutputFile>
+      <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\game\game.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -773,18 +796,15 @@
     <ClCompile Include="game\WorldSpawn.cpp" />
     <ClCompile Include="PreyRun\AutoCmd.cpp" />
     <ClCompile Include="PreyRun\Backup.cpp" />
+    <ClCompile Include="PreyRun\Ghosting\GhostEntity.cpp" />
+    <ClCompile Include="PreyRun\Ghosting\GhostManager.cpp" />
+    <ClCompile Include="PreyRun\Ghosting\GhostRecord.cpp" />
     <ClCompile Include="PreyRun\Hooking.cpp" />
-    <ClCompile Include="PreyRun\interprocess.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug with inlines|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug with inlines and memory log|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Dedicated Release|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Dedicated Debug with Inlines|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug PreyRun|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="PreyRun\GameTimer.cpp" />
+    <ClCompile Include="PreyRun\Interprocess.cpp" />
     <ClCompile Include="PreyRun\Logging.cpp" />
+    <ClCompile Include="PreyRun\Cvar.cpp" />
+    <ClCompile Include="PreyRun\Utility.cpp" />
     <ClCompile Include="Prey\ai_centurion.cpp" />
     <ClCompile Include="Prey\ai_crawler.cpp" />
     <ClCompile Include="Prey\ai_creaturex.cpp" />
@@ -2578,15 +2598,19 @@
     <ClInclude Include="PreyRun\AutoCmd.hpp" />
     <ClInclude Include="PreyRun\Backup.hpp" />
     <ClInclude Include="PreyRun\Constants.hpp" />
+    <ClInclude Include="PreyRun\Cvar.hpp" />
+    <ClInclude Include="PreyRun\Ghosting\GhostEntity.hpp" />
+    <ClInclude Include="PreyRun\Ghosting\GhostManager.hpp" />
+    <ClInclude Include="PreyRun\Ghosting\GhostRecord.hpp" />
     <ClInclude Include="PreyRun\Hooking.hpp" />
-    <ClInclude Include="PreyRun\interprocess.hpp" />
+    <ClInclude Include="PreyRun\Interprocess.hpp" />
     <ClInclude Include="PreyRun\Logging.hpp" />
     <ClInclude Include="PreyRun\Monitor.hpp" />
     <ClInclude Include="PreyRun\PreyRun.hpp" />
     <ClInclude Include="PreyRun\Random.hpp" />
-    <ClInclude Include="PreyRun\StdLib.hpp" />
     <ClInclude Include="PreyRun\GameTimer.hpp" />
     <ClInclude Include="PreyRun\Thread.hpp" />
+    <ClInclude Include="PreyRun\Utility.hpp" />
     <ClInclude Include="Prey\ai_centurion.h" />
     <ClInclude Include="Prey\ai_crawler.h" />
     <ClInclude Include="Prey\ai_creaturex.h" />

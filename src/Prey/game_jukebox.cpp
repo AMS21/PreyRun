@@ -1,8 +1,11 @@
-﻿#include "../idlib/precompiled.h"
+#include "../idlib/precompiled.h"
 #pragma hdrstop
 
 #include "prey_local.h"
 
+// PreyRun BEGIN
+#include "../PreyRun/Cvar.hpp"
+// PreyRun END
 
 CLASS_DECLARATION(hhSound, hhJukeBoxSpeaker)
 END_CLASS
@@ -201,13 +204,12 @@ void hhJukeBox::UpdateVolume() {
 
 void hhJukeBox::Think()
 {
-
 	hhConsole::Think();
 
 	if (thinkFlags & TH_MISC3)
 	{
 		// PreyRun BEGIN
-		if (cvarSystem->GetCVarBool("pr_disablejukeboxes"))
+		if (pr::Cvar::mutejukeboxes.GetBool())
 		{
 			StopCurrentTrack();
 			return;

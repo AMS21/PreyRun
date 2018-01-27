@@ -28,6 +28,9 @@
     <Filter Include="PreyRun">
       <UniqueIdentifier>{9e5c4029-07a7-4de1-b41c-265f573a1d5f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PreyRun\Ghosting">
+      <UniqueIdentifier>{684f39a5-93eb-4b4c-acc7-b2b4ceec37be}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game\Actor.cpp">
@@ -723,9 +726,6 @@
     <ClCompile Include="Prey\game_monster_ai_events.cpp">
       <Filter>Prey\ai</Filter>
     </ClCompile>
-    <ClCompile Include="PreyRun\interprocess.cpp">
-      <Filter>PreyRun</Filter>
-    </ClCompile>
     <ClCompile Include="PreyRun\Hooking.cpp">
       <Filter>PreyRun</Filter>
     </ClCompile>
@@ -739,6 +739,24 @@
       <Filter>PreyRun</Filter>
     </ClCompile>
     <ClCompile Include="PreyRun\Logging.cpp">
+      <Filter>PreyRun</Filter>
+    </ClCompile>
+    <ClCompile Include="PreyRun\Ghosting\GhostEntity.cpp">
+      <Filter>PreyRun\Ghosting</Filter>
+    </ClCompile>
+    <ClCompile Include="PreyRun\Ghosting\GhostManager.cpp">
+      <Filter>PreyRun\Ghosting</Filter>
+    </ClCompile>
+    <ClCompile Include="PreyRun\Ghosting\GhostRecord.cpp">
+      <Filter>PreyRun\Ghosting</Filter>
+    </ClCompile>
+    <ClCompile Include="PreyRun\Interprocess.cpp">
+      <Filter>PreyRun</Filter>
+    </ClCompile>
+    <ClCompile Include="PreyRun\Utility.cpp">
+      <Filter>PreyRun</Filter>
+    </ClCompile>
+    <ClCompile Include="PreyRun\Cvar.cpp">
       <Filter>PreyRun</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1415,9 +1433,6 @@
     <ClInclude Include="Prey\game_monster_ai.h">
       <Filter>Prey\ai</Filter>
     </ClInclude>
-    <ClInclude Include="PreyRun\interprocess.hpp">
-      <Filter>PreyRun</Filter>
-    </ClInclude>
     <ClInclude Include="PreyRun\Hooking.hpp">
       <Filter>PreyRun</Filter>
     </ClInclude>
@@ -1425,9 +1440,6 @@
       <Filter>PreyRun</Filter>
     </ClInclude>
     <ClInclude Include="PreyRun\AutoCmd.hpp">
-      <Filter>PreyRun</Filter>
-    </ClInclude>
-    <ClInclude Include="PreyRun\StdLib.hpp">
       <Filter>PreyRun</Filter>
     </ClInclude>
     <ClInclude Include="PreyRun\Constants.hpp">
@@ -1448,7 +1460,25 @@
     <ClInclude Include="PreyRun\Monitor.hpp">
       <Filter>PreyRun</Filter>
     </ClInclude>
+    <ClInclude Include="PreyRun\Ghosting\GhostEntity.hpp">
+      <Filter>PreyRun\Ghosting</Filter>
+    </ClInclude>
+    <ClInclude Include="PreyRun\Ghosting\GhostManager.hpp">
+      <Filter>PreyRun\Ghosting</Filter>
+    </ClInclude>
+    <ClInclude Include="PreyRun\Ghosting\GhostRecord.hpp">
+      <Filter>PreyRun\Ghosting</Filter>
+    </ClInclude>
+    <ClInclude Include="PreyRun\Interprocess.hpp">
+      <Filter>PreyRun</Filter>
+    </ClInclude>
+    <ClInclude Include="PreyRun\Utility.hpp">
+      <Filter>PreyRun</Filter>
+    </ClInclude>
     <ClInclude Include="PreyRun\Thread.hpp">
+      <Filter>PreyRun</Filter>
+    </ClInclude>
+    <ClInclude Include="PreyRun\Cvar.hpp">
       <Filter>PreyRun</Filter>
     </ClInclude>
   </ItemGroup>

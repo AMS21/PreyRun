@@ -9,9 +9,11 @@
 ===============================================================================
 */
 
+#include "../../src/PreyRun/PreyRun.hpp"
+
 #define GAME_NAME						"PreyRun"			// appears on window titles and errors
 
-#define	ENGINE_VERSION					"PreyRun-1.0.5.1"		// printed in console
+#define	ENGINE_VERSION					"PreyRun-" PR_VERSION		// printed in console
 
 // paths
 #define	CD_BASEDIR						"Prey"
@@ -131,7 +133,7 @@
 #define _HH_CLIP_FASTSECTORS			1		//rww - much faster method for clip sector checking
 #define NEW_MESH_TRANSFORM				1		//bjk - SSE new vert transform
 #define SIMD_SHADOW						0		//bjk - simd shadow calculations
-#define MULTICORE						0		// Multicore optimizations
+#define MULTICORE						1		// Multicore optimizations
 #define DEBUG_SOUND_LOG					0		// Write out a debug log, remove from final build
 #ifdef _USE_SECUROM_ // mdl: Only enable securom for certain builds
 #define _HH_SECUROM						1		//rww - enables securom api hooks
@@ -217,9 +219,3 @@
 //#define HUMANHEAD_TESTSAVEGAME
 
 // HUMANHEAD END
-
-// PreyRun BEGIN
-#ifdef PR_DEBUG
-#define PR_DEVELOP // Used to mark code which is still being worked on
-#endif // PR_DEBUG
-// PreyRun END

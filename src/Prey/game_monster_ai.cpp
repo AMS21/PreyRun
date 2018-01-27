@@ -1,8 +1,14 @@
-﻿
+
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
 #include "prey_local.h"
+
+// PreyRun BEGIN
+#include "../PreyRun/Cvar.hpp"
+#include "../PreyRun/Interprocess.hpp"
+#include "../PreyRun/Logging.hpp"
+// PreyRun END
 
 //-----------------------------------------------------
 // hhNoClipEnt
@@ -496,7 +502,7 @@ void hhMonsterAI::Killed(idEntity *inflictor, idEntity *attacker,
 
 		// PreyRun BEGIN
 		pr::DebugLog("HP Boss died: %s", GetName());
-		
+
 		if (pr::Timer::running && pr::Cvar::preysplit.GetBool())
 		{
 			// game/salvageboss.map / Sacrifices / Centurion

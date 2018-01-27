@@ -1,7 +1,8 @@
-﻿#pragma once
+#pragma once
 
-#include "StdLib.hpp"
 #include "GameTimer.hpp"
+
+#include <mutex>
 
 // Created by CppPhil (https://github.com/CppPhil)
 
@@ -21,7 +22,7 @@ public:
 	* \brief Creates a Monitor.
 	* \param sharedData the data to be protected by the Monitor.
 	**/
-	explicit Monitor(element_type sharedData)
+	explicit Monitor(element_type sharedData) noexcept
 		: m_sharedData { std::move(sharedData) },
 		m_mutex {}
 	{}
@@ -52,23 +53,21 @@ private:
 struct prTimerMonitor
 {
 public:
-	prTimerMonitor() : m_monitor(pr::prTimer())
-	{
-
-	};
+	prTimerMonitor() noexcept : m_monitor(pr::prTimer())
+	{};
 
 	void Start() { m_monitor(&pr::prTimer::Start); }
 	void Stop() { m_monitor(&pr::prTimer::Stop); }
 	void Clear() { m_monitor(&pr::prTimer::Clear); }
 
-	pr::Timer::storageType Milliseconds() { return m_monitor(&pr::prTimer::Milliseconds); }
-	pr::Timer::storageType Microseconds() { return m_monitor(&pr::prTimer::Microseconds); }
-	pr::Timer::storageType Nanoseconds() { return m_monitor(&pr::prTimer::Nanoseconds); }
+	pr::Timer::storage_type Milliseconds() { return m_monitor(&pr::prTimer::Milliseconds); }
+	pr::Timer::storage_type Microseconds() { return m_monitor(&pr::prTimer::Microseconds); }
+	pr::Timer::storage_type Nanoseconds() { return m_monitor(&pr::prTimer::Nanoseconds); }
 
-	pr::Timer::storageType ClockTicks() { return m_monitor(&pr::prTimer::ClockTicks); }
+	pr::Timer::storage_type ClockTicks() { return m_monitor(&pr::prTimer::ClockTicks); }
 
 	bool IsRunning() { return m_monitor(&pr::prTimer::IsRunning); }
-	void SetCT(int clockTicks)
+	void SetCT(int clockTicks) noexcept
 	{
 		m_monitor([&clockTicks](pr::prTimer &myType) { myType.SetCT(clockTicks); });
 	}

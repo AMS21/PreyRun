@@ -1,18 +1,26 @@
-﻿#include "../idLib/precompiled.h"
+#include "../idLib/precompiled.h"
 #pragma hdrstop
 
 // Credits to Ivan Molodetskikh (Yalter) and Chong Jiang Wei (Matherunner) for their interprocess.cpp from BunnymodXT (https://github.com/YaLTeR/BunnymodXT/blob/master/BunnymodXT/Windows/interprocess.cpp)
 
-#include "PreyRun.hpp"
-#include "interprocess.hpp"
+#include "Interprocess.hpp"
+
+#include "Cvar.hpp"
+#include "GameTimer.hpp"
+#include "Logging.hpp"
 #include "Thread.hpp"
+
+#include "../idLib/Str.h"
+
+#include <atomic>
+#include <thread>
+#include <vector>
 
 namespace pr
 {
 	static HANDLE pipe_preysplit = INVALID_HANDLE_VALUE;
 	static OVERLAPPED overlapped;
 	std::atomic<bool> writing_to_pipe;
-	//static bool writing_to_pipe;
 
 	void InitPreySplitPipe()
 	{
@@ -30,11 +38,11 @@ namespace pr
 			if (pipe_preysplit == INVALID_HANDLE_VALUE)
 			{
 				pr::DebugLog("Error opening the PreySplit pipe: %d", GetLastError());
-				gameLocal.Warning("PreyRun: PreySplit integration is not available.\n");
+				pr::Warning("PreySplit integration is not available!");
 				return;
 			}
 
-			pr::Log("Opened the PreySplit pipe.");
+			pr::Log("Successfully opened the PreySplit pipe.");
 			pr::preysplit_pipeopen = true;
 
 			std::memset(&overlapped, 0, sizeof(overlapped));
@@ -86,7 +94,7 @@ namespace pr
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(16)); // about every frame
 
-			//std::this_thread::sleep_for(std::chrono::milliseconds(pr::Cvar::preysplit_update.GetInteger())); // pr::Cvar::preysplit_update is not thread safe, but woud be better
+			//std::this_thread::sleep_for(std::chrono::milliseconds(pr::Cvar::preysplit_update.GetInteger())); // pr::Cvar::preysplit_update is not thread safe, but would be better
 		}
 	}
 
@@ -110,7 +118,7 @@ namespace pr
 
 		if (!ConnectNamedPipe(pipe_preysplit, &overlapped))
 		{
-			auto err = GetLastError();
+			const auto err = GetLastError();
 			if (err == ERROR_NO_DATA)
 			{
 				// Client has disconnected.
@@ -128,7 +136,7 @@ namespace pr
 			{
 				// Some weird error with pipe?
 				// Try remaking it.
-				pr::DebugLog("ConnectNamedPipe failed with %d.", err);
+				pr::DebugError("ConnectNamedPipe failed with %d.", err);
 
 				ShutdownPreySplitPipe();
 				InitPreySplitPipe();
@@ -138,7 +146,7 @@ namespace pr
 
 		if (!WriteFile(pipe_preysplit, data.data(), data.size(), NULL, &overlapped))
 		{
-			auto err = GetLastError();
+			const auto err = GetLastError();
 			if (err == ERROR_IO_PENDING)
 			{
 				// Started writing.
@@ -146,13 +154,13 @@ namespace pr
 			}
 			else
 			{
-				pr::DebugLog("WriteFile failed with %d.", err);
+				pr::DebugError("WriteFile failed with %d.", err);
 				DisconnectNamedPipe(pipe_preysplit);
 			}
 		}
 	}
 
-	static size_t AddTimeToBuffer(char* buf, const Time& time)
+	static size_t AddTimeToBuffer(char* buf, const Time& time) noexcept
 	{
 		std::memcpy(buf, &time.hours, sizeof(time.hours));
 		std::memcpy(buf + sizeof(time.hours), &time.minutes, sizeof(time.minutes));
@@ -188,7 +196,7 @@ namespace pr
 		{
 			static auto last_time = std::chrono::steady_clock::now() - std::chrono::milliseconds(static_cast<long long>(pr::Cvar::preysplit_update.GetFloat()) + 1);
 
-			auto now = std::chrono::steady_clock::now();
+			const auto now = std::chrono::steady_clock::now();
 
 			if (now >= last_time + std::chrono::milliseconds(static_cast<long long>(pr::Cvar::preysplit_update.GetFloat())))
 			{
@@ -202,7 +210,7 @@ namespace pr
 		}
 	}
 
-	void WriteMapChange(const Time& time, idStr& map)
+	void WriteMapChange(const Time& time, const idStr& map)
 	{
 		// normal map path    : maps/game/roadhouse.map
 		// gets turned into   : roadhouse.map
@@ -213,7 +221,7 @@ namespace pr
 		pr::DebugLog("WriteMapChange: Time %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
 	#endif // PR_DBG_INTERPROCESS
 
-		auto size = static_cast<int32_t>(Map.Size());
+		const auto size = static_cast<int32_t>(Map.Size());
 
 		std::vector<char> buf(15 + size);
 		buf[0] = static_cast<char>(buf.size());
@@ -259,13 +267,13 @@ namespace pr
 
 	void WriteBossKill(const Time& time, const idStr& boss)
 	{
-		auto size = static_cast<int32_t>(boss.Size());
+		const auto size = static_cast<int32_t>(boss.Size());
 
 		std::vector<char> buf(15 + size);
 		buf[0] = static_cast<char>(buf.size());
 		buf[1] = static_cast<char>(MessageType::EVENT);
 		buf[2] = static_cast<char>(EventType::BOSS_KILL);
-		auto time_size = AddTimeToBuffer(buf.data() + 3, time);
+		const auto time_size = AddTimeToBuffer(buf.data() + 3, time);
 
 		std::memcpy(buf.data() + 3 + time_size, &size, sizeof(size));
 		std::memcpy(buf.data() + 3 + time_size + 4, boss.c_str(), size);
@@ -294,8 +302,8 @@ namespace pr
 
 	Time GetTime()
 	{
-		auto times = PR_ms2time(pr::Timer::inGame.Milliseconds());
+		const auto times = ms2time(pr::Timer::inGame.Milliseconds());
 
 		return Time { times.hours, times.minutes, times.seconds, times.milliseconds };
 	}
-}
+} // End of namespace: pr

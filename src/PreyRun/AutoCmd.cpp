@@ -1,21 +1,23 @@
-﻿#include "../idLib/precompiled.h"
+#include "../idLib/precompiled.h"
 #pragma hdrstop
 
-#include "PreyRun.hpp"
 #include "AutoCmd.hpp"
+
+#include "../game/Game_local.h"
 
 namespace pr
 {
 	template <class CharType>
 	auto split(std::basic_string<CharType> const &str,
 			   std::basic_string<CharType> const &delims)
-		/*-> std::vector<std::basic_string<CharType>> */
 	{
 		using StringType = std::basic_string<CharType>;
 		using container_type = std::vector<StringType>;
+
 		container_type result {};
 		result.reserve(7U);
-		auto lambda
+
+		auto const lambda
 		{
 			[&](auto c)
 		{
@@ -50,7 +52,7 @@ namespace pr
 	// Autocmdzone
 	void AutocmdzoneHandler::Autocmdzone::Run()
 	{
-		if (!activated)
+		if (!mActivated)
 		{
 			static std::string const delims { ";" };
 
@@ -60,7 +62,7 @@ namespace pr
 			};
 
 			std::vector<std::vector<std::string>> v {};
-			v.push_back(f(std::string(cmds.c_str())));
+			v.push_back(f(std::string(mCommands.c_str())));
 
 			for (auto const &vec : v)
 			{
@@ -73,7 +75,7 @@ namespace pr
 				}
 			}
 
-			activated = true;
+			mActivated = true;
 		}
 	}
 
@@ -81,40 +83,41 @@ namespace pr
 	{
 		if (gameLocal.GetLocalPlayer())
 		{
-			auto axis { gameLocal.GetLocalPlayer()->viewAngles.ToMat3() };
+			const auto axis { gameLocal.GetLocalPlayer()->viewAngles.ToMat3() };
 
-			idBounds bounds(pos1, pos2);
+			const idBounds bounds(mBeginPoint, mEndPoint);
 			idStr string;
 
-			if (activated) { gameRenderWorld->DebugBounds(colorRed, bounds); }
+			if (mActivated) { gameRenderWorld->DebugBounds(colorRed, bounds); }
 			else { gameRenderWorld->DebugBounds(colorBlue, bounds); }
 
-			sprintf(string, "Autocmdzone:\n%s", cmds.c_str());
+			sprintf(string, "Autocmdzone:\n%s", mCommands.c_str());
 
 			gameRenderWorld->DrawText(string.c_str(), bounds.GetCenter(), 0.1f, colorWhite, axis);
 		}
 	}
 
 	//AutocmdzoneHandler
-	AutocmdzoneHandler& AutocmdzoneHandler::getInstance()
+	AutocmdzoneHandler& AutocmdzoneHandler::getInstance() noexcept
 	{
 		static AutocmdzoneHandler instance;
 
 		return instance;
 	}
 
-	AutocmdzoneHandler::AutocmdzoneHandler() {}
+	AutocmdzoneHandler::AutocmdzoneHandler() noexcept
+	{}
 
 	// Checks if any of the autocommandzones should be triggered and triggers them
-	void AutocmdzoneHandler::CheckForTriggering()
+	void AutocmdzoneHandler::UpdateZones()
 	{
 		if (gameLocal.GetLocalPlayer())
 		{
-			auto playerbounds = gameLocal.GetLocalPlayer()->GetPhysics()->GetAbsBounds();
+			const auto playerbounds = gameLocal.GetLocalPlayer()->GetPhysics()->GetAbsBounds();
 
-			for (auto& e : this->acz)
+			for (auto& e : this->mZones)
 			{
-				idBounds bounds { e.GetPos1(),e.GetPos2() };
+				const idBounds bounds { e.GetBeginPoint(),e.GetEndPoint() };
 
 				// Do we intersect with the Player?
 				if (bounds.IntersectsBounds(playerbounds)) { e.Run(); }
@@ -125,28 +128,39 @@ namespace pr
 
 	void AutocmdzoneHandler::Draw() const
 	{
-		for (auto const &e : acz)
+		for (auto const &e : mZones)
 		{
 			e.Draw();
 		}
 	}
 
-	void AutocmdzoneHandler::Add(const idVec3 &pos1_, const idVec3 &pos2_, const cmdType &cmds_)
+	void AutocmdzoneHandler::Add(const idVec3 &pos1, const idVec3 &pos2, const idStr &cmds)
 	{
 	#ifdef PR_DBG_AUTOCMD
 		pr::FunctionLog(__FUNCTION__, "Adding autocmdzone: %f %f %f %f %f %f %s", pos1_.x, pos1_.y, pos1_.z, pos2_.x, pos2_.y, pos2_.z, cmds_.c_str());
 	#endif // PR_DBG_AUTOCMD
-		this->acz.emplace_back(pos1_, pos2_, cmds_);
+		this->mZones.emplace_back(pos1, pos2, cmds);
 	}
 
-	// !Under the premise that const int ´num´ will always be > 0 and < acz.size()!
-	void AutocmdzoneHandler::Edit(const int &num, const idVec3 &pos1_, const idVec3 &pos2_, const cmdType &cmds_)
+	// !Under the premise that const int ´num´ will always be > 0 and < mZones.size()!
+	void AutocmdzoneHandler::Edit(const int num, const idVec3 &pos1, const idVec3 &pos2, const idStr &cmds)
 	{
 	#ifdef PR_DBG_AUTOCMD
 		pr::FunctionLog(__FUNCTION__, "Editing number: %d", num);
 	#endif // PR_DBG_AUTOCMD
-		acz[num].SetPos1(pos1_);
-		acz[num].SetPos2(pos2_);
-		acz[num].SetCmds(cmds_);
+
+	#ifdef PR_DEBUG
+		assert(num >= 0 && "Faulty parameter passed to num");
+		assert(num < mZones.size() && "Faulty parameter passed to num");
+
+		mZones.at(num).SetBeginPoint(pos1);
+		mZones.at(num).SetEndPoint(pos2);
+		mZones.at(num).SetCommands(cmds);
+	#else
+		// Unchecked access
+		mZones[num].SetBeginPoint(pos1);
+		mZones[num].SetEndPoint(pos2);
+		mZones[num].SetCommands(cmds);
+	#endif // PR_DEBUG
 	}
-}
+} // End of namespace: pr
