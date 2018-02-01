@@ -14,13 +14,14 @@ namespace pr
 
 	Time ms2time(unsigned ms) noexcept;
 
-	PR_FINLINE const char* ms2string(const unsigned ms)
+	PR_FINLINE idStr ms2string(const unsigned ms)
 	{
 		auto const time = ms2time(ms);
 
 		idStr str;
 		sprintf(str, "%02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
-		return idStr(str).c_str();
+
+		return idStr(std::move(str));
 	}
 
 	// The draw functions from Prey takes floats in the range from 0.0 to 1.0 but usually colors are represented from 0 to 255 (hex), this is just a handy function which does the conversion for us

@@ -55,10 +55,7 @@ idSaveGame::idSaveGame( idFile *savefile )
 		pr::Timer::inGame.Stop();
 		pr::Log("Timer: Paused, Game saved");
 
-#ifdef PR_DEBUG
-		auto time = pr::ms2time(pr::Timer::inGame.Milliseconds());
-		pr::DebugLog("Time: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
-#endif // PR_DEBUG
+		pr::DebugLog("Time: %s", pr::ms2string(pr::Timer::inGame.Milliseconds()).c_str());
 	}
 
 	pr::DebugLog("Saved game: %s", savefile->GetName());
@@ -91,10 +88,7 @@ idSaveGame::~idSaveGame()
 		pr::Timer::inGame.Start();
 		pr::Log("Timer, Resuming, Game saved");
 
-#ifdef PR_DEBUG
-		auto time = pr::ms2time(pr::Timer::inGame.Milliseconds());
-		pr::DebugLog("Time: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
-#endif // PR_DEBUG
+		pr::DebugLog("Time: %s", pr::ms2string(pr::Timer::inGame.Milliseconds()).c_str());
 	}
 	// PreyRun END
 }

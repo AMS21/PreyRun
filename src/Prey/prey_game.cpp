@@ -111,10 +111,7 @@ void hhGameLocal::MapShutdown(void) {
 			pr::WriteMapChange(pr::GetTime(), static_cast<idStr>(GetMapName()));
 		}
 
-#ifdef PR_DEBUG
-		auto time = pr::ms2time(pr::Timer::inGame.Milliseconds());
-		pr::DebugLog("Time: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
-#endif // PR_DEBUG
+		pr::DebugLog("Time: %s", pr::ms2string(pr::Timer::inGame.Milliseconds()).c_str());
 	}
 
 	if (gamestate != GAMESTATE_NOMAP)

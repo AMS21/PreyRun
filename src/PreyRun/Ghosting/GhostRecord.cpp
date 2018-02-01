@@ -73,9 +73,7 @@ namespace pr
 	{
 		Log("Stopped recording to: %s", gh_demoFile->GetName());
 
-		const auto time = ms2time(gh_recordTime);
-
-		Log("Recorded %u frames. Time %02d:%02d:%02d.%03d", gh_recordFrameCount, time.hours, time.minutes, time.seconds, time.milliseconds);
+		Log("Recorded %u frames. Time %s", gh_recordFrameCount, ms2string(gh_recordTime).c_str());
 
 		gh_demoFile->WriteUnsignedChar(GhostDemoInfo::DemoEnd);
 

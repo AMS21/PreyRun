@@ -55,11 +55,8 @@ namespace pr
 			pr::WriteGameEnd(pr::GetTime());
 		}
 
-		const auto times = ms2time(pr::Timer::inGame.Milliseconds());
-		const auto rtatime = ms2time(pr::Timer::RTA.Milliseconds());
-
-		pr::Log("Timer: End game, game time: %02d:%02d:%02d.%03d", times.hours, times.minutes, times.seconds, times.milliseconds);
-		pr::Log("Timer: End game, RTA time: %02d:%02d:%02d.%03d", rtatime.hours, rtatime.minutes, rtatime.seconds, rtatime.milliseconds);
+		pr::Log("Timer: End game, game time: %s", ms2string(pr::Timer::inGame.Milliseconds()).c_str());
+		pr::Log("Timer: End game, RTA time: %s", ms2string(pr::Timer::RTA.Milliseconds()).c_str());
 	}
 
 	prTimer::prTimer() noexcept

@@ -1191,12 +1191,9 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 
 		pr::Log("Timer: Resuming, Map loaded");
 
-	#ifdef PR_DEBUG
-		auto time = pr::ms2time(pr::Timer::inGame.Milliseconds());
-		pr::DebugLog("Time: %02d:%02d:%02d.%03d", time.hours, time.minutes, time.seconds, time.milliseconds);
+		pr::DebugLog("Time: %s", pr::ms2string(pr::Timer::inGame.Milliseconds()).c_str());
 
 		pr::DebugLog("Changed map to: %s", gameLocal.GetMapName());
-	#endif // PR_DEBUG
 	}
 	// PreyRun END
 
