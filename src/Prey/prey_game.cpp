@@ -163,10 +163,13 @@ void hhGameLocal::InitFromNewMap(const char *mapName, idRenderWorld *renderWorld
 	// Execute map config file
 	// mapName = maps/game/feedingtowera.map
 	// command = exec MapScript/feedingtowera.cfg
-	idStr pr_str(mapName);
+	if (pr::Cvar::exec_mapconfig.GetBool())
+	{
+		idStr pr_str(mapName);
 
-	sprintf(pr_str, "exec MapScript/%s.cfg\n", pr_str.Mid(10, pr_str.Length() - 14).c_str());
-	cmdSystem->BufferCommandText(CMD_EXEC_APPEND, pr_str);
+		sprintf(pr_str, "exec MapScript/%s.cfg\n", pr_str.Mid(10, pr_str.Length() - 14).c_str());
+		cmdSystem->BufferCommandText(CMD_EXEC_APPEND, pr_str);
+	}
 	// PreyRun END
 
 	//HUMANHEAD rww - throw up the prey logo if using the logitech lcd screen

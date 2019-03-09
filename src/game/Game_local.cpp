@@ -6,12 +6,13 @@
 
 #include "Game_local.h"
 //HUMANHEAD: aob
-#include "../prey/prey_local.h"
 #include "../framework/BuildVersion.h" // HUMANHEAD mdl
+#include "../prey/prey_local.h"
 //HUMANHEAD END
 
 // PreyRun BEGIN
 #include "../PreyRun/Backup.hpp"
+#include "../PreyRun/Cvar.hpp"
 #include "../PreyRun/Hooking.hpp"
 #include "../PreyRun/Interprocess.hpp"
 #include "../PreyRun/Logging.hpp"
@@ -393,13 +394,14 @@ void idGameLocal::Init(void)
 	Printf("--------------------------------------\n");
 
 	// PreyRun BEGIN
+	// PreyRun Anchor mod load
 #ifdef PR_DEBUG
 	// Enable console logging
 	cvarSystem->SetCVarString("logFileName", "Console.log");
 	cvarSystem->SetCVarInteger("logFile", 1);
 #endif // PR_DEBUG
 
-	pr::ConsoleWrite("Running %s", ENGINE_VERSION);
+	pr::ConsoleWrite("Running %s-%s", ENGINE_VERSION, PR_BUILD_CONFIGURATION);
 
 	pr::DebugConsoleWrite("Running extra PreyRun debug functionality!");
 	pr::DebugConsoleWrite("Compiled on %s", PR_CMPL_DATETIME);
@@ -1826,8 +1828,11 @@ bool idGameLocal::InitFromSaveGame(const char *mapName, idRenderWorld *renderWor
 	// Map script execution
 	idStr pr_str(mapName);
 
-	sprintf(pr_str, "exec MapScript/%s.cfg\n", pr_str.Mid(10, pr_str.Length() - 14).c_str());
-	cmdSystem->BufferCommandText(CMD_EXEC_APPEND, pr_str);
+	if (pr::Cvar::exec_mapconfig.GetBool())
+	{
+		sprintf(pr_str, "exec MapScript/%s.cfg\n", pr_str.Mid(10, pr_str.Length() - 14).c_str());
+		cmdSystem->BufferCommandText(CMD_EXEC_APPEND, pr_str);
+	}
 	// PreyRun END
 
 	return true;

@@ -62,6 +62,9 @@ namespace pr
 
 		idCVar oneclickload("PR_OneClickLoad", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "If set to 1 you only need to press your load quick save button once not twice");
 
+		idCVar exec_runconfig("PR_ExecRunConfig", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Load run specific config file. RTArun.cfg when pr_timer_methode = 0 and ILrun.cfg when pr_timer_methode = 1");
+		idCVar exec_mapconfig("PR_ExecMapConfig", "1", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Load map specific config file located at MapScript/MapName.cfg. Example files are included in PreyRun.");
+
 		// Ghosting
 		idCVar gh_autorecord("PR_GH_AutoRecord", "0", CVAR_GAME | CVAR_BOOL | CVAR_ARCHIVE, "Whether to automatically record a ghost demo when the autostart of the timer is triggered (in other words on run start)");
 		idCVar gh_name("PR_GH_Name", "Player", CVAR_GAME | CVAR_ARCHIVE, "The name which will be displayed for your recorded ghosts");

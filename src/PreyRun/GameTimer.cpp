@@ -31,13 +31,16 @@ namespace pr
 			pr::WriteTimerStart(pr::GetTime());
 		}
 
-		if (static_cast<pr::TimerMethode>(pr::Cvar::timer_methode.GetInteger()) == pr::TimerMethode::RealTimeAttack)
+		if (pr::Cvar::exec_runconfig.GetBool())
 		{
-			cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec RTARun.cfg\n");
-		}
-		else if (static_cast<pr::TimerMethode>(pr::Cvar::timer_methode.GetInteger()) == pr::TimerMethode::IndividualLevel)
-		{
-			cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec ILRun.cfg\n");
+			if (static_cast<pr::TimerMethode>(pr::Cvar::timer_methode.GetInteger()) == pr::TimerMethode::RealTimeAttack)
+			{
+				cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec RTARun.cfg\n");
+			}
+			else if (static_cast<pr::TimerMethode>(pr::Cvar::timer_methode.GetInteger()) == pr::TimerMethode::IndividualLevel)
+			{
+				cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec ILRun.cfg\n");
+			}
 		}
 
 		pr::Log("Timer: Auto starting");

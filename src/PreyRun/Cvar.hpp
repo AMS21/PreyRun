@@ -1,8 +1,8 @@
 #pragma once
 
 // PreyRun BEGIN
-#include "Monitor.hpp"
 #include "GameTimer.hpp"
+#include "Monitor.hpp"
 
 #include <atomic>
 
@@ -57,6 +57,9 @@ namespace pr
 		extern idCVar timer_backup_interval;
 
 		extern idCVar oneclickload;
+
+		extern idCVar exec_runconfig;
+		extern idCVar exec_mapconfig;
 
 		// Ghosting
 		extern idCVar gh_autorecord;
