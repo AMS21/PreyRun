@@ -1167,6 +1167,7 @@ hhPlayer::DrawHUD
 void hhPlayer::DrawHUD(idUserInterface *_hud)
 {
 	// PreyRun BEGIN
+	// PreyRun Anchor HUD
 	if (pr::Cvar::freeze.GetBool() && pr::Timer::inGame.IsRunning())
 	{
 		pr::Timer::inGame.Stop();
