@@ -9,6 +9,7 @@
 // PreyRun BEGIN
 #include "../../PreyRun/Cvar.hpp"
 #include "../../PreyRun/Ghosting/GhostRecord.hpp"
+#include "../../PreyRun/Utility.hpp"
 // PreyRun END
 
 CLASS_DECLARATION(idPhysics_Actor, idPhysics_Player)
@@ -1703,7 +1704,7 @@ void idPhysics_Player::Restore(idRestoreGame *savefile) {
 idPhysics_Player::SetPlayerInput
 ================
 */
-void idPhysics_Player::SetPlayerInput(const usercmd_t &cmd, const idAngles &newViewAngles) 
+void idPhysics_Player::SetPlayerInput(const usercmd_t &cmd, const idAngles &newViewAngles)
 {
 	command = cmd;
 	viewAngles = newViewAngles;		// can't use cmd.angles cause of the delta_angles
@@ -1755,8 +1756,7 @@ void idPhysics_Player::SetMovementType(const pmtype_t type) {
 	// PreyRun BEGIN
 	// Autostart the game if autosplit is turned on we haven't started yet, were on the correct map and the users movement type was set to freeze (cutscene) and is now set to normal
 
-	// Casting GetMapName() to idStr might not be the optimal solution but you cant compare cstrings (you can but its a real pain in the ass)
-	if (static_cast<idStr>(gameLocal.GetMapName()) == idStr("maps/game/roadhouse.map") && type == PM_NORMAL && current.movementType == PM_FREEZE)
+	if (pr::string_equals(gameLocal.GetMapName(), "maps/game/roadhouse.map") && type == PM_NORMAL && current.movementType == PM_FREEZE)
 	{
 		if (!pr::Timer::running && pr::Cvar::timer_autostart.GetBool())
 		{

@@ -33,4 +33,20 @@ namespace pr
 	idStr formatTimeString(const Time& time, const bool allDigits, const uint8_t& msPrecision);
 
 	idVec4 AddAlphaValue(const idVec3& original, const float alpha);
+
+	constexpr bool string_equals(const char* str1, const char* str2)
+	{
+		while (*str1 != '\0')
+		{
+			if (*str1 != *str2)
+			{
+				return false;
+			}
+
+			++str1;
+			++str2;
+		}
+
+		return *str1 == *str2;
+	}
 } // End of namespace: pr
