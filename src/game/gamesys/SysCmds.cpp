@@ -392,6 +392,7 @@ void Cmd_PR_gh_record_f(const idCmdArgs &args)
 	if (pr::gh_isRecording)
 	{
 		pr::ConsoleWrite("Already recording!");
+		return;
 	}
 
 	idStr path { "Ghosts/" };
