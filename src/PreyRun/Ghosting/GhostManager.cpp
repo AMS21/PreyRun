@@ -10,6 +10,8 @@
 
 namespace pr
 {
+	GhostManager::GhostManager() noexcept : mRunning(false), mFrameTime(0) {}
+
 	void GhostManager::LoadGhostFile(const idStr& filePath)
 	{
 		if (mRunning)

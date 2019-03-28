@@ -9,7 +9,7 @@ namespace pr
 	class GhostManager
 	{
 	public:
-		GhostManager() noexcept : mRunning(false), mFrameTime(0) {}
+		GhostManager() noexcept;
 
 		void LoadGhostFile(const idStr& filePath);
 
