@@ -2290,7 +2290,7 @@ void hhPlayer::DrawHUD(idUserInterface *_hud)
 	{
 		idStr strGhostRecord;
 
-		sprintf(strGhostRecord, "Record:%s, %u, %llu", pr::gh_isRecording ? "True" : "False", pr::gh_recordFrameCount, pr::gh_recordTime);
+		sprintf(strGhostRecord, "Record:%s, fc:%u, ft:%llu", pr::gh_isRecording ? "True" : "False", pr::gh_recordFrameCount, pr::gh_recordTime);
 		renderSystem->DrawSmallStringExt(0, 0, strGhostRecord, PR_color_white, false, declManager->FindMaterial("textures/bigchars"));
 
 		std::vector<idStr> text = pr::ghostManager.Debug();

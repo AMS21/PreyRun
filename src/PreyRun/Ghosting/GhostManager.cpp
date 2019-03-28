@@ -103,7 +103,7 @@ namespace pr
 		std::vector<idStr> ret;
 
 		idStr header;
-		sprintf(header, "Ghosts:%s, %d, %llu", mRunning ? "True" : "False", mGhosts.size(), mFrameTime);
+		sprintf(header, "Ghosts:%s, %d, ft:%llu", mRunning ? "True" : "False", mGhosts.size(), mFrameTime);
 
 		ret.push_back(header);
 
