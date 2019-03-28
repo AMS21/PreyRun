@@ -7,8 +7,8 @@ class idStr;
 namespace pr
 {
 	extern bool gh_isRecording;
-	extern uint16_t gh_recordFrameCount;
-	extern uint64_t gh_recordTime;
+	extern std::uint16_t gh_recordFrameCount;
+	extern std::uint64_t gh_recordTime;
 
 	idStr GetAutoRecordFileName();
 

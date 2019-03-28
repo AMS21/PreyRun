@@ -16,8 +16,8 @@
 namespace pr
 {
 	bool gh_isRecording = false;
-	uint16_t gh_recordFrameCount = 0;
-	uint64_t gh_recordTime = 0;
+	std::uint16_t gh_recordFrameCount = 0;
+	std::uint64_t gh_recordTime = 0;
 
 	idFile* gh_demoFile;
 	idStr currentMap;
