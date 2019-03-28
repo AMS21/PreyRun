@@ -13,7 +13,7 @@ namespace pr
 	extern std::atomic<bool> preysplit_pipeopen;
 	extern bool preysplit_mapchanged;
 
-	extern idStr reload_latestsave;
+	extern std::string reload_latestsave;
 	extern bool reload_ready;
 
 	extern bool oneClickLoad;

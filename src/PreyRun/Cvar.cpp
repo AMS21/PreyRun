@@ -10,7 +10,7 @@ namespace pr
 	std::atomic<bool> preysplit_pipeopen { false };
 	bool preysplit_mapchanged { false };
 
-	idStr reload_latestsave {};
+	std::string reload_latestsave {};
 	bool reload_ready { false };
 
 	bool oneClickLoad { false };

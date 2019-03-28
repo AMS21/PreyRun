@@ -41,7 +41,7 @@ void Cmd_PR_reload_f(const idCmdArgs &args)
 {
 	if (pr::reload_ready)
 	{
-		cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("loadgame %s\n", pr::reload_latestsave.Mid(10, pr::reload_latestsave.Length()).c_str()));
+		cmdSystem->BufferCommandText(CMD_EXEC_NOW, va("loadgame %s\n", pr::reload_latestsave.substr(10).c_str()));
 
 		pr::ConsoleWrite("Loading save %s", pr::reload_latestsave.c_str());
 	}
