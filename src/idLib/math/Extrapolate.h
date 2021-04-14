@@ -22,8 +22,12 @@ typedef enum {
 	EXTRAPOLATION_NOSTOP		= 0x40	// do not stop at startTime + duration
 } extrapolation_t;
 
+class idTypeInfoTools;
+
 template< class type >
 class idExtrapolate {
+	friend idTypeInfoTools;
+
 public:
 						idExtrapolate();
 

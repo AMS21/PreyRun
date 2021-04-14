@@ -10,15 +10,14 @@
 *.rtf#
 *.ruleset
 *.tlog
+*.vcproj
+*.filters
+*.user
+*.sln
 
-build/
+[bB]uild*/
 examples/
 src/.vs/
-src/CMakeFiles/
 src/ipch/
 
-PreyRun.cppcheck
 ReadMe.rtf
-src/CMakeCache.txt
-src/CMakeLists.txt
-src/CodeMaid.config
