@@ -1,0 +1,72 @@
+name: CreateRelease
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  build:
+    runs-on: windows-2019
+
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: "2"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+
+      - name: Install cmake
+        uses: lukka/get-cmake@v3.20.1
+
+      - name: Setup msvc dev
+        uses: ilammy/msvc-dev-cmd@v1.7.0
+
+      - name: Configure build directory
+        run: |
+          mkdir build
+          cd build
+          cmake -DCMAKE_VERBOSE_MAKEFILE=ON -A Win32 ..
+
+      - name: Build Release
+        run: |
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake --build . --config "Release" --clean-first
+
+      - name: Create packages
+        run: |
+          # Create binary.conf
+          echo 0 >> binary.conf
+
+          # Create description.txt
+          echo "PreyRun $GITHUB_REF ($GITHUB_SHA)" >> description.txt
+
+          # Create game00.pk4
+          7z a game00.pk4 build/Release/gamex86.dll binary.conf
+
+          # Create PreyRun.zip
+          7z a PreyRun.zip game00.pk4 description.txt LICENSE README.md
+
+          # Create Configs.zip
+          7z a Configs.zip Configs/*
+
+      - name: Upload PreyRun.zip Artifact
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./PreyRun.zip
+          asset_name: PreyRun.zip
+          asset_content_type: application/zip
+
+      - name: Upload Configs.zip Artifact
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./Configs.zip
+          asset_name: Configs.zip
+          asset_content_type: application/zip
