@@ -1,10 +1,6 @@
 // Copyright (C) 2004 Id Software, Inc.
 //
 
-// This is real evil but allows the code to inspect arbitrary class variables.
-#define private		public
-#define protected	public
-
 #include "../../idlib/precompiled.h"
 #pragma hdrstop
 

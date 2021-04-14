@@ -12,8 +12,12 @@
 ==============================================================================================
 */
 
+class idTypeInfoTools;
+
 template< class type >
 class idInterpolate {
+	friend idTypeInfoTools;
+
 public:
 						idInterpolate();
 
@@ -103,6 +107,8 @@ ID_INLINE type idInterpolate<type>::GetCurrentValue( float time ) const {
 
 template< class type >
 class idInterpolateAccelDecelLinear  {
+	friend idTypeInfoTools;
+	
 public:
 						idInterpolateAccelDecelLinear();
 
@@ -252,6 +258,8 @@ ID_INLINE type idInterpolateAccelDecelLinear<type>::GetCurrentSpeed( float time 
 
 template< class type >
 class idInterpolateAccelDecelSine  {
+	friend idTypeInfoTools;
+
 public:
 						idInterpolateAccelDecelSine();
 
