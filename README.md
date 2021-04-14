@@ -1,4 +1,4 @@
-# PreyRun 1.6.0
+# PreyRun 1.7.0
 PreyRun is a speedrunning focused mod the video game Prey (2006) created by Human Head Studio.
 The mod can interact with [LiveSplit](https://livesplit.github.io/) using the [PreySplit](https://github.com/AMS21/LiveSplit.PreySplit) addon.
 
