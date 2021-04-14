@@ -8,7 +8,6 @@ jobs:
 
     env:
       CMAKE_BUILD_PARALLEL_LEVEL: "2"
-      CMAKE_GENERATOR: 'Ninja'
 
     strategy:
       fail-fast: false
@@ -21,14 +20,6 @@ jobs:
 
       - name: Install cmake
         uses: lukka/get-cmake@v3.19.2
-
-      - name: Install
-        shell: powershell
-        run: |
-          # Install scoop
-          Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-
-          scoop install ninja --global
 
       - name: Setup msvc dev
         uses: ilammy/msvc-dev-cmd@v1.7.0
