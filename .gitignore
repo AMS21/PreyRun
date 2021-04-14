@@ -16,8 +16,4 @@
 *.sln
 
 [bB]uild*/
-examples/
-src/.vs/
-src/ipch/
 
-ReadMe.rtf
