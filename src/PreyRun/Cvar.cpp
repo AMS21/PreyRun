@@ -39,7 +39,7 @@ namespace pr
 	namespace Cvar
 	{
 		// Information
-	#define PR_VERSION_DISPLAY_STRING ENGINE_VERSION "/" PR_BUILD_CONFIGURATION
+	#define PR_VERSION_DISPLAY_STRING ENGINE_VERSION "/" PR_BUILD_CONFIGURATION "-" PR_GIT_SHA_SHORT
 		idCVar version("PR_Version", PR_VERSION_DISPLAY_STRING, CVAR_GAME | CVAR_ROM, "PreyRun Version");
 	#ifdef PR_DEBUG
 		idCVar dbg_ghostingver("PR_dbg_GhostingVersion", PR_STR(PR_GHOSTING_DEMO_VERSION), CVAR_GAME | CVAR_ROM, "");

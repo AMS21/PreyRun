@@ -16,4 +16,4 @@
 *.sln
 
 [bB]uild*/
-
+.vscode/

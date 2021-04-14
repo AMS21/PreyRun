@@ -1,5 +1,7 @@
 #pragma once
 
+#include "BuildInfo.hpp"
+
 #define PR_STR_HELPER(x) #x
 #define PR_STR(x) PR_STR_HELPER(x)
 
@@ -16,10 +18,6 @@
 #endif // __linux__
 
 // PreyRun Version
-#define PR_VERSION_MAJOR 1
-#define PR_VERSION_MINOR 7
-#define PR_VERSION_PATCH 0
-
 #define PR_VERSION PR_STR(PR_VERSION_MAJOR) "." PR_STR(PR_VERSION_MINOR) "." PR_STR(PR_VERSION_PATCH)
 
 // Compile date and time
@@ -37,6 +35,11 @@ namespace pr
 	constexpr unsigned VersionMajor { PR_VERSION_MAJOR };
 	constexpr unsigned VersionMinor { PR_VERSION_MINOR };
 	constexpr unsigned VersionPatch { PR_VERSION_PATCH };
+
+	constexpr char GitShaFull[] { PR_GIT_SHA_FULL };
+	constexpr char GitShaShort[] { PR_GIT_SHA_SHORT };
+
+	constexpr char GitBranch[] { PR_GIT_BRANCH };
 
 	constexpr unsigned GhostingDemoVersion { PR_GHOSTING_DEMO_VERSION };
 
