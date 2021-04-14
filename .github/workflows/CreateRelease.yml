@@ -37,7 +37,7 @@ jobs:
       - name: Create packages
         run: |
           # Create directory
-          mkdir Packages -p
+          mkdir Packages
 
           # Create binary.conf
           echo 0 >> Packages/binary.conf
