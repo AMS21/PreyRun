@@ -47,8 +47,11 @@ jobs:
           # Create description.txt
           echo "PreyRun $version ($sha)" >> description.txt
 
+          # Move gamex86.dll
+          mv build/src/Release/gamex86.dll .
+
           # Create game00.pk4
-          7z a "game00.pk4" "build/src/Release/gamex86.dll" "binary.conf"
+          7z a "game00.pk4" "gamex86.dll" "binary.conf"
 
           # Create PreyRun.zip
           7z a "PreyRun.zip" "game00.pk4" "description.txt" "LICENSE" "README.md"
