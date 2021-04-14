@@ -6,17 +6,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake)
 
 project("PreyRun" CXX)
 
-set(CMAKE_CONFIGURATION_TYPES
-    # Standard CMake
-    Debug
-    MinSizeRel
-    Release
-    RelWithDebInfo
-    # Special PreyRun
-    #DebugPreyRun
-    #DebugWithInlines
-    #DebugWithInlineAndMemoryLog
-    CACHE INTERNAL "" FORCE)
+include(Configuration)
 
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_14)
@@ -163,6 +153,54 @@ elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   # processor architecture
   target_compile_options(project_options INTERFACE -m32)
   target_link_options(project_options INTERFACE -m32)
+endif()
+
+# Setup configurations
+set(CMAKE_CONFIGURATION_TYPES
+    # Standard CMake
+    Debug
+    MinSizeRel
+    Release
+    RelWithDebInfo
+    # Special Prey
+    DebugWithInlines
+    DebugWithInlinesAndMemoryLog
+    DedicatedDebugWithInlines
+    DedicatedRelease
+    # Special PreyRun
+    DebugPreyRun
+    CACHE INTERNAL "" FORCE)
+
+set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
+  "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel DebugWithInlines DebugWithInlinesAndMemoryLog DedicatedDebugWithInlines DedicatedRelease DebugPreyRun."
+  FORCE)
+
+pr_init_configuration(DebugWithInlines Debug)
+pr_init_configuration(DebugWithInlinesAndMemoryLog Debug)
+pr_init_configuration(DedicatedDebugWithInlines Debug)
+pr_init_configuration(DedicatedRelease Release)
+pr_init_configuration(DebugPreyRun RelWithDebInfo)
+
+# DebugWithInlines Flags
+if (MSVC)
+  set(CMAKE_CXX_FLAGS_DebugWithInlines "${CMAKE_CXX_FLAGS_DebugWithInlines} /Ob1 /D \"_INLINEDEBUG\"")
+endif()
+
+# DebugWithInlinesAndMemoryLog Flags
+if (MSVC)
+  set(CMAKE_CXX_FLAGS_DebugWithInlinesAndMemoryLog "${CMAKE_CXX_FLAGS_DebugWithInlinesAndMemoryLog} /Ob1 /D \"_INLINEDEBUG\" /D \"ID_REDIRECT_NEWDELETE\" /D \"ID_DEBUG_MEMORY\" /D \"ID_DEBUG_UNINITIALIZED_MEMORY\"")
+endif()
+
+# DedicatedDebugWithInlines Flags
+if (MSVC)
+  set(CMAKE_CXX_FLAGS_DedicatedDebugWithInlines "${CMAKE_CXX_FLAGS_DedicatedDebugWithInlines} /Ob1 /D \"_INLINEDEBUG\"")
+endif()
+
+# DedicatedRelease Flags
+
+# DebugPreyRun Flags
+if (MSVC)
+  set(CMAKE_CXX_FLAGS_DebugPreyRun "${CMAKE_CXX_FLAGS_DebugPreyRun} /D \"PR_DEBUG\"")
 endif()
 
 add_subdirectory(src)
