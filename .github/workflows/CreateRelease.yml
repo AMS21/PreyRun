@@ -40,7 +40,7 @@ jobs:
           echo 0 >> binary.conf
 
           # Get version info from github
-          version=$(echo ${{ github.ref }} | tail -c10)
+          version=$(echo ${{ github.ref }} | cut -c11-)
           sha=$(echo ${{ github.sha }} | head -c7)
 
           # Create description.txt
