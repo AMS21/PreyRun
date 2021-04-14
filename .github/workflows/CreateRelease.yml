@@ -36,23 +36,20 @@ jobs:
 
       - name: Create packages
         run: |
-          # Create directory
-          mkdir Packages
-
           # Create binary.conf
-          echo 0 >> Packages/binary.conf
+          echo 0 >> binary.conf
 
           # Create description.txt
-          echo "PreyRun ${{ github.ref }} (${{ github.sha }})" >> Packages/description.txt
+          echo "PreyRun $(${{ github.ref }}//refs\/tags\//) ($(echo ${{ github.sha }} | head -c7))" >> description.txt
 
           # Create game00.pk4
-          7z a "Packages/game00.pk4" "build/Release/gamex86.dll" "Packages/binary.conf"
+          7z a "game00.pk4" "build/Release/gamex86.dll" "binary.conf"
 
           # Create PreyRun.zip
-          7z a "Packages/PreyRun.zip" "Packages/game00.pk4" "Packages/description.txt" "LICENSE" "README.md"
+          7z a "PreyRun.zip" "game00.pk4" "description.txt" "LICENSE" "README.md"
 
           # Create Configs.zip
-          7z a "Packages/Configs.zip" "Configs/*"
+          7z a "Configs.zip" "Configs/*"
 
       - name: Upload PreyRun.zip Artifact
         uses: actions/upload-release-asset@v1.0.2
@@ -60,7 +57,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./Packages/PreyRun.zip
+          asset_path: ./PreyRun.zip
           asset_name: PreyRun.zip
           asset_content_type: application/zip
 
@@ -70,6 +67,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./Packages/Configs.zip
+          asset_path: ./Configs.zip
           asset_name: Configs.zip
           asset_content_type: application/zip
