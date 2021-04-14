@@ -9,7 +9,7 @@ project("PreyRun" CXX)
 include(Configuration)
 
 add_library(project_options INTERFACE)
-target_compile_features(project_options INTERFACE cxx_std_14)
+target_compile_features(project_options INTERFACE cxx_std_17)
 
 if(MSVC)
   # Warning flags
