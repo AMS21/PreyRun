@@ -35,12 +35,13 @@ jobs:
           cmake --build . --config "Release" --clean-first
 
       - name: Create packages
+        shell: bash
         run: |
           # Create binary.conf
           echo 0 >> binary.conf
 
           # Get version info from github
-          version=$(echo ${{ github.ref }} | cut -c11-)
+          version=$(echo ${{ github.ref }} | tail -c10)
           sha=$(echo ${{ github.sha }} | head -c7)
 
           # Create description.txt
