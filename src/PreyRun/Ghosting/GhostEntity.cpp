@@ -8,6 +8,7 @@
 #include "../Utility.hpp"
 
 #include "../../game/Game_local.h"
+#include <stdexcept>
 
 namespace pr
 {
