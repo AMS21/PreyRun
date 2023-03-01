@@ -22,7 +22,7 @@ jobs:
         uses: lukka/get-cmake@v3.25.2
 
       - name: Setup msvc dev
-        uses: ilammy/msvc-dev-cmd@v1.12.0
+        uses: ilammy/msvc-dev-cmd@v1.12.1
 
       - name: Configure build directory
         run: |
