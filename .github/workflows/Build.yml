@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install cmake
-        uses: lukka/get-cmake@v3.28.1
+        uses: lukka/get-cmake@v3.28.2
 
       - name: Setup msvc dev
         uses: ilammy/msvc-dev-cmd@v1.13.0
