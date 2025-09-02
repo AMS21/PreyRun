@@ -6,13 +6,10 @@ jobs:
   Build:
     runs-on: ${{ matrix.os }}
 
-    env:
-      CMAKE_BUILD_PARALLEL_LEVEL: "2"
-
     strategy:
       fail-fast: false
       matrix:
-        os: ["windows-2019", "windows-2016"]
+        os: ["windows-2022", "windows-2025"]
 
     steps:
       - name: Checkout
